@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello, IOIO User!</string>
+    <string name="app_name">Hello IOIO</string>
+    <string name="led2">Button led 2</string>
+    <string name="led4">Button led 4</string>
+    <string name="storage_state">External storage state:</string>
+    
+    <string name="row_value">Row value: </string>
+    <string name="voltage">Voltage: </string>
+    <string name="brac">Breath Alcohol Concentration(mg/l): </string>
+    
+    
+</resources>
