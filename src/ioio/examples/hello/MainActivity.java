@@ -14,7 +14,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
-
 import android.os.Bundle;
 import android.os.Environment;
 import android.widget.TextView;
@@ -41,10 +40,13 @@ public class MainActivity extends AbstractIOIOActivity {
 	DecimalFormat nf;
 	
 	TextView row_value;
-
+	TextView voltage;
 	TextView storage_state;
-
+	TextView brac;
+	
 	private float value;
+	private float volts;
+	private double brac_value;
 
 	String filename;
 	File textfile;
@@ -66,13 +68,13 @@ public class MainActivity extends AbstractIOIOActivity {
 		setContentView(R.layout.main);
 		//button_ = (ToggleButton) findViewById(R.id.button);
 		button_led_2 = (ToggleButton) findViewById(R.id.button_led2);
-		button_led_4 = (ToggleButton) findViewById(R.id.button_led4);
+		button_led_4 = (ToggleButton) findViewById(R.id.button_led4);	//used to control alcohol sensor
 	
 		num = 100.0;
 		nf = new DecimalFormat("0.0000");
 		row_value = (TextView)findViewById(R.id.row_value);
-	
-	
+		voltage = (TextView)findViewById(R.id.voltage);
+		brac = (TextView)findViewById(R.id.brac);
 	
 		storage_state = (TextView)findViewById(R.id.storage_state);
 		
@@ -93,6 +95,53 @@ public class MainActivity extends AbstractIOIOActivity {
 	}
 	
 	
+	/*
+	@Override
+	protected void onStop(){
+		try {
+			sensor_value.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.onStop();
+		Toast.makeText(this, "onStop", Toast.LENGTH_LONG).show();
+	}
+	
+	*/
+	
+	/*
+	@Override  
+    public boolean onKeyDown(int keyCode, KeyEvent event)  
+  {  
+         //replaces the default 'Back' button action  
+         if(keyCode==KeyEvent.KEYCODE_BACK)  
+         {  
+        	 try {
+				sensor_value.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+               finish();
+            
+
+         }  
+         return true;  
+   }  
+	*/
+	
+	/*
+	@Override
+	public void onResume () {
+		
+		
+		
+		super.onResume();
+		
+		
+	}
+	*/
 	/**
 	 * This is the thread on which all the IOIO activity happens. It will be run
 	 * every time the application is resumed and aborted when it is paused. The
@@ -107,11 +156,16 @@ public class MainActivity extends AbstractIOIOActivity {
 		/** The on-board LED. */
 		//private DigitalOutput led_;
 		private DigitalOutput led_2;
-		private DigitalOutput led_4;
+		private DigitalOutput led_4;	// high/low pin for alcohol sensor
 
 		
-		private AnalogInput in_40;
+		private AnalogInput in_40;	//receive the sensor data
 		
+		
+
+		
+		
+	      
 		
 		
 		/**
@@ -127,8 +181,10 @@ public class MainActivity extends AbstractIOIOActivity {
 		protected void setup() throws ConnectionLostException {
 			//led_ = ioio_.openDigitalOutput(0, true);
 			led_2 = ioio_.openDigitalOutput(2, true);
-			led_4 = ioio_.openDigitalOutput(4, true);
+			led_4 = ioio_.openDigitalOutput(4, true);	
 		
+			//led_4.write(true);
+			
 			//in_3 = ioio_.openDigitalInput(3);
 			in_40 = ioio_.openAnalogInput(40);
 			
@@ -172,8 +228,6 @@ public class MainActivity extends AbstractIOIOActivity {
 			}
 			
 			
-			
-			
 		
 		}
 
@@ -198,18 +252,48 @@ public class MainActivity extends AbstractIOIOActivity {
 
 			
 			
+			
 			try {
-				value = in_40.read();
 				
+				
+				
+				value = in_40.read();
+				volts = in_40.getVoltage();
 				calendar = Calendar.getInstance(); 
 				
-				if(!button_led_2.isChecked())
+				brac_value = Math.exp((double)(volts - 0.5706)/1.6263);
+				brac_value = brac_value * 0.002;
+				
+				
+				if(!button_led_4.isChecked())	//turn on the alcohol sensor (default)
+				{
+					led_4.write(true);
+					
+					runOnUiThread(new Runnable() { 
+				        public void run() 
+				        {			
+				        	row_value.setText("Row value: " + nf.format(value)+", button isChecked " + button_led_2.isChecked());
+		  
+				        	voltage.setText("Voltage: " + nf.format(volts));
+				        	brac.setText("Breath Alcohol Concentration(mg/l): " + nf.format(brac_value));
+				        	
+				        } 
+				    });
+					
+				}
+				else	//turn off
+				{
+					led_4.write(false);
+				}
+				
+				
+				if(!button_led_2.isChecked())	
 				{
 					sensor_value.write(calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
 							+ "_"+ calendar.get(Calendar.SECOND) + "_"+ calendar.get(Calendar.MILLISECOND) + "\t");
 					
-					sensor_value.write(String.valueOf(value) + "\t");
-					
+					sensor_value.write(String.valueOf(volts) + "\t");
+					sensor_value.write(String.valueOf(brac_value));
 					sensor_value.write("\r\n");
 				}
 				else
@@ -218,16 +302,7 @@ public class MainActivity extends AbstractIOIOActivity {
 					
 				}
 				
-				runOnUiThread(new Runnable() { 
-			        public void run() 
-			        {			
-			        	row_value.setText("Row value: " + nf.format(value)+", button isChecked " + button_led_2.isChecked());
-	  
-			        	
-			      
-			        	
-			        } 
-			    });
+				
 				
 				
 			} catch (InterruptedException e1) {
