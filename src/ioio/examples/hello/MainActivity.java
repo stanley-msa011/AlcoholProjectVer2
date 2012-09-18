@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.sql.Date;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
@@ -38,6 +39,7 @@ public class MainActivity extends AbstractIOIOActivity {
 	private double num; 
 	
 	DecimalFormat nf;
+	DecimalFormat stamp;
 	
 	TextView row_value;
 	TextView voltage;
@@ -71,7 +73,8 @@ public class MainActivity extends AbstractIOIOActivity {
 		button_led_4 = (ToggleButton) findViewById(R.id.button_led4);	//used to control alcohol sensor
 	
 		num = 100.0;
-		nf = new DecimalFormat("0.0000");
+		nf = new DecimalFormat("0.000000");
+		stamp = new DecimalFormat("0");
 		row_value = (TextView)findViewById(R.id.row_value);
 		voltage = (TextView)findViewById(R.id.voltage);
 		brac = (TextView)findViewById(R.id.brac);
@@ -81,7 +84,7 @@ public class MainActivity extends AbstractIOIOActivity {
 		//先取得sdcard目錄
 		path = Environment.getExternalStorageDirectory().getPath();
 		//利用File來設定目錄的名稱(alcohol_value)
-		File dir = new File(path + "/alcohol_value");
+		File dir = new File(path + "/drunk_detection");
 		//先檢查該目錄是否存在
 		if (!dir.exists()){
 		    //若不存在則建立它
@@ -89,8 +92,7 @@ public class MainActivity extends AbstractIOIOActivity {
 		}
 		
 		
-		
-
+	
 		
 	}
 	
@@ -161,11 +163,7 @@ public class MainActivity extends AbstractIOIOActivity {
 		
 		private AnalogInput in_40;	//receive the sensor data
 		
-		
 
-		
-		
-	      
 		
 		
 		/**
@@ -207,12 +205,14 @@ public class MainActivity extends AbstractIOIOActivity {
 		    });
 			
 			
-			calendar = Calendar.getInstance(); 
-			filename = calendar.get(Calendar.YEAR) +"_" +calendar.get(Calendar.MONTH)+ "_" + calendar.get(Calendar.DATE) 
-						+ "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
-						+ "_"+ calendar.get(Calendar.SECOND) + ".txt";
+			//calendar = Calendar.getInstance(); 
+			//filename = calendar.get(Calendar.YEAR) +"_" +calendar.get(Calendar.MONTH)+ "_" + calendar.get(Calendar.DATE) 
+			//			+ "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
+			//			+ "_"+ calendar.get(Calendar.SECOND) + ".txt";
 			
-			textfile = new File(path + "/alcohol_value/" + filename);
+			long unixTime = (int) (System.currentTimeMillis() / 1000L);
+			filename = stamp.format(unixTime);
+			textfile = new File(path + "/drunk_detection/" + filename + ".txt");
 						
 			try {
 				stream = new FileOutputStream(textfile);
@@ -256,6 +256,15 @@ public class MainActivity extends AbstractIOIOActivity {
 			try {
 				
 				
+				if(!button_led_4.isChecked())	//turn on the alcohol sensor (default)
+				{
+					led_4.write(true);
+								
+				}
+				else	//turn off
+				{
+					led_4.write(false);
+				}
 				
 				value = in_40.read();
 				volts = in_40.getVoltage();
@@ -264,15 +273,27 @@ public class MainActivity extends AbstractIOIOActivity {
 				brac_value = Math.exp((double)(volts - 0.5706)/1.6263);
 				brac_value = brac_value * 0.002;
 				
-				
-				if(!button_led_4.isChecked())	//turn on the alcohol sensor (default)
+					
+					
+				if(!button_led_2.isChecked())		//default
 				{
-					led_4.write(true);
+					
+
+
+					long unixTime = (int) (System.currentTimeMillis() / 1000L);
+					
+					//sensor_value.write(calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
+					//		+ "_"+ calendar.get(Calendar.SECOND) + "_"+ calendar.get(Calendar.MILLISECOND) + "\t");
+					sensor_value.write(stamp.format(unixTime) + "t");
+					sensor_value.write(String.valueOf(value) + "\t");
+					sensor_value.write(String.valueOf(brac_value));
+					sensor_value.write("\r\n");
+					
 					
 					runOnUiThread(new Runnable() { 
 				        public void run() 
 				        {			
-				        	row_value.setText("Row value: " + nf.format(value)+", button isChecked " + button_led_2.isChecked());
+				        	row_value.setText("Row value: " + nf.format(value)+", button2 isChecked " + button_led_2.isChecked());
 		  
 				        	voltage.setText("Voltage: " + nf.format(volts));
 				        	brac.setText("Breath Alcohol Concentration(mg/l): " + nf.format(brac_value));
@@ -281,24 +302,19 @@ public class MainActivity extends AbstractIOIOActivity {
 				    });
 					
 				}
-				else	//turn off
+				else	//close and save the file
 				{
-					led_4.write(false);
-				}
-				
-				
-				if(!button_led_2.isChecked())	
-				{
-					sensor_value.write(calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
-							+ "_"+ calendar.get(Calendar.SECOND) + "_"+ calendar.get(Calendar.MILLISECOND) + "\t");
 					
-					sensor_value.write(String.valueOf(volts) + "\t");
-					sensor_value.write(String.valueOf(brac_value));
-					sensor_value.write("\r\n");
-				}
-				else
-				{
 					sensor_value.close();
+					
+					runOnUiThread(new Runnable() { 
+						public void run() 
+				        {			
+				        	row_value.setText("file saved");
+		  
+				        	
+				        } 
+				    });
 					
 				}
 				
@@ -314,15 +330,11 @@ public class MainActivity extends AbstractIOIOActivity {
 			}
 			
 			
-			try {
-				
-				led_2.write(true);
-				sleep(1000);
-				led_2.write(false);
-				sleep(1000);
-				
-			} catch (InterruptedException e) {
-			}
+			led_2.write(true);	//for testing the IOIO is working
+			
+			//		sleep(1000);
+			//		led_2.write(false);
+			//		sleep(1000);
 		}
 	}
 
