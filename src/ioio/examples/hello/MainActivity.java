@@ -54,6 +54,8 @@ public class MainActivity extends AbstractIOIOActivity {
 	File textfile;
 	FileOutputStream stream;
 	String path;
+	String path2;
+	String path_current;
 	OutputStreamWriter sensor_value;
 	
 	Calendar calendar;
@@ -84,13 +86,25 @@ public class MainActivity extends AbstractIOIOActivity {
 		//先取得sdcard目錄
 		path = Environment.getExternalStorageDirectory().getPath();
 		//利用File來設定目錄的名稱(alcohol_value)
-		File dir = new File(path + "/drunk_detection");
+		path2 = path + "/drunk_detection";
+		File dir = new File(path2);
 		//先檢查該目錄是否存在
 		if (!dir.exists()){
 		    //若不存在則建立它
 		    dir.mkdir();
 		}
 		
+		long unixTime = (int) (System.currentTimeMillis() / 1000L);
+		filename = stamp.format(unixTime);
+		
+		//---create the sub-direction 
+		path_current = path2 +  "/" + filename + "/";
+		File dir2 = new File(path_current);
+		//先檢查該目錄是否存在
+		if (!dir2.exists()){
+		    //若不存在則建立它
+		    dir2.mkdir();
+		}
 		
 	
 		
@@ -177,16 +191,13 @@ public class MainActivity extends AbstractIOIOActivity {
 		 */
 		@Override
 		protected void setup() throws ConnectionLostException {
-			//led_ = ioio_.openDigitalOutput(0, true);
+			
 			led_2 = ioio_.openDigitalOutput(2, true);
-			led_4 = ioio_.openDigitalOutput(4, true);	
-		
-			//led_4.write(true);
+			led_4 = ioio_.openDigitalOutput(4, DigitalOutput.Spec.Mode.OPEN_DRAIN, true) ;	
 			
-			//in_3 = ioio_.openDigitalInput(3);
+			
 			in_40 = ioio_.openAnalogInput(40);
-			
-			
+	
 			runOnUiThread(new Runnable() { 
 		        public void run() 
 		        {			
@@ -209,10 +220,15 @@ public class MainActivity extends AbstractIOIOActivity {
 			//filename = calendar.get(Calendar.YEAR) +"_" +calendar.get(Calendar.MONTH)+ "_" + calendar.get(Calendar.DATE) 
 			//			+ "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
 			//			+ "_"+ calendar.get(Calendar.SECOND) + ".txt";
+		
+			
+			
+			
 			
 			long unixTime = (int) (System.currentTimeMillis() / 1000L);
+		
 			filename = stamp.format(unixTime);
-			textfile = new File(path + "/drunk_detection/" + filename + ".txt");
+			textfile = new File(path_current + filename + ".txt");
 						
 			try {
 				stream = new FileOutputStream(textfile);
@@ -256,40 +272,45 @@ public class MainActivity extends AbstractIOIOActivity {
 			try {
 				
 				
-				if(!button_led_4.isChecked())	//turn on the alcohol sensor (default)
+			
+			  if(!button_led_4.isChecked())	//turn on the alcohol sensor (default)
 				{
+				  
 					led_4.write(true);
+					
+					value = in_40.read();
+					volts = in_40.getVoltage();
+					calendar = Calendar.getInstance(); 
+					
+					brac_value = Math.exp((double)(volts - 0.5706)/1.6263);
+					brac_value = brac_value * 0.002;
 								
 				}
 				else	//turn off
 				{
+					
 					led_4.write(false);
 				}
+			
 				
-				value = in_40.read();
-				volts = in_40.getVoltage();
-				calendar = Calendar.getInstance(); 
-				
-				brac_value = Math.exp((double)(volts - 0.5706)/1.6263);
-				brac_value = brac_value * 0.002;
 				
 					
 					
-				if(!button_led_2.isChecked())		//default
+				if(!button_led_2.isChecked())		//--file is opened to write (default)
 				{
-					
-
-
+	
 					long unixTime = (int) (System.currentTimeMillis() / 1000L);
 					
 					//sensor_value.write(calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
 					//		+ "_"+ calendar.get(Calendar.SECOND) + "_"+ calendar.get(Calendar.MILLISECOND) + "\t");
-					sensor_value.write(stamp.format(unixTime) + "t");
+					sensor_value.write(stamp.format(unixTime) + "\t");
+					
 					sensor_value.write(String.valueOf(value) + "\t");
 					sensor_value.write(String.valueOf(brac_value));
 					sensor_value.write("\r\n");
 					
 					
+					//--show the sensor info on the screen
 					runOnUiThread(new Runnable() { 
 				        public void run() 
 				        {			
@@ -302,7 +323,7 @@ public class MainActivity extends AbstractIOIOActivity {
 				    });
 					
 				}
-				else	//close and save the file
+				else	//--close and save the file
 				{
 					
 					sensor_value.close();
