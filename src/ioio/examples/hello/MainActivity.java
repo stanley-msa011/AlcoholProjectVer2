@@ -44,6 +44,8 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	public static final int MEDIA_TYPE_VIDEO = 2;
 	
+	public static final int PHOTO_COUNT = 3;
+	
 	//private ToggleButton button_;
 
 //	private ToggleButton button_led_2;
@@ -235,9 +237,11 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
         TimerTask timerTask = new TimerTask(){  
         @Override  
 	        public void run() {
-        		Log.d(TAG, "Animation is stopping");
+        		Log.d(TAG, "Countdown animation is stopping");
         		isSensing = true;
-        		Log.d(TAG, "isSensing state: " + isSensing);
+        		for (int i = 0; i < 5; i++) {
+            		mCamera.takePicture(null, null, mPicture);
+            	}
         	}
 	    };  
         timer.schedule(timerTask, totalDuration);
@@ -323,7 +327,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	    //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 	    File mediaFile;
 	    if (type == MEDIA_TYPE_IMAGE){
-	    	if (pictureCount > 5)
+	    	if (pictureCount > PHOTO_COUNT)
 	    		pictureCount = 1;
 	        mediaFile = new File(sessionDir.getPath() + File.separator + "IMG_"+ dirTimeStamp + "_" + pictureCount + ".jpg");
 	        //Log.d(TAG, "File name: " + mediaFile.getPath());
