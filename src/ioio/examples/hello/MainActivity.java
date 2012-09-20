@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
@@ -473,6 +474,10 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 				        		isSensing = false;
 				        		try {
 				        			sensor_value.close();
+				        			Intent i_ShowBrac = new Intent();
+				        			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
+				        			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
+				        			startActivity(i_ShowBrac);
 				        		} catch (IOException e) {
 				    				// TODO Auto-generated catch block
 				    				e.printStackTrace();
@@ -498,7 +503,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 					//		+ "_"+ calendar.get(Calendar.SECOND) + "_"+ calendar.get(Calendar.MILLISECOND) + "\t");
 					sensor_value.write(dataTimeStamp + "\t");
 					
-					sensor_value.write(String.valueOf(value) + "\t");
+					//sensor_value.write(String.valueOf(value) + "\t");
 					sensor_value.write(String.valueOf(brac_value));
 					sensor_value.write("\r\n");
 					

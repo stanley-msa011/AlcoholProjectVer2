@@ -10,5 +10,8 @@
     <string name="voltage">Voltage: </string>
     <string name="brac">Breath Alcohol Concentration(mg/l): </string>
     
+    <string name="your_barc_value">你的酒測值是</string>
+    <string name="unknown_value">還不知道！</string>
+    <string name="desc_imageview1">用來thumbs up or down</string>
     
 </resources>
