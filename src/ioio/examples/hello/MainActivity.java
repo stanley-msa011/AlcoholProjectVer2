@@ -173,6 +173,8 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	      FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 	      preview.addView(mPreview);
 	      
+	      mCamera.setDisplayOrientation(90);
+	      
 	      mPicture = new PictureCallback() {
 		      	@Override
 		      	public void onPictureTaken(byte[] data, Camera camera) {
@@ -240,8 +242,13 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	        public void run() {
         		Log.d(TAG, "Countdown animation is stopping");
         		isSensing = true;
-        		for (int i = 0; i < 5; i++) {
-            		mCamera.takePicture(null, null, mPicture);
+        		for (int i = 0; i < PHOTO_COUNT; i++) {
+        			try {
+        				mCamera.takePicture(null, null, mPicture);
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						Log.d(TAG, "Camera could not take picture: " + e.getMessage());
+					}
             	}
         	}
 	    };  
@@ -253,7 +260,13 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     public static Camera getCameraInstance(){
         Camera cam = null;
         try {
-            cam = Camera.open(); // attempt to get a Camera instance
+        	// Check if the device has a front-facing camera
+        	if (Camera.getNumberOfCameras() > 1) {
+        		cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        	} else {
+        		// There is only one back-facing camera
+        		cam = Camera.open(); // attempt to get a Camera instance
+        	}
         }
         catch (Exception e){
             // Camera is not available (in use or does not exist)
@@ -493,7 +506,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 					volts = in_40.getVoltage();
 					calendar = Calendar.getInstance(); 
 					
-					brac_value = Math.exp((double)(volts - 0.5706)/1.6263);
+					brac_value = ((-0.904) + Math.sqrt(0.904*0.904 - 4 * (-0.0447)*(-0.5262-volts)))/(2*(-0.0447)); 
 					brac_value = brac_value * 0.002;
 				
 					long unixTime = (int) (System.currentTimeMillis() / 1000L);

@@ -13,16 +13,30 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
-        <activity android:label="@string/app_name" android:name="OpenActivity">
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:debuggable="true" >
+        
+        <activity
+            android:label="@string/app_name"
+            android:name="OpenActivity"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".ShowBracActivity"></activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".ShowBracActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        
         <service android:name=".TimerService"></service>
 
     </application>
