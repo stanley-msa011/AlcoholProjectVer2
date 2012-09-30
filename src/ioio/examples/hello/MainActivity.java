@@ -242,14 +242,19 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	        public void run() {
         		Log.d(TAG, "Countdown animation is stopping");
         		isSensing = true;
-        		for (int i = 0; i < PHOTO_COUNT; i++) {
-        			try {
-        				mCamera.takePicture(null, null, mPicture);
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						Log.d(TAG, "Camera could not take picture: " + e.getMessage());
-					}
-            	}
+        		new Thread (new Runnable() {
+        			@Override
+        			public void run() {
+        				for (int i = 0; i < PHOTO_COUNT; i++) {
+                			try {
+                				mCamera.takePicture(null, null, mPicture);
+        						Thread.sleep(500);
+        					} catch (InterruptedException e) {
+        						Log.d(TAG, "Camera could not take picture: " + e.getMessage());
+        					}
+                    	}
+        			}
+        		}).start();
         	}
 	    };  
         timer.schedule(timerTask, totalDuration);
@@ -487,10 +492,17 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 				        		isSensing = false;
 				        		try {
 				        			sensor_value.close();
-				        			Intent i_ShowBrac = new Intent();
-				        			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
-				        			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
-				        			startActivity(i_ShowBrac);
+				        			
+				        			runOnUiThread(new Runnable() { 
+								        public void run() 
+								        {			
+								        	Intent i_ShowBrac = new Intent();
+						        			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
+						        			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
+						        			startActivity(i_ShowBrac);
+								        } 
+								    });
+				        			
 				        		} catch (IOException e) {
 				    				// TODO Auto-generated catch block
 				    				e.printStackTrace();
