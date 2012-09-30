@@ -22,14 +22,15 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 /**
  * This is the main activity of the HelloIOIO example application.
@@ -47,15 +48,21 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	
 	public static final int PHOTO_COUNT = 3;
 	
+	private static final int MAX_PROGRESS = 6;
+	
 	//private ToggleButton button_;
 
 //	private ToggleButton button_led_2;
 //	private ToggleButton button_led_4;
 	
 	public ImageView imgCountdown;
-	public ImageView imgSensing;
+//	public ImageView imgSensing;
 	public AnimationDrawable countdownAnimation;
-	public AnimationDrawable sensingAnimation;
+//	public AnimationDrawable sensingAnimation;
+	
+	private ProgressBar progSensing;
+	private Handler mHandler;
+	private int progressStatus = 0;
 	
 	private Camera mCamera;
 	//private Camera.Parameters mCamParameters;
@@ -78,6 +85,10 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	TextView voltage;
 	TextView storage_state;
 	TextView brac;
+	
+	TextView tvProgress;
+	TextView tvSignal;
+	
 	
 	private float value;
 	private float volts;
@@ -111,9 +122,11 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 		
 		// Set count down animation
         imgCountdown.setBackgroundResource(R.drawable.countdown);
-        imgSensing.setBackgroundResource(R.drawable.sensing);
+//        imgSensing.setBackgroundResource(R.drawable.sensing);
     	countdownAnimation = (AnimationDrawable) imgCountdown.getBackground();
-    	sensingAnimation = (AnimationDrawable) imgSensing.getBackground();
+//    	sensingAnimation = (AnimationDrawable) imgSensing.getBackground();
+    	mHandler = new Handler();
+    	progSensing.setMax(MAX_PROGRESS);
 	
 		num = 100.0;
 		nf = new DecimalFormat("0.000000");
@@ -162,40 +175,40 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	    }
 	    
 	    mCamera = getCameraInstance();
-      
-	      // Create our Preview view and set it as the content of our activity.
-	      mPreview = new SurfaceView(this);
-	      SurfaceHolder mPreviewHolder = mPreview.getHolder();
-	      mPreviewHolder.addCallback(this);
-	      mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-	      
-	      //mPreview = new CameraPreview(this, mCamera);
-	      FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-	      preview.addView(mPreview);
-	      
-	      mCamera.setDisplayOrientation(90);
-	      
-	      mPicture = new PictureCallback() {
-		      	@Override
-		      	public void onPictureTaken(byte[] data, Camera camera) {
-		      		File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-		              if (pictureFile == null){
-		                  Log.d(TAG, "Error creating media file, check storage permissions");
-		                  return;
-		              }
-		
-		              try {
-		                  FileOutputStream fos = new FileOutputStream(pictureFile);
-		                  fos.write(data);
-		                  fos.close();
-		              } catch (FileNotFoundException e) {
-		                  Log.d(TAG, "File not found: " + e.getMessage());
-		              } catch (IOException e) {
-		                  Log.d(TAG, "Error accessing file: " + e.getMessage());
-		              }
-		      		
-		      	}
-		   };
+
+	    // Create our Preview view and set it as the content of our activity.
+	    mPreview = new SurfaceView(this);
+	    SurfaceHolder mPreviewHolder = mPreview.getHolder();
+	    mPreviewHolder.addCallback(this);
+	    mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+	    //mPreview = new CameraPreview(this, mCamera);
+	    FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+	    preview.addView(mPreview);
+
+	    mCamera.setDisplayOrientation(90);
+
+	    mPicture = new PictureCallback() {
+	    	@Override
+	    	public void onPictureTaken(byte[] data, Camera camera) {
+	    		File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+	    		if (pictureFile == null){
+	    			Log.d(TAG, "Error creating media file, check storage permissions");
+	    			return;
+	    		}
+
+	    		try {
+	    			FileOutputStream fos = new FileOutputStream(pictureFile);
+	    			fos.write(data);
+	    			fos.close();
+	    		} catch (FileNotFoundException e) {
+	    			Log.d(TAG, "File not found: " + e.getMessage());
+	    		} catch (IOException e) {
+	    			Log.d(TAG, "Error accessing file: " + e.getMessage());
+	    		}
+
+	    	}
+	    };
 	}
 	
 	@Override
@@ -221,45 +234,103 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 //		button_led_2 = (ToggleButton) findViewById(R.id.button_led2);
 //		button_led_4 = (ToggleButton) findViewById(R.id.button_led4);	//used to control alcohol sensor
     	imgCountdown = (ImageView) findViewById(R.id.imgCountdown);
-    	imgSensing = (ImageView) findViewById(R.id.imgSensing);
+//    	imgSensing = (ImageView) findViewById(R.id.imgSensing);
+    	tvProgress = (TextView) findViewById(R.id.tvProgress);
+    	tvSignal = (TextView) findViewById(R.id.tvSignal);
+    	progSensing = (ProgressBar) findViewById(R.id.progSensing);
     }
 	
 	@Override
     public void onWindowFocusChanged(boolean hasFocus) {
     	super.onWindowFocusChanged(hasFocus);
     	// When the UI is focused start running the countdown animation
-    	countdownAnimation.start();
-    	
-    	long totalDuration = 0;  
-        
-    	for(int i = 0; i< countdownAnimation.getNumberOfFrames();i++){  
-    		totalDuration += countdownAnimation.getDuration(i);  
-        }
-        
-        Timer timer = new Timer();
-        TimerTask timerTask = new TimerTask(){  
-        @Override  
-	        public void run() {
-        		Log.d(TAG, "Countdown animation is stopping");
-        		isSensing = true;
-        		new Thread (new Runnable() {
-        			@Override
-        			public void run() {
-        				for (int i = 0; i < PHOTO_COUNT; i++) {
-                			try {
-                				mCamera.takePicture(null, null, mPicture);
-        						Thread.sleep(500);
-        					} catch (InterruptedException e) {
-        						Log.d(TAG, "Camera could not take picture: " + e.getMessage());
-        					}
-                    	}
-        			}
-        		}).start();
-        	}
-	    };  
-        timer.schedule(timerTask, totalDuration);
+    	if (hasFocus) {
+	    	countdownAnimation.start();
+	    	
+	    	long totalDuration = 0;
+	        
+	    	for(int i = 0; i< countdownAnimation.getNumberOfFrames();i++){  
+	    		totalDuration += countdownAnimation.getDuration(i);  
+	        }
+	        
+	        Timer timer = new Timer();
+	        TimerTask timerTask = new TimerTask(){  
+	        @Override  
+		        public void run() {
+	        		Log.d(TAG, "Countdown animation is stopping");
+	        		isSensing = true;
+	        		doSenseProgress();
+	        		new Thread (new Runnable() {
+	        			@Override
+	        			public void run() {
+	        				for (int i = 0; i < PHOTO_COUNT; i++) {
+	                			try {
+	                				mCamera.takePicture(null, null, mPicture);
+	        						Thread.sleep(1000);
+	        					} catch (InterruptedException e) {
+	        						Log.d(TAG, "Camera could not take picture: " + e.getMessage());
+	        					}
+	                    	}
+	        			}
+	        		}).start();
+	        	}
+		    };  
+	        timer.schedule(timerTask, totalDuration);
+    	}
         
     }
+	
+	public void doSenseProgress() {
+		new Thread (new Runnable() {
+			@Override
+			public void run() {
+				while (progressStatus < MAX_PROGRESS) {
+					runOnUiThread(new Runnable() { 
+				        public void run() 
+				        {			
+				        	tvProgress.setText("Amount of data: " + progressStatus + " (in progress thread)");
+				        	tvSignal.setText("Keep blowing!");
+				        } 
+				    });
+					mHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							progSensing.setProgress(progressStatus);
+							if (progressStatus == progSensing.getMax()) {
+								runOnUiThread(new Runnable() { 
+							        public void run() 
+							        {
+							        	tvSignal.setText("STOP!");
+							        } 
+							    });
+							}
+						}
+					});
+					countDown();
+				}
+				isSensing = false;
+				Intent i_ShowBrac = new Intent();
+    			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
+    			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
+    			startActivity(i_ShowBrac);
+				
+			}
+		}).start();
+	}
+	
+	private void countDown() {
+		try {
+			progressStatus++;
+			Thread.sleep(1000);
+		} catch (InterruptedException ie) {
+			Log.d(TAG, "Error in countDown(): " + ie.getMessage());
+		}
+	}
+	
+	/*
+	 * Start camera-related methods.
+	 * Starts and releases the camera instances.
+	 */
 	
 	/** A safe way to get an instance of the Camera object. */
     public static Camera getCameraInstance(){
@@ -360,6 +431,10 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 
 	    return mediaFile;
 	}
+	
+	/*
+	 * End camera-related methods
+	 */
 	
 	/**
 	 * This is the thread on which all the IOIO activity happens. It will be run
@@ -475,42 +550,42 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 			try {
 				if(isSensing) {	//turn on the alcohol sensor (default)
 					
-					if (!sensingAnimation.isRunning()) {
-						sensingAnimation.start();
-						
-						long totalDuration = 0;  
-				        
-				    	for(int i = 0; i< sensingAnimation.getNumberOfFrames();i++){  
-				    		totalDuration += sensingAnimation.getDuration(i);  
-				        }
-				        
-				        Timer timer = new Timer();
-				        TimerTask timerTask = new TimerTask(){  
-				        @Override  
-					        public void run() {
-				        		Log.d(TAG, "Sensing animation is stopping");
-				        		isSensing = false;
-				        		try {
-				        			sensor_value.close();
-				        			
-				        			runOnUiThread(new Runnable() { 
-								        public void run() 
-								        {			
-								        	Intent i_ShowBrac = new Intent();
-						        			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
-						        			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
-						        			startActivity(i_ShowBrac);
-								        } 
-								    });
-				        			
-				        		} catch (IOException e) {
-				    				// TODO Auto-generated catch block
-				    				e.printStackTrace();
-				        		}
-				        	}
-					    };  
-				        timer.schedule(timerTask, totalDuration);
-					}
+//					if (!sensingAnimation.isRunning()) {
+//						sensingAnimation.start();
+//						
+//						long totalDuration = 0;  
+//				        
+//				    	for(int i = 0; i< sensingAnimation.getNumberOfFrames();i++){  
+//				    		totalDuration += sensingAnimation.getDuration(i);  
+//				        }
+//				        
+//				        Timer timer = new Timer();
+//				        TimerTask timerTask = new TimerTask(){  
+//				        @Override  
+//					        public void run() {
+//				        		Log.d(TAG, "Sensing animation is stopping");
+//				        		isSensing = false;
+//				        		try {
+//				        			sensor_value.close();
+//				        			
+//				        			runOnUiThread(new Runnable() { 
+//								        public void run() 
+//								        {			
+//								        	Intent i_ShowBrac = new Intent();
+//						        			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
+//						        			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
+//						        			startActivity(i_ShowBrac);
+//								        } 
+//								    });
+//				        			
+//				        		} catch (IOException e) {
+//				    				// TODO Auto-generated catch block
+//				    				e.printStackTrace();
+//				        		}
+//				        	}
+//					    };  
+//				        timer.schedule(timerTask, totalDuration);
+//					}
 				  
 					led_4.write(true);
 					

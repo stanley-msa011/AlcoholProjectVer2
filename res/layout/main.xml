@@ -44,11 +44,37 @@
 	    android:id="@+id/brac"
 	    android:layout_below="@id/voltage" />
 	
+	<TextView
+	    android:id="@+id/tvProgress"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="Amount of data:"
+	    android:layout_below="@id/brac" />
+	
+	<!--
 	<ImageView
         android:id="@+id/imgSensing"
         android:layout_width="wrap_content"
      	android:layout_height="wrap_content"
      	android:scaleType="center"
-     	android:layout_alignParentBottom="true" />
+     	android:layout_alignParentBottom="true" /> -->
+     
+	<ProgressBar
+    	android:id="@+id/progSensing"
+    	android:layout_width="fill_parent"
+     	android:layout_height="wrap_content"
+     	android:paddingRight="20dp"
+     	android:paddingLeft="20dp"
+	    android:paddingBottom="10dp"
+	    android:layout_alignParentBottom="true"
+	    style="@android:style/Widget.ProgressBar.Horizontal" />
+ 
+ 	<TextView
+ 	    android:id="@+id/tvSignal"
+ 	    android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:layout_above="@id/progSensing"
+		android:textSize="20dp"
+		android:gravity="center_horizontal" />"
 
 </RelativeLayout>

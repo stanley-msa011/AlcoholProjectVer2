@@ -30,8 +30,8 @@
         
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait" >
-            <!-- android:noHistory="true" > -->
+            android:screenOrientation="portrait"
+            android:noHistory="true" >
         </activity>
         <activity
             android:name=".ShowBracActivity"
