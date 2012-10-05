@@ -30,5 +30,15 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="37dp"
         android:text="@string/unknown_value" />
+    
+    <TextView
+        android:id="@+id/tvConnectStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/barc_value"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="@string/connectStatus" />
+        
 
 </RelativeLayout>

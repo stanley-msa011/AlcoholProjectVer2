@@ -14,4 +14,6 @@
     <string name="unknown_value">還不知道！</string>
     <string name="desc_imageview1">用來thumbs up or down</string>
     
+    <string name="connectStatus">Sending file&#8230;</string>
+    
 </resources>

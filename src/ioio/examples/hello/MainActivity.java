@@ -96,6 +96,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	
 	private boolean isSensing = false;
 	private boolean isWriting = false;
+	private boolean doneSensing = false;
 
 	//String filename;
 	File textfile;
@@ -309,6 +310,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 					countDown();
 				}
 				isSensing = false;
+				doneSensing = true;
 				Intent i_ShowBrac = new Intent();
     			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
     			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
@@ -620,6 +622,14 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 				        } 
 				    });
 					
+				} else if (doneSensing) {
+					try {
+	        			sensor_value.close();
+	        			
+	        		} catch (IOException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	        		}
 				} else {
 					//turn off
 					led_4.write(false);
