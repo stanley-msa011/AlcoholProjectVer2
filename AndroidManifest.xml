@@ -37,6 +37,10 @@
             android:name=".ShowBracActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".BracListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
         
         <service android:name=".TimerService"></service>
 

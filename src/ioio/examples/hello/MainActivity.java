@@ -473,7 +473,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 		protected void setup() throws ConnectionLostException {
 			
 			led_2 = ioio_.openDigitalOutput(2, true);
-			led_4 = ioio_.openDigitalOutput(4, DigitalOutput.Spec.Mode.OPEN_DRAIN, true) ;	
+			led_4 = ioio_.openDigitalOutput(4, true) ;	
 			
 			
 			in_40 = ioio_.openAnalogInput(40);
@@ -595,9 +595,17 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 					volts = in_40.getVoltage();
 					calendar = Calendar.getInstance(); 
 					
-					brac_value = ((-0.904) + Math.sqrt(0.904*0.904 - 4 * (-0.0447)*(-0.5262-volts)))/(2*(-0.0447)); 
-					brac_value = brac_value * 0.002;
-				
+					if (volts < 3.1) {
+					
+						brac_value = ((-0.015) + Math.sqrt(0.015*0.015 - 4* (-0.00002)*(0.3326-volts)))/(2*(-0.00002));
+						brac_value = brac_value/500;
+						
+						if (brac_value < 0)
+							brac_value = 0;
+					} else {
+						brac_value = 0.7;
+					}
+					
 					long unixTime = (int) (System.currentTimeMillis() / 1000L);
 					dataTimeStamp = stamp.format(unixTime);
 					
@@ -621,10 +629,10 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 				        	
 				        } 
 				    });
-					
 				} else if (doneSensing) {
 					try {
 	        			sensor_value.close();
+	        			led_4.write(false);
 	        			
 	        		} catch (IOException e) {
 	    				// TODO Auto-generated catch block

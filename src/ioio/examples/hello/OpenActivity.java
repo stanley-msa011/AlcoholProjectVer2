@@ -11,6 +11,7 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 	private static final String TAG = "OpenActivity";
 	
 	private Button btnInit;
+	private Button btnBracHistory;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,10 +30,12 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 	
 	private void findViews() {
 		btnInit = (Button) findViewById(R.id.btnInit);
+		btnBracHistory = (Button) findViewById(R.id.btnBracHistory);
 	}
 	
 	private void setListeners() {
 		btnInit.setOnClickListener(this);
+		btnBracHistory.setOnClickListener(this);
 	}
 	
 	@Override
@@ -42,6 +45,11 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 			Intent i_Init = new Intent();
 			i_Init.setClass(this, MainActivity.class);
 			startActivity(i_Init);
+			break;
+		case R.id.btnBracHistory:
+			Intent i_Hist = new Intent();
+			i_Hist.setClass(this, BracListActivity.class);
+			startActivity(i_Hist);
 			break;
 		default:
 			break;

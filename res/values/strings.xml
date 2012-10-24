@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="listBrac">History</string>
+    <string name="history_heading">你的酒測記錄</string>
+    <string name="no_history">No history. You have not done any tests yet.</string>
+    <string name="empty_row">Row is empty</string>
+    
     <string name="hello">Hello, IOIO User!</string>
     <string name="app_name">Hello IOIO</string>
     <string name="led2">Button led 2</string>

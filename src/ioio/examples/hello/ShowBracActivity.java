@@ -3,7 +3,10 @@ package ioio.examples.hello;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -43,6 +46,10 @@ public class ShowBracActivity extends Activity {
 	public TextView bracValueTextView;
     public ImageView thumbsImageView;
     public TextView tvConnectStatus;
+    
+    private double average;
+    private Long mRowId;
+    private BracDbAdapter mBracDbAdapter;
 	
     /** Called when the activity is first created. */
     @Override
@@ -62,6 +69,8 @@ public class ShowBracActivity extends Activity {
         fileSDCard = null;
         
         fileSent = false;
+        mBracDbAdapter = new BracDbAdapter(this);
+        mBracDbAdapter.open();
         
         //先make sure SDcard is ready
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_REMOVED))
@@ -109,7 +118,7 @@ public class ShowBracActivity extends Activity {
 			}
 			
 			//計算並且顯示 平均值
-			double average = 0;
+			average = 0;
 			for(int i = 0; i < valueArray.size(); ++i){
 				
 				average += Double.parseDouble(valueArray.get(i));
@@ -123,7 +132,6 @@ public class ShowBracActivity extends Activity {
 				thumbsImageView.setImageResource(R.drawable.thumbs_up);
 			}
 			else thumbsImageView.setImageResource(R.drawable.thumbs_down);
-			
 			
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
@@ -227,5 +235,25 @@ public class ShowBracActivity extends Activity {
     			tvConnectStatus.setText("IOException: " + ioe.getMessage());
     		}
     	}
+    	
+    	Date time = new Date(Long.parseLong(timeStamp)*1000L);
+    	String dateStamp = new SimpleDateFormat("MM/dd/yyyy\nkk:mm").format(time);
+    	Log.d(TAG, "Saving this date: " + dateStamp);
+    	
+    	DecimalFormat df = new DecimalFormat("0.000");
+    	String strAvg = df.format(average);
+    	
+    	if (mRowId == null) {
+            long id = mBracDbAdapter.createEntry(dateStamp, strAvg);
+            if (id > 0) {
+                mRowId = id;
+            }
+        } else {
+        	mBracDbAdapter.updateEntry(mRowId, dateStamp, strAvg);
+        }
+    	
+    	mBracDbAdapter.close();
     }
+    
+    
 }
