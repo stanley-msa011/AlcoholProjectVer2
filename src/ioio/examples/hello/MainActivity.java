@@ -16,14 +16,23 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -61,7 +70,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 //	public AnimationDrawable sensingAnimation;
 	
 	private ProgressBar progSensing;
-	private Handler mHandler;
+	private Handler mHandler, mLocHandler;
 	private int progressStatus = 0;
 	
 	private Camera mCamera;
@@ -98,17 +107,22 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	private boolean isWriting = false;
 	private boolean doneSensing = false;
 
-	//String filename;
 	File textfile;
 	FileOutputStream stream;
-//	String path;
-//	String path2;
-//	String path_current;
 	OutputStreamWriter sensor_value;
 	
 	Calendar calendar;
 	
-	
+	private LocationManager mLocationManager;
+	private TextView tvLatLng;
+	private boolean mUseFine;
+	private boolean mUseBoth;
+
+    private static final int UPDATE_LATLNG = 2;
+    
+	private static final int TEN_SECONDS = 1000 * 10;
+    private static final int TEN_METERS = 10;
+    private static final int TWO_MINUTES = 1000 * 60 * 2;
 	
 	/**
 	 * Called when the activity is first created. Here we normally initialize
@@ -127,6 +141,18 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     	countdownAnimation = (AnimationDrawable) imgCountdown.getBackground();
 //    	sensingAnimation = (AnimationDrawable) imgSensing.getBackground();
     	mHandler = new Handler();
+    	mLocHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+//                    case UPDATE_ADDRESS:
+//                        mAddress.setText((String) msg.obj);
+//                        break;
+                    case UPDATE_LATLNG:
+                        tvLatLng.setText((String) msg.obj);
+                        break;
+                }
+            }
+        };
     	progSensing.setMax(MAX_PROGRESS);
 	
 		num = 100.0;
@@ -210,6 +236,31 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 
 	    	}
 	    };
+	    
+	    // Location Detection start
+	    mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+	    mUseFine = true;
+	}
+	
+	@Override
+	public void onStart() {
+		super.onStart();
+		
+		// Check if the GPS setting is currently enabled on the device.
+        // This verification should be done during onStart() because the system calls this method
+        // when the user returns to the activity, which ensures the desired location provider is
+        // enabled each time the activity resumes from the stopped state.
+//        LocationManager locationManager =
+//                (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        final boolean gpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        if (!gpsEnabled) {
+            // Build an alert dialog here that requests that the user enable
+            // the location services, then when the user clicks the "OK" button,
+            // call enableLocationSettings()
+        	EnableGpsDialogFragment gpsDialog = new EnableGpsDialogFragment();
+            gpsDialog.show(gpsDialog.getFragmentManager(), "enableGpsDialog");
+        }
 	}
 	
 	@Override
@@ -220,6 +271,13 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     		mCamera = getCameraInstance();
     		Log.d(TAG, "Camera reopened");
     	}
+    	Log.d(TAG, "Start looking for location via GPS");
+    	Location loc = null;
+    	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+    		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locListener);
+    		loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    	}
+    	updateUILocation(loc);
     }
 	
 	@Override
@@ -228,6 +286,8 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     	Log.d(TAG, "Pausing...");
     	releaseCamera();
     	Log.d(TAG, "Camera is released");
+    	mLocationManager.removeUpdates(locListener);
+    	Log.d(TAG, "Location listener stopped updating");
     }
 	
 	private void findViews() {
@@ -239,6 +299,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     	tvProgress = (TextView) findViewById(R.id.tvProgress);
     	tvSignal = (TextView) findViewById(R.id.tvSignal);
     	progSensing = (ProgressBar) findViewById(R.id.progSensing);
+    	tvLatLng = (TextView) findViewById(R.id.tvLatLng);
     }
 	
 	@Override
@@ -438,15 +499,73 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	 * End camera-related methods
 	 */
 	
-	/**
-	 * This is the thread on which all the IOIO activity happens. It will be run
-	 * every time the application is resumed and aborted when it is paused. The
-	 * method setup() will be called right after a connection with the IOIO has
-	 * been established (which might happen several times!). Then, loop() will
-	 * be called repetitively until the IOIO gets disconnected.
+	/*
+	 * Start location tracking methods
 	 */
 	
-	
+	// Method to launch Settings
+    private void enableLocationSettings() {
+        Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(settingsIntent);
+    }
+
+    private final LocationListener locListener = new LocationListener() {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            // A new location update is received.  Do something useful with it.  Update the UI with
+            // the location update.
+            updateUILocation(location);
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+    };
+    
+    private void updateUILocation(Location location) {
+        // We're sending the update to a handler which then updates the UI with the new
+        // location.
+        Message.obtain(mLocHandler,
+                UPDATE_LATLNG,
+                "Latitude: " + location.getLatitude() + ", Longitude: " + location.getLongitude()).sendToTarget();
+    }
+
+   /**
+    * Dialog to prompt users to enable GPS on the device.
+    */
+   private class EnableGpsDialogFragment extends DialogFragment {
+
+	   @Override
+	   public Dialog onCreateDialog(Bundle savedInstanceState) {
+		   return new AlertDialog.Builder(getActivity())
+		   .setTitle(R.string.enable_gps)
+		   .setMessage(R.string.enable_gps_dialog)
+		   .setPositiveButton(R.string.enable_gps, new DialogInterface.OnClickListener() {
+			   @Override
+			   public void onClick(DialogInterface dialog, int which) {
+				   enableLocationSettings();
+			   }
+		   })
+		   .create();
+	   }
+   }
+
+   /**
+    * This is the thread on which all the IOIO activity happens. It will be run
+    * every time the application is resumed and aborted when it is paused. The
+    * method setup() will be called right after a connection with the IOIO has
+    * been established (which might happen several times!). Then, loop() will
+    * be called repetitively until the IOIO gets disconnected.
+    */
 	
 	class IOIOThread extends AbstractIOIOActivity.IOIOThread {
 		/** The on-board LED. */
@@ -540,54 +659,8 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 		
 		@Override
 		protected void loop() throws ConnectionLostException {
-			//led_.write(!button_.isChecked());
-			//led_2.write(!button_led_2.isChecked());
-			
-			//led_4.write(!button_led_4.isChecked());
-			
-
-			
-			
-			
 			try {
 				if(isSensing) {	//turn on the alcohol sensor (default)
-					
-//					if (!sensingAnimation.isRunning()) {
-//						sensingAnimation.start();
-//						
-//						long totalDuration = 0;  
-//				        
-//				    	for(int i = 0; i< sensingAnimation.getNumberOfFrames();i++){  
-//				    		totalDuration += sensingAnimation.getDuration(i);  
-//				        }
-//				        
-//				        Timer timer = new Timer();
-//				        TimerTask timerTask = new TimerTask(){  
-//				        @Override  
-//					        public void run() {
-//				        		Log.d(TAG, "Sensing animation is stopping");
-//				        		isSensing = false;
-//				        		try {
-//				        			sensor_value.close();
-//				        			
-//				        			runOnUiThread(new Runnable() { 
-//								        public void run() 
-//								        {			
-//								        	Intent i_ShowBrac = new Intent();
-//						        			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
-//						        			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
-//						        			startActivity(i_ShowBrac);
-//								        } 
-//								    });
-//				        			
-//				        		} catch (IOException e) {
-//				    				// TODO Auto-generated catch block
-//				    				e.printStackTrace();
-//				        		}
-//				        	}
-//					    };  
-//				        timer.schedule(timerTask, totalDuration);
-//					}
 				  
 					led_4.write(true);
 					
@@ -642,56 +715,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 					//turn off
 					led_4.write(false);
 				}
-			
-				
-				
-					
-					
-//				if(isSensing) {		//--file is opened to write (default)
-//	
-//					long unixTime = (int) (System.currentTimeMillis() / 1000L);
-//					dataTimeStamp = stamp.format(unixTime);
-//					
-//					//sensor_value.write(calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
-//					//		+ "_"+ calendar.get(Calendar.SECOND) + "_"+ calendar.get(Calendar.MILLISECOND) + "\t");
-//					sensor_value.write(dataTimeStamp + "\t");
-//					
-//					sensor_value.write(String.valueOf(value) + "\t");
-//					sensor_value.write(String.valueOf(brac_value));
-//					sensor_value.write("\r\n");
-//					
-//					
-//					//--show the sensor info on the screen
-//					runOnUiThread(new Runnable() { 
-//				        public void run() 
-//				        {			
-//				        	row_value.setText("Row value: " + nf.format(value));
-//		  
-//				        	voltage.setText("Voltage: " + nf.format(volts));
-//				        	brac.setText("Breath Alcohol Concentration(mg/l): " + nf.format(brac_value));
-//				        	
-//				        } 
-//				    });
-//					
-//				}
-//				
-//				if(!isWriting) {	//--close and save the file
-//					
-//					sensor_value.close();
-//					
-//					runOnUiThread(new Runnable() { 
-//						public void run() 
-//				        {			
-//				        	row_value.setText("file saved");
-//		  
-//				        	
-//				        } 
-//				    });
-//					
-//				}
-				
-				
-				
 				
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
@@ -700,13 +723,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
-			//led_2.write(true);	//for testing the IOIO is working
-			
-			//		sleep(1000);
-			//		led_2.write(false);
-			//		sleep(1000);
 		}
 	}
 

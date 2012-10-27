@@ -21,4 +21,11 @@
     
     <string name="connectStatus">Sending file&#8230;</string>
     
+    <string name="enable_gps">Enable GPS</string>
+    <string name="enable_gps_dialog">GPS provider not enabled. Would you like to enable it?</string>
+    <string name="unknown">--Unknown--</string>
+    <string name="waitLoc">Waiting for location&#8230;</string>
+    <string name="not_support_gps">GPS provider not supported</string>
+    <string name="not_support_network">Network provider not supported</string>
+    
 </resources>

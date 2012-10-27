@@ -51,6 +51,13 @@
 	    android:text="Amount of data:"
 	    android:layout_below="@id/brac" />
 	
+	<TextView
+	    android:id="@+id/tvLatLng"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/tvProgress"
+	    android:text="@string/waitLoc" />
+	
 	<!--
 	<ImageView
         android:id="@+id/imgSensing"
