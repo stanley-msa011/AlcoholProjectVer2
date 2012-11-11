@@ -5,21 +5,29 @@
     
     <Button
         android:id="@+id/btnInit"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="START"
+        android:text="@string/btnStart"
         android:textSize="30dp" />
     
     <Button
         android:id="@+id/btnBracHistory"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:layout_below="@id/btnInit"
         android:text="@string/listBrac"
+        android:textSize="30dp" />
+    
+    <Button
+        android:id="@+id/btnSettings"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btnBracHistory"
+        android:text="@string/btnSettings"
         android:textSize="30dp" />
     
 
