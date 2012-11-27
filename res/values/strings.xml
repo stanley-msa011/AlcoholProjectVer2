@@ -35,6 +35,19 @@
     <string name="not_support_gps">GPS provider not supported</string>
     <string name="not_support_network">Network provider not supported</string>
     
+    <!-- Bluetooth Info -->
+    <string name="enable_BT">Enable Bluetooth</string>
+    <string name="enable_BT_dialog">You must enable Bluetooth to continue</string>
+    
+    <!-- Bluetooth Device List -->
+    <string name="btnScan">Scan</string>
+    <string name="tv_title_paired_devices">Paired Devices</string>
+    <string name="tv_title_other_devices">Other Available Devices</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="scanning">Scanning for devices&#8230;</string>
+    <string name="select_device">Select a device to connect</string>
+    
     <!-- Settings Page -->
     <string name="tvSettingsHead">Settings</string>
     <string name="chbShareLoc">Don Not Share My Location</string>

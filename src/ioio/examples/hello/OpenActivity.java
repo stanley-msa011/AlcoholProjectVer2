@@ -3,6 +3,7 @@ package ioio.examples.hello;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -29,6 +30,44 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 
 	}
 	
+	@Override
+	public void onRestart() {
+		super.onRestart();
+		Log.d(TAG, "Restarting...");
+	}
+	
+	@Override
+	public void onStart() {
+		super.onStart();
+		Log.d(TAG, "Starting...");
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		Log.d(TAG, "Resuming...");
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		Log.d(TAG, "Pausing...");
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		Log.d(TAG, "Stopping...");
+	}
+	
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		
+		if (hasFocus)
+			Log.d(TAG, "HAS FOCUS");
+	}
+	
 	private void findViews() {
 		btnInit = (Button) findViewById(R.id.btnInit);
 		btnBracHistory = (Button) findViewById(R.id.btnBracHistory);
@@ -47,6 +86,7 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 		case R.id.btnInit:
 			Intent i_Init = new Intent();
 			i_Init.setClass(this, MainActivity.class);
+//			i_Init.setClass(this, SensorCheckActivity.class);
 			startActivity(i_Init);
 			break;
 		case R.id.btnBracHistory:

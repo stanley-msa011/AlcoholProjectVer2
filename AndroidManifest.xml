@@ -31,8 +31,8 @@
         
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            android:noHistory="true" >
+            android:screenOrientation="portrait" >
+            <!-- android:noHistory="true"-->
         </activity>
         <activity
             android:name=".ShowBracActivity"
@@ -44,6 +44,14 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".SensorCheckActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ioio.examples.bluetooth.BTDeviceList"
             android:screenOrientation="portrait" >
         </activity>
         

@@ -65,7 +65,8 @@
      	android:layout_height="wrap_content"
      	android:scaleType="center"
      	android:layout_alignParentBottom="true" /> -->
-     
+    
+    <!-- 
 	<ProgressBar
     	android:id="@+id/progSensing"
     	android:layout_width="fill_parent"
@@ -74,14 +75,30 @@
      	android:paddingLeft="20dp"
 	    android:paddingBottom="10dp"
 	    android:layout_alignParentBottom="true"
-	    style="@android:style/Widget.ProgressBar.Horizontal" />
- 
+	    style="@android:style/Widget.ProgressBar.Horizontal" /> -->
+	<!--
+	<ioio.examples.hello.SenseView
+	    android:id="@+id/senseView"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerHorizontal="true"
+	    android:layout_below="@id/tvLatLng" /> -->
+	
+	<!--
  	<TextView
  	    android:id="@+id/tvSignal"
  	    android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
 		android:layout_above="@id/progSensing"
 		android:textSize="20dp"
-		android:gravity="center_horizontal" />"
-
+		android:gravity="center_horizontal" /> -->
+	
+	<ImageView
+	    android:id="@+id/senseView2"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerHorizontal="true"
+	    android:layout_below="@id/tvLatLng"
+	    android:src="@drawable/balloon1" />
+	
 </RelativeLayout>
