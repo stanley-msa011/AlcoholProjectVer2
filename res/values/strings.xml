@@ -52,4 +52,7 @@
     <string name="tvSettingsHead">Settings</string>
     <string name="chbShareLoc">Don Not Share My Location</string>
     
+    <!-- Game Activity -->
+    <string name="title_activity_game">GameActivity</string>
+    
 </resources>

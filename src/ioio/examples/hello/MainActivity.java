@@ -66,11 +66,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	public static final int STATE_BT_FINDING = 0x01;
 	public static final int STATE_BT_CONNECTING = 0x02;
 	public static final int STATE_RUN = 0x03;
-	// ignore below --vvvv--
-	public static final int STATE_PAUSE = 0x04;
-	public static final int STATE_STOP = 0x05;
-	public static final int STATE_RESUME = 0X06;
-	// ignore above --^^^^--
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	public static final int MEDIA_TYPE_VIDEO = 2;
 	public static final int PHOTO_COUNT = 3;
@@ -332,20 +327,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             	        timer.schedule(timerTask, totalDuration);
             		}
                 	
-//                    byte[] readBuf = (byte[]) msg.obj;
-                    // construct a string from the valid bytes in the buffer
-                    // Check if the byte array begins with an 'a' or 'm'
-//                    if (readBuf[0] == 109) {
-//                    	if (readBuf[1] != 10) {
-//                    		senseView.currentPressure = barr2float(readBuf, 1, readBuf.length-2);
-//                    	}
-//                    } else if (readBuf[0] == 97) {
-//                    	if (readBuf[1] != 10) {
-//                    		senseView.currentBrac = barr2float(readBuf, 1, readBuf.length-2);
-//                    	}
-//                    }
-                    
-//                    String readMessage = new String(readBuf, 0, msg.arg1);
                 	String readMessage = (String) msg.obj;
                 	Log.d(TAG, "BT data: " + readMessage);
                 	
@@ -376,6 +357,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
                         			if (blowDuration > TOTAL_BLOW_DURATION) {
                         				bDraw = 9;
                         				sensor_value.close();
+                        				
                         			} else {
                         				if (bDraw < 8)
                             				bDraw++;

@@ -1,0 +1,156 @@
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GameActivity" >
+    
+    <ImageView
+	    android:id="@+id/background"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:scaleType="fitXY"
+	    android:src="@drawable/background" />
+    
+    
+    <ImageView
+	    android:id="@+id/land"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentLeft="true"
+	    android:src="@drawable/land" />
+    
+    <ImageView
+        android:id="@+id/tree1"
+        android:layout_width="256dp"
+        android:layout_height="256dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/tree1" />
+
+    <ImageView
+        android:id="@+id/tree2"
+        android:layout_width="256dp"
+        android:layout_height="320dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/tree2" />
+    <ImageView
+        android:id="@+id/tree3"
+        android:layout_width="256dp"
+        android:layout_height="320dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/tree3" />
+    <ImageView
+        android:id="@+id/tree4"
+        android:layout_width="256dp"
+        android:layout_height="320dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/tree4" />
+    <ImageView
+        android:id="@+id/tree5"
+        android:layout_width="256dp"
+        android:layout_height="320dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/tree5" />
+    <ImageView
+        android:id="@+id/tree6"
+        android:layout_width="256dp"
+        android:layout_height="320dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/tree6" />
+	<ImageView
+        android:id="@+id/tree7"
+        android:layout_width="256dp"
+        android:layout_height="320dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/tree7" />
+
+	<ImageView
+	    android:id="@+id/coin1"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentBottom="true"
+	    android:layout_marginLeft="0dp"
+	    android:layout_marginBottom="16dp"
+	    android:layout_width="32dp"
+	    android:layout_height="32dp"
+	    android:src="@drawable/coin_n" />
+
+	<ImageView
+	    android:id="@+id/coin2"
+	    android:layout_alignParentBottom="true"
+	    android:layout_toRightOf="@+id/coin1"
+	    android:layout_marginLeft="16dp"
+	    android:layout_marginBottom="16dp"
+	    android:layout_width="32dp"
+	    android:layout_height="32dp"
+	    android:src="@drawable/coin_n" />
+	<ImageView
+	    android:id="@+id/coin3"
+	    android:layout_alignParentBottom="true"
+	    android:layout_toRightOf="@+id/coin2"
+	    android:layout_marginLeft="16dp"
+	    android:layout_marginBottom="16dp"
+	    android:layout_width="32dp"
+	    android:layout_height="32dp"
+	    android:src="@drawable/coin_n" />
+	<ImageView
+	    android:id="@+id/coin4"
+	    android:layout_alignParentBottom="true"
+	    android:layout_toRightOf="@+id/coin3"
+	    android:layout_marginLeft="16dp"
+	    android:layout_marginBottom="16dp"
+	    android:layout_width="32dp"
+	    android:layout_height="32dp"
+	    android:src="@drawable/coin_n" />
+	<ImageView
+	    android:id="@+id/coin5"
+	    android:layout_alignParentBottom="true"
+	    android:layout_toRightOf="@+id/coin4"
+	    android:layout_marginLeft="16dp"
+	    android:layout_marginBottom="16dp"
+	    android:layout_width="32dp"
+	    android:layout_height="32dp"
+	    android:src="@drawable/coin_n" />
+
+	<ImageView
+	    android:id="@+id/setting_button"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentRight="true"
+	    android:layout_marginBottom="16dp"
+	    android:src="@drawable/setting_button" />
+
+	<ListView
+	    android:id="@+id/game_menu_list"
+	    android:layout_width="80dp"
+	    android:layout_height="320dp"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentRight="true"
+	    android:layout_marginBottom="64dp"
+	    android:layout_marginRight="16dp"
+	    android:choiceMode="singleChoice"
+	    android:clickable="true"
+	    android:fastScrollEnabled="false"
+	    android:scrollbarAlwaysDrawVerticalTrack="false"
+	    android:scrollbars="none"
+	    android:scrollingCache="false" >
+
+	</ListView>
+
+</RelativeLayout>

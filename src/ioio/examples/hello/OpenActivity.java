@@ -3,7 +3,6 @@ package ioio.examples.hello;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -13,8 +12,9 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 	
 	private Button btnInit;
 	private Button btnBracHistory;
-	private Button btnSettings;
-	
+	private Button gameButton;
+	private Button gameGetButton;
+	private Button gameLoseButton;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,54 +30,20 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 
 	}
 	
-	@Override
-	public void onRestart() {
-		super.onRestart();
-		Log.d(TAG, "Restarting...");
-	}
-	
-	@Override
-	public void onStart() {
-		super.onStart();
-		Log.d(TAG, "Starting...");
-	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		Log.d(TAG, "Resuming...");
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		Log.d(TAG, "Pausing...");
-	}
-	
-	@Override
-	public void onStop() {
-		super.onStop();
-		Log.d(TAG, "Stopping...");
-	}
-	
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		
-		if (hasFocus)
-			Log.d(TAG, "HAS FOCUS");
-	}
-	
 	private void findViews() {
 		btnInit = (Button) findViewById(R.id.btnInit);
 		btnBracHistory = (Button) findViewById(R.id.btnBracHistory);
-		btnSettings = (Button) findViewById(R.id.btnSettings);
+		gameButton = (Button) findViewById(R.id.gameButton);
+		gameGetButton = (Button) findViewById(R.id.game_get);
+		gameLoseButton = (Button) findViewById(R.id.game_lose);
 	}
 	
 	private void setListeners() {
 		btnInit.setOnClickListener(this);
 		btnBracHistory.setOnClickListener(this);
-		btnSettings.setOnClickListener(this);
+		gameButton.setOnClickListener(this);
+		gameGetButton.setOnClickListener(this);
+		gameLoseButton.setOnClickListener(this);
 	}
 	
 	@Override
@@ -86,7 +52,6 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 		case R.id.btnInit:
 			Intent i_Init = new Intent();
 			i_Init.setClass(this, MainActivity.class);
-//			i_Init.setClass(this, SensorCheckActivity.class);
 			startActivity(i_Init);
 			break;
 		case R.id.btnBracHistory:
@@ -94,10 +59,23 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 			i_Hist.setClass(this, BracListActivity.class);
 			startActivity(i_Hist);
 			break;
-		case R.id.btnSettings:
-			Intent i_Settings = new Intent();
-			i_Settings.setClass(this, SettingsActivity.class);
-			startActivity(i_Settings);
+		case R.id.gameButton:
+			Intent GameIntent = new Intent();
+			GameActivity.setStartAction(GameActivity.START_DO_NOTHING);
+			GameIntent.setClass(this, GameActivity.class);
+			startActivity(GameIntent);
+			break;
+		case R.id.game_get:
+			Intent GameIntent2 = new Intent();
+			GameActivity.setStartAction(GameActivity.START_GET_COIN);
+			GameIntent2.setClass(this, GameActivity.class);
+			startActivity(GameIntent2);
+			break;
+		case R.id.game_lose:
+			Intent GameIntent3 = new Intent();
+			GameActivity.setStartAction(GameActivity.START_LOSE_COIN);
+			GameIntent3.setClass(this, GameActivity.class);
+			startActivity(GameIntent3);
 			break;
 		default:
 			break;

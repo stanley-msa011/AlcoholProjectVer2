@@ -54,6 +54,10 @@
             android:name="ioio.examples.bluetooth.BTDeviceList"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="ioio.examples.hello.GameActivity"
+            android:screenOrientation="portrait" >
+        </activity>
         
         <service android:name=".TimerService"></service>
 

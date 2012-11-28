@@ -1,5 +1,6 @@
 package ioio.examples.hello;
 
+import database.DBHelper;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,26 +10,27 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class BracDbAdapter {
-	private final static String TAG = "BracDbAdapter";
+//	private final static String TAG = "BracDbAdapter";
 	
 	public final static String KEY_ROWID = "_id";
 	public final static String KEY_DATE = "date";
 	public final static String KEY_BRAC = "brac";
 	
-	private final static String DATABASE_NAME = "Brac_History";
+//	private final static String DATABASE_NAME = "Brac_History";
 	private final static String DATABASE_TABLE = "user_history";
-	private final static int DATABASE_VERSION = 2;
+//	private final static int DATABASE_VERSION = 2;
 	
-	private final static String DATABASE_CREATE =
-			"create table " + DATABASE_TABLE + " (_id integer primary key autoincrement, "
-	        + KEY_DATE + " text not null, " + KEY_BRAC + " text not null);";
+//	private final static String DATABASE_CREATE =
+//			"create table " + DATABASE_TABLE + " (_id integer primary key autoincrement, "
+//	        + KEY_DATE + " text not null, " + KEY_BRAC + " text not null);";
 	
 	private final Context mContext;
 	
-	private DatabaseHelper mDbHelper;
-    private SQLiteDatabase mDb;
+	//private DatabaseHelper mDbHelper;
+    private SQLiteOpenHelper mDbHelper;
+	private SQLiteDatabase mDb;
     
-    private class DatabaseHelper extends SQLiteOpenHelper {
+    /*private class DatabaseHelper extends SQLiteOpenHelper {
     	
     	DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -46,14 +48,15 @@ public class BracDbAdapter {
             db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
             onCreate(db);
         }
-    }
+    }*/
     
     public BracDbAdapter(Context context) {
     	mContext = context;
     }
     
     public BracDbAdapter open() throws SQLException {
-        mDbHelper = new DatabaseHelper(mContext);
+        //mDbHelper = new DatabaseHelper(mContext);
+    	mDbHelper = new DBHelper(mContext);
         mDb = mDbHelper.getWritableDatabase();
         return this;
     }
