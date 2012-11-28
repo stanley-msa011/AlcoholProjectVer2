@@ -176,17 +176,25 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     private boolean isPeak = false;
     private Bitmap balloon;
     private int[] balloons = {
+    		R.drawable.balloon0,
     		R.drawable.balloon1,
     		R.drawable.balloon2,
     		R.drawable.balloon3,
     		R.drawable.balloon4,
-    		R.drawable.balloon5
+    		R.drawable.balloon5,
+    		R.drawable.balloon6,
+    		R.drawable.balloon7,
+    		R.drawable.balloon8,
+    		R.drawable.balloon9
     		};
     private int bDraw = 0;
     private long blowStartTime;
     private long blowEndTime;
     private double blowDuration = 0.0;
     private static final double NANO_TIME = 1000000000.0;
+    private static final float BLOW_THRESHOLD = 400.f;
+    private static final double TOTAL_BLOW_DURATION = 5;
+    
     
 	/**
 	 * Called when the activity is first created. Here we normally initialize
@@ -350,38 +358,44 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
                         	
                         	float diff = pressureReading2 - pressureReading1;
                         	Log.d(TAG, "BT data diff: " + diff);
-                        	if (diff > 500.f && diff < 10000.f && !isPeak) {
+                        	if (diff > BLOW_THRESHOLD && diff < 10000.f && !isPeak) {
                         		isPeak = true;
                         		blowStartTime = System.nanoTime();
 //                        		bDraw++;
                         		
                         		// Save the alcohol reading
-                        	} else if (diff >= -500.f && diff <= 500.f) {
+                        	} else if (diff >= -BLOW_THRESHOLD && diff <= BLOW_THRESHOLD) {
                         		if (isPeak) {
                         			// Save the alcohol reading
                         			
                         			blowEndTime = System.nanoTime();
                         			blowDuration += (blowEndTime - blowStartTime) / NANO_TIME;
+                        			blowStartTime = blowEndTime;
                         			Log.d(TAG, "BT data Blow start time: " + blowStartTime + "Blow end time: " + blowEndTime);
                         			Log.d(TAG, "BT data duration: " + blowDuration);
-                        			if (blowDuration > 5) {
-                        				bDraw = 4;
+                        			if (blowDuration > TOTAL_BLOW_DURATION) {
+                        				bDraw = 9;
+                        				sensor_value.close();
                         			} else {
-                        				if (bDraw < 3)
+                        				if (bDraw < 8)
                             				bDraw++;
                             			else
-                            				bDraw = bDraw % 3;
+                            				bDraw = bDraw % 8;
                         			}
                         			
                         		} else {
                         			// Don't save alcohol reading
                         			
                         		}
-                        	} else if (diff <= -500.f) {
+                        	} else if (diff < -BLOW_THRESHOLD) {
                         		isPeak = false;
                         		// Clear data
-                        		bDraw = 0;
-                        		blowStartTime = blowEndTime = 0;
+//                        		if (blowDuration < TOTAL_BLOW_DURATION) {
+	                        		bDraw = 0;
+//	                        		blowEndTime = System.nanoTime();
+//                        			blowDuration += (blowEndTime - blowStartTime) / NANO_TIME;
+	                        		blowStartTime = blowEndTime = 0;
+//                        		}
                         	}
                         	runOnUiThread(new Runnable() { 
         				        public void run() 

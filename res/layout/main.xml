@@ -99,6 +99,6 @@
 	    android:layout_height="wrap_content"
 	    android:layout_centerHorizontal="true"
 	    android:layout_below="@id/tvLatLng"
-	    android:src="@drawable/balloon1" />
+	    android:src="@drawable/balloon0" />
 	
 </RelativeLayout>
