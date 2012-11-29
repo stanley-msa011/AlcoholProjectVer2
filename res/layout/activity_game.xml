@@ -84,7 +84,7 @@
 	    android:id="@+id/coin1"
 	    android:layout_alignParentLeft="true"
 	    android:layout_alignParentBottom="true"
-	    android:layout_marginLeft="0dp"
+	    android:layout_marginLeft="16dp"
 	    android:layout_marginBottom="16dp"
 	    android:layout_width="32dp"
 	    android:layout_height="32dp"
@@ -117,7 +117,7 @@
 	    android:layout_width="32dp"
 	    android:layout_height="32dp"
 	    android:src="@drawable/coin_n" />
-	<ImageView
+	<!--  ImageView
 	    android:id="@+id/coin5"
 	    android:layout_alignParentBottom="true"
 	    android:layout_toRightOf="@+id/coin4"
@@ -125,7 +125,7 @@
 	    android:layout_marginBottom="16dp"
 	    android:layout_width="32dp"
 	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" />
+	    android:src="@drawable/coin_n" />-->
 
 	<ImageView
 	    android:id="@+id/setting_button"
@@ -134,6 +134,7 @@
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentRight="true"
 	    android:layout_marginBottom="16dp"
+	    android:layout_marginRight="16dp"
 	    android:src="@drawable/setting_button" />
 
 	<ListView
@@ -143,7 +144,7 @@
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentRight="true"
 	    android:layout_marginBottom="64dp"
-	    android:layout_marginRight="16dp"
+	    android:layout_marginRight="32dp"
 	    android:choiceMode="singleChoice"
 	    android:clickable="true"
 	    android:fastScrollEnabled="false"

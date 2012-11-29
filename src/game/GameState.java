@@ -6,7 +6,7 @@ public class GameState {
 	static final public int MAX_STATE = 6;
 	/*0~10 coins. If # of coins > 10 => add_state*/
 	static final public int MIN_COINS = 0;
-	static final public int MAX_COINS = 5;
+	static final public int MAX_COINS = 4;
 	public int state;
 	public int coin;
 	
