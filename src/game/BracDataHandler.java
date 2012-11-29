@@ -74,11 +74,11 @@ public class BracDataHandler {
        	else
        		result = HaveAlcohol;
        	
-/*
+
        	int server_connect = connectingToServer(textFile,imageFiles);
 		if (server_connect == ERROR)
 			return ERROR;
-*/     	
+     	
 		saveToDB(avg_result);
        	
 		return result;
@@ -155,6 +155,13 @@ public class BracDataHandler {
 			
 			Log.e(TAG, "set entity");
 			
+			BracDataToServer BDT = new BracDataToServer(httpClient,httpPost);
+			Thread thread = new Thread(BDT);
+			thread.start();
+			thread.join();
+			if (BDT.result==-1)
+				return ERROR;
+			/*
 			HttpResponse httpResponse = httpClient.execute(httpPost);
 			
 			Log.e(TAG, "get response");
@@ -166,8 +173,10 @@ public class BracDataHandler {
 			if (httpStatusCode == HttpStatus.SC_OK) {} 
 			else
 				return ERROR;
+			*/
 			
 		} catch (Exception e) {
+			Log.e(TAG,e.toString());
 			return ERROR;
 		} 
 		return SUCCESS;

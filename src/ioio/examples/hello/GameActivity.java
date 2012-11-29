@@ -13,14 +13,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 @SuppressLint("NewApi")
 public class GameActivity extends Activity{
@@ -37,7 +42,13 @@ public class GameActivity extends Activity{
 	private Animation appear_anim;
 	private Animation disappear_anim;
 	private ImageView setting_image;
+	private ImageView background;
 	private ListView game_list_view;
+	private PopupWindow popupWindow;
+	private Button ok_button;
+	private TextView popText;
+	private int test_result;
+
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 	private SimpleAdapter game_adapter;
 	private static final int[] menuPics=new int[]{
@@ -71,6 +82,9 @@ public class GameActivity extends Activity{
 		initSettingButton();
 		initList();
 		setImage();
+		initPopWindow();
+
+		background = (ImageView)findViewById(R.id.background);
 		Log.e(this.getClass().toString(), "end init");
 		context = this;
 		if (START_ACTION == START_GET_COIN)
@@ -122,7 +136,7 @@ public class GameActivity extends Activity{
 				new String[] { "pic"},new int[] { R.id.game_menu_icon } );
 		game_list_view.setAdapter(game_adapter);
 		game_list_view.setVisibility(View.INVISIBLE);
-		game_list_view.setBackgroundColor(0xAAFFCC33);
+		game_list_view.setBackgroundColor(0xAAAAFFAA);
 		game_list_view.setOnItemClickListener(new GameMenuOnClickListener());
 	}
 	
@@ -272,11 +286,54 @@ public class GameActivity extends Activity{
 	private void startBracDataHandler(String ts){
 		BracDataHandler bdh = new BracDataHandler(ts,context);
 		int result = bdh.start();
-		//result = BracDataHandler.HaveAlcohol;
-		if (result == BracDataHandler.ERROR);
+		test_result = result;
+		showPopWindow();
+		/*if (result == BracDataHandler.ERROR);
+		else if (result == BracDataHandler.HaveAlcohol)
+			this.loseCoin();
+		else if (result == BracDataHandler.NoAlcohol)
+			this.getCoin();*/
+	}
+	
+	
+	private void initPopWindow(){
+		 Context mContext = this;   
+		 LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
+		 View v_pop = mLayoutInflater.inflate(R.layout.game_pop_window, null);
+		 popupWindow = new PopupWindow(v_pop,400,400);
+		 ok_button = (Button)v_pop.findViewById(R.id.game_pop_ok_button);
+		 ok_button.setOnClickListener(new PopWindowOnClickListener());
+		 popText = (TextView)v_pop.findViewById(R.id.game_pop_text);
+	}
+	
+	private void showPopWindow(){
+		
+        int result = test_result;
+        if (result == BracDataHandler.ERROR)
+        	popText.setText("ERROR");
+		else if (result == BracDataHandler.HaveAlcohol)
+			popText.setText("BAD");
+		else if (result == BracDataHandler.NoAlcohol)
+			popText.setText("GOOD");
+        
+		popupWindow.showAtLocation(background, Gravity.CENTER, 0, 0);
+        popupWindow.setFocusable(true);
+        popupWindow.update();
+	}
+	private void closePopWindow(){
+        popupWindow.dismiss();
+        popupWindow.setFocusable(false);
+        int result = test_result;
+        if (result == BracDataHandler.ERROR);
 		else if (result == BracDataHandler.HaveAlcohol)
 			this.loseCoin();
 		else if (result == BracDataHandler.NoAlcohol)
 			this.getCoin();
+	}
+	
+	private class PopWindowOnClickListener implements View.OnClickListener{
+		public void onClick(View v) {
+			closePopWindow();
+		}
 	}
 }
