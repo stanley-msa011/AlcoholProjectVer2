@@ -42,7 +42,7 @@ public class GameActivity extends Activity{
 	private Animation appear_anim;
 	private Animation disappear_anim;
 	private ImageView setting_image;
-	private ImageView background;
+	ImageView background;
 	private ListView game_list_view;
 	private PopupWindow popupWindow;
 	private Button ok_button;
@@ -56,8 +56,8 @@ public class GameActivity extends Activity{
 		 R.drawable.history_function,R.drawable.setting_function
 	};
 	public final static int START_DO_NOTHING = 0;
-	public final static int START_GET_COIN = 1;
-	public final static int START_LOSE_COIN = 2;
+	public final static int START_MAIN = 3;
+	
 	
 	private static int START_ACTION=START_DO_NOTHING;
 	public Context context;
@@ -83,15 +83,16 @@ public class GameActivity extends Activity{
 		initList();
 		setImage();
 		initPopWindow();
-
 		background = (ImageView)findViewById(R.id.background);
-		Log.e(this.getClass().toString(), "end init");
 		context = this;
-		if (START_ACTION == START_GET_COIN)
-			getCoin();
-		else if (START_ACTION == START_LOSE_COIN)
-			loseCoin();
-		START_ACTION = START_DO_NOTHING;
+		
+		/*Go to MainActivity if start because of the notice*/
+		if (START_ACTION == START_MAIN){
+			START_ACTION = START_DO_NOTHING;
+			Intent newActivity;
+			newActivity = new Intent(context, TestActivity.class);  
+			startActivityForResult(newActivity, REQUEST_TEST);  
+		}
 	}
 	
 	private void initAnim(){
@@ -288,13 +289,7 @@ public class GameActivity extends Activity{
 		int result = bdh.start();
 		test_result = result;
 		showPopWindow();
-		/*if (result == BracDataHandler.ERROR);
-		else if (result == BracDataHandler.HaveAlcohol)
-			this.loseCoin();
-		else if (result == BracDataHandler.NoAlcohol)
-			this.getCoin();*/
 	}
-	
 	
 	private void initPopWindow(){
 		 Context mContext = this;   
@@ -306,8 +301,8 @@ public class GameActivity extends Activity{
 		 popText = (TextView)v_pop.findViewById(R.id.game_pop_text);
 	}
 	
+	
 	private void showPopWindow(){
-		
         int result = test_result;
         if (result == BracDataHandler.ERROR)
         	popText.setText("ERROR");
@@ -316,10 +311,26 @@ public class GameActivity extends Activity{
 		else if (result == BracDataHandler.NoAlcohol)
 			popText.setText("GOOD");
         
-		popupWindow.showAtLocation(background, Gravity.CENTER, 0, 0);
-        popupWindow.setFocusable(true);
+        background.post(new showPopWindowThread());
+        
+		/*popupWindow.showAtLocation(background, Gravity.CENTER, 0, 0);
+		popupWindow.setFocusable(true);
         popupWindow.update();
+        */
 	}
+	
+	private class showPopWindowThread implements Runnable{
+
+		@Override
+		public void run() {
+				popupWindow.showAtLocation(background, Gravity.CENTER, 0, 0);
+				popupWindow.setFocusable(true);
+		        popupWindow.update();
+		}
+		
+	}
+	
+	
 	private void closePopWindow(){
         popupWindow.dismiss();
         popupWindow.setFocusable(false);

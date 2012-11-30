@@ -34,30 +34,15 @@
         android:id="@+id/gameButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btnInit"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="64dp"
         android:text="GameStart" />
 
-    <Button
-        android:id="@+id/game_get"
+     <Button
+        android:id="@+id/game_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btnInit"
-        android:layout_alignRight="@+id/gameButton"
-        android:layout_marginBottom="18dp"
-        android:layout_marginRight="58dp"
-        android:text="G+" />
-
-    <Button
-        android:id="@+id/game_lose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/game_get"
-        android:layout_alignBottom="@+id/game_get"
-        android:layout_alignLeft="@+id/gameButton"
-        android:layout_marginLeft="58dp"
-        android:text="G-" />
-    
+        android:layout_below="@+id/gameButton"
+        android:layout_centerHorizontal="true"
+        android:text="Start to Main" />
 
 </RelativeLayout>

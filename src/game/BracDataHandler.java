@@ -42,6 +42,7 @@ public class BracDataHandler {
 	
 	public static final int HaveAlcohol = 11;
 	public static final int NoAlcohol = 10; 
+	public static final int Nothing = 0; 
 	public static final int ERROR = -1;
 	public static final int SUCCESS = 1;
 	private static final double THRESHOLD = 0.01;

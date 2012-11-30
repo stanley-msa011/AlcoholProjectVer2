@@ -95,7 +95,10 @@ public class TimerService extends Service {
 				Context context = getApplicationContext();
 				CharSequence contentTitle = "IOIO Alcohol test";
 				CharSequence contentText = "該吹氣摟！！";
-				Intent notificationIntent = new Intent(context, MainActivity.class);
+				//Intent notificationIntent = new Intent(context, MainActivity.class);
+				GameActivity.setStartAction(GameActivity.START_MAIN);
+				Intent notificationIntent = new Intent(context, GameActivity.class);
+				
 				PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
 				notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
