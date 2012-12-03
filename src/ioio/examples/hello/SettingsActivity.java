@@ -29,13 +29,11 @@ public class SettingsActivity extends Activity {
 	    // Is the view now checked?
 	    boolean checked = ((CheckedTextView) view).isChecked();
 	    
-	    // Check which checkbox was clicked
-	    switch(view.getId()) {
-	        case R.id.chktvShareLoc:
-	            if (checked)
-	            	// Check to turn on GPS
-	            break;
-	    }
+	    if (view.getId() == R.id.chktvShareLoc) {
+			if (checked);
+				// Check to turn on GPS
+			//break;
+		}
 	}
 
 }

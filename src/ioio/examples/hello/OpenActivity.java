@@ -13,7 +13,7 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 	private Button btnInit;
 	private Button btnBracHistory;
 	private Button gameButton;
-	private Button gameMainButton;
+	private Button galleryButton;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,14 +33,14 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 		btnInit = (Button) findViewById(R.id.btnInit);
 		btnBracHistory = (Button) findViewById(R.id.btnBracHistory);
 		gameButton = (Button) findViewById(R.id.gameButton);
-		gameMainButton = (Button) findViewById(R.id.game_main);
+		galleryButton = (Button) findViewById(R.id.galleryButton);
 	}
 	
 	private void setListeners() {
 		btnInit.setOnClickListener(this);
 		btnBracHistory.setOnClickListener(this);
 		gameButton.setOnClickListener(this);
-		gameMainButton.setOnClickListener(this);
+		galleryButton.setOnClickListener(this);
 	}
 	
 	@Override
@@ -58,10 +58,9 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 			GameActivity.setStartAction(GameActivity.START_DO_NOTHING);
 			GameIntent.setClass(this, GameActivity.class);
 			startActivity(GameIntent);
-		}  else if (v.getId() == R.id.game_main) {
+		}  else if (v.getId() == R.id.galleryButton) {
 			Intent GameIntent3 = new Intent();
-			GameActivity.setStartAction(GameActivity.START_MAIN);
-			GameIntent3.setClass(this, GameActivity.class);
+			GameIntent3.setClass(this, GalleryActivity.class);
 			startActivity(GameIntent3);
 		}else {
 		}

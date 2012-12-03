@@ -56,4 +56,35 @@ public class GameDB {
     	return oldState;
     }
     
+    public GameState[] getAllStates(){
+    	gDB = gDBHelper.getReadableDatabase();
+    	Cursor cursor;
+    	
+    	cursor = gDB.rawQuery("SELECT _ID,_STATE,_COIN FROM AlcoholTreeGame ORDER BY _ID ASC",null);
+    	if (cursor.getCount()==0){
+    		gDB.close();
+    		return null;
+    	}
+    	int list_size = cursor.getCount();
+    	
+    	GameState[] stateList = new GameState[list_size];
+    	
+    	cursor.moveToFirst();
+    	
+    	int id = cursor.getInt(0);
+    	int state = cursor.getInt(1);
+    	int coin = cursor.getInt(2);
+    	stateList[0]=new GameState(state,coin);
+    	int i = 1;
+    	while(cursor.moveToNext()){
+        	state = cursor.getInt(1);
+        	coin = cursor.getInt(2);
+        	stateList[i]=new GameState(state,coin);
+        	++i;
+    	}
+    	
+    	gDB.close();
+    	return stateList;
+    }
+    
 }

@@ -133,8 +133,11 @@ public class GameActivity extends Activity{
 			game_list.add(item);
 		}
 		game_adapter = new SimpleAdapter(
-				this,game_list,R.layout.game_menu,
-				new String[] { "pic"},new int[] { R.id.game_menu_icon } );
+				this,
+				game_list,
+				R.layout.game_menu,
+				new String[] { "pic"},
+				new int[] { R.id.game_menu_icon } );
 		game_list_view.setAdapter(game_adapter);
 		game_list_view.setVisibility(View.INVISIBLE);
 		game_list_view.setBackgroundColor(0xAAAAFFAA);
@@ -263,6 +266,8 @@ public class GameActivity extends Activity{
 					startActivityForResult(newActivity, REQUEST_TEST);  
 					break;
 				case 1: //Dummy (Record of TreeGame)
+					newActivity = new Intent(context, GalleryActivity.class);  
+					startActivityForResult(newActivity, REQUEST_TEST);  
 					break;
 				case 2: //BracListActivity
 					newActivity = new Intent(context, BracListActivity.class);     
