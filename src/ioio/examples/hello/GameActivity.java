@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import game.BracDataHandler;
 import game.GameDB;
+import game.GameMenuHandler;
 import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
@@ -17,10 +18,7 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 @SuppressLint("NewApi")
 public class GameActivity extends Activity{
@@ -37,28 +35,21 @@ public class GameActivity extends Activity{
 	private Animation appear_anim;
 	private Animation disappear_anim;
 	private ImageView setting_image;
-	private ListView game_list_view;
 	private GamePopupWindowHandler gPopWindow;
+	private GameMenuHandler gMenu;
 
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
-	private SimpleAdapter game_adapter;
-	private static final int[] menuPics=new int[]{
-		 R.drawable.blow_function,R.drawable.history2_function,
-		 R.drawable.history_function,R.drawable.setting_function
-	};
+
 	public final static int START_DO_NOTHING = 0;
-	public final static int START_MAIN = 3;
-	
+	public final static int START_MAIN = 1;
 	
 	private static int START_ACTION=START_DO_NOTHING;
 	public Context context;
+
 	/*Setting the action when start the activity*/
 	static public void setStartAction(int action){
 		START_ACTION = action;
 	}
-	public boolean isShowingMenu = false;
-	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,12 +61,10 @@ public class GameActivity extends Activity{
 		initTreeImage();
 		initCoinImage();
 		initSettingButton();
-		initList();
 		setImage();
 		gPopWindow = new GamePopupWindowHandler(this);
-		
+		gMenu = new GameMenuHandler(this);
 		context = this;
-		
 		/*Go to MainActivity if start because of the notice*/
 		if (START_ACTION == START_MAIN){
 			START_ACTION = START_DO_NOTHING;
@@ -84,7 +73,6 @@ public class GameActivity extends Activity{
 			startActivityForResult(newActivity, REQUEST_TEST);  
 		}
 	}
-	
 	private void initAnim(){
 		/*used for initializing animations*/
 		appear_anim = new AlphaAnimation(0.f,1.f);
@@ -94,8 +82,6 @@ public class GameActivity extends Activity{
 		disappear_anim.setDuration(1000);
 		disappear_anim.setStartOffset(30);
 	}
-	
-	
 	private void initTreeImage(){
 		/*used for initializing tree images*/
 		tree_image[0] = (ImageView) findViewById(R.id.tree1);
@@ -112,27 +98,7 @@ public class GameActivity extends Activity{
 		coin_image[1] = (ImageView) findViewById(R.id.coin2);
 		coin_image[2] = (ImageView) findViewById(R.id.coin3);
 		coin_image[3] = (ImageView) findViewById(R.id.coin4);
-		//coin_image[4] = (ImageView) findViewById(R.id.coin5);
 	}	
-	
-	private void initList(){
-		game_list_view = (ListView) findViewById(R.id.game_menu_list);
-		for (int i=0;i<4;++i){
-			HashMap<String,Object> item = new HashMap<String,Object>();
-			item.put("pic", menuPics[i]);
-			game_list.add(item);
-		}
-		game_adapter = new SimpleAdapter(
-				this,
-				game_list,
-				R.layout.game_menu,
-				new String[] { "pic"},
-				new int[] { R.id.game_menu_icon } );
-		game_list_view.setAdapter(game_adapter);
-		game_list_view.setVisibility(View.INVISIBLE);
-		game_list_view.setBackgroundColor(0xAAAAFFAA);
-		game_list_view.setOnItemClickListener(new GameMenuOnClickListener());
-	}
 	
 	private void initSettingButton(){
 		setting_image= (ImageView) findViewById(R.id.setting_button);
@@ -227,49 +193,10 @@ public class GameActivity extends Activity{
 	/*OnListenerForSettingButton*/
 	private class SettingButtonOnClickListener implements View.OnClickListener{
 		public void onClick(View v) {
-			if (isShowingMenu){
-				game_list_view.setVisibility(View.INVISIBLE);
-				isShowingMenu = false;
-			}
-			else{
-				game_list_view.setVisibility(View.VISIBLE);
-				isShowingMenu = true;
-			}
+			gMenu.changeMenuVisibility();
 		}
 	}
 
-	
-	private class GameMenuOnClickListener implements AdapterView.OnItemClickListener{
-
-		@Override
-		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-			int list_id = (int)arg3;
-			Intent newActivity;
-			
-			game_list_view.setVisibility(View.INVISIBLE);
-			isShowingMenu = false;
-			
-			switch (list_id){
-				case 0:	//MainActivity
-					//newActivity = new Intent(context, MainActivity.class);     
-					newActivity = new Intent(context, TestActivity.class);  
-					startActivityForResult(newActivity, REQUEST_TEST);  
-					break;
-				case 1: //Dummy (Record of TreeGame)
-					newActivity = new Intent(context, GalleryActivity.class);  
-					startActivityForResult(newActivity, REQUEST_TEST);  
-					break;
-				case 2: //BracListActivity
-					newActivity = new Intent(context, BracHistoryActivity.class);     
-	                startActivity(newActivity);
-					break;
-				case 3: //Dummy (Setting)
-					break;
-				default:
-					break;
-			}
-		}
-	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (requestCode == REQUEST_TEST && resultCode == RESULT_OK){

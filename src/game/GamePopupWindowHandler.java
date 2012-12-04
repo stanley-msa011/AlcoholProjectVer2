@@ -80,7 +80,6 @@ public class GamePopupWindowHandler {
 			ga.getCoin();
 	}
 	private class showPopWindowThread implements Runnable{
-
 		@Override
 		public void run() {
 				popupWindow.showAtLocation( bg, Gravity.CENTER, 0, 0);
