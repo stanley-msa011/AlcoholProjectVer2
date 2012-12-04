@@ -30,13 +30,6 @@ public class GalleryActivity extends Activity {
 		R.drawable.tree7
 	};
 	
-	private final int[] weatherPics = {
-			R.drawable.w00,R.drawable.w01,R.drawable.w02,R.drawable.w03,R.drawable.w04,
-			R.drawable.w05,R.drawable.w06,R.drawable.w07,R.drawable.w08,R.drawable.w09,
-			R.drawable.w10,R.drawable.w11,R.drawable.w12,R.drawable.w13,R.drawable.w14,
-			R.drawable.w15,R.drawable.w16,R.drawable.w17,R.drawable.w18,R.drawable.w19
-	};
-	
 	private final int MAX_WEATHER_CHANGE_STATE = 10;
 	
 	private final int[] weatherPicsGood = {

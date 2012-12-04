@@ -13,7 +13,7 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 	private Button btnInit;
 	private Button btnBracHistory;
 	private Button gameButton;
-	private Button galleryButton;
+	private Button historyButton;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,35 +33,32 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 		btnInit = (Button) findViewById(R.id.btnInit);
 		btnBracHistory = (Button) findViewById(R.id.btnBracHistory);
 		gameButton = (Button) findViewById(R.id.gameButton);
-		galleryButton = (Button) findViewById(R.id.galleryButton);
+		historyButton = (Button) findViewById(R.id.historyButton);
 	}
 	
 	private void setListeners() {
 		btnInit.setOnClickListener(this);
 		btnBracHistory.setOnClickListener(this);
 		gameButton.setOnClickListener(this);
-		galleryButton.setOnClickListener(this);
+		historyButton.setOnClickListener(this);
 	}
 	
 	@Override
 	public void onClick(View v) {
+		Intent i_Init = new Intent();
 		if (v.getId() == R.id.btnInit) {
-			Intent i_Init = new Intent();
 			i_Init.setClass(this, MainActivity.class);
 			startActivity(i_Init);
 		} else if (v.getId() == R.id.btnBracHistory) {
-			Intent i_Hist = new Intent();
-			i_Hist.setClass(this, BracListActivity.class);
-			startActivity(i_Hist);
+			i_Init.setClass(this, BracListActivity.class);
+			startActivity(i_Init);
 		} else if (v.getId() == R.id.gameButton) {
-			Intent GameIntent = new Intent();
 			GameActivity.setStartAction(GameActivity.START_DO_NOTHING);
-			GameIntent.setClass(this, GameActivity.class);
-			startActivity(GameIntent);
-		}  else if (v.getId() == R.id.galleryButton) {
-			Intent GameIntent3 = new Intent();
-			GameIntent3.setClass(this, GalleryActivity.class);
-			startActivity(GameIntent3);
+			i_Init.setClass(this, GameActivity.class);
+			startActivity(i_Init);
+		}  else if (v.getId() == R.id.historyButton) {
+			i_Init.setClass(this, BracHistoryActivity.class);
+			startActivity(i_Init);
 		}else {
 		}
 	}

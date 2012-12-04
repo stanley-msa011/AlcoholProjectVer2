@@ -270,7 +270,7 @@ public class GameActivity extends Activity{
 					startActivityForResult(newActivity, REQUEST_TEST);  
 					break;
 				case 2: //BracListActivity
-					newActivity = new Intent(context, BracListActivity.class);     
+					newActivity = new Intent(context, BracHistoryActivity.class);     
 	                startActivity(newActivity);
 					break;
 				case 3: //Dummy (Setting)

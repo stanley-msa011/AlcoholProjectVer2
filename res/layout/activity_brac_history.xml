@@ -1,0 +1,27 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BracHistoryActivity" >
+
+
+
+    <TextView 
+        android:id="@+id/brac_history_head"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/history_heading"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true" 
+        android:textSize="30sp" />
+    
+
+    <ListView
+        android:id="@+id/brac_history_listview"
+        android:layout_below="@+id/brac_history_head"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        />
+    
+</RelativeLayout>

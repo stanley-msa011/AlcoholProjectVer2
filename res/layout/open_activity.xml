@@ -38,11 +38,11 @@
         android:text="GameStart" />
 
      <Button
-        android:id="@+id/galleryButton"
+        android:id="@+id/historyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/gameButton"
         android:layout_centerHorizontal="true"
-        android:text="Gallery" />
+        android:text="NewHistory" />
 
 </RelativeLayout>

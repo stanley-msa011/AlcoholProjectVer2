@@ -59,5 +59,6 @@
     <string name="title_activity_test">TestActivity</string>
     <string name="title_activity_game_list">GameListActivity</string>
     <string name="title_activity_gallery">GalleryActivity</string>
+    <string name="title_activity_brac_history">BracHistoryActivity</string>
 
 </resources>

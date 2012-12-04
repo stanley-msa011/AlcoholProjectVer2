@@ -75,11 +75,11 @@ public class BracDataHandler {
        	else
        		result = HaveAlcohol;
        	
-
-       	int server_connect = connectingToServer(textFile,imageFiles);
+       	/*Connection to server*/
+       	/*int server_connect = connectingToServer(textFile,imageFiles);
 		if (server_connect == ERROR)
 			return ERROR;
-     	
+     	*/
 		saveToDB(avg_result);
        	
 		return result;

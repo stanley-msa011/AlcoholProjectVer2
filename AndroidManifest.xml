@@ -68,15 +68,19 @@
 
         <activity
             android:name="ioio.examples.hello.TestActivity"
-             android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ioio.examples.hello.GameListActivity"
-             android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ioio.examples.hello.GalleryActivity"
-             android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ioio.examples.hello.BracHistoryActivity"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
