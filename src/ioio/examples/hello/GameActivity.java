@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import game.BracDataHandler;
 import game.GameDB;
+import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
 import android.os.Bundle;
@@ -12,20 +13,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 @SuppressLint("NewApi")
 public class GameActivity extends Activity{
@@ -42,12 +37,8 @@ public class GameActivity extends Activity{
 	private Animation appear_anim;
 	private Animation disappear_anim;
 	private ImageView setting_image;
-	ImageView background;
 	private ListView game_list_view;
-	private PopupWindow popupWindow;
-	private Button ok_button;
-	private TextView popText;
-	private int test_result;
+	private GamePopupWindowHandler gPopWindow;
 
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 	private SimpleAdapter game_adapter;
@@ -74,7 +65,6 @@ public class GameActivity extends Activity{
 		setContentView(R.layout.activity_game);
 		gDB = new GameDB(this);
 		GameState gState = gDB.getLatestGameState();
-		Log.e(this.getClass().toString(), "state coin "+gState.state+" "+gState.coin);
 		treeGame=new TreeGame(gState);
 		initAnim();
 		initTreeImage();
@@ -82,8 +72,8 @@ public class GameActivity extends Activity{
 		initSettingButton();
 		initList();
 		setImage();
-		initPopWindow();
-		background = (ImageView)findViewById(R.id.background);
+		gPopWindow = new GamePopupWindowHandler(this);
+		
 		context = this;
 		
 		/*Go to MainActivity if start because of the notice*/
@@ -292,64 +282,8 @@ public class GameActivity extends Activity{
 	private void startBracDataHandler(String ts){
 		BracDataHandler bdh = new BracDataHandler(ts,context);
 		int result = bdh.start();
-		test_result = result;
-		showPopWindow();
+		gPopWindow.showPopWindow(result);
 	}
-	
-	private void initPopWindow(){
-		 Context mContext = this;   
-		 LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
-		 View v_pop = mLayoutInflater.inflate(R.layout.game_pop_window, null);
-		 popupWindow = new PopupWindow(v_pop,400,400);
-		 ok_button = (Button)v_pop.findViewById(R.id.game_pop_ok_button);
-		 ok_button.setOnClickListener(new PopWindowOnClickListener());
-		 popText = (TextView)v_pop.findViewById(R.id.game_pop_text);
-	}
-	
-	
-	private void showPopWindow(){
-        int result = test_result;
-        if (result == BracDataHandler.ERROR)
-        	popText.setText("ERROR");
-		else if (result == BracDataHandler.HaveAlcohol)
-			popText.setText("BAD");
-		else if (result == BracDataHandler.NoAlcohol)
-			popText.setText("GOOD");
-        
-        background.post(new showPopWindowThread());
-        
-		/*popupWindow.showAtLocation(background, Gravity.CENTER, 0, 0);
-		popupWindow.setFocusable(true);
-        popupWindow.update();
-        */
-	}
-	
-	private class showPopWindowThread implements Runnable{
 
-		@Override
-		public void run() {
-				popupWindow.showAtLocation(background, Gravity.CENTER, 0, 0);
-				popupWindow.setFocusable(true);
-		        popupWindow.update();
-		}
-		
-	}
 	
-	
-	private void closePopWindow(){
-        popupWindow.dismiss();
-        popupWindow.setFocusable(false);
-        int result = test_result;
-        if (result == BracDataHandler.ERROR);
-		else if (result == BracDataHandler.HaveAlcohol)
-			this.loseCoin();
-		else if (result == BracDataHandler.NoAlcohol)
-			this.getCoin();
-	}
-	
-	private class PopWindowOnClickListener implements View.OnClickListener{
-		public void onClick(View v) {
-			closePopWindow();
-		}
-	}
 }

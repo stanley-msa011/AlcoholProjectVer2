@@ -2,17 +2,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="false"
+    android:longClickable="false"
     tools:context=".GameActivity" >
     
     <ImageView
-	    android:id="@+id/background"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:layout_alignParentLeft="true"
-	    android:layout_alignParentTop="true"
-	    android:scaleType="fitXY"
-	    android:src="@drawable/background" />
-    
+        android:id="@+id/background"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:clickable="false"
+        android:scaleType="fitXY"
+        android:src="@drawable/background" />
     
     <ImageView
 	    android:id="@+id/land"
@@ -20,7 +22,9 @@
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentLeft="true"
-	    android:src="@drawable/land" />
+	    android:src="@drawable/land"
+	    android:clickable="false"
+	     />
     
     <ImageView
         android:id="@+id/tree1"
@@ -29,7 +33,9 @@
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/tree1" />
+        android:src="@drawable/tree1" 
+        android:clickable="false"
+        />
 
     <ImageView
         android:id="@+id/tree2"
@@ -38,7 +44,10 @@
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/tree2" />
+        android:src="@drawable/tree2" 
+        android:clickable="false"
+        />
+    
     <ImageView
         android:id="@+id/tree3"
         android:layout_width="256dp"
@@ -46,7 +55,10 @@
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/tree3" />
+        android:src="@drawable/tree3" 
+        android:clickable="false"
+        />
+    
     <ImageView
         android:id="@+id/tree4"
         android:layout_width="256dp"
@@ -54,7 +66,10 @@
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/tree4" />
+        android:src="@drawable/tree4" 
+        android:clickable="false"
+        />
+    
     <ImageView
         android:id="@+id/tree5"
         android:layout_width="256dp"
@@ -62,7 +77,9 @@
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/tree5" />
+        android:src="@drawable/tree5" 
+        android:clickable="false"
+        />
     <ImageView
         android:id="@+id/tree6"
         android:layout_width="256dp"
@@ -70,7 +87,9 @@
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/tree6" />
+        android:src="@drawable/tree6" 
+        android:clickable="false"
+        />
 	<ImageView
         android:id="@+id/tree7"
         android:layout_width="256dp"
@@ -78,7 +97,9 @@
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/tree7" />
+        android:src="@drawable/tree7" 
+        android:clickable="false"
+        />
 
 	<ImageView
 	    android:id="@+id/coin1"
@@ -88,7 +109,9 @@
 	    android:layout_marginBottom="16dp"
 	    android:layout_width="32dp"
 	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" />
+	    android:src="@drawable/coin_n" 
+	    android:clickable="false"
+	    />
 
 	<ImageView
 	    android:id="@+id/coin2"
@@ -98,7 +121,9 @@
 	    android:layout_marginBottom="16dp"
 	    android:layout_width="32dp"
 	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" />
+	    android:src="@drawable/coin_n" 
+	    android:clickable="false"
+	    />
 	<ImageView
 	    android:id="@+id/coin3"
 	    android:layout_alignParentBottom="true"
@@ -107,7 +132,9 @@
 	    android:layout_marginBottom="16dp"
 	    android:layout_width="32dp"
 	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" />
+	    android:src="@drawable/coin_n"
+	    android:clickable="false"
+	     />
 	<ImageView
 	    android:id="@+id/coin4"
 	    android:layout_alignParentBottom="true"
@@ -116,16 +143,10 @@
 	    android:layout_marginBottom="16dp"
 	    android:layout_width="32dp"
 	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" />
-	<!--  ImageView
-	    android:id="@+id/coin5"
-	    android:layout_alignParentBottom="true"
-	    android:layout_toRightOf="@+id/coin4"
-	    android:layout_marginLeft="16dp"
-	    android:layout_marginBottom="16dp"
-	    android:layout_width="32dp"
-	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" />-->
+	    android:src="@drawable/coin_n" 
+	    android:clickable="false"
+	    />
+
 
 	<ImageView
 	    android:id="@+id/setting_button"
