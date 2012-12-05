@@ -2,7 +2,6 @@ package ioio.examples.hello;
 
 import ioio.examples.bluetooth.BTDeviceList;
 import ioio.examples.bluetooth.BTService;
-import ioio.examples.hello.SenseView.SenseLoop;
 import ioio.lib.api.AnalogInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
@@ -28,13 +27,13 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -71,10 +70,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	public static final int PHOTO_COUNT = 3;
 	private static final int MAX_PROGRESS = 6;
 	
-	//private ToggleButton button_;
-
-//	private ToggleButton button_led_2;
-//	private ToggleButton button_led_4;
 	private static int state;
 	
 	public ImageView imgCountdown;
@@ -110,7 +105,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	TextView storage_state;
 	TextView brac;
 	
-	TextView tvProgress;
 	TextView tvSignal;
 	
 	
@@ -164,12 +158,16 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     private boolean btConnected = false;
     private boolean foundDevice = false;
     
-    private SenseView senseView;
-    private SenseLoop senseLoop;
+    /*
+     * Balloon load screen variables
+     */
+    private static final double NANO_TIME = 1000000000.0;
+    private static final float BLOW_SENSE_THRESHOLD = 300.f;
+    private static final float BLOW_THRESHOLD = 150.f;
+    private static final double TOTAL_BLOW_DURATION = 5;
     private boolean uiRun = false;
-    private ImageView senseView2;
+    private ImageView ivBalloonLoader;
     private boolean isPeak = false;
-    private Bitmap balloon;
     private int[] balloons = {
     		R.drawable.balloon0,
     		R.drawable.balloon1,
@@ -186,10 +184,8 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     private long blowStartTime;
     private long blowEndTime;
     private double blowDuration = 0.0;
-    private static final double NANO_TIME = 1000000000.0;
-    private static final float BLOW_THRESHOLD = 400.f;
-    private static final double TOTAL_BLOW_DURATION = 5;
-    
+    private MediaPlayer mpBlow;
+    private MediaPlayer mpBlowEnd;
     
 	/**
 	 * Called when the activity is first created. Here we normally initialize
@@ -204,16 +200,12 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 		
 		// Set count down animation
         imgCountdown.setBackgroundResource(R.drawable.countdown);
-//        imgSensing.setBackgroundResource(R.drawable.sensing);
     	countdownAnimation = (AnimationDrawable) imgCountdown.getBackground();
-//    	sensingAnimation = (AnimationDrawable) imgSensing.getBackground();
+    	
     	mHandler = new Handler();
     	mLocHandler = new Handler() {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
-//                    case UPDATE_ADDRESS:
-//                        mAddress.setText((String) msg.obj);
-//                        break;
                     case UPDATE_LATLNG:
                         tvLatLng.setText((String) msg.obj);
                         break;
@@ -274,7 +266,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             			
             			try {
             				stream = new FileOutputStream(textfile);
-            				
             				sensor_value = new OutputStreamWriter(stream, "US-ASCII");
             				
             			} catch (FileNotFoundException e1) {
@@ -308,7 +299,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             		        public void run() {
             	        		Log.d(TAG, "Countdown animation is stopping");
             	        		isSensing = true;
-//            	        		doSenseProgress();
             	        		new Thread (new Runnable() {
             	        			@Override
             	        			public void run() {
@@ -325,6 +315,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             	        	}
             		    };
             	        timer.schedule(timerTask, totalDuration);
+            	        
             		}
                 	
                 	String readMessage = (String) msg.obj;
@@ -335,17 +326,23 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
                 		try {
                 			pressureReading2 = Float.parseFloat(readMessage.substring(1));
                 			Log.d(TAG, "BT data Pressure reading 1: " + pressureReading1 + " Pressure reading 2: " + pressureReading2);
-//                        	Log.d(TAG, "BT data Alcohol reading: " + alcoholReading);
                         	
                         	float diff = pressureReading2 - pressureReading1;
                         	Log.d(TAG, "BT data diff: " + diff);
-                        	if (diff > BLOW_THRESHOLD && diff < 10000.f && !isPeak) {
+                        	if (diff > BLOW_SENSE_THRESHOLD && diff < 20000.f && !isPeak) {
                         		isPeak = true;
                         		blowStartTime = System.nanoTime();
-//                        		bDraw++;
+                        		runOnUiThread(new Runnable() { 
+            				        public void run() {
+            				        	mpBlow.start();
+            				        } 
+            				    });
                         		
                         		// Save the alcohol reading
-                        	} else if (diff >= -BLOW_THRESHOLD && diff <= BLOW_THRESHOLD) {
+                        	} else if (diff >= BLOW_THRESHOLD && diff < BLOW_SENSE_THRESHOLD && !isPeak) {
+                        		if (bDraw < 8)
+                        			bDraw++;
+                        	} else if (diff >= -BLOW_SENSE_THRESHOLD && diff <= BLOW_SENSE_THRESHOLD) {
                         		if (isPeak) {
                         			// Save the alcohol reading
                         			
@@ -355,34 +352,45 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
                         			Log.d(TAG, "BT data Blow start time: " + blowStartTime + "Blow end time: " + blowEndTime);
                         			Log.d(TAG, "BT data duration: " + blowDuration);
                         			if (blowDuration > TOTAL_BLOW_DURATION) {
-                        				bDraw = 9;
+                        				// User has blown the required amount of time
+                        				// Close the file and finish the activity
                         				sensor_value.close();
-                        				
+                        				runOnUiThread(new Runnable() { 
+                    				        public void run() {
+                    				        	mpBlow.pause();
+                    				        	mpBlowEnd.start();
+                    				        } 
+                    				    });
+                        				Intent i_return = new Intent();
+                        				Bundle bData = new Bundle();
+                        				bData.putString("testfilename", dirTimeStamp);
+                        				i_return.putExtras(bData);
+                        				setResult(RESULT_OK, i_return);
+                        				finish();
                         			} else {
-                        				if (bDraw < 8)
-                            				bDraw++;
-                            			else
-                            				bDraw = bDraw % 8;
+                        				bDraw = 9;
                         			}
                         			
                         		} else {
-                        			// Don't save alcohol reading
-                        			
+                        			if (bDraw > 0)
+                        				bDraw--;
                         		}
-                        	} else if (diff < -BLOW_THRESHOLD) {
+                        	} else if (diff < -BLOW_SENSE_THRESHOLD) {
                         		isPeak = false;
                         		// Clear data
-//                        		if (blowDuration < TOTAL_BLOW_DURATION) {
-	                        		bDraw = 0;
-//	                        		blowEndTime = System.nanoTime();
-//                        			blowDuration += (blowEndTime - blowStartTime) / NANO_TIME;
-	                        		blowStartTime = blowEndTime = 0;
 //                        		}
+                        		if (bDraw > 0)
+                        			bDraw--;
+                        		runOnUiThread(new Runnable() { 
+            				        public void run() {
+            				        	mpBlow.pause();
+            				        } 
+            				    });
+                        		blowStartTime = blowEndTime = 0;
                         	}
                         	runOnUiThread(new Runnable() { 
-        				        public void run() 
-        				        {
-        				        	senseView2.setImageResource(balloons[bDraw]);
+        				        public void run() {
+        				        	ivBalloonLoader.setImageResource(balloons[bDraw]);
         				        } 
         				    });
                 		} catch (Exception e) {
@@ -425,8 +433,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
                 }
             }
         };
-        
-//    	progSensing.setMax(MAX_PROGRESS);
         
         /*
          * Set variables for writing into data file
@@ -480,15 +486,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	        }
 	    }
 	    
-	    // Set up the camera
-//	    setupCamera();
-	    
-	    /*
-	     * Set up SenseView canvas and thread
-	     */
-//	    senseView = (SenseView) findViewById(R.id.senseView);
-//    	senseLoop = senseView.getThread();
-	    
 	    // Location Detection start
 	    mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	    mUseFine = true;
@@ -502,6 +499,9 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             finish();
             return;
         }
+        
+        mpBlow = MediaPlayer.create(this, R.raw.blow_beep);
+        mpBlowEnd = MediaPlayer.create(this, R.raw.completed_beep);
         
         // Check right away if GPS and Bluetooth are enabled
         if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && mBTAdapter.isEnabled()) {
@@ -601,8 +601,9 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 		case STATE_BT_CONNECTING:
 			// The mobile device is trying to connect to the
 			// Bluetooth device. Check if mBTService is connected yet.
-			if (mBTService.getState() == BTService.STATE_CONNECTED)
+			if (mBTService.getState() == BTService.STATE_CONNECTED) {
 				state = STATE_RUN;
+			}
 			break;
     	}
     	
@@ -647,7 +648,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     	super.onPause();
     	Log.d(TAG, "Pausing...");
     	
-//    	state = STATE_PAUSE;
     	releaseCamera();
     	Log.d(TAG, "Camera is released");
     	mLocationManager.removeUpdates(locListener);
@@ -658,19 +658,16 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	public void onStop() {
 		super.onStop();
 		Log.d(TAG, "Stopping...");
+		mBTService.stop();
 	}
 	
+	/**
+	 * Find all the view widgets necessary for your UI
+	 */
 	private void findViews() {
-		//button_ = (ToggleButton) findViewById(R.id.button);
-//		button_led_2 = (ToggleButton) findViewById(R.id.button_led2);
-//		button_led_4 = (ToggleButton) findViewById(R.id.button_led4);	//used to control alcohol sensor
     	imgCountdown = (ImageView) findViewById(R.id.imgCountdown);
-//    	imgSensing = (ImageView) findViewById(R.id.imgSensing);
-    	tvProgress = (TextView) findViewById(R.id.tvProgress);
-//    	tvSignal = (TextView) findViewById(R.id.tvSignal);
-//    	progSensing = (ProgressBar) findViewById(R.id.progSensing);
     	tvLatLng = (TextView) findViewById(R.id.tvLatLng);
-    	senseView2 = (ImageView) findViewById(R.id.senseView2);
+    	ivBalloonLoader = (ImageView) findViewById(R.id.ivBalloonLoader);
     }
 	
 	@Override
@@ -680,51 +677,50 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     	if (hasFocus) {
     		Log.d(TAG, "HAS FOCUS");
     		
-    		if (state == STATE_RUN) {
-    			
-    			setupCamera();
-    	    	
-    	    	Log.d(TAG, "Start looking for location via GPS");
-    	    	Location loc = null;
-    	    	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-    	    		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locListener);
-    	    		loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    	    	}
-    	    	if (loc != null)
-    	    		updateUILocation(loc);
-    	    	
-        		countdownAnimation.start();
-    	    	
-    	    	long totalDuration = 0;
-    	        
-    	    	for(int i = 0; i< countdownAnimation.getNumberOfFrames();i++){  
-    	    		totalDuration += countdownAnimation.getDuration(i);  
-    	        }
-    	        
-    	        Timer timer = new Timer();
-    	        TimerTask timerTask = new TimerTask(){  
-    	        @Override
-    		        public void run() {
-    	        		Log.d(TAG, "Countdown animation is stopping");
-    	        		isSensing = true;
-//    	        		doSenseProgress();
-    	        		new Thread (new Runnable() {
-    	        			@Override
-    	        			public void run() {
-    	        				for (int i = 0; i < PHOTO_COUNT; i++) {
-    	                			try {
-    	                				mCamera.takePicture(null, null, mPicture);
-    	        						Thread.sleep(1000);
-    	        					} catch (InterruptedException e) {
-    	        						Log.e(TAG, "Camera could not take picture: " + e.getMessage());
-    	        					}
-    	                    	}
-    	        			}
-    	        		}).start();
-    	        	}
-    		    };
-    	        timer.schedule(timerTask, totalDuration);
-    		}
+//    		if (state == STATE_RUN) {
+//    			
+//    			setupCamera();
+//    	    	
+//    	    	Log.d(TAG, "Start looking for location via GPS");
+//    	    	Location loc = null;
+//    	    	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//    	    		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locListener);
+//    	    		loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//    	    	}
+//    	    	if (loc != null)
+//    	    		updateUILocation(loc);
+//    	    	
+//        		countdownAnimation.start();
+//    	    	
+//    	    	long totalDuration = 0;
+//    	        
+//    	    	for(int i = 0; i< countdownAnimation.getNumberOfFrames();i++){  
+//    	    		totalDuration += countdownAnimation.getDuration(i);  
+//    	        }
+//    	        
+//    	        Timer timer = new Timer();
+//    	        TimerTask timerTask = new TimerTask(){  
+//    	        @Override
+//    		        public void run() {
+//    	        		Log.d(TAG, "Countdown animation is stopping");
+//    	        		isSensing = true;
+//    	        		new Thread (new Runnable() {
+//    	        			@Override
+//    	        			public void run() {
+//    	        				for (int i = 0; i < PHOTO_COUNT; i++) {
+//    	                			try {
+//    	                				mCamera.takePicture(null, null, mPicture);
+//    	        						Thread.sleep(1000);
+//    	        					} catch (InterruptedException e) {
+//    	        						Log.e(TAG, "Camera could not take picture: " + e.getMessage());
+//    	        					}
+//    	                    	}
+//    	        			}
+//    	        		}).start();
+//    	        	}
+//    		    };
+//    	        timer.schedule(timerTask, totalDuration);
+//    		}
     	}
     }
 	
@@ -778,8 +774,8 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             }
         }
 	}
-	
-	public void doSenseProgress() {
+	/*
+	private void doSenseProgress() {
 		new Thread (new Runnable() {
 			@Override
 			public void run() {
@@ -825,7 +821,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 		} catch (InterruptedException ie) {
 			Log.e(TAG, "Error in countDown(): " + ie.getMessage());
 		}
-	}
+	}*/
 	
 	private void runSensorCheck() {
 		if (!gpsChecked) {
@@ -836,16 +832,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 			Log.d(TAG, "Showing Enable Bluetooth Dialog");
 			new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
 		}
-//        } else {
-//        	if (!mBTAdapter.isEnabled()) {
-//        		new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
-//        	} else if (!btConnected) {
-//        		if (mBTService == null)
-//        			setupBTTransfer();
-//        		Intent serverIntent = new Intent(this, BTDeviceList.class);
-//            	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-//        	}
-//        }
 	}
 	
 	/*
@@ -941,16 +927,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
         // The Surface has been created, now tell the camera where to draw the preview.
 		Log.d(TAG, "Creating camera preview surface...");
 		initCamera(holder);
-//        try {
-//        	if (btEnabled) {
-//        		if (mCamera != null) {
-//        			mCamera.setPreviewDisplay(holder);
-//        			mCamera.startPreview();
-//        		}
-//        	}
-//        } catch (IOException e) {
-//            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-//        }
     }
 	
 	public void surfaceDestroyed(SurfaceHolder holder) {
@@ -1146,18 +1122,12 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
         mBTService.connect(device, secure);
         Log.d(TAG, "Just ran mBTService.connect()");
         state = STATE_BT_CONNECTING;
-//        state = STATE_RUN;
     }
     
     private void setupBTTransfer() {
     	Log.d(TAG, "Setup BT Transfer");
     	mBTService = new BTService(this, btHandler);
     }
-    
-    private float barr2float(byte[] barr, int offset, int len) {
-		String str = new String(barr, offset, len);
-		return Float.parseFloat(str);
-	}
     
     private void writeIntoFile(float value) {
 		try {

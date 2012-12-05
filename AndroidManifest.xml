@@ -70,10 +70,7 @@
             android:name="ioio.examples.hello.TestActivity"
             android:label="@string/title_activity_test" >
         </activity>
-        <activity
-            android:name="ioio.examples.hello.GameListActivity"
-            android:label="@string/title_activity_game_list" >
-        </activity>
+
     </application>
 
 </manifest>
