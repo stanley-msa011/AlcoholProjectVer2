@@ -68,9 +68,21 @@
 
         <activity
             android:name="ioio.examples.hello.TestActivity"
-            android:label="@string/title_activity_test" >
+            android:screenOrientation="portrait" >
         </activity>
 
+        <activity
+            android:name="ioio.examples.hello.GameListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ioio.examples.hello.GalleryActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ioio.examples.hello.BracHistoryActivity"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

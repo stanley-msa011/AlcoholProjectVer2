@@ -18,25 +18,19 @@ public class GameDB {
     }
     
     public GameState getLatestGameState(){
-    	Log.e(this.getClass().toString(), "call getLatestGameState");
     	gDB = gDBHelper.getWritableDatabase();
-    	Log.e(this.getClass().toString(), "getDBsucess");
     	Cursor cursor = gDB.rawQuery("SELECT MAX(_ID) FROM AlcoholTreeGame", null);
-    	Log.e(this.getClass().toString(), "getCursor");
     	
     	cursor.moveToFirst();
     	int max_id = cursor.getInt(0);
     	cursor = gDB.rawQuery("SELECT _STATE,_COIN FROM AlcoholTreeGame WHERE _ID="+String.valueOf(max_id),null);
-    	Log.e(this.getClass().toString(), "getCursorData "+cursor.getCount());
     	if (cursor.getCount()==0){
     		gDB.close();
     		return new GameState(3,0);
     	}
-    	Log.e(this.getClass().toString(), "getData_xxx");
     	cursor.moveToFirst();
     	int state = cursor.getInt(0);
     	int coin = cursor.getInt(1);
-    	Log.e(this.getClass().toString(), "getCursor"+state+" "+coin);
     	if (state > GameState.MAX_STATE || state < GameState.MIN_STATE)
     		state = 3;
     	if (coin > GameState.MAX_COINS || coin < GameState.MIN_COINS)
@@ -54,6 +48,36 @@ public class GameDB {
     	"INSERT INTO AlcoholTreeGame (_STATE,_COIN) VALUES ("+String.valueOf(state)+", "+String.valueOf(coin)+")");
     	gDB.close();
     	return oldState;
+    }
+    
+    public GameState[] getAllStates(){
+    	gDB = gDBHelper.getReadableDatabase();
+    	Cursor cursor;
+    	
+    	cursor = gDB.rawQuery("SELECT _ID,_STATE,_COIN FROM AlcoholTreeGame ORDER BY _ID ASC",null);
+    	if (cursor.getCount()==0){
+    		gDB.close();
+    		return null;
+    	}
+    	int list_size = cursor.getCount();
+    	
+    	GameState[] stateList = new GameState[list_size];
+    	
+    	cursor.moveToFirst();
+    	
+    	int state = cursor.getInt(1);
+    	int coin = cursor.getInt(2);
+    	stateList[0]=new GameState(state,coin);
+    	int i = 1;
+    	while(cursor.moveToNext()){
+        	state = cursor.getInt(1);
+        	coin = cursor.getInt(2);
+        	stateList[i]=new GameState(state,coin);
+        	++i;
+    	}
+    	
+    	gDB.close();
+    	return stateList;
     }
     
 }

@@ -3,7 +3,9 @@ package game;
 import ioio.examples.hello.BracDbAdapter;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,8 +14,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -52,7 +52,7 @@ public class BracDataHandler {
 	public int start(){
 		
 		File mainStorageDir;
-		File textFile;
+		File textFile, geoFile;
 		File[] imageFiles = new File[3];
 
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_REMOVED))
@@ -61,6 +61,19 @@ public class BracDataHandler {
         	mainStorageDir = new File(Environment.getExternalStorageDirectory(), "drunk_detection");
         
         textFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + ts + ".txt");
+        geoFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "geo.txt");
+        boolean hasGeoFile = false;
+        try {
+			FileInputStream geoFileTester = new FileInputStream(geoFile);
+			geoFileTester.close();
+			hasGeoFile = true;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         imageFiles[0] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_1.jpg");
         imageFiles[1] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_2.jpg");
         imageFiles[2] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_3.jpg");
@@ -75,8 +88,8 @@ public class BracDataHandler {
        	else
        		result = HaveAlcohol;
        	
-
-       	int server_connect = connectingToServer(textFile,imageFiles);
+       	/*Connection to server*/
+       	int server_connect = connectingToServer(textFile,geoFile,imageFiles,hasGeoFile);
 		if (server_connect == ERROR)
 			return ERROR;
      	
@@ -120,7 +133,7 @@ public class BracDataHandler {
         return avg_result;
 	}
 	
-	private int connectingToServer(File textFile,File[] imageFiles){
+	private int connectingToServer(File textFile, File geoFile, File[] imageFiles,boolean hasGeoFile){
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(SERVER_URL);
@@ -141,7 +154,10 @@ public class BracDataHandler {
 			
 			ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
 			mpEntity.addPart("userfile[]", cbFile);
-			
+			if (hasGeoFile){
+				ContentBody cbGeoFile = new FileBody(geoFile, "application/octet-stream");
+				mpEntity.addPart("userfile[]", cbGeoFile);
+			}
 			Log.e(TAG, "add part #2");
 			
 			mpEntity.addPart("userfile[]", new FileBody(imageFiles[0], "image/jpeg"));

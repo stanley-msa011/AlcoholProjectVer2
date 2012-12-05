@@ -5,19 +5,46 @@
     tools:context=".TestActivity" >
 
     <Button
-        android:id="@+id/testGetButton"
+        android:id="@+id/test_less_0_05"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="TestGetCoin" />
+        android:layout_alignParentTop="true"
+        android:text="test less than 0.05" />
 
     <Button
-        android:id="@+id/testLoseButton"
+        android:id="@+id/test_less_0_15"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/testGetButton"
+        android:layout_below="@+id/test_less_0_05"
         android:layout_centerHorizontal="true"
-        android:text="TestLoseButton" />
-
+        android:text="test less than 0.15" />
+    <Button
+        android:id="@+id/test_less_0_25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/test_less_0_15"
+        android:layout_centerHorizontal="true"
+        android:text="test less than 0.25" />
+	<Button
+        android:id="@+id/test_less_0_40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/test_less_0_25"
+        android:layout_centerHorizontal="true"
+        android:text="test less than 0.40" />
+	<Button
+        android:id="@+id/test_less_0_60"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/test_less_0_40"
+        android:layout_centerHorizontal="true"
+        android:text="test less than 0.60" />
+    <Button
+        android:id="@+id/test_more_0_60"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/test_less_0_60"
+        android:layout_centerHorizontal="true"
+        android:text="test more than 0.60" />
 </RelativeLayout>

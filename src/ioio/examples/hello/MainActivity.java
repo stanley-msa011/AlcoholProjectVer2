@@ -117,8 +117,10 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	private boolean doneSensing = false;
 
 	File textfile;
-	FileOutputStream stream;
+	File geoFile;
+	FileOutputStream stream, geoStream;
 	OutputStreamWriter sensor_value;
+	OutputStreamWriter geo_value;
 	
 	Calendar calendar;
 	
@@ -263,6 +265,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             		    });
             	    	
             	    	textfile = new File(sessionDir + File.separator + dirTimeStamp + ".txt");
+            	    	geoFile = new File(sessionDir + File.separator + "geo.txt");
             			
             			try {
             				stream = new FileOutputStream(textfile);
@@ -282,8 +285,29 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             	    		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locListener);
             	    		loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             	    	}
-            	    	if (loc != null)
+            	    	if (loc != null) {
             	    		updateUILocation(loc);
+            	    		try {
+								geoStream = new FileOutputStream(geoFile);
+								geo_value = new OutputStreamWriter(geoStream);
+								geo_value.write(String.valueOf(loc.getLatitude()) + "\t" + String.valueOf(loc.getLongitude()));
+							} catch (FileNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} finally {
+								if (geo_value != null) {
+									try {
+										geo_value.close();
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							}
+            	    	}
             	    	
                 		countdownAnimation.start();
             	    	
@@ -606,41 +630,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 			}
 			break;
     	}
-    	
-//    	if (state == STATE_PAUSE) {
-    		// We've returned from a paused state
-    		// Check the sensors if they need to be re-enabled
-//    		if (gpsChecked && mBTAdapter.isEnabled()) {
-//    			state = STATE_BT_CONNECTING;
-//    			setupBTTransfer();
-//            	Intent serverIntent = new Intent(this, BTDeviceList.class);
-//            	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-//    		} else {
-//    			runSensorCheck();
-//    		}
-//    	} else if (state == STATE_BT_CONNECTING) {
-    		// Do Bluetooth device connection
-//    		setupBTTransfer();
-//        	Intent serverIntent = new Intent(this, BTDeviceList.class);
-//        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-//    	}
-//    	
-    	// Only start the camera and the location search if Bluetooth has been enabled
-//    	if (btEnabled && btConnected) {
-//	    	if (mCamera == null) {
-//	    		mCamera = getCameraInstance();
-//	    		Log.d(TAG, "Camera reopened");
-//	    	}
-//	    	
-//	    	Log.d(TAG, "Start looking for location via GPS");
-//	    	Location loc = null;
-//	    	if (gpsEnabled) {
-//	    		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locListener);
-//	    		loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//	    	}
-//	    	if (loc != null)
-//	    		updateUILocation(loc);
-//    	}
     }
 	
 	@Override
@@ -658,7 +647,8 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	public void onStop() {
 		super.onStop();
 		Log.d(TAG, "Stopping...");
-		mBTService.stop();
+		if (mBTService != null)
+			mBTService.stop();
 	}
 	
 	/**
@@ -676,51 +666,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     	
     	if (hasFocus) {
     		Log.d(TAG, "HAS FOCUS");
-    		
-//    		if (state == STATE_RUN) {
-//    			
-//    			setupCamera();
-//    	    	
-//    	    	Log.d(TAG, "Start looking for location via GPS");
-//    	    	Location loc = null;
-//    	    	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//    	    		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locListener);
-//    	    		loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//    	    	}
-//    	    	if (loc != null)
-//    	    		updateUILocation(loc);
-//    	    	
-//        		countdownAnimation.start();
-//    	    	
-//    	    	long totalDuration = 0;
-//    	        
-//    	    	for(int i = 0; i< countdownAnimation.getNumberOfFrames();i++){  
-//    	    		totalDuration += countdownAnimation.getDuration(i);  
-//    	        }
-//    	        
-//    	        Timer timer = new Timer();
-//    	        TimerTask timerTask = new TimerTask(){  
-//    	        @Override
-//    		        public void run() {
-//    	        		Log.d(TAG, "Countdown animation is stopping");
-//    	        		isSensing = true;
-//    	        		new Thread (new Runnable() {
-//    	        			@Override
-//    	        			public void run() {
-//    	        				for (int i = 0; i < PHOTO_COUNT; i++) {
-//    	                			try {
-//    	                				mCamera.takePicture(null, null, mPicture);
-//    	        						Thread.sleep(1000);
-//    	        					} catch (InterruptedException e) {
-//    	        						Log.e(TAG, "Camera could not take picture: " + e.getMessage());
-//    	        					}
-//    	                    	}
-//    	        			}
-//    	        		}).start();
-//    	        	}
-//    		    };
-//    	        timer.schedule(timerTask, totalDuration);
-//    		}
+    		// Do nothing for now
     	}
     }
 	
