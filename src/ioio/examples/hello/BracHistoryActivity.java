@@ -17,9 +17,9 @@ public class BracHistoryActivity extends Activity {
 	private ListView brac_list_view;
 	
 	
-	static private final double[] limit = {0.01, 0.1, 0.25};
+	static private final double[] limit = {0.05, 0.15, 0.25, 0.40, 0.60};
 	static private final int[]	bg_setting = {
-		R.drawable.bar01,R.drawable.bar02,R.drawable.bar03,R.drawable.bar04
+		R.drawable.bar01,R.drawable.bar02,R.drawable.bar03,R.drawable.bar04,R.drawable.bar05,R.drawable.bar06
 	};
 	
 	@Override
@@ -76,7 +76,11 @@ public class BracHistoryActivity extends Activity {
 			return bg_setting[1];
 		else if (brac_v < limit[2])
 			return bg_setting[2];
-		else
+		else if (brac_v < limit[3])
 			return bg_setting[3];
+		else if (brac_v < limit[4])
+			return bg_setting[4];
+		else 
+			return bg_setting[5];
 	}
 }
