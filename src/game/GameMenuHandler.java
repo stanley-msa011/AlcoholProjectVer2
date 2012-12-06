@@ -5,6 +5,7 @@ import ioio.examples.hello.GalleryActivity;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.MainActivity;
 import ioio.examples.hello.R;
+import ioio.examples.hello.TestActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -22,6 +22,7 @@
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentLeft="true"
+	    android:adjustViewBounds="true"
 	    android:src="@drawable/land"
 	    android:clickable="false"
 	     />
@@ -32,8 +33,9 @@
         android:layout_height="256dp"
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:src="@drawable/tree1" 
+        android:adjustViewBounds="true"
         android:clickable="false"
         />
 
@@ -43,8 +45,9 @@
         android:layout_height="320dp"
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:src="@drawable/tree2" 
+        android:adjustViewBounds="true"
         android:clickable="false"
         />
     
@@ -54,8 +57,9 @@
         android:layout_height="320dp"
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:src="@drawable/tree3" 
+        android:adjustViewBounds="true"
         android:clickable="false"
         />
     
@@ -65,8 +69,9 @@
         android:layout_height="320dp"
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:src="@drawable/tree4" 
+        android:adjustViewBounds="true"
         android:clickable="false"
         />
     
@@ -76,8 +81,9 @@
         android:layout_height="320dp"
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:src="@drawable/tree5" 
+        android:adjustViewBounds="true"
         android:clickable="false"
         />
     <ImageView
@@ -86,8 +92,9 @@
         android:layout_height="320dp"
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:src="@drawable/tree6" 
+        android:adjustViewBounds="true"
         android:clickable="false"
         />
 	<ImageView
@@ -96,8 +103,9 @@
         android:layout_height="320dp"
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:src="@drawable/tree7" 
+        android:adjustViewBounds="true"
         android:clickable="false"
         />
 

@@ -12,12 +12,16 @@ import com.devsmart.android.ui.HorizontalListView;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 public class GalleryActivity extends Activity {
 
 	private SimpleAdapter gallery_adapter;
 	private HorizontalListView galleryListView;
+	//private ListView galleryListView;
 	ArrayList<HashMap<String,Object>> gallery_list = new ArrayList<HashMap<String,Object>>();
 	
 	private final int[] treePics ={
@@ -33,35 +37,33 @@ public class GalleryActivity extends Activity {
 	private final int MAX_WEATHER_CHANGE_STATE = 10;
 	
 	private final int[] weatherPicsGood = {
-			R.drawable.w10,R.drawable.w11,R.drawable.w12,R.drawable.w13,R.drawable.w14,
-			R.drawable.w15,R.drawable.w16,R.drawable.w17,R.drawable.w18,R.drawable.w19
+			R.drawable.w09,R.drawable.w08,R.drawable.w07,R.drawable.w06,R.drawable.w05,
+			R.drawable.w04,R.drawable.w03,R.drawable.w02,R.drawable.w01,R.drawable.w00
 	};
 	
 	private final int[] weatherPicsBad = {
-			R.drawable.w05,R.drawable.w06,R.drawable.w07,R.drawable.w08,R.drawable.w09,
-			R.drawable.w00,R.drawable.w01,R.drawable.w02,R.drawable.w03,R.drawable.w04
+			R.drawable.w10,R.drawable.w11,R.drawable.w12,R.drawable.w13,R.drawable.w14,
+			R.drawable.w15,R.drawable.w16,R.drawable.w17,R.drawable.w18,R.drawable.w19
 	};
-	// 00 ~ 04 thunder
-	// 05 ~ 09 rain
-	// 10 ~ 14 cloud
-	// 15 ~ 19 sun
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_gallery);
 		galleryListView = (HorizontalListView) findViewById(R.id.gallery_list);
-
+		//galleryListView = (ListView) findViewById(R.id.gallery_list);
 		int adapter_len = setGalleryList();
-		
 		 gallery_adapter = new SimpleAdapter(
 				this, 
 				gallery_list,
 				R.layout.game_history,
 				new String[] { "pic","tree","coin0","coin1","coin2","coin3"},
 				new int[] {R.id.gallery_background,R.id.gallery_tree,R.id.gallery_coin1,R.id.gallery_coin2,R.id.gallery_coin3,R.id.gallery_coin4});
-		if (adapter_len >0)
+		 Log.d("Gallery", "End Adapter");
+		 if (adapter_len >0){
 			galleryListView.setAdapter(gallery_adapter);
+		}
 	}
 
 	private int setGalleryList(){

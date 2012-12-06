@@ -5,11 +5,12 @@
 
     <ImageView
         android:id="@+id/brac_background"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_width="160dp"
+        android:layout_height = "60dp"
+        android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
+        android:scaleType="fitXY"
         android:src="@drawable/bar01" />
     
     <TextView
@@ -20,19 +21,22 @@
         android:layout_centerVertical="true"
         android:text="@string/empty_row" 
         android:textSize="20sp"
-        android:textColor="#FF000000"
+        android:textStyle="bold"
+        android:textColor="#FFFFFFFF"
     />
 
     <TextView
         android:id="@+id/brac_value"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-		android:layout_toRightOf="@+id/brac_date"
-		android:layout_marginLeft="60dp"
+		android:layout_alignParentRight = "true"
+		android:layout_marginRight="30dp"
         android:layout_centerVertical="true"
         android:text="@string/empty_row" 
         android:textSize="20sp"
-        android:textColor="#FFFFFFFF"
+        android:textStyle="bold"
+        android:textColor="#FF000000"
         />
+
 
 </RelativeLayout>

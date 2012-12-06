@@ -28,7 +28,6 @@ public class BracHistoryActivity extends Activity {
 		setContentView(R.layout.activity_brac_history);
 		
 		brac_list_view = (ListView)findViewById(R.id.brac_history_listview);
-		
 		mBracDbAdapter = new BracDbAdapter(this);
 		mBracDbAdapter.open();
 		ArrayList<HashMap<String,Object>> brac_list = fillData();
@@ -38,10 +37,8 @@ public class BracHistoryActivity extends Activity {
 					R.layout.brac_history_content,
 					new String[] { "date","brac","bg"},
 					new int[] {R.id.brac_date,R.id.brac_value,R.id.brac_background});
-		Log.d("BracHistory", String.valueOf(brac_list.size()));
-		if (brac_list.size()>0)
-			brac_list_view.setAdapter(brac_adapter);
-		
+		brac_list_view.setAdapter(brac_adapter);
+
 	}
 	
 	private ArrayList<HashMap<String,Object>> fillData() {
