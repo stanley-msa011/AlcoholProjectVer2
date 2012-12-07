@@ -3,21 +3,25 @@ package ioio.examples.hello;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import game.BackgroundHandler;
 import game.BracDataHandler;
 import game.GameDB;
 import game.GameMenuHandler;
 import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
+import android.R.interpolator;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.ImageView;
 
 @SuppressLint("NewApi")
@@ -30,6 +34,8 @@ public class GameActivity extends Activity{
 	private static final int MAX_COIN = GameState.MAX_COINS; 
 	private ImageView[] tree_image = new ImageView[TREE_TYPES];
 	private ImageView[] coin_image = new ImageView[MAX_COIN];
+	private ImageView background;
+	private ImageView background_anime;
 	private TreeGame treeGame=null;
 	private GameDB gDB=null;
 	private Animation appear_anim;
@@ -57,6 +63,7 @@ public class GameActivity extends Activity{
 		gDB = new GameDB(this);
 		GameState gState = gDB.getLatestGameState();
 		treeGame=new TreeGame(gState);
+		initBackground();
 		initAnim();
 		initTreeImage();
 		initCoinImage();
@@ -73,6 +80,13 @@ public class GameActivity extends Activity{
 			startActivityForResult(newActivity, REQUEST_TEST);  
 		}
 	}
+	
+	private void initBackground(){
+		background = (ImageView) findViewById(R.id.background);
+		background_anime = (ImageView) findViewById(R.id.background_anime);
+		background_anime.setVisibility(View.INVISIBLE);
+	}
+	
 	private void initAnim(){
 		/*used for initializing animations*/
 		appear_anim = new AlphaAnimation(0.f,1.f);
@@ -100,6 +114,7 @@ public class GameActivity extends Activity{
 		coin_image[3] = (ImageView) findViewById(R.id.coin4);
 	}	
 	
+	
 	private void initSettingButton(){
 		setting_image= (ImageView) findViewById(R.id.setting_button);
 		setting_image.setClickable(true);
@@ -117,10 +132,12 @@ public class GameActivity extends Activity{
 		tree_image[gState.state].setVisibility(ImageView.VISIBLE);
 		for (int i=0;i<gState.coin;++i)
 			coin_image[i].setVisibility(ImageView.VISIBLE);
+		Drawable bg = this.getResources().getDrawable( BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
+		background.setImageDrawable(bg);
 	}
 	
 	
-	private void setImageDelay(GameState oldState){
+	private void setImageChange(GameState oldState){
 		/*set images with animation (used in onCreate())*/
 		GameState gState=treeGame.getGameState();
 		if (oldState.coin < gState.coin){
@@ -147,7 +164,6 @@ public class GameActivity extends Activity{
 			if (oldState.coin ==GameState.MAX_COINS && gState.coin == GameState.MIN_COINS){
 				//lose coin because state increases
 				for (int i=gState.coin;i<oldState.coin;++i){
-					coin_image[i].setAlpha(1.f);
 					coin_image[i].startAnimation(disappear_anim);
 					coin_image[i].setVisibility(ImageView.INVISIBLE);
 				}
@@ -156,7 +172,6 @@ public class GameActivity extends Activity{
 				Animation a;
 				a = AnimationUtils.loadAnimation(this, R.anim.coin_disappear_anim_type1);
 				for (int i=gState.coin;i<oldState.coin;++i){
-					coin_image[i].setAlpha(1.f);
 					coin_image[i].clearAnimation();
 					coin_image[i].startAnimation(a);
 					coin_image[i].setVisibility(ImageView.INVISIBLE);
@@ -165,29 +180,31 @@ public class GameActivity extends Activity{
 		}
 		
 		if (oldState.state != gState.state){
-			tree_image[oldState.state].setAlpha(1.f);
 			tree_image[oldState.state].startAnimation(disappear_anim);
 			tree_image[oldState.state].setVisibility(ImageView.INVISIBLE);
-			tree_image[gState.state].setAlpha(0.f);
 			tree_image[gState.state].setVisibility(ImageView.VISIBLE);
 			tree_image[gState.state].startAnimation(appear_anim);
-			tree_image[gState.state].setAlpha(1.f);
+		}
+		
+		if (oldState.coin != gState.coin || oldState.state != gState.state){
+			Drawable bgNext = this.getResources().getDrawable( BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
+			Drawable bgNow = this.getResources().getDrawable( BackgroundHandler.getBackgroundDrawableId(oldState.state, oldState.coin));
+			background_anime.setImageDrawable(bgNow);
+			background_anime.setVisibility(View.VISIBLE);
+			background.setImageDrawable(bgNext);
+			background_anime.startAnimation(disappear_anim);
+			background.setAnimation(appear_anim);
+			background_anime.setVisibility(View.INVISIBLE);
 		}
 	}	
 	
-	/*Similar to getCoin(), but with delayed animation*/
 	public void getCoin(){
-		GameState oldState = new GameState(treeGame.getGameState());
-		treeGame.getCoin();
-		gDB.updateState(treeGame.getGameState());
-		this.setImageDelay(oldState);
+		GameState oldState = treeGame.getPrevState();
+		this.setImageChange(oldState);
 	}
-	/*Similar to loseCoin(), but with delayed animation*/
 	public void loseCoin(){
-		GameState oldState = new GameState(treeGame.getGameState());
-		treeGame.loseCoin();
-		gDB.updateState(treeGame.getGameState());
-		this.setImageDelay(oldState);
+		GameState oldState = treeGame.getPrevState();
+		this.setImageChange(oldState);
 	}
 	
 	/*OnListenerForSettingButton*/
@@ -207,7 +224,7 @@ public class GameActivity extends Activity{
 	}
 
 	private void startBracDataHandler(String ts){
-		BracDataHandler bdh = new BracDataHandler(ts,context);
+		BracDataHandler bdh = new BracDataHandler(ts,context,treeGame,gDB);
 		int result = bdh.start();
 		gPopWindow.showPopWindow(result);
 	}

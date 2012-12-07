@@ -2,10 +2,11 @@ package game;
 
 import ioio.examples.hello.BracDbAdapter;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,26 +34,31 @@ import android.util.Log;
 public class BracDataHandler {
 	String ts;
 	Context activity_context;
+	TreeGame treeGame;
+	GameDB gDB;
 	String TAG = "BRACDATAHANDLER";
 	
-	public BracDataHandler(String timestamp_string, Context activity){
+	public BracDataHandler(String timestamp_string, Context activity, TreeGame treeGame,GameDB gDB){
 		ts = timestamp_string;
 		activity_context = activity;
+		this.treeGame = treeGame;
+		this.gDB = gDB;
 	}
+	
 	
 	public static final int HaveAlcohol = 11;
 	public static final int NoAlcohol = 10; 
 	public static final int Nothing = 0; 
 	public static final int ERROR = -1;
 	public static final int SUCCESS = 1;
-	private static final double THRESHOLD = 0.01;
+	private static final double THRESHOLD = 0.05;
 	
 	private static final String SERVER_URL = "http://140.112.30.165:80/drunk_detect_upload.php";
 	
 	public int start(){
 		
 		File mainStorageDir;
-		File textFile, geoFile;
+		File textFile, geoFile, stateFile;
 		File[] imageFiles = new File[3];
 
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_REMOVED))
@@ -67,13 +73,8 @@ public class BracDataHandler {
 			FileInputStream geoFileTester = new FileInputStream(geoFile);
 			geoFileTester.close();
 			hasGeoFile = true;
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (Exception e) {e.printStackTrace();}
+        
         imageFiles[0] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_1.jpg");
         imageFiles[1] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_2.jpg");
         imageFiles[2] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_3.jpg");
@@ -83,15 +84,33 @@ public class BracDataHandler {
        	
        	if (avg_result == ERROR)
        		return ERROR;
-       	if (avg_result < THRESHOLD)
+       	if (avg_result < THRESHOLD){
 			result = NoAlcohol;
-       	else
+			treeGame.getCoin();
+			gDB.updateState(treeGame.getGameState());
+       	}
+       	else{
        		result = HaveAlcohol;
+       		treeGame.loseCoin();
+       		gDB.updateState(treeGame.getGameState());
+       	}
+       	
+       	boolean hasStateFile = false;
+       	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");
+       	try {
+       		BufferedWriter state_writer = new BufferedWriter(new FileWriter(stateFile));
+       		state_writer.write(treeGame.toString());
+       		state_writer.flush();
+       		state_writer.close();
+       		hasStateFile = true;
+		} catch (Exception e) {	
+			e.printStackTrace();	
+			Log.d("Write state", "no state.txt");
+		}
        	
        	/*Connection to server*/
-       	int server_connect = connectingToServer(textFile,geoFile,imageFiles,hasGeoFile);
-		if (server_connect == ERROR)
-			return ERROR;
+       	int server_connect = connectingToServer(textFile,geoFile,stateFile,imageFiles,hasGeoFile,hasStateFile);
+		if (server_connect == ERROR);
      	
 		saveToDB(avg_result);
        	
@@ -133,24 +152,19 @@ public class BracDataHandler {
         return avg_result;
 	}
 	
-	private int connectingToServer(File textFile, File geoFile, File[] imageFiles,boolean hasGeoFile){
+	private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles,boolean hasGeoFile,boolean hasStateFile){
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(SERVER_URL);
 			
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-			Log.e(TAG, "http setParams");
 			
 			String devId = Secure.getString(activity_context.getContentResolver(), Secure.ANDROID_ID);
-			
-			Log.e(TAG, "get devID");
 			
 			MultipartEntity mpEntity = new MultipartEntity();
 			
 			mpEntity.addPart("userData[]", new StringBody(devId));
 			mpEntity.addPart("userData[]", new StringBody(ts));
-			
-			Log.e(TAG, "add part #1");
 			
 			ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
 			mpEntity.addPart("userfile[]", cbFile);
@@ -158,19 +172,16 @@ public class BracDataHandler {
 				ContentBody cbGeoFile = new FileBody(geoFile, "application/octet-stream");
 				mpEntity.addPart("userfile[]", cbGeoFile);
 			}
-			Log.e(TAG, "add part #2");
+			if(hasStateFile){
+				ContentBody cbStateFile = new FileBody(stateFile, "application/octet-stream");
+				mpEntity.addPart("userfile[]", cbStateFile);
+			}
 			
 			mpEntity.addPart("userfile[]", new FileBody(imageFiles[0], "image/jpeg"));
-			
 			mpEntity.addPart("userfile[]", new FileBody(imageFiles[1], "image/jpeg"));
-			
 			mpEntity.addPart("userfile[]", new FileBody(imageFiles[2], "image/jpeg"));
 			
-			Log.e(TAG, "add part #3");
-			
 			httpPost.setEntity(mpEntity);
-			
-			Log.e(TAG, "set entity");
 			
 			BracDataToServer BDT = new BracDataToServer(httpClient,httpPost);
 			Thread thread = new Thread(BDT);
@@ -178,22 +189,8 @@ public class BracDataHandler {
 			thread.join();
 			if (BDT.result==-1)
 				return ERROR;
-			/*
-			HttpResponse httpResponse = httpClient.execute(httpPost);
-			
-			Log.e(TAG, "get response");
-			
-			int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-			
-			Log.e(TAG, "get http status");
-			
-			if (httpStatusCode == HttpStatus.SC_OK) {} 
-			else
-				return ERROR;
-			*/
 			
 		} catch (Exception e) {
-			Log.e(TAG,e.toString());
 			return ERROR;
 		} 
 		return SUCCESS;
@@ -212,5 +209,4 @@ public class BracDataHandler {
 		mBracDbAdapter.close();
 	}
 	
-
 }

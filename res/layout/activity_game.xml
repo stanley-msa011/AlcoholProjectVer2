@@ -17,15 +17,15 @@
         android:src="@drawable/background" />
     
     <ImageView
-	    android:id="@+id/land"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"
-	    android:layout_alignParentLeft="true"
-	    android:adjustViewBounds="true"
-	    android:src="@drawable/land"
-	    android:clickable="false"
-	     />
+        android:id="@+id/background_anime"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:clickable="false"
+        android:scaleType="fitXY"
+        android:src="@drawable/background" />
+    
     
     <ImageView
         android:id="@+id/tree1"
