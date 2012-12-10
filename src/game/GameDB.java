@@ -26,7 +26,7 @@ public class GameDB {
     	cursor = gDB.rawQuery("SELECT _STATE,_COIN FROM AlcoholTreeGame WHERE _ID="+String.valueOf(max_id),null);
     	if (cursor.getCount()==0){
     		gDB.close();
-    		return new GameState(3,0);
+    		return new GameState(3,2);
     	}
     	cursor.moveToFirst();
     	int state = cursor.getInt(0);

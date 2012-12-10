@@ -78,7 +78,7 @@ public class GameMenuHandler {
 			
 			switch (list_id){
 				case 0:	//MainActivity
-					newActivity = new Intent(context, MainActivity.class);  
+					newActivity = new Intent(context, TestActivity.class);  
 					ga.startActivityForResult(newActivity, REQUEST_TEST);  
 					break;
 				case 1: //Dummy (Record of TreeGame)
