@@ -10,9 +10,7 @@ import game.GameMenuHandler;
 import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
-import android.R.interpolator;
 import android.os.Bundle;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -21,10 +19,9 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.widget.ImageView;
 
-@SuppressLint("NewApi")
+
 public class GameActivity extends Activity{
 	
 	/*communication with MainACtivity*/
@@ -43,7 +40,7 @@ public class GameActivity extends Activity{
 	private ImageView setting_image;
 	private GamePopupWindowHandler gPopWindow;
 	private GameMenuHandler gMenu;
-
+	
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 
 	public final static int START_DO_NOTHING = 0;

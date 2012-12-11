@@ -5,6 +5,7 @@ import ioio.examples.hello.GalleryActivity;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.MainActivity;
 import ioio.examples.hello.R;
+import ioio.examples.hello.SettingActivity;
 import ioio.examples.hello.TestActivity;
 
 import java.util.ArrayList;
@@ -90,6 +91,8 @@ public class GameMenuHandler {
 	                ga.startActivity(newActivity);
 					break;
 				case 3: //Dummy (Setting)
+					newActivity = new Intent(context, SettingActivity.class);     
+	                ga.startActivity(newActivity);
 					break;
 				default:
 					break;

@@ -5,12 +5,12 @@
     android:background="@android:color/black"
     tools:context=".StoryActivity" >
 
-    <com.devsmart.android.ui.HorizontalListView
+    <Gallery
         android:id="@+id/gallery_list"
         android:layout_width="match_parent"
         android:layout_height="420dp"
         android:layout_centerInParent="true"
-		>
-    </com.devsmart.android.ui.HorizontalListView>
+     />
+
 
 </RelativeLayout>

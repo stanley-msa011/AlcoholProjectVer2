@@ -61,5 +61,7 @@
     <string name="title_activity_gallery">GalleryActivity</string>
     <string name="title_activity_brac_history">BracHistoryActivity</string>
     <string name="emptyHistoryString">未有酒測紀錄</string>
+    <string name="title_activity_setting">SettingActivity</string>
+    <string name="title_activity_doctor_setting_pwd">DoctorSettingPwdActivity</string>
 
 </resources>
