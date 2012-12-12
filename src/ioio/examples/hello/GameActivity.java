@@ -10,6 +10,7 @@ import game.GameMenuHandler;
 import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
+import game.interaction.InteractiveGameHandler;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -40,6 +41,7 @@ public class GameActivity extends Activity{
 	private ImageView setting_image;
 	private GamePopupWindowHandler gPopWindow;
 	private GameMenuHandler gMenu;
+	private InteractiveGameHandler gInteractiveGame;
 	
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 
@@ -68,6 +70,7 @@ public class GameActivity extends Activity{
 		setImage();
 		gPopWindow = new GamePopupWindowHandler(this);
 		gMenu = new GameMenuHandler(this);
+		gInteractiveGame = new InteractiveGameHandler(this);
 		context = this;
 		/*Go to MainActivity if start because of the notice*/
 		if (START_ACTION == START_MAIN){

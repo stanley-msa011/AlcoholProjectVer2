@@ -36,12 +36,20 @@ public class DBHelper extends SQLiteOpenHelper {
                 ")"
         );
         db.execSQL(DATABASE_CREATE);
+        db.execSQL(
+        		"CREATE TABLE AlcoholInteractiveGame ("+
+        				"_ID INTEGER PRIMARY KEY," +
+        				"_PID CHAR[50] NOT NULL," +
+        				"_STATE INTEGER NOT NULL," +
+        				"_COIN INTEGER NOT NULL )" 
+        		);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int old_ver, int new_ver){
 		db.execSQL("DROP TABLE IF EXISTS AlcoholTreeGame");
 		db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
+		db.execSQL("DROP TABLE IF EXISTS  AlcoholInteractiveGame");
 		onCreate(db);
 	}
 	

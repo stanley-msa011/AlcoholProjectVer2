@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.view.View;
 import android.widget.Gallery;
 import android.widget.SimpleAdapter;
 
@@ -23,19 +22,6 @@ public class GalleryActivity extends Activity {
 	private Gallery galleryListView;
 	private Context galleryActivity;
 	ArrayList<HashMap<String,Object>> gallery_list = new ArrayList<HashMap<String,Object>>();
-	View[] items;;
-	
-	private final int[] treePics ={
-		R.drawable.tree1,
-		R.drawable.tree2,
-		R.drawable.tree3,
-		R.drawable.tree4,
-		R.drawable.tree5,
-		R.drawable.tree6,
-		R.drawable.tree7
-	};
-
-	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +68,12 @@ public class GalleryActivity extends Activity {
 			}
 			
 			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(state, coin);
+			int tree_pic = BackgroundHandler.getTreeDrawableId(state);
 			brac_test_list.moveToPosition(i);
 			String date = brac_test_list.getString(1);
 			
 			item.put("pic",bg_pic);
-			item.put("tree",treePics[state] );
+			item.put("tree",tree_pic );
 			item.put("coin0", coins[0]);
 			item.put("coin1", coins[1]);
 			item.put("coin2", coins[2]);
