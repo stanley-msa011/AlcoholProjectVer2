@@ -2,10 +2,6 @@ package ioio.examples.hello;
 
 import ioio.examples.bluetooth.BTDeviceList;
 import ioio.examples.bluetooth.BTService;
-import ioio.lib.api.AnalogInput;
-import ioio.lib.api.DigitalOutput;
-import ioio.lib.api.exception.ConnectionLostException;
-import ioio.lib.util.AbstractIOIOActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Timer;
@@ -27,13 +24,18 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.ShutterCallback;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnErrorListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -48,23 +50,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * This is the main activity of the HelloIOIO example application.
- * 
- * It displays a toggle button on the screen, which enables control of the
- * on-board LED. This example shows a very simple usage of the IOIO, by using
- * the {@link AbstractIOIOActivity} class. For a more advanced use case, see the
- * HelloIOIOPower example.
- */
-public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.Callback {
+public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	private final static String TAG = "IOIO";
-	private final static boolean D = false;
+	private final static String TAG_AUDIO = "MainActivity-AudioManager";
+	private final static boolean DEBUG_MODE = true;
 	
 	// State of the Activity
 	public static final int STATE_SENSOR_CHECK = 0x00;
 	public static final int STATE_BT_FINDING = 0x01;
 	public static final int STATE_BT_CONNECTING = 0x02;
 	public static final int STATE_RUN = 0x03;
+	public static final int STATE_COMPLETE = 0x04;
+	
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	public static final int MEDIA_TYPE_VIDEO = 2;
 	public static final int PHOTO_COUNT = 3;
@@ -88,6 +85,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	private SurfaceView mPreview;
 	private SurfaceHolder mPreviewHolder = null;
 	private PictureCallback mPicture;
+	private ShutterCallback mShutter;
 	
 	private File mainStorageDir;
 	private File sessionDir;
@@ -125,6 +123,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	Calendar calendar;
 	
 	private LocationManager mLocationManager;
+	private Location mLoc = null;
 	private TextView tvLatLng;
 	private boolean gpsEnabled;
 	private boolean gpsChecked;
@@ -134,6 +133,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     private static final int UPDATE_LATLNG = 2;
     
 	private static final int TEN_SECONDS = 1000 * 10;
+	private static final int TWO_SECONDS = 1000 * 2;
     private static final int TEN_METERS = 10;
     private static final int TWO_MINUTES = 1000 * 60 * 2;
 	
@@ -188,6 +188,20 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     private double blowDuration = 0.0;
     private MediaPlayer mpBlow;
     private MediaPlayer mpBlowEnd;
+    private AudioManager mAudioManager;
+    public static boolean mHasEnforcedStream = true;
+    public final static int MAX_VOLUME = 100;
+    public static int STREAM_SYSTEM_ENFORCED = 0;
+    static {
+    	try {
+    		Class asClass = Class.forName("android.media.AudioSystem");
+    		Field sseField = asClass.getDeclaredField("STREAM_SYSTEM_ENFORCED");
+    		STREAM_SYSTEM_ENFORCED = sseField.getInt(null);
+    	} catch (Exception e) {
+    		Log.e(TAG, e.getMessage());
+    		mHasEnforcedStream = false;
+    	}
+    }
     
 	/**
 	 * Called when the activity is first created. Here we normally initialize
@@ -219,7 +233,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                 case MESSAGE_STATE_CHANGE:
-                    if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    if(DEBUG_MODE) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     /*
                     switch (msg.arg1) {
                     case BluetoothChatService.STATE_CONNECTED:
@@ -279,36 +293,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             				e.printStackTrace();
             			}
             	    	
-            	    	Log.d(TAG, "Start looking for location via GPS");
-            	    	Location loc = null;
-            	    	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            	    		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locListener);
-            	    		loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            	    	}
-            	    	if (loc != null) {
-            	    		updateUILocation(loc);
-            	    		try {
-								geoStream = new FileOutputStream(geoFile);
-								geo_value = new OutputStreamWriter(geoStream);
-								geo_value.write(String.valueOf(loc.getLatitude()) + "\t" + String.valueOf(loc.getLongitude()));
-							} catch (FileNotFoundException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} finally {
-								if (geo_value != null) {
-									try {
-										geo_value.close();
-									} catch (IOException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-								}
-							}
-            	    	}
-            	    	
                 		countdownAnimation.start();
             	    	
             	    	long totalDuration = 0;
@@ -356,11 +340,12 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
                         	if (diff > BLOW_SENSE_THRESHOLD && diff < 20000.f && !isPeak) {
                         		isPeak = true;
                         		blowStartTime = System.nanoTime();
-                        		runOnUiThread(new Runnable() { 
-            				        public void run() {
-            				        	mpBlow.start();
-            				        } 
-            				    });
+                        		bDraw = 9;
+//                        		runOnUiThread(new Runnable() { 
+//            				        public void run() {
+//            				        	mpBlow.start();
+//            				        } 
+//            				    });
                         		
                         		// Save the alcohol reading
                         	} else if (diff >= BLOW_THRESHOLD && diff < BLOW_SENSE_THRESHOLD && !isPeak) {
@@ -379,17 +364,19 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
                         				// User has blown the required amount of time
                         				// Close the file and finish the activity
                         				sensor_value.close();
-                        				runOnUiThread(new Runnable() { 
-                    				        public void run() {
-                    				        	mpBlow.pause();
+                        				writeLocationFile();
+//                        				runOnUiThread(new Runnable() { 
+//                    				        public void run() {
+//                    				        	mpBlow.pause();
                     				        	mpBlowEnd.start();
-                    				        } 
-                    				    });
+//                    				        } 
+//                    				    });
                         				Intent i_return = new Intent();
                         				Bundle bData = new Bundle();
                         				bData.putString("testfilename", dirTimeStamp);
                         				i_return.putExtras(bData);
                         				setResult(RESULT_OK, i_return);
+                        				state = STATE_COMPLETE;
                         				finish();
                         			} else {
                         				bDraw = 9;
@@ -405,11 +392,11 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 //                        		}
                         		if (bDraw > 0)
                         			bDraw--;
-                        		runOnUiThread(new Runnable() { 
-            				        public void run() {
-            				        	mpBlow.pause();
-            				        } 
-            				    });
+//                        		runOnUiThread(new Runnable() { 
+//            				        public void run() {
+//            				        	mpBlow.pause();
+//            				        } 
+//            				    });
                         		blowStartTime = blowEndTime = 0;
                         	}
                         	runOnUiThread(new Runnable() { 
@@ -524,18 +511,66 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             return;
         }
         
-        mpBlow = MediaPlayer.create(this, R.raw.blow_beep);
+//        mpBlow = MediaPlayer.create(this, R.raw.blow_beep_ogg);
+//        Initialize mpBlow through setDataSource() and prepareAsync() to make sure it completes preparation
+//        mpBlow = new MediaPlayer();
+//        mpBlow.setOnErrorListener(new OnErrorListener() {
+//        	@Override
+//        	public boolean onError(MediaPlayer mp, int what, int extra) {
+//        		if (what == MediaPlayer.MEDIA_ERROR_UNKNOWN) {
+//        			Log.d(TAG_AUDIO, "MediaPlayer error: MEDIA_ERROR_UNKNOWN");
+//        			return true;
+//        		} else if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
+//        			Log.d(TAG_AUDIO, "MediaPlayer error: MEDIA_ERROR_SERVER_DIED");
+//        			return true;
+//        		}
+//        		return false;
+//        	}
+//        });
+//        try {
+//	        AssetFileDescriptor afd = this.getResources().openRawResourceFd(R.raw.blow_beep_ogg);
+//        	AssetFileDescriptor afd = this.getResources().openRawResourceFd(R.raw.completed_beep);
+//	        mpBlow.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getDeclaredLength());
+//	        if (mHasEnforcedStream) {
+//    			Log.d(TAG_AUDIO, "mpBlow has enforced audibility!");
+//    			mpBlow.setAudioStreamType(STREAM_SYSTEM_ENFORCED);
+//    			mpBlow.setAudioStreamType(AudioManager.STREAM_SYSTEM);
+//    		}
+//	        mpBlow.prepareAsync();
+//        } catch (IllegalArgumentException iae) {
+//        	Log.e(TAG, iae.getMessage());
+//        } catch (IllegalStateException ise) {
+//        	Log.e(TAG, ise.getMessage());
+//        } catch (IOException ioe) {
+//        	Log.e(TAG, ioe.getMessage());
+//        }
+//        
+//        mpBlow.setOnPreparedListener(new OnPreparedListener() {
+//        	@Override
+//        	public void onPrepared(MediaPlayer mp) {
+//        		Log.d(TAG_AUDIO, "mpBlow is prepared!");
+//        		setupAudioManager();
+//        	}
+//        });
+        
         mpBlowEnd = MediaPlayer.create(this, R.raw.completed_beep);
+        
         
         // Check right away if GPS and Bluetooth are enabled
         if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && mBTAdapter.isEnabled()) {
         	state = STATE_BT_FINDING;
+        	// GPS enabled; don't need to check GPS
         	gpsChecked = true;
         } else {
         	state = STATE_SENSOR_CHECK;
-        	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
         		gpsChecked = true;
+        	}
         }
+        
+//        mpBlow.start();
+//        mpBlow.pause();
+        initLocationTrack();
 	}
 	
 	@Override
@@ -557,50 +592,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	public void onStart() {
 		super.onStart();
 		Log.d(TAG, "Starting...");
-		
-//		switch (state) {
-//		case STATE_SENSOR_CHECK:
-//			// Check if the GPS setting is currently enabled on the device.
-//	        // This verification should be done during onStart() because the system calls this method
-//	        // when the user returns to the activity, which ensures the desired location provider is
-//	        // enabled each time the activity resumes from the stopped state.
-//			runSensorCheck();
-//			break;
-//		case STATE_BT_FINDING:
-//			// Bluetooth needs to look for a device to connect to
-//			// We will set up Bluetooth Service and open BTDeviceList
-//			setupBTTransfer();
-//        	Intent serverIntent = new Intent(this, BTDeviceList.class);
-//        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-//			break;
-//		case STATE_BT_CONNECTING:
-//			setupBTTransfer();
-//        	Intent serverIntent = new Intent(this, BTDeviceList.class);
-//        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-//			break;
-//		}
-//		if (state == STATE_SENSOR_CHECK) {
-			// Check if the GPS setting is currently enabled on the device.
-	        // This verification should be done during onStart() because the system calls this method
-	        // when the user returns to the activity, which ensures the desired location provider is
-	        // enabled each time the activity resumes from the stopped state.
-//	        gpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-//	        btEnabled = mBTAdapter.isEnabled();
-	        
-//	    	if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//	        	new EnableGpsDialogFragment().show(getFragmentManager(), "enableGpsDialog");
-//	        } else {
-//	        	if (!mBTAdapter.isEnabled()) {
-//	        		new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
-//	        	} else if (!btConnected) {
-//	        		if (mBTService == null)
-//	        			setupBTTransfer();
-//	        		Intent serverIntent = new Intent(this, BTDeviceList.class);
-//	            	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-//	        	}
-//	        }
-//			runSensorCheck();
-//		}
+		if (DEBUG_MODE) Log.d(TAG, "State: " + printState());
 	}
 	
 	@Override
@@ -616,18 +608,28 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 			runSensorCheck();
 			break;
 		case STATE_BT_FINDING:
+			// Run location tracking after sensor checking is completed
+			initLocationTrack();
 			// Bluetooth needs to look for a device to connect to
 			// We will set up Bluetooth Service and open BTDeviceList
 			setupBTTransfer();
+            state = STATE_BT_CONNECTING;
         	Intent serverIntent = new Intent(this, BTDeviceList.class);
-        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+//        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
 			break;
 		case STATE_BT_CONNECTING:
 			// The mobile device is trying to connect to the
 			// Bluetooth device. Check if mBTService is connected yet.
-			if (mBTService.getState() == BTService.STATE_CONNECTED) {
+			if (mBTService.getState() == BTService.STATE_NONE) {
+				if (DEBUG_MODE) Log.d(TAG, "Setting state to STATE_RUN");
 				state = STATE_RUN;
+				mBTService.start();
 			}
+//			while (mBTService.getState() != BTService.STATE_CONNECTED) {
+				// Do nothing and run until connected
+//			}
+//			state = STATE_RUN;
 			break;
     	}
     }
@@ -641,14 +643,33 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     	Log.d(TAG, "Camera is released");
     	mLocationManager.removeUpdates(locListener);
     	Log.d(TAG, "Location listener stopped updating");
+//    	if (mBTService != null) {
+//    		if (DEBUG_MODE) Log.d(TAG, "mBTService is not null");
+//    		if (mBTService.getState() != BTService.STATE_CONNECTING) {
+//    			if (DEBUG_MODE) Log.d(TAG, "mBTService state = " + mBTService.getState() + "! mBTService will stop");
+//    			mBTService.stop();
+//    		} else {
+//    			if (DEBUG_MODE) Log.d(TAG, "mBTService state = " + mBTService.getState() + "! mBTService is running");
+//    		}
+//    	}
+    	if (state == STATE_COMPLETE) {
+//			mpBlow.release();
+			mBTService.stop();
+		}
     }
 	
 	@Override
 	public void onStop() {
 		super.onStop();
 		Log.d(TAG, "Stopping...");
-		if (mBTService != null)
-			mBTService.stop();
+		
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Log.d(TAG, "Destroying...");
+		mpBlowEnd.release();
 	}
 	
 	/**
@@ -677,15 +698,15 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             // When DeviceListActivity returns with a device to connect
             if (resultCode == Activity.RESULT_OK) {
             	Log.d(TAG, "Found devices to (securely) connect to");
-            	if (mBTService != null) {
-    	            // Only if the state is STATE_NONE, do we know that we haven't started already
-    	            if (mBTService.getState() == BTService.STATE_NONE) {
-    	              // Start the Bluetooth chat services
-    	            	mBTService.start();
-    	            	Log.d(TAG, "mBTService has started!");
-    	            	
-    	            }
-    	        }
+//            	if (mBTService != null) {
+//    	            // Only if the state is STATE_NONE, do we know that we haven't started already
+//    	            if (mBTService.getState() == BTService.STATE_NONE) {
+//    	              // Start the Bluetooth chat services
+//    	            	mBTService.start();
+//    	            	Log.d(TAG, "mBTService has started!");
+//    	            	
+//    	            }
+//    	        }
                 connectDevice(data, true);
             }
             break;
@@ -693,15 +714,15 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             // When DeviceListActivity returns with a device to connect
             if (resultCode == Activity.RESULT_OK) {
             	Log.d(TAG, "Found devices to (insecurely) connect to");
-            	if (mBTService != null) {
-    	            // Only if the state is STATE_NONE, do we know that we haven't started already
-    	            if (mBTService.getState() == BTService.STATE_NONE) {
-    	              // Start the Bluetooth chat services
-    	            	mBTService.start();
-    	            	Log.d(TAG, "mBTService has started!");
-    	            	
-    	            }
-    	        }
+//            	if (mBTService != null) {
+//    	            // Only if the state is STATE_NONE, do we know that we haven't started already
+//    	            if (mBTService.getState() == BTService.STATE_NONE) {
+//    	              // Start the Bluetooth chat services
+//    	            	mBTService.start();
+//    	            	Log.d(TAG, "mBTService has started!");
+//    	            	
+//    	            }
+//    	        }
                 connectDevice(data, false);
             }
             break;
@@ -720,54 +741,6 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
             }
         }
 	}
-	/*
-	private void doSenseProgress() {
-		new Thread (new Runnable() {
-			@Override
-			public void run() {
-				while (progressStatus < MAX_PROGRESS) {
-					runOnUiThread(new Runnable() { 
-				        public void run() 
-				        {			
-				        	tvProgress.setText("Amount of data: " + progressStatus + " (in progress thread)");
-				        	tvSignal.setText("Keep blowing!");
-				        } 
-				    });
-					mHandler.post(new Runnable() {
-						@Override
-						public void run() {
-							progSensing.setProgress(progressStatus);
-							if (progressStatus == progSensing.getMax()) {
-								runOnUiThread(new Runnable() { 
-							        public void run() 
-							        {
-							        	tvSignal.setText("STOP!");
-							        } 
-							    });
-							}
-						}
-					});
-					countDown();
-				}
-				isSensing = false;
-				doneSensing = true;
-				Intent i_ShowBrac = new Intent();
-    			i_ShowBrac.putExtra("timestamp", dirTimeStamp);
-    			i_ShowBrac.setClass(MainActivity.this, ShowBracActivity.class);
-    			startActivity(i_ShowBrac);
-				
-			}
-		}).start();
-	}
-	
-	private void countDown() {
-		try {
-			progressStatus++;
-			Thread.sleep(1000);
-		} catch (InterruptedException ie) {
-			Log.e(TAG, "Error in countDown(): " + ie.getMessage());
-		}
-	}*/
 	
 	private void runSensorCheck() {
 		if (!gpsChecked) {
@@ -777,6 +750,12 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 		} else if (!mBTAdapter.isEnabled()) {
 			Log.d(TAG, "Showing Enable Bluetooth Dialog");
 			new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
+		} else {
+			state = STATE_BT_FINDING;
+			setupBTTransfer();
+        	Intent serverIntent = new Intent(this, BTDeviceList.class);
+//        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
 		}
 	}
 	
@@ -794,7 +773,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	    mPreview = new SurfaceView(this);
 	    SurfaceHolder mPreviewHolder = mPreview.getHolder();
 	    mPreviewHolder.addCallback(this);
-	    mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+//	    mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 	    //mPreview = new CameraPreview(this, mCamera);
 	    FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
@@ -834,7 +813,7 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 			
 			try {
     			mCamera.setPreviewDisplay(holder);
-    			mCamera.startPreview();
+//    			mCamera.startPreview();
 	        } catch (IOException e) {
 	            Log.e(TAG, "Error setting camera preview: " + e.getMessage());
 	        }
@@ -944,6 +923,120 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 	 * Start location tracking methods
 	 */
 	
+	private void initLocationTrack() {
+		Location gpsLocation = null;
+		Location networkLocation = null;
+		gpsLocation = requestUpdatesFromProvider(LocationManager.GPS_PROVIDER);
+		networkLocation = requestUpdatesFromProvider(LocationManager.NETWORK_PROVIDER);
+		
+		// If both providers return last known locations, compare the two and use the better
+        // one to update the UI.  If only one provider returns a location, use it.
+        if (gpsLocation != null && networkLocation != null) {
+        	mLoc = getBetterLocation(gpsLocation, networkLocation);
+            updateUILocation(mLoc);
+        } else if (gpsLocation != null) {
+        	mLoc = gpsLocation;
+            updateUILocation(mLoc);
+        } else if (networkLocation != null) {
+        	mLoc = networkLocation;
+            updateUILocation(mLoc);
+        }
+	}
+	
+	/** Determines whether one Location reading is better than the current Location fix.
+	 * Code taken from
+	 * http://developer.android.com/guide/topics/location/obtaining-user-location.html
+	 *
+	 * @param newLocation  The new Location that you want to evaluate
+	 * @param currentBestLocation  The current Location fix, to which you want to compare the new
+	 *        one
+	 * @return The better Location object based on recency and accuracy.
+	 */
+	protected Location getBetterLocation(Location newLocation, Location currentBestLocation) {
+		if (currentBestLocation == null) {
+			// A new location is always better than no location
+			return newLocation;
+		}
+
+		// Check whether the new location fix is newer or older
+		long timeDelta = newLocation.getTime() - currentBestLocation.getTime();
+		boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+		boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+		boolean isNewer = timeDelta > 0;
+
+		// If it's been more than two minutes since the current location, use the new location
+		// because the user has likely moved.
+		if (isSignificantlyNewer) {
+			return newLocation;
+			// If the new location is more than two minutes older, it must be worse
+		} else if (isSignificantlyOlder) {
+			return currentBestLocation;
+		}
+
+		// Check whether the new location fix is more or less accurate
+		int accuracyDelta = (int) (newLocation.getAccuracy() - currentBestLocation.getAccuracy());
+		boolean isLessAccurate = accuracyDelta > 0;
+		boolean isMoreAccurate = accuracyDelta < 0;
+		boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+		// Check if the old and new location are from the same provider
+		boolean isFromSameProvider = isSameProvider(newLocation.getProvider(), currentBestLocation.getProvider());
+
+		// Determine location quality using a combination of timeliness and accuracy
+		if (isMoreAccurate) {
+			return newLocation;
+		} else if (isNewer && !isLessAccurate) {
+			return newLocation;
+		} else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+			return newLocation;
+		}
+		return currentBestLocation;
+	}
+	
+	/** Checks whether two providers are the same */
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+          return provider2 == null;
+        }
+        return provider1.equals(provider2);
+    }
+	
+	private Location requestUpdatesFromProvider(final String provider) {
+        Location location = null;
+        if (mLocationManager.isProviderEnabled(provider)) {
+            mLocationManager.requestLocationUpdates(provider, TWO_SECONDS, TEN_METERS, locListener);
+            location = mLocationManager.getLastKnownLocation(provider);
+        }
+        return location;
+    }
+	
+	private void writeLocationFile() {
+		try {
+			geoStream = new FileOutputStream(geoFile);
+			geo_value = new OutputStreamWriter(geoStream);
+			if (mLoc != null) {
+				geo_value.write(String.valueOf(mLoc.getLatitude()) + "\t" + String.valueOf(mLoc.getLongitude()));
+			} else {
+				geo_value.write("-1\t-1");
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (geo_value != null) {
+				try {
+					geo_value.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	// Method to launch Settings
     private void enableLocationSettings() {
         Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -996,11 +1089,11 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     				enableLocationSettings();
     			}
     		})
-    		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+    		.setNegativeButton(R.string.dont_enable_gps, new DialogInterface.OnClickListener() {
     			@Override
     			public void onClick(DialogInterface dialog, int which) {
-    				dismiss();
     				runSensorCheck();
+    				dismiss();
     			}
     		})
     		.create();
@@ -1075,6 +1168,10 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
     	mBTService = new BTService(this, btHandler);
     }
     
+    /*
+     * End Bluetooth-related methods
+     */
+    
     private void writeIntoFile(float value) {
 		try {
 			long unixTime = (int) (System.currentTimeMillis() / 1000L);
@@ -1091,184 +1188,79 @@ public class MainActivity extends AbstractIOIOActivity implements SurfaceHolder.
 		}
     }
     
-    /*
-     * End Bluetooth-related methods
-     */
+//    private void setupAudioManager() {
+//    	mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+//    	int result = mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+//    	if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+//    		Log.d(TAG_AUDIO, "Audio focus request failed!");
+//    	} else {
+//    		Log.d(TAG_AUDIO, "Audio focus request granted!");
+//    		Log.d(TAG_AUDIO, "Audio stream max volume: " + mAudioManager.getStreamMaxVolume(STREAM_SYSTEM_ENFORCED));
+//    		Log.d(TAG_AUDIO, "Audio stream current volume: " + mAudioManager.getStreamVolume(STREAM_SYSTEM_ENFORCED));
+//    		mAudioManager.setStreamVolume(STREAM_SYSTEM_ENFORCED, 0, AudioManager.FLAG_PLAY_SOUND);
+//    		Log.d(TAG_AUDIO, "Audio stream current volume after adjustment: " + mAudioManager.getStreamVolume(STREAM_SYSTEM_ENFORCED));
+//    		Log.d(TAG_AUDIO, "Audio stream max volume: " + mAudioManager.getStreamMaxVolume(AudioManager.STREAM_SYSTEM));
+//    		Log.d(TAG_AUDIO, "Audio stream current volume: " + mAudioManager.getStreamVolume(AudioManager.STREAM_SYSTEM));
+//    		mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, 2, AudioManager.FLAG_PLAY_SOUND);
+//    		Log.d(TAG_AUDIO, "Audio stream current volume after adjustment: " + mAudioManager.getStreamVolume(AudioManager.STREAM_SYSTEM));
+//    	}
+//    }
 
-   /**
-    * This is the thread on which all the IOIO activity happens. It will be run
-    * every time the application is resumed and aborted when it is paused. The
-    * method setup() will be called right after a connection with the IOIO has
-    * been established (which might happen several times!). Then, loop() will
-    * be called repetitively until the IOIO gets disconnected.
-    */
-	
-	class IOIOThread extends AbstractIOIOActivity.IOIOThread {
-		/** The on-board LED. */
-		//private DigitalOutput led_;
-		private DigitalOutput led_2;
-		private DigitalOutput led_4;	// high/low pin for alcohol sensor
-
-		
-		private AnalogInput in_40;	//receive the sensor data
-		
-
-		
-		
-		/**
-		 * Called every time a connection with IOIO has been established.
-		 * Typically used to open pins.
-		 * 
-		 * @throws ConnectionLostException
-		 *             When IOIO connection is lost.
-		 * 
-		 * @see ioio.lib.util.AbstractIOIOActivity.IOIOThread#setup()
-		 */
-		@Override
-		protected void setup() throws ConnectionLostException {
-			
-			led_2 = ioio_.openDigitalOutput(2, true);
-			led_4 = ioio_.openDigitalOutput(4, true) ;	
-			
-			
-			in_40 = ioio_.openAnalogInput(40);
-	
-			runOnUiThread(new Runnable() { 
-		        public void run() 
-		        {			
-		        	//取得外部儲存媒體的狀態
-					String state = Environment.getExternalStorageState();
-					//判斷狀態
-					if (Environment.MEDIA_MOUNTED.equals(state)) {
-						storage_state.setText("can written");
-					} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-						storage_state.setText("read only, can't written");
-					} else {
-						storage_state.setText("can't read and written");
-					}
-  
-		        } 
-		    });
-			
-			
-			//calendar = Calendar.getInstance(); 
-			//filename = calendar.get(Calendar.YEAR) +"_" +calendar.get(Calendar.MONTH)+ "_" + calendar.get(Calendar.DATE) 
-			//			+ "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
-			//			+ "_"+ calendar.get(Calendar.SECOND) + ".txt";
-		
-			
-			
-			
-			
-			//long unixTime = (int) (System.currentTimeMillis() / 1000L);
-		
-			//filename = stamp.format(unixTime);
-			textfile = new File(sessionDir + File.separator + dirTimeStamp + ".txt");
-						
-			try {
-				stream = new FileOutputStream(textfile);
-				
-				sensor_value = new OutputStreamWriter(stream, "US-ASCII");
-				
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			
-		
-		}
-
-		/**
-		 * Called repetitively while the IOIO is connected.
-		 * 
-		 * @throws ConnectionLostException
-		 *             When IOIO connection is lost.
-		 * 
-		 * @see ioio.lib.util.AbstractIOIOActivity.IOIOThread#loop()
-		 */
-		
-		
-		
-		@Override
-		protected void loop() throws ConnectionLostException {
-			try {
-				if(isSensing) {	//turn on the alcohol sensor (default)
-				  
-					led_4.write(true);
-					
-					value = in_40.read();
-					volts = in_40.getVoltage();
-					calendar = Calendar.getInstance(); 
-					
-					if (volts < 3.1) {
-					
-						brac_value = ((-0.015) + Math.sqrt(0.015*0.015 - 4* (-0.00002)*(0.3326-volts)))/(2*(-0.00002));
-						brac_value = brac_value/500;
-						
-						if (brac_value < 0)
-							brac_value = 0;
-					} else {
-						brac_value = 0.7;
-					}
-					
-					long unixTime = (int) (System.currentTimeMillis() / 1000L);
-					dataTimeStamp = stamp.format(unixTime);
-					
-					//sensor_value.write(calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE) 
-					//		+ "_"+ calendar.get(Calendar.SECOND) + "_"+ calendar.get(Calendar.MILLISECOND) + "\t");
-					sensor_value.write(dataTimeStamp + "\t");
-					
-					//sensor_value.write(String.valueOf(value) + "\t");
-					sensor_value.write(String.valueOf(brac_value));
-					sensor_value.write("\r\n");
-					
-					
-					//--show the sensor info on the screen
-					runOnUiThread(new Runnable() { 
-				        public void run() 
-				        {			
-				        	row_value.setText("Row value: " + nf.format(value));
-		  
-				        	voltage.setText("Voltage: " + nf.format(volts));
-				        	brac.setText("Breath Alcohol Concentration(mg/l): " + nf.format(brac_value));
-				        	
-				        } 
-				    });
-				} else if (doneSensing) {
-					try {
-	        			sensor_value.close();
-	        			led_4.write(false);
-	        			
-	        		} catch (IOException e) {
-	    				// TODO Auto-generated catch block
-	    				e.printStackTrace();
-	        		}
-				} else {
-					//turn off
-					led_4.write(false);
-				}
-				
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * A method to create our IOIO thread.
-	 * 
-	 * @see ioio.lib.util.AbstractIOIOActivity#createIOIOThread()
-	 */
-	@Override
-	protected AbstractIOIOActivity.IOIOThread createIOIOThread() {
-		return new IOIOThread();
-	}
+//	@Override
+//	public void onAudioFocusChange(int focusChange) {
+//		switch (focusChange) {
+//        case AudioManager.AUDIOFOCUS_GAIN:
+//        	Log.d(TAG_AUDIO, "onAudioFocusChange(): Gained focus");
+            // resume playback
+//            if (mpBlow == null)
+//            	MediaPlayer.create(this, R.raw.blow_beep_ogg);
+//            else if (!mpBlow.isPlaying())
+//            	mpBlow.start();
+//            mpBlow.setVolume(1.0f, 1.0f);
+//            break;
+//
+//        case AudioManager.AUDIOFOCUS_LOSS:
+//            // Lost focus for an unbounded amount of time: stop playback and release media player
+//        	Log.d(TAG_AUDIO, "onAudioFocusChange(): Lost focus");
+//            if (mpBlow.isPlaying())
+//            	mpBlow.stop();
+//            mpBlow.release();
+//            mpBlow = null;
+//            break;
+//
+//        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+//        	Log.d(TAG_AUDIO, "onAudioFocusChange(): Transient lost focus");
+            // Lost focus for a short time, but we have to stop
+            // playback. We don't release the media player because playback
+            // is likely to resume
+//            if (mpBlow.isPlaying())
+//            	mpBlow.pause();
+//            break;
+//
+//        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+//        	Log.d(TAG_AUDIO, "onAudioFocusChange(): Transient lost focus but can duck");
+            // Lost focus for a short time, but it's ok to keep playing
+            // at an attenuated level
+//            if (mpBlow.isPlaying())
+//            	mpBlow.setVolume(0.5f, 0.5f);
+//            break;
+//		}
+//	}
+    
+    private String printState() {
+    	switch (state) {
+    	case 0:
+    		return "STATE_SENSOR_CHECK";
+    	case 1:
+    		return "STATE_BT_FINDING";
+    	case 2:
+    		return "STATE_BT_CONNECTING";
+    	case 3:
+    		return "STATE_RUN";
+    	case 4:
+    		return "STATE_COMPLETE";
+    	default:
+    		return String.valueOf(state);
+    	}
+    }
 }

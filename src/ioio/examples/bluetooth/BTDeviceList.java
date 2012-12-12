@@ -26,7 +26,7 @@ import android.widget.AdapterView.OnItemClickListener;
 public class BTDeviceList extends Activity {
 	// Debugging
     private static final String TAG = "DeviceListActivity";
-    private static final boolean D = true;
+    private static final boolean D = false;
 
     // Return Intent extra
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
@@ -99,12 +99,12 @@ public class BTDeviceList extends Activity {
     
     }
 
-//    @Override
-//    public void onPause() {
-//    	super.onPause();
-//    	
-//    	this.unregisterReceiver(mReceiver);
-//    }
+    @Override
+    public void onPause() {
+    	super.onPause();
+    	
+    	this.unregisterReceiver(mReceiver);
+    }
     
     /**
      * Start device discover with the BluetoothAdapter

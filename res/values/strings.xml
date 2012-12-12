@@ -28,16 +28,17 @@
     <string name="connectStatus">Sending file&#8230;</string>
 
     <!-- Location Tracking Info -->
-    <string name="enable_gps">Enable GPS</string>
-    <string name="enable_gps_dialog">GPS provider not enabled. Would you like to enable it?</string>
+    <string name="enable_gps">開啟GPS</string>
+    <string name="enable_gps_dialog">GPS服務尚未開啟。您希望開啟嗎？</string>
+    <string name="dont_enable_gps">不開啟GPS</string>
     <string name="unknown">--Unknown--</string>
-    <string name="waitLoc">Waiting for location&#8230;</string>
-    <string name="not_support_gps">GPS provider not supported</string>
-    <string name="not_support_network">Network provider not supported</string>
+    <string name="waitLoc">定位中&#8230;</string>
+    <string name="not_support_gps">本裝置不支援GPS。</string>
+    <string name="not_support_network">本裝置不支援通訊網路定位。</string>
 
     <!-- Bluetooth Info -->
-    <string name="enable_BT">Enable Bluetooth</string>
-    <string name="enable_BT_dialog">You must enable Bluetooth to continue</string>
+    <string name="enable_BT">開啟藍牙</string>
+    <string name="enable_BT_dialog">您必須開啟藍牙才可繼續。</string>
 
     <!-- Bluetooth Device List -->
     <string name="btnScan">Scan</string>
