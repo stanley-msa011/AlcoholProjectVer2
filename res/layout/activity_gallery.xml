@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
+
     tools:context=".StoryActivity" >
 
     <Gallery
@@ -12,4 +13,60 @@
         android:layout_centerInParent="true"
         android:spacing="@dimen/gallery_space" />
 
+    <LinearLayout
+        android:id="@+id/gallery_controlbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:alpha="0.8"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:scrollbars="none" >
+
+    <Button
+        android:id="@+id/gallery_prev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:enabled="false"
+        android:text="Prev page"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/gallery_cur_page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:ems="3"
+        android:inputType="number"
+        android:text="999"
+        android:textSize="18sp" >
+
+    </EditText>
+
+        <TextView
+        android:id="@+id/gallery_page_divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="32sp"
+        android:layout_marginBottom="4dp"
+        android:text="/" />
+    
+     <TextView
+         android:id="@+id/gallery_page_max"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="999"
+         android:textSize="24sp" />
+     
+         <Button
+             android:id="@+id/gallery_next"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:clickable="false"
+             android:enabled="false"
+             android:text="Next page"
+             android:textSize="16sp" />
+     
+     </LinearLayout>
 </RelativeLayout>

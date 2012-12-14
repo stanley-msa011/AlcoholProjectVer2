@@ -83,8 +83,10 @@ public class GameActivity extends Activity{
 	
 	protected void onResume(){
 		super.onResume();
+		
 		gInteractiveGame.update();
 	}
+	
 	
 	private void initBackground(){
 		background = (ImageView) findViewById(R.id.background);

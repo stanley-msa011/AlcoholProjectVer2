@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -83,7 +84,9 @@ public class GameMenuHandler {
 					ga.startActivityForResult(newActivity, REQUEST_TEST);  
 					break;
 				case 1: //Dummy (Record of TreeGame)
-					newActivity = new Intent(context, GalleryActivity.class);  
+					newActivity = new Intent(context, GalleryActivity.class); 
+					//newActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+					newActivity.putExtra("PAGE", -1);
 					ga.startActivity(newActivity);  
 					break;
 				case 2: //BracListActivity

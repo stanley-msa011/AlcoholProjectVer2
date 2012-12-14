@@ -19,6 +19,7 @@ public class GamePopupWindowHandler {
 	private TextView popText;
 	private PopupWindow popupWindow;
 	private ImageView bg;
+	private View v_pop;
 	
 	public GamePopupWindowHandler(GameActivity ga){
 		this.ga = ga;
@@ -29,7 +30,7 @@ public class GamePopupWindowHandler {
 	private void initPopWindow(){
 		 Context mContext = ga;   
 		 LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		 View v_pop = mLayoutInflater.inflate(R.layout.game_pop_window, null);
+		 v_pop = mLayoutInflater.inflate(R.layout.game_pop_window, null);
 		 popupWindow = new PopupWindow(v_pop,400,400);
 		 ok_button = (Button)v_pop.findViewById(R.id.game_pop_ok_button);
 		 ok_button.setOnClickListener(new PopWindowOnClickListener());
