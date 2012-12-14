@@ -96,6 +96,13 @@ public class BTDeviceList extends Activity {
             String noDevices = getResources().getText(R.string.none_paired).toString();
             mPairedDevicesArrayAdapter.add(noDevices);
         }
+        
+//        String targetAddress = "";
+//        if (pairedDevices.size() > 0) {
+//        	for (BluetoothDevice device : pairedDevices) {
+//        		String address = device.getAddress();
+//        	}
+//        }
     
     }
 

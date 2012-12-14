@@ -771,7 +771,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 				 if (!mBTAdapter.isEnabled()) {
 					Log.d(TAG, "Showing Enable Bluetooth Dialog");
 					new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
-				}
+				 } else {
+					 state = STATE_BT_CONNECTING;
+					 setupBTTransfer();
+					 Intent serverIntent = new Intent(this, BTDeviceList.class);
+					 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+				 }
 			}
 		} else if (!mBTAdapter.isEnabled()) {
 			Log.d(TAG, "Showing Enable Bluetooth Dialog");
