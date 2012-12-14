@@ -35,6 +35,10 @@
     <string name="waitLoc">定位中&#8230;</string>
     <string name="not_support_gps">本裝置不支援GPS。</string>
     <string name="not_support_network">本裝置不支援通訊網路定位。</string>
+    <string name="permit_track_title">現在位置</string>
+    <string name="permit_track_dialog">請問您是否願意分享現在位置？</string>
+    <string name="permit_track">願意</string>
+    <string name="dont_permit_track">不願意</string>
 
     <!-- Bluetooth Info -->
     <string name="enable_BT">開啟藍牙</string>

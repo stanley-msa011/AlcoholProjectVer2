@@ -125,8 +125,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	private LocationManager mLocationManager;
 	private Location mLoc = null;
 	private TextView tvLatLng;
-	private boolean gpsEnabled;
-	private boolean gpsChecked;
+	private boolean locationTrackPermitted;
+	private boolean permissionChecked;
+	private boolean locationChecked;
 	private boolean mUseFine;
 	private boolean mUseBoth;
 
@@ -148,6 +149,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
+    private static final int REQUEST_ENABLE_GPS = 4;
     
  // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
@@ -306,7 +308,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             	        @Override
             		        public void run() {
             	        		Log.d(TAG, "Countdown animation is stopping");
-            	        		isSensing = true;
+            	        		state = STATE_RUN;
             	        		new Thread (new Runnable() {
             	        			@Override
             	        			public void run() {
@@ -326,104 +328,105 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             	        
             		}
                 	
-                	String readMessage = (String) msg.obj;
-                	Log.d(TAG, "BT data: " + readMessage);
-                	
-                	if (readMessage.charAt(0) == 'm') {
-                		pressureReading1 = pressureReading2;
-                		try {
-                			pressureReading2 = Float.parseFloat(readMessage.substring(1));
-                			Log.d(TAG, "BT data Pressure reading 1: " + pressureReading1 + " Pressure reading 2: " + pressureReading2);
-                        	
-                        	float diff = pressureReading2 - pressureReading1;
-                        	Log.d(TAG, "BT data diff: " + diff);
-                        	if (diff > BLOW_SENSE_THRESHOLD && diff < 20000.f && !isPeak) {
-                        		isPeak = true;
-                        		blowStartTime = System.nanoTime();
-                        		bDraw = 9;
-//                        		runOnUiThread(new Runnable() { 
-//            				        public void run() {
-//            				        	mpBlow.start();
-//            				        } 
-//            				    });
-                        		
-                        		// Save the alcohol reading
-                        	} else if (diff >= BLOW_THRESHOLD && diff < BLOW_SENSE_THRESHOLD && !isPeak) {
-                        		if (bDraw < 8)
-                        			bDraw++;
-                        	} else if (diff >= -BLOW_SENSE_THRESHOLD && diff <= BLOW_SENSE_THRESHOLD) {
-                        		if (isPeak) {
-                        			// Save the alcohol reading
-                        			
-                        			blowEndTime = System.nanoTime();
-                        			blowDuration += (blowEndTime - blowStartTime) / NANO_TIME;
-                        			blowStartTime = blowEndTime;
-                        			Log.d(TAG, "BT data Blow start time: " + blowStartTime + "Blow end time: " + blowEndTime);
-                        			Log.d(TAG, "BT data duration: " + blowDuration);
-                        			if (blowDuration > TOTAL_BLOW_DURATION) {
-                        				// User has blown the required amount of time
-                        				// Close the file and finish the activity
-                        				sensor_value.close();
-                        				writeLocationFile();
-//                        				runOnUiThread(new Runnable() { 
-//                    				        public void run() {
-//                    				        	mpBlow.pause();
-                    				        	mpBlowEnd.start();
-//                    				        } 
-//                    				    });
-                        				Intent i_return = new Intent();
-                        				Bundle bData = new Bundle();
-                        				bData.putString("testfilename", dirTimeStamp);
-                        				i_return.putExtras(bData);
-                        				setResult(RESULT_OK, i_return);
-                        				state = STATE_COMPLETE;
-                        				finish();
-                        			} else {
-                        				bDraw = 9;
-                        			}
-                        			
-                        		} else {
-                        			if (bDraw > 0)
-                        				bDraw--;
-                        		}
-                        	} else if (diff < -BLOW_SENSE_THRESHOLD) {
-                        		isPeak = false;
-                        		// Clear data
-//                        		}
-                        		if (bDraw > 0)
-                        			bDraw--;
-//                        		runOnUiThread(new Runnable() { 
-//            				        public void run() {
-//            				        	mpBlow.pause();
-//            				        } 
-//            				    });
-                        		blowStartTime = blowEndTime = 0;
-                        	}
-                        	runOnUiThread(new Runnable() { 
-        				        public void run() {
-        				        	ivBalloonLoader.setImageResource(balloons[bDraw]);
-        				        } 
-        				    });
-                		} catch (Exception e) {
-                			Log.e(TAG, "ERROR! : " + e.getMessage());
-                		}
-                	} else if (readMessage.charAt(0) == 'a') {
-                		Log.d(TAG, "BT data Alcohol reading: " + readMessage.substring(1));
-//                		alcoholReading = Float.parseFloat(readMessage.substring(1));
-                		if (isPeak) {
-                			long unixTime = (int) (System.currentTimeMillis() / 1000L);
-        					dataTimeStamp = stamp.format(unixTime);
-        					try {
-	        					sensor_value.write(dataTimeStamp + "\t");
-	        					
-	        					sensor_value.write(readMessage.substring(1));
-	        					sensor_value.write("\r\n");
-        					} catch (IOException ioe) {
-        						ioe.printStackTrace();
-        					}
-                		}
+                	if (state == STATE_RUN) {
+	                	String readMessage = (String) msg.obj;
+	                	Log.d(TAG, "BT data: " + readMessage);
+	                	
+	                	if (readMessage.charAt(0) == 'm') {
+	                		pressureReading1 = pressureReading2;
+	                		try {
+	                			pressureReading2 = Float.parseFloat(readMessage.substring(1));
+	                			Log.d(TAG, "BT data Pressure reading 1: " + pressureReading1 + " Pressure reading 2: " + pressureReading2);
+	                        	
+	                        	float diff = pressureReading2 - pressureReading1;
+	                        	Log.d(TAG, "BT data diff: " + diff);
+	                        	if (diff > BLOW_SENSE_THRESHOLD && diff < 20000.f && !isPeak) {
+	                        		isPeak = true;
+	                        		blowStartTime = System.nanoTime();
+	                        		bDraw = 9;
+	//                        		runOnUiThread(new Runnable() { 
+	//            				        public void run() {
+	//            				        	mpBlow.start();
+	//            				        } 
+	//            				    });
+	                        		
+	                        		// Save the alcohol reading
+	                        	} else if (diff >= BLOW_THRESHOLD && diff < BLOW_SENSE_THRESHOLD && !isPeak) {
+	                        		if (bDraw < 8)
+	                        			bDraw++;
+	                        	} else if (diff >= -BLOW_SENSE_THRESHOLD && diff <= BLOW_SENSE_THRESHOLD) {
+	                        		if (isPeak) {
+	                        			// Save the alcohol reading
+	                        			
+	                        			blowEndTime = System.nanoTime();
+	                        			blowDuration += (blowEndTime - blowStartTime) / NANO_TIME;
+	                        			blowStartTime = blowEndTime;
+	                        			Log.d(TAG, "BT data Blow start time: " + blowStartTime + "Blow end time: " + blowEndTime);
+	                        			Log.d(TAG, "BT data duration: " + blowDuration);
+	                        			if (blowDuration > TOTAL_BLOW_DURATION) {
+	                        				// User has blown the required amount of time
+	                        				// Close the file and finish the activity
+	                        				sensor_value.close();
+	                        				writeLocationFile();
+	//                        				runOnUiThread(new Runnable() { 
+	//                    				        public void run() {
+	//                    				        	mpBlow.pause();
+	                    				        	mpBlowEnd.start();
+	//                    				        } 
+	//                    				    });
+	                        				Intent i_return = new Intent();
+	                        				Bundle bData = new Bundle();
+	                        				bData.putString("testfilename", dirTimeStamp);
+	                        				i_return.putExtras(bData);
+	                        				setResult(RESULT_OK, i_return);
+	                        				state = STATE_COMPLETE;
+	                        				finish();
+	                        			} else {
+	                        				bDraw = 9;
+	                        			}
+	                        			
+	                        		} else {
+	                        			if (bDraw > 0)
+	                        				bDraw--;
+	                        		}
+	                        	} else if (diff < -BLOW_SENSE_THRESHOLD) {
+	                        		isPeak = false;
+	                        		// Clear data
+	//                        		}
+	                        		if (bDraw > 0)
+	                        			bDraw--;
+	//                        		runOnUiThread(new Runnable() { 
+	//            				        public void run() {
+	//            				        	mpBlow.pause();
+	//            				        } 
+	//            				    });
+	                        		blowStartTime = blowEndTime = 0;
+	                        	}
+	                        	runOnUiThread(new Runnable() { 
+	        				        public void run() {
+	        				        	ivBalloonLoader.setImageResource(balloons[bDraw]);
+	        				        } 
+	        				    });
+	                		} catch (Exception e) {
+	                			Log.e(TAG, "ERROR! : " + e.getMessage());
+	                		}
+	                	} else if (readMessage.charAt(0) == 'a') {
+	                		Log.d(TAG, "BT data Alcohol reading: " + readMessage.substring(1));
+	//                		alcoholReading = Float.parseFloat(readMessage.substring(1));
+	                		if (isPeak) {
+	                			long unixTime = (int) (System.currentTimeMillis() / 1000L);
+	        					dataTimeStamp = stamp.format(unixTime);
+	        					try {
+		        					sensor_value.write(dataTimeStamp + "\t");
+		        					
+		        					sensor_value.write(readMessage.substring(1));
+		        					sensor_value.write("\r\n");
+	        					} catch (IOException ioe) {
+	        						ioe.printStackTrace();
+	        					}
+	                		}
+	                	}
                 	}
-                    
                    /*  Toast.makeText(getApplicationContext(), "Sensor messages: "
                             + readMessage, Toast.LENGTH_SHORT).show(); */
                     
@@ -555,22 +558,27 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         
         mpBlowEnd = MediaPlayer.create(this, R.raw.completed_beep);
         
+        // Ask the user for permission to track location
+//        new TrackPermitDialogFragment().show(getFragmentManager(), "trackPermitDialog");
         
         // Check right away if GPS and Bluetooth are enabled
-        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && mBTAdapter.isEnabled()) {
-        	state = STATE_BT_FINDING;
-        	// GPS enabled; don't need to check GPS
-        	gpsChecked = true;
-        } else {
-        	state = STATE_SENSOR_CHECK;
-        	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-        		gpsChecked = true;
-        	}
-        }
+//        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && mBTAdapter.isEnabled()) {
+////        	state = STATE_BT_FINDING;
+//        	// GPS enabled; don't need to check GPS
+//        	locationChecked = true;
+//        } else {
+//        	state = STATE_SENSOR_CHECK;
+//        	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//        		locationChecked = true;
+//        	}
+//        }
+//        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+//        	locationChecked = true;
+        state = STATE_SENSOR_CHECK;
         
 //        mpBlow.start();
 //        mpBlow.pause();
-        initLocationTrack();
+//        initLocationTrack();
 	}
 	
 	@Override
@@ -605,7 +613,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	        // This verification should be done during onStart() because the system calls this method
 	        // when the user returns to the activity, which ensures the desired location provider is
 	        // enabled each time the activity resumes from the stopped state.
-			runSensorCheck();
+			if (!permissionChecked)
+				runPermissionCheck();
+			else
+				runSensorCheck();
 			break;
 		case STATE_BT_FINDING:
 			// Run location tracking after sensor checking is completed
@@ -739,24 +750,47 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 Toast.makeText(this, "User did not enable Bluetooth", Toast.LENGTH_SHORT).show();
                 finish();
             }
+            break;
+        case REQUEST_ENABLE_GPS:
+        	if (!mBTAdapter.isEnabled()) {
+//            	Log.d(TAG, "User chose not to enable GPS, now prompt for Bluetooth enablement");
+//            	new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
+            } else {
+            	state = STATE_BT_FINDING;
+            }
+        	break;
         }
 	}
 	
 	private void runSensorCheck() {
-		if (!gpsChecked) {
-			gpsChecked = true;
-			Log.d(TAG, "Showing Enable GPS Dialog");
-        	new EnableGpsDialogFragment().show(getFragmentManager(), "enableGpsDialog");
+		if (locationTrackPermitted) {
+			 if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				Log.d(TAG, "Showing Enable GPS Dialog");
+		        new EnableGpsDialogFragment().show(getFragmentManager(), "enableGpsDialog");
+			} else {
+				 if (!mBTAdapter.isEnabled()) {
+					Log.d(TAG, "Showing Enable Bluetooth Dialog");
+					new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
+				}
+			}
 		} else if (!mBTAdapter.isEnabled()) {
 			Log.d(TAG, "Showing Enable Bluetooth Dialog");
 			new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
 		} else {
-			state = STATE_BT_FINDING;
+			state = STATE_BT_CONNECTING;
 			setupBTTransfer();
         	Intent serverIntent = new Intent(this, BTDeviceList.class);
 //        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
         	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
 		}
+	}
+	
+	private void runPermissionCheck() {
+//		if (!permissionChecked) {
+			permissionChecked = true;
+			Log.d(TAG, "Asking for location tracking permission");
+			new TrackPermitDialogFragment().show(getFragmentManager(), "trackPermitDialog");
+//		}
 	}
 	
 	/*
@@ -1040,7 +1074,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	// Method to launch Settings
     private void enableLocationSettings() {
         Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        startActivity(settingsIntent);
+        startActivityForResult(settingsIntent, REQUEST_ENABLE_GPS);
     }
 
     private final LocationListener locListener = new LocationListener() {
@@ -1092,7 +1126,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     		.setNegativeButton(R.string.dont_enable_gps, new DialogInterface.OnClickListener() {
     			@Override
     			public void onClick(DialogInterface dialog, int which) {
-    				runSensorCheck();
+    				if (!mBTAdapter.isEnabled()) {
+    	            	Log.d(TAG, "User chose not to enable GPS, now prompt for Bluetooth enablement");
+    	            	new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
+    	            }
     				dismiss();
     			}
     		})
@@ -1107,6 +1144,34 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             	Log.d(TAG, "User chose not to enable GPS, now prompt for Bluetooth enablement");
             	new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
             }
+    	}
+    }
+    
+    /**
+	 * Dialog to ask for permission to track user location
+	 */
+    private class TrackPermitDialogFragment extends DialogFragment {
+    	@Override
+    	public Dialog onCreateDialog(Bundle savedInstanceState) {
+    		return new AlertDialog.Builder(getActivity())
+    		.setTitle(R.string.permit_track_title)
+    		.setMessage(R.string.permit_track_dialog)
+    		.setPositiveButton(R.string.permit_track, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					locationTrackPermitted = true;
+					runSensorCheck();
+				}
+			})
+			.setNegativeButton(R.string.dont_permit_track, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					locationTrackPermitted = false;
+					runSensorCheck();
+				}
+			})
+			.create();
     	}
     }
 
