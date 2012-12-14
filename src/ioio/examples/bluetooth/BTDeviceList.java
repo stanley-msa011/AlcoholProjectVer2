@@ -87,22 +87,32 @@ public class BTDeviceList extends Activity {
         Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
 
         // If there are paired devices, add each one to the ArrayAdapter
-        if (pairedDevices.size() > 0) {
-            findViewById(R.id.tv_title_paired_devices).setVisibility(View.VISIBLE);
-            for (BluetoothDevice device : pairedDevices) {
-                mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-            }
-        } else {
-            String noDevices = getResources().getText(R.string.none_paired).toString();
-            mPairedDevicesArrayAdapter.add(noDevices);
-        }
-        
-//        String targetAddress = "";
 //        if (pairedDevices.size() > 0) {
-//        	for (BluetoothDevice device : pairedDevices) {
-//        		String address = device.getAddress();
-//        	}
+//            findViewById(R.id.tv_title_paired_devices).setVisibility(View.VISIBLE);
+//            for (BluetoothDevice device : pairedDevices) {
+//                mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+//            }
+//        } else {
+//            String noDevices = getResources().getText(R.string.none_paired).toString();
+//            mPairedDevicesArrayAdapter.add(noDevices);
 //        }
+        
+        String targetAddress = "00:15:FF:F3:35:48";
+        if (pairedDevices.size() > 0) {
+        	for (BluetoothDevice device : pairedDevices) {
+        		if (targetAddress.equals(device.getAddress())) {
+        			break;
+        		}
+        	}
+        	mBtAdapter.cancelDiscovery();
+        	// Create the result Intent and include the MAC address
+            Intent intent = new Intent();
+            intent.putExtra(EXTRA_DEVICE_ADDRESS, targetAddress);
+
+            // Set result and finish this Activity
+            setResult(Activity.RESULT_OK, intent);
+            finish();
+        }
     
     }
 

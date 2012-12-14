@@ -1178,6 +1178,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 			})
 			.create();
     	}
+    	
+    	// If user cancels this dialog (by pressing back)
+    	// Assume the same as declining to share location (negative button)
+    	@Override
+    	public void onCancel(DialogInterface dialog) {
+    		locationTrackPermitted = false;
+			runSensorCheck();
+    	}
     }
 
     /*
