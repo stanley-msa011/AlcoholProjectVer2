@@ -25,8 +25,8 @@ public class BracHistoryActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		System.gc();
 		setContentView(R.layout.activity_brac_history);
-		
 		brac_list_view = (ListView)findViewById(R.id.brac_history_listview);
 		mBracDbAdapter = new BracDbAdapter(this);
 		mBracDbAdapter.open();

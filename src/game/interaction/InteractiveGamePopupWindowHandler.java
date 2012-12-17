@@ -33,12 +33,14 @@ public class InteractiveGamePopupWindowHandler {
 		initPopWindow();
 	}
 	private OnClickListener listener;
+	private showPopWindowThread showThread;
 	
 	private void initPopWindow(){
 		 Context mContext = ga;   
 		 LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		 View v_pop = mLayoutInflater.inflate(R.layout.interactive_game_pop_window, null);
 		 popupWindow = new PopupWindow(v_pop,400,400);
+		 showThread = new showPopWindowThread();
 		 listener = new PopWindowOnClickListener();
 		 ok_button = (Button)v_pop.findViewById(R.id.interactive_game_pop_ok_button);
 		 ok_button.setOnClickListener(listener);
@@ -59,7 +61,7 @@ public class InteractiveGamePopupWindowHandler {
         popupWindow.setOutsideTouchable(false);
         popText.setText("Cheers "+code_name+"?");
         cur_pid = pid;
-        bg.post(new showPopWindowThread());
+        bg.post(showThread);
 	}
 	
 	private class showPopWindowThread implements Runnable{

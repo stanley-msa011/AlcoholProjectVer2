@@ -27,7 +27,7 @@ public class GalleryActivity extends Activity {
 
 	private SimpleAdapter gallery_adapter;
 	private Gallery galleryListView;
-	private Context galleryActivity;
+	private GalleryActivity galleryActivity;
 	private Button nextButton;
 	private Button prevButton;
 	private EditText curPage;
@@ -35,20 +35,34 @@ public class GalleryActivity extends Activity {
 	
 	private int max_page;
 	private int cur_page;
+	private int first_show_view;
+	
+	private GameDB gDB;
+	private BracDbAdapter bDb;
 	
 	private static final int TOTAL_VIEW_PAGE = 10;
+	
+	private static boolean lock = false;
 	
 	ArrayList<HashMap<String,Object>> gallery_list = new ArrayList<HashMap<String,Object>>();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		System.gc();
 		setContentView(R.layout.activity_gallery);
 		galleryActivity = this;
 		galleryListView = (Gallery) findViewById(R.id.gallery_list);
 		
 		
 		cur_page = this.getIntent().getIntExtra("PAGE", -1);
+		first_show_view = this.getIntent().getIntExtra("SHOW", -1);
+		
+		gDB=new GameDB(this);
+		bDb = new BracDbAdapter(this);
+		
+		
+		
 		int adapter_len = getGalleryListSize();
 		 init(adapter_len);
 		
@@ -69,7 +83,11 @@ public class GalleryActivity extends Activity {
 
 		 if (adapter_len>0){
 			galleryListView.setAdapter(gallery_adapter);
-			int select_pos = end_pos-start_pos;
+			int select_pos;
+			if (first_show_view == -1)
+				select_pos = end_pos-start_pos;
+			else 
+				select_pos = first_show_view;
 			galleryListView.setSelection(select_pos);
 		}
 	}
@@ -115,62 +133,17 @@ public class GalleryActivity extends Activity {
 		super.onStop();
 		gallery_list.clear();
 		gallery_adapter.notifyDataSetInvalidated();
+		System.gc();
 	}
 	
 	private int getGalleryListSize(){
-		GameDB gDB=new GameDB(this);
 		GameState[] stateList = gDB.getAllStates();
 		if (stateList == null)
 			return 0;
 		return stateList.length;
 	}
 	
-	
-	private int setGalleryList(){
-		GameDB gDB=new GameDB(this);
-		BracDbAdapter bDb = new BracDbAdapter(galleryActivity);
-		GameState[] stateList = gDB.getAllStates();
-		bDb.open();
-		Cursor brac_test_list =  bDb.fetchAllHistory();
-
-		if (stateList == null)
-			return 0;
-		
-		for (int i=0;i<stateList.length;++i){
-			HashMap<String,Object> item = new HashMap<String,Object>();
-			int state = stateList[i].state;
-			int coin = stateList[i].coin;
-
-			int[] coins = new int[4];
-			int j=0;
-			for (;j<4;++j){
-				if (j<coin)
-					coins[j] = R.drawable.coin_n;
-				else
-					coins[j] = R.drawable.blank_img;
-			}
-			
-			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(state, coin);
-			int tree_pic = BackgroundHandler.getTreeDrawableId(state);
-			brac_test_list.moveToPosition(i);
-			String date = brac_test_list.getString(1);
-			
-			item.put("pic",bg_pic);
-			item.put("tree",tree_pic );
-			item.put("coin0", coins[0]);
-			item.put("coin1", coins[1]);
-			item.put("coin2", coins[2]);
-			item.put("coin3", coins[3]);
-			item.put("date", date);
-			gallery_list.add(item);
-		}
-		bDb.close();
-		return stateList.length;
-	}
-
 	private int setGalleryList(int start, int end){
-		GameDB gDB=new GameDB(this);
-		BracDbAdapter bDb = new BracDbAdapter(galleryActivity);
 		GameState[] stateList = gDB.getAllStates();
 		bDb.open();
 		Cursor brac_test_list =  bDb.fetchAllHistory();
@@ -216,14 +189,20 @@ public class GalleryActivity extends Activity {
 	{
 		@Override
 		public void onClick(View v) {
-			if (nextButton.isClickable() && nextButton.isEnabled()){
-			nextButton.setEnabled(false);
-			nextButton.setClickable(false);
-			gallery_list.clear();
-			gallery_adapter.notifyDataSetInvalidated();
-			Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
-			newActivity.putExtra("PAGE", cur_page+1);
-			galleryActivity.startActivity(newActivity);
+			if(!lock){
+				lock = true;
+				if (nextButton.isClickable() && nextButton.isEnabled()){
+					nextButton.setEnabled(false);
+					nextButton.setClickable(false);
+					gallery_list.clear();
+					gallery_adapter.notifyDataSetInvalidated();
+					System.gc();
+					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
+					newActivity.putExtra("PAGE", cur_page+1);
+					newActivity.putExtra("SHOW", 0);
+					galleryActivity.startActivity(newActivity);
+				}
+				lock = false;
 			}
 		}
 		
@@ -232,14 +211,21 @@ public class GalleryActivity extends Activity {
 	{
 		@Override
 		public void onClick(View v) {
-			if (prevButton.isClickable() && prevButton.isEnabled()){
-			prevButton.setEnabled(false);
-			prevButton.setClickable(false);
-			gallery_list.clear();
-			gallery_adapter.notifyDataSetInvalidated();
-			Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
-			newActivity.putExtra("PAGE", cur_page-1);
-			galleryActivity.startActivity(newActivity);
+			if(!lock){
+				lock = true;
+				if (prevButton.isClickable() && prevButton.isEnabled()){
+					prevButton.setEnabled(false);
+					prevButton.setClickable(false);
+					gallery_list.clear();
+					gallery_adapter.notifyDataSetInvalidated();
+					System.gc();
+					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
+					newActivity.putExtra("PAGE", cur_page-1);
+					newActivity.putExtra("SHOW", -1);
+					galleryActivity.startActivity(newActivity);
+					galleryActivity.finish();
+				}
+				lock = false;
 			}
 		}
 		
@@ -256,6 +242,7 @@ public class GalleryActivity extends Activity {
 				Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 				newActivity.putExtra("PAGE", set_page);
 				galleryActivity.startActivity(newActivity);
+				galleryActivity.finish();
 			}
 			return false;
 		}

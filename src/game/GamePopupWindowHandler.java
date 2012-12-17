@@ -22,6 +22,8 @@ public class GamePopupWindowHandler {
 	private View v_pop;
     Drawable good_apple;
     Drawable bad_apple;
+    private PopWindowOnDismissListener dismissListener;
+    private showPopWindowThread showThread;
 	public GamePopupWindowHandler(GameActivity ga){
 		this.ga = ga;
 		this.bg = (ImageView)ga.findViewById(R.id.background);
@@ -37,6 +39,9 @@ public class GamePopupWindowHandler {
 		 popupWindow = new PopupWindow(v_pop,400,400);
 		 ok_button = (Button)v_pop.findViewById(R.id.game_pop_ok_button);
 		 ok_button.setOnClickListener(new PopWindowOnClickListener());
+		 dismissListener = new PopWindowOnDismissListener(BracDataHandler.ERROR);
+		 popupWindow.setOnDismissListener(dismissListener);
+		 showThread = new showPopWindowThread();
 		 popText = (TextView)v_pop.findViewById(R.id.game_pop_text);
 	}
 	private class PopWindowOnClickListener implements View.OnClickListener{
@@ -61,13 +66,17 @@ public class GamePopupWindowHandler {
 			popupWindow.setBackgroundDrawable(good_apple);
 		}
         popupWindow.setOutsideTouchable(false);
-        popupWindow.setOnDismissListener(new PopWindowOnDismissListener(test_result));
-        bg.post(new showPopWindowThread());
+       // popupWindow.setOnDismissListener(new PopWindowOnDismissListener(test_result));
+        dismissListener.set(test_result);
+        bg.post( showThread);
 	}
 	
 	private class PopWindowOnDismissListener implements PopupWindow.OnDismissListener{
 		private int test_result;
 		PopWindowOnDismissListener(int test_result){
+			this.test_result = test_result;
+		}
+		public void set(int test_result){
 			this.test_result = test_result;
 		}
 		public void onDismiss() {

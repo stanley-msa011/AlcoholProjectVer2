@@ -68,12 +68,7 @@ public class BracDataHandler {
         
         textFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + ts + ".txt");
         geoFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "geo.txt");
-        boolean hasGeoFile = false;
-        try {
-			FileInputStream geoFileTester = new FileInputStream(geoFile);
-			geoFileTester.close();
-			hasGeoFile = true;
-		} catch (Exception e) {e.printStackTrace();}
+        boolean hasGeoFile = geoFile.exists();
         
         imageFiles[0] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_1.jpg");
         imageFiles[1] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_2.jpg");
@@ -112,6 +107,7 @@ public class BracDataHandler {
        	int server_connect = connectingToServer(textFile,geoFile,stateFile,imageFiles,hasGeoFile,hasStateFile);
 		if (server_connect == ERROR);
      	
+		
 		saveToDB(avg_result);
        	
 		return result;

@@ -62,6 +62,7 @@ public class GameActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		System.gc();
 		setContentView(R.layout.activity_game);
 		gDB = new GameDB(this);
 		GameState gState = gDB.getLatestGameState();
@@ -93,6 +94,7 @@ public class GameActivity extends Activity{
 	
 	protected void onResume(){
 		super.onResume();
+		//System.gc();
 		gInteractiveGame.update();
 	}
 	

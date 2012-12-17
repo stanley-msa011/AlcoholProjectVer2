@@ -16,7 +16,7 @@ public class InteractiveGameHandler {
 	private Gallery gGallery;
 	private ArrayList<HashMap<String,Object>> parterner_list = new ArrayList<HashMap<String,Object>>();
 	private InteractiveGamePopupWindowHandler pop;
-	private InteractiveGameDB igDB = new InteractiveGameDB(ga);
+	private InteractiveGameDB igDB;
 	private SimpleAdapter adapter;
 	private int cur_pos = -1;
 	
