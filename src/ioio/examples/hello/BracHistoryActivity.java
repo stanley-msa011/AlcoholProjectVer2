@@ -15,7 +15,7 @@ public class BracHistoryActivity extends Activity {
 	private BracDbAdapter mBracDbAdapter;
 	private SimpleAdapter brac_adapter;
 	private ListView brac_list_view;
-	
+	private ArrayList<HashMap<String,Object>> brac_list;
 	
 	static private final double[] limit = {0.05, 0.15, 0.25, 0.40, 0.60};
 	static private final int[]	bg_setting = {
@@ -30,7 +30,7 @@ public class BracHistoryActivity extends Activity {
 		brac_list_view = (ListView)findViewById(R.id.brac_history_listview);
 		mBracDbAdapter = new BracDbAdapter(this);
 		mBracDbAdapter.open();
-		ArrayList<HashMap<String,Object>> brac_list = fillData();
+		brac_list = fillData();
 		brac_adapter = new SimpleAdapter(
 					this, 
 					brac_list,
@@ -39,6 +39,13 @@ public class BracHistoryActivity extends Activity {
 					new int[] {R.id.brac_date,R.id.brac_value,R.id.brac_background});
 		brac_list_view.setAdapter(brac_adapter);
 
+	}
+	
+	protected void onStop(){
+		super.onStop();
+		Log.d("Brac","OnStop");
+		brac_list.clear();
+		brac_adapter.notifyDataSetInvalidated();
 	}
 	
 	private ArrayList<HashMap<String,Object>> fillData() {

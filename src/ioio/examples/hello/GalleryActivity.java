@@ -94,15 +94,27 @@ public class GalleryActivity extends Activity {
 		curPage.setText(String.valueOf(cur_page));
 		
 		nextButton.setEnabled(false);
+		nextButton.setClickable(false);
 		prevButton.setEnabled(false);
-		if (cur_page < max_page)
+		prevButton.setClickable(false);
+		if (cur_page < max_page){
 			nextButton.setEnabled(true);
-		if (cur_page > 1)
+			nextButton.setClickable(true);
+		}
+		if (cur_page > 1){
 			prevButton.setEnabled(true);
+			prevButton.setClickable(true);
+		}
 		
 		nextButton.setOnClickListener(new NextOnClickListener());
 		prevButton.setOnClickListener(new PrevOnClickListener());
 		curPage.setOnEditorActionListener(new CurPageListener());
+	}
+	
+	protected void onStop(){
+		super.onStop();
+		gallery_list.clear();
+		gallery_adapter.notifyDataSetInvalidated();
 	}
 	
 	private int getGalleryListSize(){
@@ -204,12 +216,12 @@ public class GalleryActivity extends Activity {
 	{
 		@Override
 		public void onClick(View v) {
-			if (nextButton.isClickable()){
+			if (nextButton.isClickable() && nextButton.isEnabled()){
 			nextButton.setEnabled(false);
+			nextButton.setClickable(false);
 			gallery_list.clear();
 			gallery_adapter.notifyDataSetInvalidated();
 			Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
-			//newActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 			newActivity.putExtra("PAGE", cur_page+1);
 			galleryActivity.startActivity(newActivity);
 			}
@@ -220,12 +232,12 @@ public class GalleryActivity extends Activity {
 	{
 		@Override
 		public void onClick(View v) {
-			if (prevButton.isClickable()){
+			if (prevButton.isClickable() && prevButton.isEnabled()){
 			prevButton.setEnabled(false);
+			prevButton.setClickable(false);
 			gallery_list.clear();
 			gallery_adapter.notifyDataSetInvalidated();
 			Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
-			//newActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 			newActivity.putExtra("PAGE", cur_page-1);
 			galleryActivity.startActivity(newActivity);
 			}

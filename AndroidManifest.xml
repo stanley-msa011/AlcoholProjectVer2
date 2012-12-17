@@ -81,7 +81,8 @@
         </activity>
         <activity
             android:name="ioio.examples.hello.BracHistoryActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:noHistory="true">
         </activity>
         <activity
             android:name="ioio.examples.hello.SettingActivity"

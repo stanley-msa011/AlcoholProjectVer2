@@ -15,7 +15,9 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -43,6 +45,8 @@ public class GameActivity extends Activity{
 	private GameMenuHandler gMenu;
 	private InteractiveGameHandler gInteractiveGame;
 	
+	private Bitmap cur_bg = null;
+	private Bitmap bg_now = null;
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 
 	public final static int START_DO_NOTHING = 0;
@@ -81,9 +85,14 @@ public class GameActivity extends Activity{
 		}
 	}
 	
+	protected void onPause(){
+		super.onPause();
+		gInteractiveGame.clear();
+	}
+	
+	
 	protected void onResume(){
 		super.onResume();
-		
 		gInteractiveGame.update();
 	}
 	
@@ -130,29 +139,29 @@ public class GameActivity extends Activity{
 	
 	private void setImage(){
 		/*set image visibility*/
+		if (cur_bg != null)
+			cur_bg.recycle();
 		GameState gState=treeGame.getGameState();
-		for (int i=0;i<TREE_TYPES;++i){
+		for (int i=0;i<TREE_TYPES;++i)
 			tree_image[i].setVisibility(ImageView.INVISIBLE);
-		}
 		for (int i=0;i<MAX_COIN;++i)
 			coin_image[i].setVisibility(ImageView.INVISIBLE);
 		tree_image[gState.state].setVisibility(ImageView.VISIBLE);
 		for (int i=0;i<gState.coin;++i)
 			coin_image[i].setVisibility(ImageView.VISIBLE);
-		Drawable bg = this.getResources().getDrawable( BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
-		background.setImageDrawable(bg);
+		cur_bg = BitmapFactory.decodeResource(this.getResources(), BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
+		background.setImageBitmap(cur_bg);
 	}
 	
 	
 	private void setImageChange(GameState oldState){
-		/*set images with animation (used in onCreate())*/
 		GameState gState=treeGame.getGameState();
 		if (oldState.coin < gState.coin){
 			if (oldState.coin ==GameState.MIN_COINS && gState.coin == GameState.MAX_COINS){
 				//get coin because state drop
 				for (int i=oldState.coin;i<gState.coin;++i){
 					coin_image[i].setAlpha(0.f);
-					coin_image[i].setVisibility(ImageView.VISIBLE);
+					coin_image[i].setVisibility(View.VISIBLE);
 					coin_image[i].startAnimation(appear_anim);
 					coin_image[i].setAlpha(1.f);
 				}
@@ -161,7 +170,7 @@ public class GameActivity extends Activity{
 				Animation a;
 				a = AnimationUtils.loadAnimation(this, R.anim.coin_appear_anim);
 				for (int i=oldState.coin;i<gState.coin;++i){
-					coin_image[i].setVisibility(ImageView.VISIBLE);
+					coin_image[i].setVisibility(View.VISIBLE);
 					coin_image[i].clearAnimation();
 					coin_image[i].startAnimation(a);
 				}
@@ -194,14 +203,16 @@ public class GameActivity extends Activity{
 		}
 		
 		if (oldState.coin != gState.coin || oldState.state != gState.state){
-			Drawable bgNext = this.getResources().getDrawable( BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
-			Drawable bgNow = this.getResources().getDrawable( BackgroundHandler.getBackgroundDrawableId(oldState.state, oldState.coin));
-			background_anime.setImageDrawable(bgNow);
+			if (bg_now != null)
+				bg_now.recycle();
+			bg_now = cur_bg;
+			cur_bg = BitmapFactory.decodeResource(this.getResources(), BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
+			background_anime.setImageBitmap(bg_now);
 			background_anime.setVisibility(View.VISIBLE);
-			background.setImageDrawable(bgNext);
+			background.setImageBitmap(cur_bg);
 			background_anime.startAnimation(disappear_anim);
 			background.setAnimation(appear_anim);
-			background_anime.setVisibility(View.INVISIBLE);
+			background_anime.setVisibility(View.INVISIBLE);			
 		}
 	}	
 	

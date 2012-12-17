@@ -14,7 +14,7 @@
         android:layout_alignParentTop="true"
         android:clickable="false"
         android:scaleType="fitXY"
-        android:src="@drawable/background" />
+        />
     
     <ImageView
         android:id="@+id/background_anime"
@@ -24,7 +24,7 @@
         android:layout_alignParentTop="true"
         android:clickable="false"
         android:scaleType="fitXY"
-        android:src="@drawable/background" />
+        />
     
     
     <ImageView

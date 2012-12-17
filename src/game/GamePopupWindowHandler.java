@@ -20,10 +20,13 @@ public class GamePopupWindowHandler {
 	private PopupWindow popupWindow;
 	private ImageView bg;
 	private View v_pop;
-	
+    Drawable good_apple;
+    Drawable bad_apple;
 	public GamePopupWindowHandler(GameActivity ga){
 		this.ga = ga;
 		this.bg = (ImageView)ga.findViewById(R.id.background);
+	    good_apple = ga.getResources().getDrawable(R.drawable.apple_good);
+	    bad_apple = ga.getResources().getDrawable(R.drawable.apple_bad);
 		initPopWindow();
 	}
 	
@@ -44,8 +47,7 @@ public class GamePopupWindowHandler {
 	}
 	public void showPopWindow(int test_result){
         int result = test_result;
-        Drawable good_apple = ga.getResources().getDrawable(R.drawable.apple_good);
-        Drawable bad_apple = ga.getResources().getDrawable(R.drawable.apple_bad);
+
         if (result == BracDataHandler.ERROR){
         	popText.setText("ERROR");
         	popupWindow.setBackgroundDrawable(bad_apple);

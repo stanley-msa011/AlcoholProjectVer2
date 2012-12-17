@@ -79,6 +79,10 @@ public class InteractiveGameHandler {
 		update_adapter();
 	}
 	
+	public void clear(){
+		parterner_list.clear();
+		adapter.notifyDataSetInvalidated();
+	}
 	
 	private void update_adapter(){
 		setAdapter();
