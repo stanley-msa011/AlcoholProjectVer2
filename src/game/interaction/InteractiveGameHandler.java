@@ -14,7 +14,7 @@ import ioio.examples.hello.R;
 public class InteractiveGameHandler {
 	private GameActivity ga;
 	private Gallery gGallery;
-	private ArrayList<HashMap<String,Object>> parterner_list = new ArrayList<HashMap<String,Object>>();
+	private ArrayList<HashMap<String,Object>> partner_list = new ArrayList<HashMap<String,Object>>();
 	private InteractiveGamePopupWindowHandler pop;
 	private InteractiveGameDB igDB;
 	private SimpleAdapter adapter;
@@ -37,7 +37,7 @@ public class InteractiveGameHandler {
 	private final static String code_names = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	
 	private void setAdapter(){
-		parterner_list.clear();
+		partner_list.clear();
 		InteractiveGameState[] stateList = igDB.getStates();
 		if (stateList.length == 0){
 				adapter = null;
@@ -52,12 +52,12 @@ public class InteractiveGameHandler {
 			item.put("tree",tree_pic );
 			item.put("pid", stateList[i].PID);
 			item.put("code_name",code_names.substring(i, i+1) );
-			parterner_list.add(item);
+			partner_list.add(item);
 		}
 		
 		adapter = new SimpleAdapter(
 					ga, 
-					parterner_list,
+					partner_list,
 					R.layout.interactive_item,
 					new String[] { "pic","tree","code_name"},
 					new int[] {R.id.interactive_state,R.id.interactive_tree,R.id.interactive_code});
@@ -80,7 +80,7 @@ public class InteractiveGameHandler {
 	}
 	
 	public void clear(){
-		parterner_list.clear();
+		partner_list.clear();
 		adapter.notifyDataSetInvalidated();
 	}
 	
@@ -103,7 +103,7 @@ public class InteractiveGameHandler {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
 			int idx = (int)arg3;
-			HashMap<String,Object> item =parterner_list.get(idx);
+			HashMap<String,Object> item =partner_list.get(idx);
 			String pid = (String) item.get("pid");
 			String code_name = (String) item.get("code_name");
 			pop.showPopWindow(code_name, pid);

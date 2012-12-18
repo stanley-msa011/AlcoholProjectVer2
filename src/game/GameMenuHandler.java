@@ -4,20 +4,26 @@ import ioio.examples.hello.BracHistoryActivity;
 import ioio.examples.hello.GalleryActivity;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.MainActivity;
+import ioio.examples.hello.PrefSettingActivity;
 import ioio.examples.hello.R;
-import ioio.examples.hello.SettingActivity;
 import ioio.examples.hello.TestActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+import android.content.SharedPreferences;
+
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class GameMenuHandler {
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
@@ -80,12 +86,16 @@ public class GameMenuHandler {
 			
 			switch (list_id){
 				case 0:	//MainActivity
-					newActivity = new Intent(context, TestActivity.class);  
+					SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(ga);
+			        boolean fake = sp.getBoolean("use_fake_data", false);
+			        if (fake)
+			        	newActivity = new Intent(context, TestActivity.class);
+			        else
+			        	newActivity = new Intent(context, MainActivity.class);
 					ga.startActivityForResult(newActivity, REQUEST_TEST);  
 					break;
 				case 1: //Dummy (Record of TreeGame)
 					newActivity = new Intent(context, GalleryActivity.class); 
-					//newActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 					newActivity.putExtra("PAGE", -1);
 					ga.startActivity(newActivity);  
 					break;
@@ -94,7 +104,7 @@ public class GameMenuHandler {
 	                ga.startActivity(newActivity);
 					break;
 				case 3: //Dummy (Setting)
-					newActivity = new Intent(context, SettingActivity.class);     
+					newActivity = new Intent(context, PrefSettingActivity.class);     
 	                ga.startActivity(newActivity);
 					break;
 				default:

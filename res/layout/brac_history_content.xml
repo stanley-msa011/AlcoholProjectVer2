@@ -11,7 +11,7 @@
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
-        android:src="@drawable/bar01" />
+        />
     
     <TextView
         android:id="@+id/brac_date"
@@ -19,7 +19,6 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:text="@string/empty_row" 
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#FFFFFFFF"
@@ -32,7 +31,6 @@
 		android:layout_alignParentRight = "true"
 		android:layout_marginRight="30dp"
         android:layout_centerVertical="true"
-        android:text="@string/empty_row" 
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#FF000000"

@@ -10,7 +10,7 @@
         android:layout_centerInParent="true"
         android:scaleType="fitXY"
         android:adjustViewBounds="true"
-        android:src="@drawable/background" />
+        />
     <ImageView
         android:id="@+id/interactive_tree"
         android:layout_width="64dp"
@@ -19,14 +19,13 @@
         android:layout_alignBottom="@+id/interactive_state"
         android:scaleType="fitXY"
         android:adjustViewBounds="true"
-        android:src="@drawable/tree3" />
+         />
     <TextView
         android:id="@+id/interactive_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/interactive_state"
         android:layout_alignTop="@+id/interactive_state"
-        android:text="A" 
         android:textColor="#FFFFFFFF"
         android:textSize="36dp"
         android:background="#55000000"

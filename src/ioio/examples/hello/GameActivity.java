@@ -1,5 +1,10 @@
 package ioio.examples.hello;
 
+import ioio.examples.hello.R;
+import ioio.examples.hello.R.anim;
+import ioio.examples.hello.R.id;
+import ioio.examples.hello.R.layout;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,9 +17,11 @@ import game.GameState;
 import game.TreeGame;
 import game.interaction.InteractiveGameHandler;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -95,6 +102,9 @@ public class GameActivity extends Activity{
 	protected void onResume(){
 		super.onResume();
 		//System.gc();
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+        boolean s = sp.getBoolean("enable_gps_check", false);
+        Log.d("Pref in Game","<"+String.valueOf(s)+">");
 		gInteractiveGame.update();
 	}
 	

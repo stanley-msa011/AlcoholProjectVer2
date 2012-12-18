@@ -2,9 +2,14 @@ package ioio.examples.hello;
 
 
 
+
 import game.BackgroundHandler;
 import game.GameDB;
 import game.GameState;
+import ioio.examples.hello.R;
+import ioio.examples.hello.R.drawable;
+import ioio.examples.hello.R.id;
+import ioio.examples.hello.R.layout;
 
 import java.util.ArrayList;
 import java.util.HashMap;

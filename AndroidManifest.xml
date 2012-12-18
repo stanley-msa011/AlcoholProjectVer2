@@ -85,10 +85,10 @@
             android:noHistory="true">
         </activity>
         <activity
-            android:name="ioio.examples.hello.SettingActivity"
-            android:screenOrientation="portrait" >
+            android:name="ioio.examples.hello.PrefSettingActivity"
+            android:screenOrientation="portrait" 
+            android:noHistory="true">
         </activity>
-
     </application>
 
 </manifest>

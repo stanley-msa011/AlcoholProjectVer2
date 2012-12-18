@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:shouldDisableView="true" 
+    android:title="設定" 
+    android:summary="Setting" 
+    android:key="setting_page" >
+    
+    <PreferenceCategory 
+        android:title="喜好設定" 
+        android:key="location_setting" >
+        <SwitchPreference 
+            android:summaryOn="資料上傳時顯示我的位置" 
+            android:summaryOff="資料上傳時隱藏我的位置" 
+            android:key="enable_gps_check" 
+            android:title="顯示我的位置" 
+            android:defaultValue="false" 
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Developer Setting">
+        <SwitchPreference 
+            android:summaryOn="Yes" 
+            android:summaryOff="No" 
+            android:title="Use fake data?" 
+            android:key="use_fake_data"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
