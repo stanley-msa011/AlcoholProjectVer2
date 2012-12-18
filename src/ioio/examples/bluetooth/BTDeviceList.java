@@ -1,8 +1,9 @@
 package ioio.examples.bluetooth;
 
+import ioio.examples.hello.R;
+
 import java.util.Set;
 
-import ioio.examples.hello.R;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,23 +11,29 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 public class BTDeviceList extends Activity {
 	// Debugging
     private static final String TAG = "DeviceListActivity";
     private static final boolean D = false;
+    
+    private final String[] macAddressList = {
+    		"00:15:FF:F3:35:48",
+    		"00:15:FF:F3:35:37"
+    };
 
     // Return Intent extra
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
@@ -97,22 +104,67 @@ public class BTDeviceList extends Activity {
 //            mPairedDevicesArrayAdapter.add(noDevices);
 //        }
         
-        String targetAddress = "00:15:FF:F3:35:48";
-        if (pairedDevices.size() > 0) {
-        	for (BluetoothDevice device : pairedDevices) {
-        		if (targetAddress.equals(device.getAddress())) {
-        			break;
+        SharedPreferences linkBTSettings = getPreferences(0);
+        SharedPreferences.Editor editor = linkBTSettings.edit();
+        Boolean targetSet = linkBTSettings.getBoolean("targetSet", false);
+        Boolean hasMatch = false;
+        Intent intent = new Intent();
+        if (targetSet) {
+        	Log.d(TAG, "There is a target device in shared preferences: " + linkBTSettings.getString("targetAddress", "00:00:00:00:00:00"));
+        	// The phone already has a target device set
+        	intent.putExtra(EXTRA_DEVICE_ADDRESS, linkBTSettings.getString("targetAddress", "00:00:00:00:00:00"));
+        	// Set result and finish this Activity
+        	setResult(Activity.RESULT_OK, intent);
+        	finish();
+        } else {
+        	// This is the first time a target device is being discovered
+        	Log.d(TAG, "No target device set in shared preferences");
+        	if (pairedDevices.size() > 0) {
+        		for (BluetoothDevice device : pairedDevices) {
+        			Log.d(TAG, "Match device: " + device.getAddress());
+        			for (String possibleTarget : macAddressList) {
+        				if (device.getAddress().equals(possibleTarget)) {
+        					Log.d(TAG, "Found a target device: " + possibleTarget);
+        					
+        		        	editor.putString("targetAddress", device.getAddress());
+        		        	editor.putBoolean("targetSet", true);
+        		        	editor.commit();
+        					hasMatch = true;
+        					break;
+        				}
+        			}
+        			if (hasMatch)
+        				break;
         		}
+        		if (hasMatch) {
+        			Log.d(TAG, "Connecting to target device: " + linkBTSettings.getString("targetAddress", "00:00:00:00:00:00"));
+        			intent.putExtra(EXTRA_DEVICE_ADDRESS, linkBTSettings.getString("targetAddress", "00:00:00:00:00:00"));
+                	// Set result and finish this Activity
+                	setResult(Activity.RESULT_OK, intent);
+                	finish();
+        		}
+        	} else {
+        		Toast.makeText(this, "There are no targer Bluetooth devices paired to this phone", Toast.LENGTH_LONG).show();
+                finish();
         	}
-        	mBtAdapter.cancelDiscovery();
-        	// Create the result Intent and include the MAC address
-            Intent intent = new Intent();
-            intent.putExtra(EXTRA_DEVICE_ADDRESS, targetAddress);
-
-            // Set result and finish this Activity
-            setResult(Activity.RESULT_OK, intent);
-            finish();
         }
+        
+//        String targetAddress = "00:15:FF:F3:35:37";
+//        if (pairedDevices.size() > 0) {
+//        	for (BluetoothDevice device : pairedDevices) {
+//        		if (targetAddress.equals(device.getAddress())) {
+//        			break;
+//        		}
+//        	}
+//        	mBtAdapter.cancelDiscovery();
+//        	// Create the result Intent and include the MAC address
+//            Intent intent = new Intent();
+//            intent.putExtra(EXTRA_DEVICE_ADDRESS, targetAddress);
+//
+//            // Set result and finish this Activity
+//            setResult(Activity.RESULT_OK, intent);
+//            finish();
+//        }
     
     }
 
