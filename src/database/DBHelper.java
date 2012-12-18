@@ -43,6 +43,12 @@ public class DBHelper extends SQLiteOpenHelper {
         				"_STATE INTEGER NOT NULL," +
         				"_COIN INTEGER NOT NULL )" 
         		);
+        db.execSQL(
+        		"CREATE TABLE NotUploadedTimeStamp ("+
+        				"_ID INTEGER PRIMARY KEY," +
+        				"_TS CHAR[50] NOT NULL )"
+        		);
+        
 	}
 
 	@Override

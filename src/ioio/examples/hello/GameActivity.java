@@ -8,6 +8,8 @@ import ioio.examples.hello.R.layout;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import database.Reuploader;
+
 import game.BackgroundHandler;
 import game.BracDataHandler;
 import game.GameDB;
@@ -51,6 +53,8 @@ public class GameActivity extends Activity{
 	private GamePopupWindowHandler gPopWindow;
 	private GameMenuHandler gMenu;
 	private InteractiveGameHandler gInteractiveGame;
+	private Reuploader reuploader;
+	
 	
 	private Bitmap cur_bg = null;
 	private Bitmap bg_now = null;
@@ -84,6 +88,8 @@ public class GameActivity extends Activity{
 		gMenu = new GameMenuHandler(this);
 		gInteractiveGame = new InteractiveGameHandler(this);
 		context = this;
+		reuploader = new Reuploader(this);
+		reuploader.reTransmission();
 		/*Go to MainActivity if start because of the notice*/
 		if (START_ACTION == START_MAIN){
 			START_ACTION = START_DO_NOTHING;
@@ -92,6 +98,7 @@ public class GameActivity extends Activity{
 			startActivityForResult(newActivity, REQUEST_TEST);  
 		}
 	}
+	
 	
 	protected void onPause(){
 		super.onPause();

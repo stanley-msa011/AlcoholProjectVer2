@@ -25,6 +25,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
+import database.Reuploader;
+
 import android.content.Context;
 import android.os.Environment;
 import android.provider.Settings.Secure;
@@ -32,18 +34,28 @@ import android.util.Log;
 
 
 public class BracDataHandler {
-	String ts;
-	Context activity_context;
-	TreeGame treeGame;
-	GameDB gDB;
-	String TAG = "BRACDATAHANDLER";
+	private String ts;
+	private Context activity_context;
+	private TreeGame treeGame;
+	private GameDB gDB;
+	private String TAG = "BRACDATAHANDLER";
+	private String devId;
+	private Reuploader reuploader;
+	
 	
 	public BracDataHandler(String timestamp_string, Context activity, TreeGame treeGame,GameDB gDB){
 		ts = timestamp_string;
 		activity_context = activity;
 		this.treeGame = treeGame;
 		this.gDB = gDB;
+		this.devId = Secure.getString(activity_context.getContentResolver(), Secure.ANDROID_ID);
+		reuploader = new Reuploader(activity);
 	}
+	
+	private BracDataHandler(String timestamp_string, String id){
+		ts = timestamp_string;
+		devId = id;
+	};
 	
 	
 	public static final int HaveAlcohol = 11;
@@ -105,8 +117,8 @@ public class BracDataHandler {
        	
        	/*Connection to server*/
        	int server_connect = connectingToServer(textFile,geoFile,stateFile,imageFiles,hasGeoFile,hasStateFile);
-		if (server_connect == ERROR);
-     	
+		if (server_connect == ERROR)
+			reuploader.storeTS(ts);
 		
 		saveToDB(avg_result);
        	
@@ -148,14 +160,18 @@ public class BracDataHandler {
         return avg_result;
 	}
 	
+	public static int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles,boolean hasGeoFile,boolean hasStateFile,String ts,String Id){
+		BracDataHandler bdh = new BracDataHandler(ts,Id);
+		return bdh.connectingToServer(textFile, geoFile, stateFile, imageFiles, hasGeoFile, hasStateFile);
+	}
+	
+	
 	private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles,boolean hasGeoFile,boolean hasStateFile){
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(SERVER_URL);
 			
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-			
-			String devId = Secure.getString(activity_context.getContentResolver(), Secure.ANDROID_ID);
 			
 			MultipartEntity mpEntity = new MultipartEntity();
 			
