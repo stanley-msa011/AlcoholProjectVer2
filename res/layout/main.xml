@@ -2,19 +2,41 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:background="@drawable/background" >
 
+    <ImageView
+	    android:id="@+id/ivBGLand"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerHorizontal="true"
+	    android:layout_alignParentBottom="true"
+	    android:src="@drawable/land" />
+    
+    <ImageView
+	    android:id="@+id/ivBalloonLoader"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerHorizontal="true"
+	    android:layout_alignParentBottom="true"
+	    android:paddingBottom="70dp"
+	    android:src="@drawable/balloon0" />
+    
     <ImageView
         android:id="@+id/imgCountdown"
         android:layout_width="wrap_content"
      	android:layout_height="wrap_content"
-     	android:scaleType="center" />
+     	android:scaleType="center"
+	    android:layout_centerHorizontal="true"
+	    android:layout_alignParentBottom="true"
+	    android:layout_marginBottom="70dp" />
     
     <FrameLayout
 	    android:id="@+id/camera_preview"
 	    android:layout_width="150dp"
 	    android:layout_height="225dp"
-	    android:layout_alignParentRight="true" />
+	    android:layout_above="@id/ivBalloonLoader"
+	    android:layout_centerHorizontal="true" />
     
 	<TextView
 	    android:layout_width="fill_parent" 
@@ -58,13 +80,7 @@
 	    android:layout_height="wrap_content"
 	    android:layout_below="@id/brac"
 	    android:text="@string/waitLoc" />
-	
-	<ImageView
-	    android:id="@+id/ivBalloonLoader"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_centerHorizontal="true"
-	    android:layout_below="@id/tvLatLng"
-	    android:src="@drawable/balloon0" />
+	    <!-- android:layout_below="@id/tvLatLng"
+	    android:src="@drawable/balloon0" /> -->
 	
 </RelativeLayout>

@@ -24,7 +24,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
+import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
@@ -34,12 +34,11 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -325,7 +324,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             	        	}
             		    };
             	        timer.schedule(timerTask, totalDuration);
-            	        
+//            	        updateUILocation(mLoc);
             		}
                 	
                 	if (state == STATE_RUN) {
@@ -575,6 +574,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 //        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 //        	locationChecked = true;
         state = STATE_SENSOR_CHECK;
+        SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+        if (!sp.getBoolean("enable_gps_check", true)) {
+        	Log.d(TAG, "Settings FALSE");
+        	locationTrackPermitted = false;
+        	permissionChecked = true;
+        }
         
 //        mpBlow.start();
 //        mpBlow.pause();

@@ -110,9 +110,9 @@ public class GameActivity extends Activity{
 	protected void onResume(){
 		super.onResume();
 		//System.gc();
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
-        boolean s = sp.getBoolean("enable_gps_check", false);
-        Log.d("Pref in Game","<"+String.valueOf(s)+">");
+//		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+//        boolean s = sp.getBoolean("enable_gps_check", false);
+//        Log.d("Pref in Game","<"+String.valueOf(s)+">");
 		gInteractiveGame.update();
 	}
 	
