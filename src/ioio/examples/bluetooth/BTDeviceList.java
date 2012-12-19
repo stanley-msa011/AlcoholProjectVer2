@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -104,7 +105,8 @@ public class BTDeviceList extends Activity {
 //            mPairedDevicesArrayAdapter.add(noDevices);
 //        }
         
-        SharedPreferences linkBTSettings = getPreferences(0);
+//        SharedPreferences linkBTSettings = getPreferences(0);
+        SharedPreferences linkBTSettings = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = linkBTSettings.edit();
         Boolean targetSet = linkBTSettings.getBoolean("targetSet", false);
         Boolean hasMatch = false;

@@ -14,7 +14,7 @@
             android:summaryOff="資料上傳時隱藏我的位置" 
             android:key="enable_gps_check" 
             android:title="顯示我的位置" 
-            android:defaultValue="false" 
+            android:defaultValue="true" 
             />
     </PreferenceCategory>
 
