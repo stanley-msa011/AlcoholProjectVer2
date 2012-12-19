@@ -102,7 +102,8 @@ public class GameActivity extends Activity{
 	
 	protected void onPause(){
 		super.onPause();
-		gInteractiveGame.clear();
+		if (gInteractiveGame != null)
+			gInteractiveGame.clear();
 	}
 	
 	
