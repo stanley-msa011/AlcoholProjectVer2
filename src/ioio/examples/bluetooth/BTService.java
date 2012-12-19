@@ -34,7 +34,8 @@ public class BTService {
     private static final UUID MY_UUID_SECURE =
       UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final UUID MY_UUID_INSECURE =
-        UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    		UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+//        UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     // Member fields
     private final BluetoothAdapter mAdapter;
@@ -341,6 +342,8 @@ public class BTService {
             mmDevice = device;
             BluetoothSocket tmp = null;
             mSocketType = secure ? "Secure" : "Insecure";
+            if (D)
+            	Log.d(TAG, "Socket Type: " + mSocketType + " is initializing...");
 
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
