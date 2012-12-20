@@ -29,7 +29,15 @@
      	android:scaleType="center"
 	    android:layout_centerHorizontal="true"
 	    android:layout_alignParentBottom="true"
-	    android:layout_marginBottom="70dp" />
+	    android:layout_marginBottom="75dp" />
+    <ImageView
+        android:id="@+id/imgCountdown2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="75dp"
+        android:visibility="invisible" />"
     
     <FrameLayout
 	    android:id="@+id/camera_preview"

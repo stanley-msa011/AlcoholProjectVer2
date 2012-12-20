@@ -82,11 +82,17 @@ public class BTDeviceList extends Activity {
 
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        if (mReceiver == null)
+        	Log.d(TAG, "mReceiver is NULL");
+        Log.d(TAG, "REGISTER 1");
         this.registerReceiver(mReceiver, filter);
 
         // Register for broadcasts when discovery has finished
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+//        this.unregisterReceiver(mReceiver);
+        Log.d(TAG, "REGISTER 2");
         this.registerReceiver(mReceiver, filter);
+        Log.d(TAG, "REGISTER END");
 
         // Get the local Bluetooth adapter
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -173,7 +179,13 @@ public class BTDeviceList extends Activity {
     @Override
     public void onPause() {
     	super.onPause();
-    	
+    	Log.d(TAG, "PAUSE");
+//    	this.unregisterReceiver(mReceiver);
+    }
+    
+    @Override
+    public void onDestroy() {
+    	super.onDestroy();
     	this.unregisterReceiver(mReceiver);
     }
     
@@ -226,7 +238,7 @@ public class BTDeviceList extends Activity {
    
     // The BroadcastReceiver that listens for discovered devices and
     // changes the title when discovery is finished
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
