@@ -76,7 +76,7 @@ public class GameActivity extends Activity{
 	public Context context;
 
 	AsyncTask<Void, Void, Void> mRegisterTask;
-	
+	String regId;
 	/*Setting the action when start the activity*/
 	static public void setStartAction(int action){
 		START_ACTION = action;
@@ -174,10 +174,14 @@ public class GameActivity extends Activity{
 	
 	private void initRegistration(){
 		registerReceiver(mHandleMessageReceiver,  new IntentFilter("GCM_RECEIVE_ACTION"));
-		final String regId = GCMRegistrar.getRegistrationId(this);
-        if (regId.equals(""))
+		regId = GCMRegistrar.getRegistrationId(this);
+        if (regId.equals("")){
+        	Log.d("GCM","start register 0");
             GCMRegistrar.register(this, CommonUtilities.SENDER_ID);
-		else {
+            regId = GCMRegistrar.getRegistrationId(this);
+            Log.d("GCM regid","Regid= "+regId);
+        }
+		//else {
             if (GCMRegistrar.isRegisteredOnServer(this))  Log.d("GCM","skip register");
             else {
             	Log.d("GCM","start register");
@@ -193,7 +197,7 @@ public class GameActivity extends Activity{
                 };
                 mRegisterTask.execute(null, null, null);
             }
-        }
+       // }
 	}
 	
 	
