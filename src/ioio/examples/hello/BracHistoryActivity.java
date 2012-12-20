@@ -17,7 +17,7 @@ public class BracHistoryActivity extends Activity {
 	private ListView brac_list_view;
 	private ArrayList<HashMap<String,Object>> brac_list;
 	
-	static private final double[] limit = {0.05, 0.15, 0.25, 0.40, 0.60};
+	static private final double[] limit = {0.05, 0.09, 0.25, 0.40, 0.60};
 	static private final int[]	bg_setting = {
 		R.drawable.bar01,R.drawable.bar02,R.drawable.bar03,R.drawable.bar04,R.drawable.bar05,R.drawable.bar06
 	};

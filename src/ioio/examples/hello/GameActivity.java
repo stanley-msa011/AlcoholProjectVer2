@@ -1,5 +1,6 @@
 package ioio.examples.hello;
 
+import static game.cheer.CommonUtilities.SENDER_ID;
 import ioio.examples.hello.R;
 import ioio.examples.hello.R.anim;
 import ioio.examples.hello.R.id;
@@ -7,6 +8,8 @@ import ioio.examples.hello.R.layout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.google.android.gcm.GCMRegistrar;
 
 import database.Reuploader;
 
@@ -17,12 +20,18 @@ import game.GameMenuHandler;
 import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
+import game.cheer.CommonUtilities;
+import game.cheer.ServerUtilities;
 import game.interaction.InteractiveGameHandler;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings.Secure;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -66,6 +75,8 @@ public class GameActivity extends Activity{
 	private static int START_ACTION=START_DO_NOTHING;
 	public Context context;
 
+	AsyncTask<Void, Void, Void> mRegisterTask;
+	
 	/*Setting the action when start the activity*/
 	static public void setStartAction(int action){
 		START_ACTION = action;
@@ -90,6 +101,9 @@ public class GameActivity extends Activity{
 		context = this;
 		reuploader = new Reuploader(this);
 		reuploader.reTransmission();
+		initRegistration();
+      	Intent service_intent = new Intent(this, TimerService.class);
+      	startService(service_intent);
 		/*Go to MainActivity if start because of the notice*/
 		if (START_ACTION == START_MAIN){
 			START_ACTION = START_DO_NOTHING;
@@ -97,6 +111,7 @@ public class GameActivity extends Activity{
 			newActivity = new Intent(context, MainActivity.class);  
 			startActivityForResult(newActivity, REQUEST_TEST);  
 		}
+		
 	}
 	
 	
@@ -106,6 +121,13 @@ public class GameActivity extends Activity{
 			gInteractiveGame.clear();
 	}
 	
+	protected void onDestroy(){
+        if (mRegisterTask != null) {
+            mRegisterTask.cancel(true);
+        }
+        unregisterReceiver(mHandleMessageReceiver);
+		super.onDestroy();
+	}
 	
 	protected void onResume(){
 		super.onResume();
@@ -149,6 +171,30 @@ public class GameActivity extends Activity{
 		coin_image[2] = (ImageView) findViewById(R.id.coin3);
 		coin_image[3] = (ImageView) findViewById(R.id.coin4);
 	}	
+	
+	private void initRegistration(){
+		registerReceiver(mHandleMessageReceiver,  new IntentFilter("GCM_RECEIVE_ACTION"));
+		final String regId = GCMRegistrar.getRegistrationId(this);
+        if (regId.equals(""))
+            GCMRegistrar.register(this, CommonUtilities.SENDER_ID);
+		else {
+            if (GCMRegistrar.isRegisteredOnServer(this))  Log.d("GCM","skip register");
+            else {
+            	Log.d("GCM","start register");
+                mRegisterTask = new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        boolean registered = ServerUtilities.register(context, regId);
+                        if (!registered)  GCMRegistrar.unregister(context);
+                        return null;
+                    }
+                    @Override
+                    protected void onPostExecute(Void result) {mRegisterTask = null; }
+                };
+                mRegisterTask.execute(null, null, null);
+            }
+        }
+	}
 	
 	
 	private void initSettingButton(){
@@ -267,5 +313,11 @@ public class GameActivity extends Activity{
 		gPopWindow.showPopWindow(result);
 	}
 
-	
+    private final BroadcastReceiver mHandleMessageReceiver =
+            new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //String newMessage = intent.getExtras().getString("push_msg");
+        }
+    };
 }

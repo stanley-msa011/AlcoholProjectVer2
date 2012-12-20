@@ -1,5 +1,8 @@
 package game.interaction;
 
+import static game.cheer.CommonUtilities.SENDER_ID;
+import static game.cheer.CommonUtilities.SERVER_URL;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +21,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
+
+import com.google.android.gcm.GCMRegistrar;
 
 import android.provider.Settings.Secure;
 import android.util.Log;
@@ -182,7 +187,6 @@ public class InteractiveGameHandler {
 				coin = 0;
 			else
 				coin = Integer.valueOf(items[2].substring(1,items[2].length()-1));
-			//Log.d("UPDATE STATE",pid+" / " +state+" / "+coin);
 			states[i] = new InteractiveGameState(state,coin,pid);
 		}
 		return states;
@@ -237,7 +241,7 @@ public class InteractiveGameHandler {
 		
 	}
 	
+	
 	public void send_cheers(String pid){
-		
 	}
 }

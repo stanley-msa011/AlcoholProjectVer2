@@ -17,13 +17,15 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.VIBRATE" />
-
+    <permission android:name="com.google.android.gcm.demo.app.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.google.android.gcm.demo.app.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
         <activity
-            android:name="ioio.examples.hello.OpenActivity"
+            android:name="ioio.examples.hello.GameActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -59,13 +61,16 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="ioio.examples.hello.GameActivity"
+            android:name="ioio.examples.hello.OpenActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <service android:name="ioio.examples.hello.TimerService" >
         </service>
 
+        <service android:name="ioio.examples.hello.GCMIntentService" >
+        </service>
+        
         <activity
             android:name="ioio.examples.hello.TestActivity"
             android:screenOrientation="portrait" >

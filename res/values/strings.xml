@@ -13,7 +13,7 @@
 
     <!-- Main Activity Page -->
     <string name="hello">Hello, IOIO User!</string>
-    <string name="app_name">Hello IOIO</string>
+    <string name="app_name">Alcohol Test</string>
     <string name="led2">Button led 2</string>
     <string name="led4">Button led 4</string>
     <string name="storage_state">External storage state:</string>

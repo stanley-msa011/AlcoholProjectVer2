@@ -63,7 +63,7 @@ public class BracDataHandler {
 	public static final int Nothing = 0; 
 	public static final int ERROR = -1;
 	public static final int SUCCESS = 1;
-	private static final double THRESHOLD = 0.05;
+	private static final double THRESHOLD = 0.09;
 	
 	private static final String SERVER_URL = "http://140.112.30.165:80/drunk_detect_upload.php";
 	
@@ -127,8 +127,6 @@ public class BracDataHandler {
 	}
 	
 	private double parseTextFile(File textFile){
-        int numberToForsakeHead = 2;
-        int numberToForsakeTail = 2;
 		double avg_result = 0;
         try {
 			Scanner s = new Scanner(textFile);
@@ -140,12 +138,6 @@ public class BracDataHandler {
 				String word = s.next();
 				if(index % 2 == 0)
 					valueArray.add(word);
-			}
-			if (valueArray.size()>=5){
-				for(int i = 0; i < numberToForsakeHead ;++i )
-					valueArray.remove(0);
-				for(int i = 0; i < numberToForsakeTail ;++i)
-					valueArray.remove(valueArray.size()-1);
 			}
 			for(int i = 0; i < valueArray.size(); ++i)
 				avg_result += Double.parseDouble(valueArray.get(i));
