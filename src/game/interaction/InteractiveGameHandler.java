@@ -110,7 +110,8 @@ public class InteractiveGameHandler {
 			thread.join();
 			if (handler .result==-1)
 				return;
-			//update_adapter();
+			update_adapter();
+			adapter.notifyDataSetChanged();
 		} catch (Exception e) {
 			e.printStackTrace();	
 			return;
@@ -147,7 +148,9 @@ public class InteractiveGameHandler {
 				InteractiveGameState[] states = parseResponse(responseString);
 				if (states != null){
 					igDB.updateState(states);
-					update_adapter();
+					//update_adapter();
+					//adapter.notifyDataSetChanged();
+					result = 2;
 				}
 				//Log.d("UPDATE STATE",responseString);
 			} catch (Exception e) {	e.printStackTrace();}
