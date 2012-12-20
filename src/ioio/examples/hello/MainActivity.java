@@ -43,6 +43,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -69,6 +70,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	private static int state;
 	
 	public ImageView imgCountdown;
+	public ImageView imgCountdown2;
 //	public ImageView imgSensing;
 	public AnimationDrawable countdownAnimation;
 //	public AnimationDrawable sensingAnimation;
@@ -121,6 +123,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	
 	Calendar calendar;
 	
+	private Timer timer;
 	private LocationManager mLocationManager;
 	private Location mLoc = null;
 	private TextView tvLatLng;
@@ -264,20 +267,20 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             			
             			setupCamera();
             			
-            			runOnUiThread(new Runnable() { 
-            		        public void run() {
-            		        	//取得外部儲存媒體的狀態
-            					String state = Environment.getExternalStorageState();
-            					//判斷狀態
-            					if (Environment.MEDIA_MOUNTED.equals(state)) {
-            						storage_state.setText("can written");
-            					} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            						storage_state.setText("read only, can't written");
-            					} else {
-            						storage_state.setText("can't read and written");
-            					}
-            		        } 
-            		    });
+//            			runOnUiThread(new Runnable() { 
+//            		        public void run() {
+//            		        	//取得外部儲存媒體的狀態
+//            					String state = Environment.getExternalStorageState();
+//            					//判斷狀態
+//            					if (Environment.MEDIA_MOUNTED.equals(state)) {
+//            						storage_state.setText("can written");
+//            					} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+//            						storage_state.setText("read only, can't written");
+//            					} else {
+//            						storage_state.setText("can't read and written");
+//            					}
+//            		        } 
+//            		    });
             	    	
             	    	textfile = new File(sessionDir + File.separator + dirTimeStamp + ".txt");
             	    	geoFile = new File(sessionDir + File.separator + "geo.txt");
@@ -302,12 +305,19 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             	    		totalDuration += countdownAnimation.getDuration(i);  
             	        }
             	        
-            	        Timer timer = new Timer();
+            	        timer = new Timer();
             	        TimerTask timerTask = new TimerTask(){  
             	        @Override
             		        public void run() {
             	        		Log.d(TAG, "Countdown animation is stopping");
             	        		state = STATE_RUN;
+            	        		runOnUiThread(new Runnable() { 
+	        				        public void run() {
+	        				        	imgCountdown.setVisibility(View.INVISIBLE);
+	        				        	imgCountdown2.setVisibility(View.VISIBLE);
+	        				        	imgCountdown2.setImageResource(R.drawable.count_go);
+	        				        } 
+	        				    });
             	        		new Thread (new Runnable() {
             	        			@Override
             	        			public void run() {
@@ -317,6 +327,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             	        						Thread.sleep(1000);
             	        					} catch (InterruptedException e) {
             	        						Log.e(TAG, "Camera could not take picture: " + e.getMessage());
+            	        					} catch (NullPointerException npe) {
+            	        						Log.e(TAG, "Camera could not take picture: " + npe.getMessage());
             	        					}
             	                    	}
             	        			}
@@ -367,12 +379,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	                        				// Close the file and finish the activity
 	                        				sensor_value.close();
 	                        				writeLocationFile();
-	//                        				runOnUiThread(new Runnable() { 
-	//                    				        public void run() {
-	//                    				        	mpBlow.pause();
-	                    				        	mpBlowEnd.start();
-	//                    				        } 
-	//                    				    });
+	                    				    mpBlowEnd.start();
+	                    				    runOnUiThread(new Runnable() { 
+	        	        				        public void run() {
+	        	        				        	imgCountdown2.setImageResource(R.drawable.count_end);
+	        	        				        } 
+	        	        				    });    	
 	                        				Intent i_return = new Intent();
 	                        				Bundle bData = new Bundle();
 	                        				bData.putString("testfilename", dirTimeStamp);
@@ -574,12 +586,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 //        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 //        	locationChecked = true;
         state = STATE_SENSOR_CHECK;
-        SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
-        if (!sp.getBoolean("enable_gps_check", true)) {
-        	Log.d(TAG, "Settings FALSE");
-        	locationTrackPermitted = false;
-        	permissionChecked = true;
-        }
+//        SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+//        if (!sp.getBoolean("enable_gps_check", true)) {
+//        	Log.d(TAG, "Settings FALSE");
+//        	locationTrackPermitted = false;
+//        	permissionChecked = true;
+//        }
         
 //        mpBlow.start();
 //        mpBlow.pause();
@@ -618,6 +630,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	        // This verification should be done during onStart() because the system calls this method
 	        // when the user returns to the activity, which ensures the desired location provider is
 	        // enabled each time the activity resumes from the stopped state.
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+	        if (!sp.getBoolean("enable_gps_check", true)) {
+	        	Log.d(TAG, "Settings FALSE");
+	        	locationTrackPermitted = false;
+	        	permissionChecked = true;
+	        }
 			if (!permissionChecked)
 				runPermissionCheck();
 			else
@@ -629,7 +647,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 			// Bluetooth needs to look for a device to connect to
 			// We will set up Bluetooth Service and open BTDeviceList
 			setupBTTransfer();
-            state = STATE_BT_CONNECTING;
+//            state = STATE_BT_CONNECTING;
         	Intent serverIntent = new Intent(this, BTDeviceList.class);
 //        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
         	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
@@ -659,19 +677,22 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     	Log.d(TAG, "Camera is released");
     	mLocationManager.removeUpdates(locListener);
     	Log.d(TAG, "Location listener stopped updating");
-//    	if (mBTService != null) {
-//    		if (DEBUG_MODE) Log.d(TAG, "mBTService is not null");
-//    		if (mBTService.getState() != BTService.STATE_CONNECTING) {
-//    			if (DEBUG_MODE) Log.d(TAG, "mBTService state = " + mBTService.getState() + "! mBTService will stop");
-//    			mBTService.stop();
-//    		} else {
-//    			if (DEBUG_MODE) Log.d(TAG, "mBTService state = " + mBTService.getState() + "! mBTService is running");
-//    		}
-//    	}
-    	if (state == STATE_COMPLETE) {
-//			mpBlow.release();
+    	if (state == STATE_COMPLETE || state == STATE_BT_CONNECTING) {
 			mBTService.stop();
+			mBTService = null;
+			state = STATE_SENSOR_CHECK;
+		} else if (state == STATE_RUN) {
+			if (timer != null)
+				timer.cancel();
+			mBTService.stop();
+			mBTService = null;
+			state = STATE_SENSOR_CHECK;
 		}
+//    	if (state == STATE_COMPLETE) {
+//    		mBTService.stop();
+//    		mBTService = null;
+//			state = STATE_SENSOR_CHECK;
+//    	}
     }
 	
 	@Override
@@ -693,6 +714,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	 */
 	private void findViews() {
     	imgCountdown = (ImageView) findViewById(R.id.imgCountdown);
+    	imgCountdown2 = (ImageView) findViewById(R.id.imgCountdown2);
     	tvLatLng = (TextView) findViewById(R.id.tvLatLng);
     	ivBalloonLoader = (ImageView) findViewById(R.id.ivBalloonLoader);
     }
@@ -777,7 +799,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 					Log.d(TAG, "Showing Enable Bluetooth Dialog");
 					new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
 				 } else {
-					 state = STATE_BT_CONNECTING;
+//					 state = STATE_BT_CONNECTING;
 					 setupBTTransfer();
 					 Intent serverIntent = new Intent(this, BTDeviceList.class);
 					 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
@@ -787,7 +809,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 			Log.d(TAG, "Showing Enable Bluetooth Dialog");
 			new EnableBluetoothDialogFragment().show(getFragmentManager(), "enableBTDialog");
 		} else {
-			state = STATE_BT_CONNECTING;
+//			state = STATE_BT_CONNECTING;
 			setupBTTransfer();
         	Intent serverIntent = new Intent(this, BTDeviceList.class);
 //        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
