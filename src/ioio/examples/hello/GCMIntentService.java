@@ -15,8 +15,7 @@
  */
 package ioio.examples.hello;
 
-import static game.cheer.CommonUtilities.SENDER_ID;
-import game.cheer.ServerUtilities;
+import static ioio.examples.hello.CommonUtilities.SENDER_ID;
 import ioio.examples.hello.R;
 
 import android.app.Notification;

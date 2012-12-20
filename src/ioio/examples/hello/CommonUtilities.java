@@ -1,4 +1,4 @@
-package game.cheer;
+package ioio.examples.hello;
 
 
 

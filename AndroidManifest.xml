@@ -20,6 +20,8 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <permission android:name="ioio.examples.hello.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+	<uses-permission android:name="ioio.examples.hello.permission.C2D_MESSAGE" /> 
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"
@@ -94,6 +96,13 @@
             android:screenOrientation="portrait" 
             android:noHistory="true">
         </activity>
+        <receiver android:name="com.google.android.gcm.GCMBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
+  			<intent-filter>
+    			<action android:name="com.google.android.c2dm.intent.RECEIVE" />
+    			<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+    			<category android:name="ioio.examples.hello" />
+  			</intent-filter>
+		</receiver>
     </application>
 
 </manifest>

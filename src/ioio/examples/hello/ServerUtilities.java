@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package game.cheer;
+package ioio.examples.hello;
 
-import static game.cheer.CommonUtilities.SERVER_URL;
-import static game.cheer.CommonUtilities.TAG;
+import static ioio.examples.hello.CommonUtilities.SERVER_URL;
+import static ioio.examples.hello.CommonUtilities.TAG;
 
 import com.google.android.gcm.GCMRegistrar;
 

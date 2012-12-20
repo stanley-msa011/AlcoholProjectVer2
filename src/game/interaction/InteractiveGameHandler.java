@@ -1,7 +1,7 @@
 package game.interaction;
 
-import static game.cheer.CommonUtilities.SENDER_ID;
-import static game.cheer.CommonUtilities.SERVER_URL;
+import static ioio.examples.hello.CommonUtilities.SENDER_ID;
+import static ioio.examples.hello.CommonUtilities.SERVER_URL;
 
 import java.io.IOException;
 import java.util.ArrayList;

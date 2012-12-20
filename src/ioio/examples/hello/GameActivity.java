@@ -1,6 +1,6 @@
 package ioio.examples.hello;
 
-import static game.cheer.CommonUtilities.SENDER_ID;
+import static ioio.examples.hello.CommonUtilities.SENDER_ID;
 import ioio.examples.hello.R;
 import ioio.examples.hello.R.anim;
 import ioio.examples.hello.R.id;
@@ -20,8 +20,6 @@ import game.GameMenuHandler;
 import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
-import game.cheer.CommonUtilities;
-import game.cheer.ServerUtilities;
 import game.interaction.InteractiveGameHandler;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -173,6 +171,9 @@ public class GameActivity extends Activity{
 	}	
 	
 	private void initRegistration(){
+		
+		GCMRegistrar.checkDevice(this);
+		GCMRegistrar.checkManifest(this);
 		registerReceiver(mHandleMessageReceiver,  new IntentFilter("GCM_RECEIVE_ACTION"));
 		regId = GCMRegistrar.getRegistrationId(this);
         if (regId.equals("")){
