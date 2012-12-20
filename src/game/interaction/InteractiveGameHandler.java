@@ -1,13 +1,32 @@
 package game.interaction;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+
+import android.provider.Settings.Secure;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Gallery;
 import android.widget.SimpleAdapter;
 import game.BackgroundHandler;
+import game.BracDataToServer;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.R;
 
@@ -74,14 +93,104 @@ public class InteractiveGameHandler {
 		update_adapter();
 	}
 	
+	private static final String SERVER_URL = "http://140.112.30.165/drunk_detection/userStates.php";
+	
 	public void update(){
-		fake_update();
-		update_adapter();
+		try {
+			 DefaultHttpClient httpClient = new DefaultHttpClient();
+			HttpPost httpPost = new HttpPost(SERVER_URL);
+			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			MultipartEntity mpEntity = new MultipartEntity();
+			String devId = Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID);
+			mpEntity.addPart("userData[]", new StringBody(devId));
+			httpPost.setEntity(mpEntity);
+			GetStateHandler handler = new GetStateHandler(httpClient,httpPost);
+			Thread thread = new Thread(handler);
+			thread.start();
+			thread.join();
+			if (handler .result==-1)
+				return;
+			//update_adapter();
+		} catch (Exception e) {
+			e.printStackTrace();	
+			return;
+		} 
+		//fake_update();
+		
 	}
 	
+	
+	private class GetStateHandler implements Runnable{
+		private HttpPost httpPost;
+		private DefaultHttpClient httpClient;
+		public int result;
+		private ResponseHandler< String> responseHandler;
+		
+		public GetStateHandler(DefaultHttpClient httpClient, HttpPost httpPost){
+			this.httpClient = httpClient;
+			this.httpPost = httpPost;
+			responseHandler=new BasicResponseHandler();
+			result = -1;
+		}
+		@Override
+		public void run() {
+			HttpResponse httpResponse;
+			try {
+				httpResponse = httpClient.execute(httpPost);
+				String responseString = responseHandler.handleResponse(httpResponse);
+				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
+				if (httpStatusCode == HttpStatus.SC_OK)
+					result = 1;
+				else
+					result = -1;
+				Log.d("UPDATE STATE",responseString);
+				InteractiveGameState[] states = parseResponse(responseString);
+				if (states != null){
+					igDB.updateState(states);
+					update_adapter();
+				}
+				//Log.d("UPDATE STATE",responseString);
+			} catch (Exception e) {	e.printStackTrace();}
+		}
+		
+	}
+	
+	private InteractiveGameState[] parseResponse(String response){
+		response = response.substring(2, response.length()-2);
+		//Log.d("UPDATE STATE",response);
+		String[] tmp = response.split("]," );
+		if (tmp.length==0)
+			return null;
+					
+		InteractiveGameState[] states = new InteractiveGameState[tmp.length];
+		for (int i=0;i<tmp.length;++i){
+			if (tmp[i].charAt(0)=='[')
+				tmp[i]=tmp[i].substring(1,tmp[i].length());
+			String[] items = tmp[i].split(",");
+			//Log.d("UPDATE STATE",items[0]+" / " +items[1]+" / "+items[2]);
+			String pid = items[0].substring(1, items[0].length()-1);
+			int state;
+			if (items[1].equals("null"))
+				state = 0;
+			else
+				state= Integer.valueOf(items[1].substring(1,items[1].length()-1));
+			int coin;
+			if (items[2].equals("null"))
+				coin = 0;
+			else
+				coin = Integer.valueOf(items[2].substring(1,items[2].length()-1));
+			//Log.d("UPDATE STATE",pid+" / " +state+" / "+coin);
+			states[i] = new InteractiveGameState(state,coin,pid);
+		}
+		return states;
+	}
+	
+	
 	public void clear(){
-		partner_list.clear();
-		adapter.notifyDataSetInvalidated();
+		if (partner_list != null)
+			partner_list.clear();
+		if (adapter != null)
+			adapter.notifyDataSetInvalidated();
 	}
 	
 	private void update_adapter(){
