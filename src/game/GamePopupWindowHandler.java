@@ -1,9 +1,11 @@
 package game;
 
+import game.interaction.MsgService;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.R;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,7 @@ public class GamePopupWindowHandler {
 	private View v_pop;
     Drawable good_apple;
     Drawable bad_apple;
+    Drawable smile;
     private PopWindowOnDismissListener dismissListener;
     private showPopWindowThread showThread;
 	public GamePopupWindowHandler(GameActivity ga){
@@ -29,6 +32,7 @@ public class GamePopupWindowHandler {
 		this.bg = (ImageView)ga.findViewById(R.id.background);
 	    good_apple = ga.getResources().getDrawable(R.drawable.apple_good);
 	    bad_apple = ga.getResources().getDrawable(R.drawable.apple_bad);
+	    smile = ga.getResources().getDrawable(R.drawable.smile);
 		initPopWindow();
 	}
 	
@@ -55,15 +59,24 @@ public class GamePopupWindowHandler {
 
         if (result == BracDataHandler.ERROR){
         	popText.setText("ERROR");
+        	popText.setTextColor(0xFFFFFFFF);
         	popupWindow.setBackgroundDrawable(bad_apple);
         }
 		else if (result == BracDataHandler.HaveAlcohol){
 			popText.setText("BAD");
+			popText.setTextColor(0xFFFFFFFF);
 			popupWindow.setBackgroundDrawable(bad_apple);
 		}
 		else if (result == BracDataHandler.NoAlcohol){
 			popText.setText("GOOD");
+			popText.setTextColor(0xFFFFFFFF);
 			popupWindow.setBackgroundDrawable(good_apple);
+		}else if (result == GameActivity.CHEER_MESSAGE){
+			String pid = MsgService.getMsg();
+			String cn = ga.getInteractiveGameHandler().getCodeNameByPID(pid);
+			popText.setText(cn + "為您加油");
+			popText.setTextColor(0xFF0000FF);
+			popupWindow.setBackgroundDrawable(smile);
 		}
         popupWindow.setOutsideTouchable(false);
        // popupWindow.setOnDismissListener(new PopWindowOnDismissListener(test_result));

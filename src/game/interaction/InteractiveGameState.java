@@ -9,4 +9,7 @@ public class InteractiveGameState extends GameState {
 		super(state, coin);
 		this.PID = PID;
 	}
+	public String toString(){
+		return "<"+PID+">";
+	}
 }

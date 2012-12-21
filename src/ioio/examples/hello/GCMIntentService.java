@@ -16,6 +16,7 @@
 package ioio.examples.hello;
 
 import static ioio.examples.hello.CommonUtilities.SENDER_ID;
+import game.interaction.MsgService;
 import ioio.examples.hello.R;
 
 import android.app.Notification;
@@ -53,7 +54,11 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onMessage(Context context, Intent intent) {
-    	String message = "Receive Msg";
+    	//String message = "Receive Msg";
+    	Log.d("GCM receive string","Receive");
+    	//String message =  "MESSAGE TEST";
+    	String message = intent.getExtras().getString("price");
+    	//Log.d("GCM receive string",message);
         generateNotification(context, message);
     }
 
@@ -77,15 +82,18 @@ public class GCMIntentService extends GCMBaseIntentService {
     	int icon = R.drawable.icon;
         long when = System.currentTimeMillis();
         NotificationManager notificationManager = (NotificationManager)  context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification(icon, message, when);
+        Notification notification = new Notification(icon, "有人為您加油", when);
         String title = context.getString(R.string.app_name);
         Intent notificationIntent = new Intent(context, GameActivity.class);
         // set intent so it does not start a new activity
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        notificationIntent.putExtra("push_msg", message);
-       
+       // notificationIntent.putExtra("notify", false);
+        //notificationIntent.putExtra("push_msg", message);
+
+        MsgService.setMsg(message);
+        
          PendingIntent intent =  PendingIntent.getActivity(context, 0, notificationIntent, 0);
-         notification.setLatestEventInfo(context, title, message, intent);
+         notification.setLatestEventInfo(context, title,  "有人為您加油", intent);
          notification.flags |= Notification.FLAG_AUTO_CANCEL;
          notificationManager.notify(0, notification);
     }

@@ -9,6 +9,7 @@ import ioio.examples.hello.R.layout;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 import com.google.android.gcm.GCMRegistrar;
 
 import database.Reuploader;
@@ -21,6 +22,7 @@ import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
 import game.interaction.InteractiveGameHandler;
+import game.interaction.MsgService;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -45,7 +47,7 @@ public class GameActivity extends Activity{
 	
 	/*communication with MainACtivity*/
 	public static final int REQUEST_TEST = 99;
-	
+	public static final int CHEER_MESSAGE = 777;
 	private static final int TREE_TYPES = GameState.MAX_STATE+1; 
 	private static final int MAX_COIN = GameState.MAX_COINS; 
 	private ImageView[] tree_image = new ImageView[TREE_TYPES];
@@ -67,18 +69,10 @@ public class GameActivity extends Activity{
 	private Bitmap bg_now = null;
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 
-	public final static int START_DO_NOTHING = 0;
-	public final static int START_MAIN = 1;
-	
-	private static int START_ACTION=START_DO_NOTHING;
 	public Context context;
 
 	AsyncTask<Void, Void, Void> mRegisterTask;
 	String regId;
-	/*Setting the action when start the activity*/
-	static public void setStartAction(int action){
-		START_ACTION = action;
-	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -102,14 +96,9 @@ public class GameActivity extends Activity{
 		initRegistration();
       	Intent service_intent = new Intent(this, TimerService.class);
       	startService(service_intent);
-		/*Go to MainActivity if start because of the notice*/
-		if (START_ACTION == START_MAIN){
-			START_ACTION = START_DO_NOTHING;
-			Intent newActivity;
-			newActivity = new Intent(context, MainActivity.class);  
-			startActivityForResult(newActivity, REQUEST_TEST);  
-		}
-		
+      	Intent service_intent_msg = new Intent(this, MsgService.class);
+      	startService(service_intent_msg);
+
 	}
 	
 	
@@ -129,12 +118,20 @@ public class GameActivity extends Activity{
 	
 	protected void onResume(){
 		super.onResume();
-		//System.gc();
-//		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
-//        boolean s = sp.getBoolean("enable_gps_check", false);
-//        Log.d("Pref in Game","<"+String.valueOf(s)+">");
-		gInteractiveGame.update();
+		if (MsgService.getNotify()){
+			MsgService.releaseNotify();
+			Intent newActivity;
+			newActivity = new Intent(context, MainActivity.class);  
+			startActivityForResult(newActivity, REQUEST_TEST);
+		}
+		else if (MsgService.isHavingMsg()){
+			gPopWindow.showPopWindow(CHEER_MESSAGE);
+		}
+		if (!MsgService.getNotify())
+			gInteractiveGame.update();
+
 	}
+	
 	
 	
 	private void initBackground(){
@@ -179,10 +176,10 @@ public class GameActivity extends Activity{
         if (regId.equals("")){
         	Log.d("GCM","start register 0");
             GCMRegistrar.register(this, CommonUtilities.SENDER_ID);
-            regId = GCMRegistrar.getRegistrationId(this);
-            Log.d("GCM regid","Regid= "+regId);
+           // regId = GCMRegistrar.getRegistrationId(this);
+            //Log.d("GCM regid","Regid= "+regId);
         }
-		//else {
+		else {
             if (GCMRegistrar.isRegisteredOnServer(this))  Log.d("GCM","skip register");
             else {
             	Log.d("GCM","start register");
@@ -198,7 +195,7 @@ public class GameActivity extends Activity{
                 };
                 mRegisterTask.execute(null, null, null);
             }
-       // }
+        }
 	}
 	
 	
@@ -303,6 +300,10 @@ public class GameActivity extends Activity{
 		}
 	}
 
+	public InteractiveGameHandler getInteractiveGameHandler(){
+		return gInteractiveGame;
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (requestCode == REQUEST_TEST && resultCode == RESULT_OK){

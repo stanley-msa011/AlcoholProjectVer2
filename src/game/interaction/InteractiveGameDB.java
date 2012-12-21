@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import database.DBHelper;
 
 public class InteractiveGameDB {
@@ -28,6 +29,7 @@ public class InteractiveGameDB {
     		int state = newStates[i].state;
     		int coin = newStates[i].coin;
     		String pid = newStates[i].PID;
+    		Log.d("states update pid",pid);
     		if (need_to_create){
     			gDB.execSQL(
     					"INSERT INTO AlcoholInteractiveGame ( _STATE,_COIN,_PID ) VALUES (" + String.valueOf(state)+","+String.valueOf(coin)+",'"+pid+"')"
@@ -40,6 +42,28 @@ public class InteractiveGameDB {
     		}
     	}
     	gDB.close();
+    }
+    
+    public int getCodeNameOrder(String pid){
+    	gDB = gDBHelper.getReadableDatabase();
+    	Cursor cursor;
+    	
+    	cursor = gDB.rawQuery("SELECT _ID,_STATE,_COIN,_PID FROM AlcoholInteractiveGame ORDER BY _PID ASC",null);
+    	if (cursor.getCount()==0){
+    		gDB.close();
+    		return -1;
+    	}
+    	cursor.moveToFirst();
+    	int i = 1;
+    	while(cursor.moveToNext()){
+        	String pids = cursor.getString(3);
+    		if (pid.equals(pids)){
+    			return i;
+    		}
+        	++i;
+    	}
+    	gDB.close();
+		return -1;
     }
     
     public InteractiveGameState[] getStates(){
@@ -65,6 +89,7 @@ public class InteractiveGameDB {
     	while(cursor.moveToNext()){
         	state = cursor.getInt(1);
         	coin = cursor.getInt(2);
+        	pid = cursor.getString(3);
         	stateList[i]=new InteractiveGameState(state,coin,pid);
         	++i;
     	}

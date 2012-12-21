@@ -125,6 +125,11 @@ public class InteractiveGameHandler {
 		
 	}
 	
+	public String getCodeNameByPID(String pid){
+		Log.d("FIND pid",String.valueOf(pid));
+		 int c_n =igDB. getCodeNameOrder(pid);
+		 return code_names.substring(c_n, c_n+1);
+	}
 	
 	private class GetStateHandler implements Runnable{
 		private HttpPost httpPost;
@@ -149,12 +154,9 @@ public class InteractiveGameHandler {
 					result = 1;
 				else
 					result = -1;
-				Log.d("UPDATE STATE",responseString);
 				InteractiveGameState[] states = parseResponse(responseString);
 				if (states != null){
 					igDB.updateState(states);
-					//update_adapter();
-					//adapter.notifyDataSetChanged();
 					result = 2;
 				}
 				//Log.d("UPDATE STATE",responseString);
@@ -188,6 +190,7 @@ public class InteractiveGameHandler {
 			else
 				coin = Integer.valueOf(items[2].substring(1,items[2].length()-1));
 			states[i] = new InteractiveGameState(state,coin,pid);
+			//Log.d("states update",states[i].toString());
 		}
 		return states;
 	}
@@ -241,7 +244,61 @@ public class InteractiveGameHandler {
 		
 	}
 	
+	private static final String GCM_SERVER_URL = "http://140.112.30.165:80/drunk_detection/GCM/encourage.php";
 	
 	public void send_cheers(String pid){
+		try {
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+			String devId = Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID);
+			String url = GCM_SERVER_URL+"?sender="+devId+"&receiver="+pid;
+			HttpPost httpPost = new HttpPost(url);
+			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			SendCheers cheer= new SendCheers(httpClient,httpPost);
+			Thread thread = new Thread(cheer);
+			thread.start();
+			thread.join();
+			if (cheer.result==-1)
+				Log.d("GCM","Send fail");
+			else
+				Log.d("GCM","Send Success");
+		} catch (Exception e) {
+			e.printStackTrace();	
+			return;
+		} 
+	}
+	public class SendCheers implements Runnable {
+
+		private HttpPost httpPost;
+		private HttpClient httpClient;
+		public SendCheers(HttpClient httpClient, HttpPost httpPost){
+			this.httpClient = httpClient;
+			this.httpPost = httpPost;
+			 responseHandler=new BasicResponseHandler();
+			result = -1;
+		}
+		public int result;
+		private BasicResponseHandler responseHandler;
+		@Override
+		public void run() {
+			
+			
+			HttpResponse httpResponse;
+			try {
+				httpResponse = httpClient.execute(httpPost);
+				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
+				String responseString = responseHandler .handleResponse(httpResponse);
+				Log.e("GCM return", responseString);
+				if (httpStatusCode == HttpStatus.SC_OK)
+					result = 1;
+				else
+					result = -1;
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+
 	}
 }
