@@ -18,13 +18,23 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Gallery;
+import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -38,6 +48,8 @@ public class GalleryActivity extends Activity {
 	private EditText curPage;
 	private TextView maxPage;
 	
+	private ImageView anime1;
+	
 	private int max_page;
 	private int cur_page;
 	private int first_show_view;
@@ -46,6 +58,8 @@ public class GalleryActivity extends Activity {
 	private BracDbAdapter bDb;
 	
 	private static final int TOTAL_VIEW_PAGE = 10;
+	private AnimeListener animeListener;
+	
 	
 	private static boolean lock = false;
 	
@@ -58,7 +72,8 @@ public class GalleryActivity extends Activity {
 		setContentView(R.layout.activity_gallery);
 		galleryActivity = this;
 		galleryListView = (Gallery) findViewById(R.id.gallery_list);
-		
+
+		anime1 = (ImageView) findViewById(R.id.gallery_anime1);
 		
 		cur_page = this.getIntent().getIntExtra("PAGE", -1);
 		first_show_view = this.getIntent().getIntExtra("SHOW", -1);
@@ -66,7 +81,8 @@ public class GalleryActivity extends Activity {
 		gDB=new GameDB(this);
 		bDb = new BracDbAdapter(this);
 		
-		
+		stopAnimeSetting();
+		anime1.setOnClickListener(new AnimeFrameClickListener());
 		
 		int adapter_len = getGalleryListSize();
 		 init(adapter_len);
@@ -94,6 +110,9 @@ public class GalleryActivity extends Activity {
 			else 
 				select_pos = first_show_view;
 			galleryListView.setSelection(select_pos);
+			animeListener = new AnimeListener();
+			galleryListView.setOnItemLongClickListener(animeListener);
+			galleryListView.setOnItemSelectedListener(new GallerySelectedListener());
 		}
 	}
 	
@@ -138,6 +157,7 @@ public class GalleryActivity extends Activity {
 		super.onStop();
 		gallery_list.clear();
 		gallery_adapter.notifyDataSetInvalidated();
+		BackgroundHandler.cleanBitmaps();
 		System.gc();
 	}
 	
@@ -254,4 +274,67 @@ public class GalleryActivity extends Activity {
 		
 	}
 
+	
+	private class AnimeFrameClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			stopAnimeSetting();
+		}
+	}
+	
+	private class GallerySelectedListener implements AdapterView.OnItemSelectedListener{
+
+		@Override
+		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
+				long arg3) {
+			stopAnimeSetting();
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> arg0) {
+			stopAnimeSetting();
+		}
+		
+	}
+	
+	
+	private class AnimeListener implements AdapterView.OnItemLongClickListener{
+		private AnimationDrawable animation;
+		private int start;
+		private GameState[] states;
+		private int idx;
+		private Resources r;
+		
+		
+		 AnimeListener(){
+			 r = galleryActivity.getResources();
+		 }
+		 
+		@Override
+		public boolean onItemLongClick(AdapterView<?> arg0, View arg1,int arg2, long arg3) {
+			anime1.setClickable(true);
+			anime1.clearAnimation();
+			anime1.setVisibility(View.VISIBLE);
+			start = (int) arg3;
+			states = gDB.getAllStates();
+			idx =start + TOTAL_VIEW_PAGE*(cur_page-1);
+			 animation = new AnimationDrawable();
+			 anime1.setImageDrawable(animation);
+			for (;idx<states.length;++idx){
+				@SuppressWarnings("deprecation")
+				int state = states[idx].state;
+				int coin = states[idx].coin;
+				Drawable d = new BitmapDrawable(BackgroundHandler.getBackgroundBitmap(state, coin, r));
+				animation.addFrame(d,300);
+			}
+			animation.start();
+			return false;
+		}
+	}
+	
+	private void stopAnimeSetting(){
+		anime1.setClickable(false);
+		anime1.clearAnimation();
+		anime1.setVisibility(View.INVISIBLE);
+	}
 }

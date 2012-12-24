@@ -1,5 +1,8 @@
 package game;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import ioio.examples.hello.R;
 
 public class BackgroundHandler {
@@ -24,13 +27,43 @@ public class BackgroundHandler {
 			R.drawable.tree7
 		};
 	
+	private static Bitmap[] bg_bitmap = null;
+	
 	public static int getBackgroundDrawableId(int state, int coin_num){
 		int idx = state*(GameState.MAX_COINS+1) + coin_num;
 		idx = Background_pics.length - idx -1;
 		return Background_pics [idx];
 	}
 	
+	public static int getBackgroundIdx(int state, int coin_num){
+		int idx = state*(GameState.MAX_COINS+1) + coin_num;
+		idx = Background_pics.length - idx -1;
+		return idx;
+	}
+	
 	public static int getTreeDrawableId(int state){
 		return treePics[state];
+	}
+	
+	public static Bitmap getBackgroundBitmap(int state, int coin_num,Resources r){
+		if (bg_bitmap == null){
+			bg_bitmap = new Bitmap[35];
+				 for (int i=0;i<bg_bitmap.length;++i){
+					Bitmap tmp = BitmapFactory.decodeResource(r, BackgroundHandler.Background_pics[i]);
+					bg_bitmap[i] = Bitmap.createScaledBitmap(tmp, 135, 240, true);
+				 	tmp.recycle();
+				 }
+		}
+		return bg_bitmap[getBackgroundIdx(state, coin_num)];
+	}
+	public static void cleanBitmaps(){
+		if (bg_bitmap != null){
+				 for (int i=0;i<bg_bitmap.length;++i)
+					 if (bg_bitmap[i] != null){
+						 bg_bitmap[i].recycle();
+						 bg_bitmap[i]= null;
+					 }
+				 bg_bitmap=null;
+		}
 	}
 }
