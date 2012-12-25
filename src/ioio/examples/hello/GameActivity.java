@@ -92,6 +92,20 @@ public class GameActivity extends Activity{
 		reuploader.reTransmission();
 		initRegistration();
 		
+		Intent intent = this.getIntent();
+		if (intent != null){
+			boolean notify = intent.getBooleanExtra("notify", false);
+			if (notify){
+				Intent newActivity;
+				newActivity = new Intent(context, MainActivity.class);  
+				startActivityForResult(newActivity, REQUEST_TEST);
+			}
+			String msg = intent.getStringExtra("msgmsg");
+			if (msg != null){
+				iPopWindow.showPopWindow(msg);
+			}
+		}
+		
       	Intent service_intent = new Intent(this, TimerService.class);
       	startService(service_intent);
 

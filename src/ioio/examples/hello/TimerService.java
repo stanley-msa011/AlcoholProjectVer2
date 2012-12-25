@@ -99,7 +99,7 @@ public class TimerService extends Service {
 				CharSequence contentText = "該吹氣摟！！";
 				Intent notificationIntent = new Intent(context, GameActivity.class);
 				notificationIntent.putExtra("notify", true);
-				PendingIntent contentIntent = PendingIntent.getActivity(context, 2, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 				notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 				notificationManager.notify(16, notification); //前面的只是一個tag而已 ＝ ＝
 				

@@ -43,7 +43,6 @@ public class BracHistoryActivity extends Activity {
 	
 	protected void onStop(){
 		super.onStop();
-		Log.d("Brac","OnStop");
 		brac_list.clear();
 		brac_adapter.notifyDataSetInvalidated();
 	}

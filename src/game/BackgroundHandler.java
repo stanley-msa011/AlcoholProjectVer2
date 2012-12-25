@@ -7,6 +7,7 @@ import ioio.examples.hello.R;
 
 public class BackgroundHandler {
 
+	static private Object lock = new Object();
 	private static final int[] Background_pics = {
 			R.drawable.w00,R.drawable.w01,R.drawable.w02,R.drawable.w03,R.drawable.w04,
 			R.drawable.w05,R.drawable.w06,R.drawable.w07,R.drawable.w08,R.drawable.w09,
@@ -46,24 +47,28 @@ public class BackgroundHandler {
 	}
 	
 	public static Bitmap getBackgroundBitmap(int state, int coin_num,Resources r){
-		if (bg_bitmap == null){
-			bg_bitmap = new Bitmap[35];
-				 for (int i=0;i<bg_bitmap.length;++i){
-					Bitmap tmp = BitmapFactory.decodeResource(r, BackgroundHandler.Background_pics[i]);
-					bg_bitmap[i] = Bitmap.createScaledBitmap(tmp, 135, 240, true);
-				 	tmp.recycle();
-				 }
+		synchronized(lock){
+			if (bg_bitmap == null){
+				bg_bitmap = new Bitmap[35];
+				 	for (int i=0;i<bg_bitmap.length;++i){
+				 		Bitmap tmp = BitmapFactory.decodeResource(r, BackgroundHandler.Background_pics[i]);
+				 		bg_bitmap[i] = Bitmap.createScaledBitmap(tmp, 105, 192, true);
+				 		tmp.recycle();
+				 	}
+			}
 		}
 		return bg_bitmap[getBackgroundIdx(state, coin_num)];
 	}
 	public static void cleanBitmaps(){
-		if (bg_bitmap != null){
-				 for (int i=0;i<bg_bitmap.length;++i)
-					 if (bg_bitmap[i] != null){
-						 bg_bitmap[i].recycle();
-						 bg_bitmap[i]= null;
-					 }
-				 bg_bitmap=null;
+		synchronized(lock){
+			if (bg_bitmap != null){
+				 	for (int i=0;i<bg_bitmap.length;++i)
+				 		if (bg_bitmap[i] != null){
+				 			bg_bitmap[i].recycle();
+				 			bg_bitmap[i]= null;
+				 		}
+				 	bg_bitmap=null;
+			}
 		}
 	}
 }

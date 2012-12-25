@@ -102,6 +102,9 @@ public class InteractiveGameHandler {
 	public String getCodeNameByPID(String pid){
 		Log.d("FIND pid",String.valueOf(pid));
 		 int c_n =igDB. getCodeNameOrder(pid);
+		 Log.e("CN",String.valueOf(c_n));
+		 if (c_n == -1)
+			 return "???";
 		 return code_names.substring(c_n, c_n+1);
 	}
 	
