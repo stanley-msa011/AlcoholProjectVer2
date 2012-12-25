@@ -16,7 +16,6 @@
 package ioio.examples.hello;
 
 import static ioio.examples.hello.CommonUtilities.SENDER_ID;
-import game.interaction.MsgService;
 import ioio.examples.hello.R;
 
 import android.app.Notification;
@@ -85,14 +84,11 @@ public class GCMIntentService extends GCMBaseIntentService {
         Notification notification = new Notification(icon, "有人為您加油", when);
         String title = context.getString(R.string.app_name);
         Intent notificationIntent = new Intent(context, GameActivity.class);
-        // set intent so it does not start a new activity
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
-       // notificationIntent.putExtra("notify", false);
-        //notificationIntent.putExtra("push_msg", message);
+        notificationIntent.putExtra("msgmsg", message);
 
-        MsgService.setMsg(message);
         
-         PendingIntent intent =  PendingIntent.getActivity(context, 0, notificationIntent, 0);
+         PendingIntent intent =  PendingIntent.getActivity(context, 1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
          notification.setLatestEventInfo(context, title,  "有人為您加油", intent);
          notification.flags |= Notification.FLAG_AUTO_CANCEL;
          notificationManager.notify(0, notification);

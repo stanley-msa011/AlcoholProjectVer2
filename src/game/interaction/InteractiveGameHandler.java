@@ -1,8 +1,5 @@
 package game.interaction;
 
-import static ioio.examples.hello.CommonUtilities.SENDER_ID;
-import static ioio.examples.hello.CommonUtilities.SERVER_URL;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,23 +12,17 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
-
-import com.google.android.gcm.GCMRegistrar;
 
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Gallery;
-import android.widget.SimpleAdapter;
 import game.BackgroundHandler;
-import game.BracDataToServer;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.R;
 
@@ -41,9 +32,8 @@ public class InteractiveGameHandler {
 	private ArrayList<HashMap<String,Object>> partner_list = new ArrayList<HashMap<String,Object>>();
 	private InteractiveGamePopupWindowHandler pop;
 	private InteractiveGameDB igDB;
-	private SimpleAdapter adapter;
+	private InteractiveAdapter i_adapter;
 	private int cur_pos = -1;
-	
 	
 	public InteractiveGameHandler(GameActivity ga){
 		this.ga = ga;
@@ -64,7 +54,7 @@ public class InteractiveGameHandler {
 		partner_list.clear();
 		InteractiveGameState[] stateList = igDB.getStates();
 		if (stateList.length == 0){
-				adapter = null;
+				i_adapter = null;
 				return;
 		}
 		for (int i=0;i<stateList.length;++i){
@@ -79,23 +69,7 @@ public class InteractiveGameHandler {
 			partner_list.add(item);
 		}
 		
-		adapter = new SimpleAdapter(
-					ga, 
-					partner_list,
-					R.layout.interactive_item,
-					new String[] { "pic","tree","code_name"},
-					new int[] {R.id.interactive_state,R.id.interactive_tree,R.id.interactive_code});
-	}
-	
-	private void fake_update(){
-		InteractiveGameState states[] = new 	InteractiveGameState[5];
-		states[0] = new InteractiveGameState(3,4,"Abcde");
-		states[1] = new InteractiveGameState(4,2,"Bcdef");
-		states[2] = new InteractiveGameState(5,3,"Cdefg");
-		states[3] = new InteractiveGameState(6,1,"Defgh");
-		states[4] = new InteractiveGameState(0,2,"Ehijk");
-		igDB.updateState(states);
-		update_adapter();
+		i_adapter = new InteractiveAdapter(partner_list,ga);
 	}
 	
 	private static final String SERVER_URL = "http://140.112.30.165/drunk_detection/userStates.php";
@@ -116,7 +90,7 @@ public class InteractiveGameHandler {
 			if (handler .result==-1)
 				return;
 			update_adapter();
-			adapter.notifyDataSetChanged();
+			i_adapter.notifyDataSetChanged();
 		} catch (Exception e) {
 			e.printStackTrace();	
 			return;
@@ -197,21 +171,24 @@ public class InteractiveGameHandler {
 	
 	
 	public void clear(){
+		if (i_adapter != null){
+			i_adapter.notifyDataSetInvalidated();
+			i_adapter.clearAll();
+		}
 		if (partner_list != null)
 			partner_list.clear();
-		if (adapter != null)
-			adapter.notifyDataSetInvalidated();
+			
 	}
 	
 	private void update_adapter(){
 		setAdapter();
-		if (adapter == null)
+		if (i_adapter == null)
 			gGallery.setVisibility(View.INVISIBLE);
 		else{
 			gGallery.setVisibility(View.VISIBLE);
-			gGallery.setAdapter(adapter);
+			gGallery.setAdapter(i_adapter);
 			if (cur_pos == -1)
-				cur_pos= (adapter.getCount())/2;
+				cur_pos= (i_adapter.getCount())/2;
 			gGallery.setSelection(cur_pos);
 			gGallery.refreshDrawableState();
 		}

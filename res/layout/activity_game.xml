@@ -34,7 +34,6 @@
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="24dp"
-        android:src="@drawable/tree1" 
         android:adjustViewBounds="true"
         android:clickable="false"
         />
@@ -42,73 +41,15 @@
     <ImageView
         android:id="@+id/tree2"
         android:layout_width="256dp"
-        android:layout_height="320dp"
+        android:layout_height="256dp"
         android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="24dp"
-        android:src="@drawable/tree2" 
         android:adjustViewBounds="true"
         android:clickable="false"
+        android:visibility="invisible"
         />
     
-    <ImageView
-        android:id="@+id/tree3"
-        android:layout_width="256dp"
-        android:layout_height="320dp"
-        android:scaleType="fitXY"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:src="@drawable/tree3" 
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        />
-    
-    <ImageView
-        android:id="@+id/tree4"
-        android:layout_width="256dp"
-        android:layout_height="320dp"
-        android:scaleType="fitXY"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:src="@drawable/tree4" 
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        />
-    
-    <ImageView
-        android:id="@+id/tree5"
-        android:layout_width="256dp"
-        android:layout_height="320dp"
-        android:scaleType="fitXY"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:src="@drawable/tree5" 
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        />
-    <ImageView
-        android:id="@+id/tree6"
-        android:layout_width="256dp"
-        android:layout_height="320dp"
-        android:scaleType="fitXY"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:src="@drawable/tree6" 
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        />
-	<ImageView
-        android:id="@+id/tree7"
-        android:layout_width="256dp"
-        android:layout_height="320dp"
-        android:scaleType="fitXY"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:src="@drawable/tree7" 
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        />
-
 	<ImageView
 	    android:id="@+id/coin1"
 	    android:layout_alignParentLeft="true"
@@ -181,7 +122,7 @@
 	<ListView
 	    android:id="@+id/game_menu_list"
 	    android:layout_width="80dp"
-	    android:layout_height="320dp"
+	    android:layout_height="323dp"
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentRight="true"
 	    android:layout_marginBottom="64dp"
@@ -191,6 +132,8 @@
 	    android:fastScrollEnabled="false"
 	    android:scrollbarAlwaysDrawVerticalTrack="false"
 	    android:scrollbars="none"
-	    android:scrollingCache="false" >
+	    android:scrollingCache="false" 
+	    android:cacheColorHint="#00000000"
+	    android:dividerHeight="0dp">
 	</ListView>
 </RelativeLayout>

@@ -53,7 +53,7 @@ public class OpenActivity extends Activity implements View.OnClickListener {
 			i_Init.setClass(this, MainActivity.class);
 			startActivity(i_Init);
 		} else if (v.getId() == R.id.btnBracHistory) {
-			i_Init.setClass(this, BracListActivity.class);
+			i_Init.setClass(this, BracHistoryActivity.class);
 			startActivity(i_Init);
 		} else if (v.getId() == R.id.gameButton) {
 			i_Init.setClass(this, GameActivity.class);

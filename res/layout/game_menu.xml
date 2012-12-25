@@ -9,6 +9,5 @@
 	    android:layout_width="80dp"
 	    android:scaleType="fitXY"
 		android:id="@+id/game_menu_icon" 
-		android:src="@drawable/icon"
 	/>
  </LinearLayout>

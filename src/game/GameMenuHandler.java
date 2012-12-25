@@ -35,8 +35,8 @@ public class GameMenuHandler {
 	public static final int REQUEST_TEST = GameActivity.REQUEST_TEST;
 	
 	private static final int[] menuPics=new int[]{
-		 R.drawable.blow_function,R.drawable.history2_function,
-		 R.drawable.history_function,R.drawable.setting_function
+		 R.drawable.icon_blow,R.drawable.icon_gallery,
+		 R.drawable.icon_chart,R.drawable.icon_setting
 	};
 	
 	public GameMenuHandler(GameActivity ga){
@@ -52,25 +52,25 @@ public class GameMenuHandler {
 			item.put("pic", menuPics[i]);
 			game_list.add(item);
 		}
-		game_adapter = new SimpleAdapter(
-				ga,
-				game_list,
-				R.layout.game_menu,
-				new String[] { "pic"},
-				new int[] { R.id.game_menu_icon } );
-		game_list_view.setAdapter(game_adapter);
 		game_list_view.setVisibility(View.INVISIBLE);
-		game_list_view.setBackgroundColor(0xAAAAFFAA);
 		game_list_view.setOnItemClickListener(new GameMenuOnClickListener());
 	}
 	
 	public void changeMenuVisibility(){
 	if (isShowingMenu == false){
 			game_list_view.setVisibility(View.VISIBLE);
+			game_adapter = new SimpleAdapter(
+					ga,
+					game_list,
+					R.layout.game_menu,
+					new String[] { "pic"},
+					new int[] { R.id.game_menu_icon } );
+			game_list_view.setAdapter(game_adapter);
 			isShowingMenu = true;
 		}
 		else{
 			game_list_view.setVisibility(View.INVISIBLE);
+			game_adapter.notifyDataSetInvalidated();
 			isShowingMenu = false;
 		}
 	

@@ -1,10 +1,6 @@
 package ioio.examples.hello;
 
-import static ioio.examples.hello.CommonUtilities.SENDER_ID;
 import ioio.examples.hello.R;
-import ioio.examples.hello.R.anim;
-import ioio.examples.hello.R.id;
-import ioio.examples.hello.R.layout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,17 +18,14 @@ import game.GamePopupWindowHandler;
 import game.GameState;
 import game.TreeGame;
 import game.interaction.InteractiveGameHandler;
-import game.interaction.MsgService;
+import game.interaction.InteractivePopupWindowHandler;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.Settings.Secure;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -47,19 +40,19 @@ public class GameActivity extends Activity{
 	
 	/*communication with MainACtivity*/
 	public static final int REQUEST_TEST = 99;
-	public static final int CHEER_MESSAGE = 777;
-	private static final int TREE_TYPES = GameState.MAX_STATE+1; 
 	private static final int MAX_COIN = GameState.MAX_COINS; 
-	private ImageView[] tree_image = new ImageView[TREE_TYPES];
 	private ImageView[] coin_image = new ImageView[MAX_COIN];
 	private ImageView background;
 	private ImageView background_anime;
+	private ImageView tree;
+	private ImageView tree_anime;
 	private TreeGame treeGame=null;
 	private GameDB gDB=null;
 	private Animation appear_anim;
 	private Animation disappear_anim;
 	private ImageView setting_image;
 	private GamePopupWindowHandler gPopWindow;
+	private InteractivePopupWindowHandler iPopWindow;
 	private GameMenuHandler gMenu;
 	private InteractiveGameHandler gInteractiveGame;
 	private Reuploader reuploader;
@@ -67,6 +60,9 @@ public class GameActivity extends Activity{
 	
 	private Bitmap cur_bg = null;
 	private Bitmap bg_now = null;
+	private Bitmap tree_now = null;
+	private Bitmap tree_prev = null;
+	
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 
 	public Context context;
@@ -88,16 +84,16 @@ public class GameActivity extends Activity{
 		initSettingButton();
 		setImage();
 		gPopWindow = new GamePopupWindowHandler(this);
+		iPopWindow = new InteractivePopupWindowHandler(this);
 		gMenu = new GameMenuHandler(this);
 		gInteractiveGame = new InteractiveGameHandler(this);
 		context = this;
 		reuploader = new Reuploader(this);
 		reuploader.reTransmission();
 		initRegistration();
+		
       	Intent service_intent = new Intent(this, TimerService.class);
       	startService(service_intent);
-      	Intent service_intent_msg = new Intent(this, MsgService.class);
-      	startService(service_intent_msg);
 
 	}
 	
@@ -106,6 +102,7 @@ public class GameActivity extends Activity{
 		super.onPause();
 		if (gInteractiveGame != null)
 			gInteractiveGame.clear();
+
 	}
 	
 	protected void onDestroy(){
@@ -113,23 +110,37 @@ public class GameActivity extends Activity{
             mRegisterTask.cancel(true);
         }
         unregisterReceiver(mHandleMessageReceiver);
+		if (cur_bg != null)
+			cur_bg.recycle();
+		if (bg_now != null)
+			bg_now.recycle();
+		if (tree_now != null)
+			tree_now.recycle();
+		if (tree_prev != null)
+			tree_prev.recycle();
 		super.onDestroy();
 	}
 	
 	protected void onResume(){
 		super.onResume();
-		if (MsgService.getNotify()){
-			MsgService.releaseNotify();
-			Intent newActivity;
-			newActivity = new Intent(context, MainActivity.class);  
-			startActivityForResult(newActivity, REQUEST_TEST);
+		System.gc();
+		gInteractiveGame.update();
+	}
+	
+	protected void onNewIntent(Intent intent){
+		super.onNewIntent(intent);
+		if (intent != null){
+			boolean notify = intent.getBooleanExtra("notify", false);
+			if (notify){
+				Intent newActivity;
+				newActivity = new Intent(context, MainActivity.class);  
+				startActivityForResult(newActivity, REQUEST_TEST);
+			}
+			String msg = intent.getStringExtra("msgmsg");
+			if (msg != null){
+				iPopWindow.showPopWindow(msg);
+			}
 		}
-		else if (MsgService.isHavingMsg()){
-			gPopWindow.showPopWindow(CHEER_MESSAGE);
-		}
-		if (!MsgService.getNotify())
-			gInteractiveGame.update();
-
 	}
 	
 	
@@ -149,15 +160,17 @@ public class GameActivity extends Activity{
 		disappear_anim.setDuration(1000);
 		disappear_anim.setStartOffset(30);
 	}
+	
+	private final int[] treeImg = {
+			R.drawable.tree1,R.drawable.tree2,R.drawable.tree4,
+			R.drawable.tree4,R.drawable.tree5,R.drawable.tree6,
+			R.drawable.tree7
+	};
+	
 	private void initTreeImage(){
 		/*used for initializing tree images*/
-		tree_image[0] = (ImageView) findViewById(R.id.tree1);
-		tree_image[1] = (ImageView) findViewById(R.id.tree2);
-		tree_image[2] = (ImageView) findViewById(R.id.tree3);
-		tree_image[3] = (ImageView) findViewById(R.id.tree4);
-		tree_image[4] = (ImageView) findViewById(R.id.tree5);
-		tree_image[5] = (ImageView) findViewById(R.id.tree6);
-		tree_image[6] = (ImageView) findViewById(R.id.tree7);
+		tree = (ImageView) findViewById(R.id.tree1);
+		tree_anime = (ImageView) findViewById(R.id.tree2);
 	}
 	private void initCoinImage(){
 		/*used for initializing coin images*/
@@ -176,8 +189,6 @@ public class GameActivity extends Activity{
         if (regId.equals("")){
         	Log.d("GCM","start register 0");
             GCMRegistrar.register(this, CommonUtilities.SENDER_ID);
-           // regId = GCMRegistrar.getRegistrationId(this);
-            //Log.d("GCM regid","Regid= "+regId);
         }
 		else {
             if (GCMRegistrar.isRegisteredOnServer(this))  Log.d("GCM","skip register");
@@ -210,11 +221,10 @@ public class GameActivity extends Activity{
 		if (cur_bg != null)
 			cur_bg.recycle();
 		GameState gState=treeGame.getGameState();
-		for (int i=0;i<TREE_TYPES;++i)
-			tree_image[i].setVisibility(ImageView.INVISIBLE);
+		tree_now = BitmapFactory.decodeResource(this.getResources(),treeImg[gState.state]);
+		tree.setImageBitmap(tree_now);
 		for (int i=0;i<MAX_COIN;++i)
 			coin_image[i].setVisibility(ImageView.INVISIBLE);
-		tree_image[gState.state].setVisibility(ImageView.VISIBLE);
 		for (int i=0;i<gState.coin;++i)
 			coin_image[i].setVisibility(ImageView.VISIBLE);
 		cur_bg = BitmapFactory.decodeResource(this.getResources(), BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
@@ -228,10 +238,8 @@ public class GameActivity extends Activity{
 			if (oldState.coin ==GameState.MIN_COINS && gState.coin == GameState.MAX_COINS){
 				//get coin because state drop
 				for (int i=oldState.coin;i<gState.coin;++i){
-					coin_image[i].setAlpha(0.f);
 					coin_image[i].setVisibility(View.VISIBLE);
 					coin_image[i].startAnimation(appear_anim);
-					coin_image[i].setAlpha(1.f);
 				}
 			}
 			else{
@@ -264,15 +272,25 @@ public class GameActivity extends Activity{
 		}
 		
 		if (oldState.state != gState.state){
-			tree_image[oldState.state].startAnimation(disappear_anim);
-			tree_image[oldState.state].setVisibility(ImageView.INVISIBLE);
-			tree_image[gState.state].setVisibility(ImageView.VISIBLE);
-			tree_image[gState.state].startAnimation(appear_anim);
+			if (tree_prev != null){
+				tree_prev.recycle();
+				tree_prev = null;
+			}
+			tree_prev = tree_now;
+			tree_now = BitmapFactory.decodeResource(this.getResources(),treeImg[gState.state]);
+			tree_anime.setImageBitmap(tree_prev);
+			tree_anime.setVisibility(View.VISIBLE);
+			tree.setImageBitmap(tree_now);
+			tree_anime.startAnimation(disappear_anim);
+			tree.startAnimation(appear_anim);
+			tree_anime.setVisibility(View.INVISIBLE);
 		}
 		
 		if (oldState.coin != gState.coin || oldState.state != gState.state){
-			if (bg_now != null)
+			if (bg_now != null){
 				bg_now.recycle();
+				bg_now = null;
+			}
 			bg_now = cur_bg;
 			cur_bg = BitmapFactory.decodeResource(this.getResources(), BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
 			background_anime.setImageBitmap(bg_now);
@@ -323,7 +341,6 @@ public class GameActivity extends Activity{
             new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //String newMessage = intent.getExtras().getString("push_msg");
         }
     };
 }

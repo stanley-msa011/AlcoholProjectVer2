@@ -16,7 +16,6 @@
 package ioio.examples.hello;
 
 import static ioio.examples.hello.CommonUtilities.SERVER_URL;
-import static ioio.examples.hello.CommonUtilities.TAG;
 
 import com.google.android.gcm.GCMRegistrar;
 
@@ -43,7 +42,8 @@ public final class ServerUtilities {
     private static final int MAX_ATTEMPTS = 5;
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
-
+    private static final String TAG = "Server Utilities";
+    
     /**
      * Register this account/device pair within the server.
      *

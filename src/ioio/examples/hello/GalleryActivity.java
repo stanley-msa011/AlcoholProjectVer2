@@ -6,6 +6,7 @@ package ioio.examples.hello;
 import game.BackgroundHandler;
 import game.GameDB;
 import game.GameState;
+import game.gallery.GalleryAdapter;
 import ioio.examples.hello.R;
 import ioio.examples.hello.R.drawable;
 import ioio.examples.hello.R.id;
@@ -40,7 +41,7 @@ import android.widget.TextView;
 
 public class GalleryActivity extends Activity {
 
-	private SimpleAdapter gallery_adapter;
+	private GalleryAdapter i_adapter;
 	private Gallery galleryListView;
 	private GalleryActivity galleryActivity;
 	private Button nextButton;
@@ -94,16 +95,9 @@ public class GalleryActivity extends Activity {
 		 
 		 setGalleryList(start_pos, end_pos);
 		 
-		 
-		 gallery_adapter = new SimpleAdapter(
-				this, 
-				gallery_list,
-				R.layout.game_history,
-				new String[] { "pic","tree","coin0","coin1","coin2","coin3","date"},
-				new int[] {R.id.gallery_background,R.id.gallery_tree,R.id.gallery_coin1,R.id.gallery_coin2,R.id.gallery_coin3,R.id.gallery_coin4,R.id.gallery_date});
-
+		 i_adapter = new GalleryAdapter(gallery_list,galleryActivity);
 		 if (adapter_len>0){
-			galleryListView.setAdapter(gallery_adapter);
+			 galleryListView.setAdapter(i_adapter);
 			int select_pos;
 			if (first_show_view == -1)
 				select_pos = end_pos-start_pos;
@@ -155,8 +149,10 @@ public class GalleryActivity extends Activity {
 	
 	protected void onStop(){
 		super.onStop();
+		i_adapter.notifyDataSetInvalidated();
+		i_adapter.clearAll();
 		gallery_list.clear();
-		gallery_adapter.notifyDataSetInvalidated();
+		//gallery_adapter.notifyDataSetInvalidated();
 		BackgroundHandler.cleanBitmaps();
 		System.gc();
 	}
@@ -181,15 +177,6 @@ public class GalleryActivity extends Activity {
 			int state = stateList[i].state;
 			int coin = stateList[i].coin;
 
-			int[] coins = new int[4];
-			int j=0;
-			for (;j<4;++j){
-				if (j<coin)
-					coins[j] = R.drawable.coin_n;
-				else
-					coins[j] = R.drawable.blank_img;
-			}
-			
 			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(state, coin);
 			int tree_pic = BackgroundHandler.getTreeDrawableId(state);
 			brac_test_list.moveToPosition(i);
@@ -197,10 +184,7 @@ public class GalleryActivity extends Activity {
 			
 			item.put("pic",bg_pic);
 			item.put("tree",tree_pic );
-			item.put("coin0", coins[0]);
-			item.put("coin1", coins[1]);
-			item.put("coin2", coins[2]);
-			item.put("coin3", coins[3]);
+			item.put("coin", coin);
 			item.put("date", date);
 			gallery_list.add(item);
 		}
@@ -219,8 +203,9 @@ public class GalleryActivity extends Activity {
 				if (nextButton.isClickable() && nextButton.isEnabled()){
 					nextButton.setEnabled(false);
 					nextButton.setClickable(false);
+					i_adapter.notifyDataSetInvalidated();
+					i_adapter.clearAll();
 					gallery_list.clear();
-					gallery_adapter.notifyDataSetInvalidated();
 					System.gc();
 					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 					newActivity.putExtra("PAGE", cur_page+1);
@@ -241,8 +226,9 @@ public class GalleryActivity extends Activity {
 				if (prevButton.isClickable() && prevButton.isEnabled()){
 					prevButton.setEnabled(false);
 					prevButton.setClickable(false);
+					i_adapter.notifyDataSetInvalidated();
+					i_adapter.clearAll();
 					gallery_list.clear();
-					gallery_adapter.notifyDataSetInvalidated();
 					System.gc();
 					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 					newActivity.putExtra("PAGE", cur_page-1);
@@ -262,8 +248,9 @@ public class GalleryActivity extends Activity {
 		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 			int set_page = Integer.parseInt(curPage.getText().toString());
 			if (set_page <= max_page && set_page >=1){
+				i_adapter.notifyDataSetInvalidated();
+				i_adapter.clearAll();
 				gallery_list.clear();
-				gallery_adapter.notifyDataSetInvalidated();
 				Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 				newActivity.putExtra("PAGE", set_page);
 				galleryActivity.startActivity(newActivity);
@@ -321,7 +308,6 @@ public class GalleryActivity extends Activity {
 			 animation = new AnimationDrawable();
 			 anime1.setImageDrawable(animation);
 			for (;idx<states.length;++idx){
-				@SuppressWarnings("deprecation")
 				int state = states[idx].state;
 				int coin = states[idx].coin;
 				Drawable d = new BitmapDrawable(BackgroundHandler.getBackgroundBitmap(state, coin, r));
