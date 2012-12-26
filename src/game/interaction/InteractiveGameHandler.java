@@ -50,8 +50,6 @@ public class InteractiveGameHandler {
 		pop = new InteractiveGamePopupWindowHandler(ga,this);
 	}
 	
-	private final static String code_names = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	
 	private void setAdapter(){
 		partner_list.clear();
 		InteractiveGameState[] stateList = igDB.getStates();
@@ -70,7 +68,7 @@ public class InteractiveGameHandler {
 			if (stateList[i].PID.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))
 				item.put("code_name",myCode);
 			else
-				item.put("code_name",code_names.substring(i, i+1) );
+				item.put("code_name",stateList[i].name );
 			partner_list.add(item);
 		}
 		
@@ -107,10 +105,11 @@ public class InteractiveGameHandler {
 	public String getCodeNameByPID(String pid){
 		if (pid.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))
 			return myCode;
-		 int c_n =igDB. getCodeNameOrder(pid);
-		 if (c_n == -1)
-			 return "???";
-		 return code_names.substring(c_n, c_n+1);
+		String c_name = igDB. getCodeName(pid);
+		if (c_name == null)
+			return "???";
+		else
+			return c_name;
 	}
 	
 	private class GetStateHandler implements Runnable{
@@ -131,6 +130,7 @@ public class InteractiveGameHandler {
 			try {
 				httpResponse = httpClient.execute(httpPost);
 				String responseString = responseHandler.handleResponse(httpResponse);
+				Log.d("UPDATE STATE",responseString);
 				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
 				if (httpStatusCode == HttpStatus.SC_OK)
 					result = 1;
@@ -141,7 +141,7 @@ public class InteractiveGameHandler {
 					igDB.updateState(states);
 					result = 2;
 				}
-				Log.d("UPDATE STATE",responseString);
+				
 			} catch (Exception e) {	e.printStackTrace();}
 		}
 		
@@ -171,8 +171,10 @@ public class InteractiveGameHandler {
 				coin = 0;
 			else
 				coin = Integer.valueOf(items[2].substring(1,items[2].length()-1));
-			states[i] = new InteractiveGameState(state,coin,pid);
-			//Log.d("states update",states[i].toString());
+			String name = items[3].substring(1,items[3].length()-1);
+			states[i] = new InteractiveGameState(state,coin,pid,name);
+			
+			Log.d("states update",states[i].toString());
 		}
 		return states;
 	}

@@ -29,10 +29,11 @@ public class InteractiveGameDB {
     		int state = newStates[i].state;
     		int coin = newStates[i].coin;
     		String pid = newStates[i].PID;
+    		String name = newStates[i].name;
     		Log.d("states update pid",pid);
     		if (need_to_create){
     			gDB.execSQL(
-    					"INSERT INTO AlcoholInteractiveGame ( _STATE,_COIN,_PID ) VALUES (" + String.valueOf(state)+","+String.valueOf(coin)+",'"+pid+"')"
+    					"INSERT INTO AlcoholInteractiveGame ( _STATE,_COIN,_PID,_NAME ) VALUES (" + String.valueOf(state)+","+String.valueOf(coin)+",'"+pid+"',"+"'"+name+"')"
     					);
     		}
     		else{
@@ -43,7 +44,7 @@ public class InteractiveGameDB {
     	}
     	gDB.close();
     }
-    
+/*    
     public int getCodeNameOrder(String pid){
     	gDB = gDBHelper.getReadableDatabase();
     	Cursor cursor;
@@ -65,12 +66,28 @@ public class InteractiveGameDB {
     	gDB.close();
 		return -1;
     }
+    */
+    
+    public String getCodeName(String pid){
+    	gDB = gDBHelper.getReadableDatabase();
+    	Cursor cursor;
+    	
+    	cursor = gDB.rawQuery("SELECT _NAME FROM AlcoholInteractiveGame WHERE _PID ='"+pid+"'",null);
+    	if (cursor.getCount()==0){
+    		gDB.close();
+    		return null;
+    	}
+    	cursor.moveToFirst();
+    	String name = cursor.getString(0);
+    	gDB.close();
+    	return name;
+    }
     
     public InteractiveGameState[] getStates(){
     	gDB = gDBHelper.getReadableDatabase();
     	Cursor cursor;
     	
-    	cursor = gDB.rawQuery("SELECT _ID,_STATE,_COIN,_PID FROM AlcoholInteractiveGame ORDER BY _PID ASC",null);
+    	cursor = gDB.rawQuery("SELECT _ID,_STATE,_COIN,_PID,_NAME FROM AlcoholInteractiveGame ORDER BY _NAME ASC",null);
     	if (cursor.getCount()==0){
     		gDB.close();
     		return null;
@@ -84,13 +101,15 @@ public class InteractiveGameDB {
     	int state = cursor.getInt(1);
     	int coin = cursor.getInt(2);
     	String pid = cursor.getString(3);
-    	stateList[0]=new InteractiveGameState(state,coin,pid);
+    	String name = cursor.getString(4);
+    	stateList[0]=new InteractiveGameState(state,coin,pid,name);
     	int i = 1;
     	while(cursor.moveToNext()){
         	state = cursor.getInt(1);
         	coin = cursor.getInt(2);
         	pid = cursor.getString(3);
-        	stateList[i]=new InteractiveGameState(state,coin,pid);
+        	name = cursor.getString(4);
+        	stateList[i]=new InteractiveGameState(state,coin,pid,name);
         	++i;
     	}
     	

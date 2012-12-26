@@ -27,7 +27,7 @@
         android:layout_alignLeft="@+id/interactive_state"
         android:layout_alignTop="@+id/interactive_state"
         android:textColor="#FFFFFFFF"
-        android:textSize="36dp"
+        android:textSize="24dp"
         android:background="#55000000"
         />
 

@@ -40,6 +40,7 @@ public class DBHelper extends SQLiteOpenHelper {
         		"CREATE TABLE AlcoholInteractiveGame ("+
         				"_ID INTEGER PRIMARY KEY," +
         				"_PID CHAR[50] NOT NULL," +
+        				"_NAME CHAR[50] NOT NULL,"+
         				"_STATE INTEGER NOT NULL," +
         				"_COIN INTEGER NOT NULL )" 
         		);
