@@ -25,6 +25,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
@@ -68,6 +70,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	private static final int MAX_PROGRESS = 6;
 	
 	private static int state;
+	
+	private Context mContext;
 	
 	public ImageView imgCountdown;
 	public ImageView imgCountdown2;
@@ -184,8 +188,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     		R.drawable.balloon6,
     		R.drawable.balloon7,
     		R.drawable.balloon8,
-    		R.drawable.balloon9
+    		R.drawable.balloon9,
+    		R.drawable.count_go,
+    		R.drawable.count_end
     		};
+    private Bitmap[] balloonsBM = new Bitmap[12];
     private int bDraw = 0;
     private long blowStartTime;
     private long blowEndTime;
@@ -217,7 +224,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 		setContentView(R.layout.main);
 		
 		findViews();
-		
+		mContext = this;
 		// Set count down animation
         imgCountdown.setBackgroundResource(R.drawable.countdown);
     	countdownAnimation = (AnimationDrawable) imgCountdown.getBackground();
@@ -315,7 +322,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	        				        public void run() {
 	        				        	imgCountdown.setVisibility(View.INVISIBLE);
 	        				        	imgCountdown2.setVisibility(View.VISIBLE);
-	        				        	imgCountdown2.setImageResource(R.drawable.count_go);
+//	        				        	imgCountdown2.setImageResource(R.drawable.count_go);
+	        				        	imgCountdown2.setImageBitmap(balloonsBM[10]);
 	        				        } 
 	        				    });
             	        		new Thread (new Runnable() {
@@ -354,7 +362,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	                        	if (diff > BLOW_SENSE_THRESHOLD && diff < 20000.f && !isPeak) {
 	                        		isPeak = true;
 	                        		blowStartTime = System.nanoTime();
-	                        		bDraw = 9;
+//	                        		bDraw = 9;
+	                        		if (bDraw < 18) {
+	                        			bDraw++;
+	                        		}
 	//                        		runOnUiThread(new Runnable() { 
 	//            				        public void run() {
 	//            				        	mpBlow.start();
@@ -363,8 +374,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	                        		
 	                        		// Save the alcohol reading
 	                        	} else if (diff >= BLOW_THRESHOLD && diff < BLOW_SENSE_THRESHOLD && !isPeak) {
-	                        		if (bDraw < 8)
+	                        		if (bDraw < 16) {
 	                        			bDraw++;
+	                        		}
 	                        	} else if (diff >= -BLOW_SENSE_THRESHOLD && diff <= BLOW_SENSE_THRESHOLD) {
 	                        		if (isPeak) {
 	                        			// Save the alcohol reading
@@ -382,30 +394,39 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	                    				    mpBlowEnd.start();
 	                    				    runOnUiThread(new Runnable() { 
 	        	        				        public void run() {
-	        	        				        	imgCountdown2.setImageResource(R.drawable.count_end);
-	        	        				        } 
-	        	        				    });    	
+//	        	        				        	imgCountdown2.setImageResource(R.drawable.count_end);
+	        	        				        	imgCountdown2.setImageBitmap(balloonsBM[11]);
+	        	        				        }
+	        	        				    });
 	                        				Intent i_return = new Intent();
 	                        				Bundle bData = new Bundle();
 	                        				bData.putString("testfilename", dirTimeStamp);
 	                        				i_return.putExtras(bData);
 	                        				setResult(RESULT_OK, i_return);
 	                        				state = STATE_COMPLETE;
+//	                        				for (int i=0; i<11; i++) {
+//	                        					balloonsBM[i].recycle();
+//	                        				}
 	                        				finish();
 	                        			} else {
-	                        				bDraw = 9;
+//	                        				bDraw = 9;
+	                        				if (bDraw < 18) {
+	                        					bDraw++;
+	                        				}
 	                        			}
 	                        			
 	                        		} else {
-	                        			if (bDraw > 0)
+	                        			if (bDraw > 0) {
 	                        				bDraw--;
+	                        			}
 	                        		}
 	                        	} else if (diff < -BLOW_SENSE_THRESHOLD) {
 	                        		isPeak = false;
 	                        		// Clear data
 	//                        		}
-	                        		if (bDraw > 0)
+	                        		if (bDraw > 0) {
 	                        			bDraw--;
+	                        		}
 	//                        		runOnUiThread(new Runnable() { 
 	//            				        public void run() {
 	//            				        	mpBlow.pause();
@@ -415,7 +436,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	                        	}
 	                        	runOnUiThread(new Runnable() { 
 	        				        public void run() {
-	        				        	ivBalloonLoader.setImageResource(balloons[bDraw]);
+//	        				        	ivBalloonLoader.setImageResource(balloons[bDraw/2]);
+	        				        	ivBalloonLoader.setImageBitmap(balloonsBM[bDraw/2]);
 	        				        } 
 	        				    });
 	                		} catch (Exception e) {
@@ -624,6 +646,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     public void onResume() {
     	super.onResume();
     	Log.d(TAG, "Resuming...");
+    	for (int i = 0; i < 12; i++) {
+    		balloonsBM[i] = BitmapFactory.decodeResource(this.getResources(), balloons[i]);
+    	}
     	switch (state) {
 		case STATE_SENSOR_CHECK:
 			// Check if the GPS setting is currently enabled on the device.
@@ -677,6 +702,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     	Log.d(TAG, "Camera is released");
     	mLocationManager.removeUpdates(locListener);
     	Log.d(TAG, "Location listener stopped updating");
+    	for (int i = 0; i < 12; i++) {
+    		if (!balloonsBM[i].isRecycled()) {
+    			balloonsBM[i].recycle();
+    		}
+    	}
     	if (state == STATE_COMPLETE || state == STATE_BT_CONNECTING) {
 			mBTService.stop();
 			mBTService = null;
