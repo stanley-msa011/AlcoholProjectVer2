@@ -9,7 +9,7 @@
     <PreferenceCategory 
         android:title="喜好設定" 
         android:key="location_setting" >
-        <SwitchPreference 
+        <CheckBoxPreference 
             android:summaryOn="資料上傳時顯示我的位置" 
             android:summaryOff="資料上傳時隱藏我的位置" 
             android:key="enable_gps_check" 
@@ -19,7 +19,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Developer Setting">
-        <SwitchPreference 
+        <CheckBoxPreference 
             android:summaryOn="Yes" 
             android:summaryOff="No" 
             android:title="Use fake data?" 

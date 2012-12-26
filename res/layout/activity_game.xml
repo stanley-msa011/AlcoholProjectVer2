@@ -134,6 +134,9 @@
 	    android:scrollbars="none"
 	    android:scrollingCache="false" 
 	    android:cacheColorHint="#00000000"
+	    android:background="#00000000"
+	    android:headerDividersEnabled="false"
+	    android:footerDividersEnabled="false"
 	    android:dividerHeight="0dp">
 	</ListView>
 </RelativeLayout>

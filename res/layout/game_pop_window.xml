@@ -13,6 +13,7 @@
         android:layout_centerVertical="true"
         android:textSize="24sp"
         android:textStyle="bold" 
+         android:gravity="center"
         />
     
     <Button

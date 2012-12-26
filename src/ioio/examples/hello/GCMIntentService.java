@@ -77,6 +77,8 @@ public class GCMIntentService extends GCMBaseIntentService {
         return super.onRecoverableError(context, errorId);
     }
 
+    
+    private static final long[] vibrate = {0,50,100,150,200};
     /**
      * Issues a notification to inform the user that server has sent a message.
      */
@@ -85,16 +87,23 @@ public class GCMIntentService extends GCMBaseIntentService {
         long when = System.currentTimeMillis();
         NotificationManager notificationManager = (NotificationManager)  context.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = new Notification(icon, "有人為您加油", when);
+        notification.defaults = Notification.DEFAULT_ALL; 
+        
         String title = context.getString(R.string.app_name);
         Intent notificationIntent = new Intent(context, GameActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
         notificationIntent.putExtra("msgmsg", message);
+        int coding = 0;
+        for (int i=0;i<message.length();++i){
+        	coding += message.charAt(i);
+        }
         
+       
         Log.d("MESSAGE CODE",message);
-         PendingIntent intent =  PendingIntent.getActivity(context, 1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+         PendingIntent intent =  PendingIntent.getActivity(context, coding, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
          notification.setLatestEventInfo(context, title,  "有人為您加油", intent);
          notification.flags |= Notification.FLAG_AUTO_CANCEL;
-         notificationManager.notify(0, notification);
+         notificationManager.notify(coding, notification);
     }
 
 }

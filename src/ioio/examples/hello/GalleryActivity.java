@@ -256,6 +256,8 @@ public class GalleryActivity extends Activity {
 				galleryActivity.startActivity(newActivity);
 				galleryActivity.finish();
 			}
+			else
+				curPage.setText(String.valueOf(cur_page));
 			return false;
 		}
 		

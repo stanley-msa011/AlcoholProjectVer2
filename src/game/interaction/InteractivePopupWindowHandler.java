@@ -3,6 +3,7 @@ package game.interaction;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.R;
 import android.content.Context;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -33,7 +34,12 @@ public class InteractivePopupWindowHandler {
 		 Context mContext = ga;   
 		 LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		 v_pop = mLayoutInflater.inflate(R.layout.game_pop_window, null);
-		 popupWindow = new PopupWindow(v_pop,400,400);
+		 Point p = ga.getSize();
+		 int width_max = (int) (p.x * 0.8);
+		 int width = 400;
+		 if (width > width_max)
+			 width = width_max;
+		 popupWindow = new PopupWindow(v_pop,width,width);
 		 ok_button = (Button)v_pop.findViewById(R.id.game_pop_ok_button);
 		 ok_button.setOnClickListener(new PopWindowOnClickListener());
 		 showThread = new showPopWindowThread();

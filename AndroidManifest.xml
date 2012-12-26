@@ -4,7 +4,7 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="11" />
+    <uses-sdk android:minSdkVersion="7" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -86,6 +86,11 @@
         </activity>
         <activity
             android:name="ioio.examples.hello.PrefSettingActivity"
+            android:screenOrientation="portrait" 
+            android:noHistory="true">
+        </activity>
+        <activity
+            android:name="ioio.examples.hello.OldPrefSettingActivity"
             android:screenOrientation="portrait" 
             android:noHistory="true">
         </activity>

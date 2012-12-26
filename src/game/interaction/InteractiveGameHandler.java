@@ -35,6 +35,8 @@ public class InteractiveGameHandler {
 	private InteractiveAdapter i_adapter;
 	private int cur_pos = -1;
 	
+	static private final String myCode = "ME";
+	
 	public InteractiveGameHandler(GameActivity ga){
 		this.ga = ga;
 		init();
@@ -65,7 +67,10 @@ public class InteractiveGameHandler {
 			item.put("pic",bg_pic);
 			item.put("tree",tree_pic );
 			item.put("pid", stateList[i].PID);
-			item.put("code_name",code_names.substring(i, i+1) );
+			if (stateList[i].PID.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))
+				item.put("code_name",myCode);
+			else
+				item.put("code_name",code_names.substring(i, i+1) );
 			partner_list.add(item);
 		}
 		
@@ -100,9 +105,9 @@ public class InteractiveGameHandler {
 	}
 	
 	public String getCodeNameByPID(String pid){
-		Log.d("FIND pid",String.valueOf(pid));
+		if (pid.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))
+			return myCode;
 		 int c_n =igDB. getCodeNameOrder(pid);
-		 Log.e("CN",String.valueOf(c_n));
 		 if (c_n == -1)
 			 return "???";
 		 return code_names.substring(c_n, c_n+1);
@@ -136,7 +141,7 @@ public class InteractiveGameHandler {
 					igDB.updateState(states);
 					result = 2;
 				}
-				//Log.d("UPDATE STATE",responseString);
+				Log.d("UPDATE STATE",responseString);
 			} catch (Exception e) {	e.printStackTrace();}
 		}
 		

@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+        android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         android:textStyle="bold" />
@@ -24,7 +25,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginTop="12dp"
         android:layout_marginLeft="40dp"
-        android:text="OK"
+        android:text="是"
         android:textSize="22sp" />
 
     <Button
@@ -36,7 +37,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginTop="12dp"
         android:layout_marginRight="40dp"
-        android:text="NO"
+        android:text="否"
         android:textSize="22sp"  />
 
 </RelativeLayout>

@@ -3,11 +3,15 @@ package game;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.R;
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -23,7 +27,6 @@ public class GamePopupWindowHandler {
 	private View v_pop;
     private Drawable good_apple;
     private Drawable bad_apple;
-    private Drawable smile;
     private PopWindowOnDismissListener dismissListener;
     private showPopWindowThread showThread;
 	public GamePopupWindowHandler(GameActivity ga){
@@ -31,7 +34,6 @@ public class GamePopupWindowHandler {
 		this.bg = (ImageView)ga.findViewById(R.id.background);
 		good_apple = ga.getResources().getDrawable(R.drawable.apple_good);
 	    bad_apple = ga.getResources().getDrawable(R.drawable.apple_bad);
-	    smile = ga.getResources().getDrawable(R.drawable.smile);
 		initPopWindow();
 	}
 	
@@ -39,7 +41,13 @@ public class GamePopupWindowHandler {
 		 Context mContext = ga;   
 		 LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		 v_pop = mLayoutInflater.inflate(R.layout.game_pop_window, null);
-		 popupWindow = new PopupWindow(v_pop,400,400);
+		
+		 Point p = ga.getSize();
+		 int width_max = (int) (p.x * 0.8);
+		 int width = 400;
+		 if (width > width_max)
+			 width = width_max;
+		 popupWindow = new PopupWindow(v_pop,width,width);
 		 ok_button = (Button)v_pop.findViewById(R.id.game_pop_ok_button);
 		 ok_button.setOnClickListener(new PopWindowOnClickListener());
 		 dismissListener = new PopWindowOnDismissListener(BracDataHandler.ERROR);
@@ -62,17 +70,16 @@ public class GamePopupWindowHandler {
         	popupWindow.setBackgroundDrawable(bad_apple);
         }
 		else if (result == BracDataHandler.HaveAlcohol){
-			popText.setText("BAD");
+			popText.setText("有喝酒\n請再加油");
 			popText.setTextColor(0xFFFFFFFF);
 			popupWindow.setBackgroundDrawable(bad_apple);
 		}
 		else if (result == BracDataHandler.NoAlcohol){
-			popText.setText("GOOD");
+			popText.setText("沒有喝酒\n做得好");
 			popText.setTextColor(0xFFFFFFFF);
 			popupWindow.setBackgroundDrawable(good_apple);
 		}
         popupWindow.setOutsideTouchable(false);
-       // popupWindow.setOnDismissListener(new PopWindowOnDismissListener(test_result));
         dismissListener.set(test_result);
         bg.post( showThread);
 	}

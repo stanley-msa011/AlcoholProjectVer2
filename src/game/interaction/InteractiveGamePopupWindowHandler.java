@@ -3,10 +3,14 @@ package game.interaction;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.R;
 import android.content.Context;
+import android.graphics.Point;
+import android.provider.Settings.Secure;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -38,7 +42,13 @@ public class InteractiveGamePopupWindowHandler {
 		 Context mContext = ga;   
 		 LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		 View v_pop = mLayoutInflater.inflate(R.layout.interactive_game_pop_window, null);
-		 popupWindow = new PopupWindow(v_pop,400,400);
+		 Point p = ga.getSize();
+		 int width_max = (int) (p.x * 0.8);
+		 int width = 400;
+		 if (width > width_max)
+			 width = width_max;
+		 popupWindow = new PopupWindow(v_pop,width,width,true);
+		 popupWindow.getContentView().setOnClickListener(new WindowOnClickListener());
 		 showThread = new showPopWindowThread();
 		 listener = new PopWindowOnClickListener();
 		 ok_button = (Button)v_pop.findViewById(R.id.interactive_game_pop_ok_button);
@@ -50,15 +60,39 @@ public class InteractiveGamePopupWindowHandler {
 	private class PopWindowOnClickListener implements View.OnClickListener{
 		public void onClick(View v) {
 			if (v.getId() ==R.id.interactive_game_pop_ok_button ){
-				igh.send_cheers(cur_pid);
+				if (cur_pid.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))
+					;//Do nothing
+				else
+					igh.send_cheers(cur_pid);
 			}
-			popupWindow.setFocusable(false);
 		    popupWindow.dismiss();
 		}
 	}
+	
+	private class WindowOnClickListener implements View.OnClickListener{
+		public void onClick(View v) {
+				if (cur_pid.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))
+					popupWindow.dismiss();
+		}
+	}
+	
+	
 	public void showPopWindow(String code_name,String pid){
-        popupWindow.setOutsideTouchable(false);
-        popText.setText("Cheers "+code_name+"?");
+        
+        String my_pid = Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID);
+        if (pid.equals(my_pid)){
+        	//popupWindow.setOutsideTouchable(true);
+        	
+        	 popText.setText("為自己加油!!");
+        	 ok_button.setVisibility(View.INVISIBLE);
+        	 no_button.setVisibility(View.INVISIBLE);
+        }
+        else{
+        	//popupWindow.setOutsideTouchable(false);
+        	popText.setText("為"+code_name+"加油?");
+       	 	ok_button.setVisibility(View.VISIBLE);
+       	 	no_button.setVisibility(View.VISIBLE);
+        }
         cur_pid = pid;
         bg.post(showThread);
 	}
@@ -67,12 +101,8 @@ public class InteractiveGamePopupWindowHandler {
 		@Override
 		public void run() {
 				popupWindow.showAtLocation( bg, Gravity.CENTER, 0, 0);
-				popupWindow.setFocusable(true);
 		        popupWindow.update();
 		}
-
 	}
-
-		
 
 }

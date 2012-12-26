@@ -73,12 +73,12 @@ public class TimerService extends Service {
 			Calendar calendar = Calendar.getInstance();
 			int minute = calendar.get(Calendar.MINUTE);
 			int second = calendar.get(Calendar.SECOND);
+			int hour = calendar.get(Calendar.HOUR_OF_DAY);
 			
-			
-			if( minute % 5 == 0 && second == 0){
-				
-				
-				mp.start();
+			if (false){
+			//if( minute % 1 == 0 && second == 0){
+			//if (hour == 17 &&minute == 0 && second ==0){
+				//mp.start();
 				//get a reference to notificationManager
 				String ns = Context.NOTIFICATION_SERVICE;
 				NotificationManager notificationManager = (NotificationManager)getSystemService(ns);
@@ -88,20 +88,21 @@ public class TimerService extends Service {
 				CharSequence tickerText = "Alc test!";
 				long when = System.currentTimeMillis();
 				
-				long[] tVibrate = {0,100,200,300};
+				//long[] tVibrate = {0,100,200,300};
 
 				Notification notification = new Notification(icon,tickerText,when);
-				notification.vibrate = tVibrate;
+				//notification.vibrate = tVibrate;
+				notification.defaults = Notification.DEFAULT_ALL;
 				notification.flags = Notification.FLAG_AUTO_CANCEL;
 				
 				Context context = getApplicationContext();
-				CharSequence contentTitle = "IOIO Alcohol test";
+				CharSequence contentTitle = "Alcohol test";
 				CharSequence contentText = "該吹氣摟！！";
 				Intent notificationIntent = new Intent(context, GameActivity.class);
 				notificationIntent.putExtra("notify", true);
 				PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 				notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-				notificationManager.notify(16, notification); //前面的只是一個tag而已 ＝ ＝
+				notificationManager.notify(0, notification); //前面的只是一個tag而已 ＝ ＝
 				
 			}
 			

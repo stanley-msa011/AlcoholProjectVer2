@@ -4,6 +4,7 @@ import ioio.examples.hello.BracHistoryActivity;
 import ioio.examples.hello.GalleryActivity;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.MainActivity;
+import ioio.examples.hello.OldPrefSettingActivity;
 import ioio.examples.hello.PrefSettingActivity;
 import ioio.examples.hello.R;
 import ioio.examples.hello.TestActivity;
@@ -16,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
@@ -103,8 +105,11 @@ public class GameMenuHandler {
 					newActivity = new Intent(context, BracHistoryActivity.class);     
 	                ga.startActivity(newActivity);
 					break;
-				case 3: //Dummy (Setting)
-					newActivity = new Intent(context, PrefSettingActivity.class);     
+				case 3: //Setting
+					if (Build.VERSION.SDK_INT < 11)
+						newActivity = new Intent(context, OldPrefSettingActivity.class);
+					else
+						newActivity = new Intent(context, PrefSettingActivity.class);     
 	                ga.startActivity(newActivity);
 					break;
 				default:

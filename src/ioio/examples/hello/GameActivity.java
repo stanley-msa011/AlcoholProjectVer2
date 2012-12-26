@@ -20,7 +20,9 @@ import game.TreeGame;
 import game.interaction.InteractiveGameHandler;
 import game.interaction.InteractivePopupWindowHandler;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,7 +30,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -67,12 +72,25 @@ public class GameActivity extends Activity{
 
 	public Context context;
 
+	private Point screen_size;
+	
 	AsyncTask<Void, Void, Void> mRegisterTask;
 	String regId;
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		System.gc();
+		
+		 Display display = getWindowManager().getDefaultDisplay();
+		 if (Build.VERSION.SDK_INT<13){
+			 int w = display.getWidth();
+			 int h = display.getHeight();
+			 screen_size = new Point(w,h);
+		 }
+		 else{
+			 screen_size = getSize(display);
+		 }
+		
 		setContentView(R.layout.activity_game);
 		gDB = new GameDB(this);
 		GameState gState = gDB.getLatestGameState();
@@ -92,6 +110,8 @@ public class GameActivity extends Activity{
 		reuploader.reTransmission();
 		initRegistration();
 		
+
+		
 		Intent intent = this.getIntent();
 		if (intent != null){
 			boolean notify = intent.getBooleanExtra("notify", false);
@@ -108,9 +128,18 @@ public class GameActivity extends Activity{
 		
       	Intent service_intent = new Intent(this, TimerService.class);
       	startService(service_intent);
-
 	}
 	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+	private Point getSize(Display display){
+		Point p = new Point();
+		display.getSize(p);
+		return p;
+	}
+	
+	public Point getSize(){
+		return screen_size;
+	}
 	
 	protected void onPause(){
 		super.onPause();
@@ -124,14 +153,22 @@ public class GameActivity extends Activity{
             mRegisterTask.cancel(true);
         }
         unregisterReceiver(mHandleMessageReceiver);
-		if (cur_bg != null)
+		if (cur_bg != null){
 			cur_bg.recycle();
-		if (bg_now != null)
+			cur_bg = null;
+		}
+		if (bg_now != null){
 			bg_now.recycle();
-		if (tree_now != null)
+			bg_now = null;
+		}
+		if (tree_now != null){
 			tree_now.recycle();
-		if (tree_prev != null)
+			tree_now = null;
+		}
+		if (tree_prev != null){
 			tree_prev.recycle();
+			tree_prev = null;
+		}
 		super.onDestroy();
 	}
 	
@@ -235,7 +272,9 @@ public class GameActivity extends Activity{
 		if (cur_bg != null)
 			cur_bg.recycle();
 		GameState gState=treeGame.getGameState();
-		tree_now = BitmapFactory.decodeResource(this.getResources(),treeImg[gState.state]);
+		Bitmap tmp = BitmapFactory.decodeResource(this.getResources(),treeImg[gState.state]);
+		tree_now = Bitmap.createScaledBitmap(tmp, 256, 256, true);
+		tmp.recycle();
 		tree.setImageBitmap(tree_now);
 		for (int i=0;i<MAX_COIN;++i)
 			coin_image[i].setVisibility(ImageView.INVISIBLE);
@@ -291,7 +330,9 @@ public class GameActivity extends Activity{
 				tree_prev = null;
 			}
 			tree_prev = tree_now;
-			tree_now = BitmapFactory.decodeResource(this.getResources(),treeImg[gState.state]);
+			Bitmap tmp = BitmapFactory.decodeResource(this.getResources(),treeImg[gState.state]);
+			tree_now = Bitmap.createScaledBitmap(tmp, 256, 256, true);
+			tmp.recycle();
 			tree_anime.setImageBitmap(tree_prev);
 			tree_anime.setVisibility(View.VISIBLE);
 			tree.setImageBitmap(tree_now);
