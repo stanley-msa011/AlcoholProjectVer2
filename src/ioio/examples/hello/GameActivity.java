@@ -110,8 +110,6 @@ public class GameActivity extends Activity{
 		reuploader.reTransmission();
 		initRegistration();
 		
-
-		
 		Intent intent = this.getIntent();
 		if (intent != null){
 			boolean notify = intent.getBooleanExtra("notify", false);
@@ -128,6 +126,8 @@ public class GameActivity extends Activity{
 		
       	Intent service_intent = new Intent(this, TimerService.class);
       	startService(service_intent);
+      	
+      	//iPopWindow.showPopWindow("xxx");
 	}
 	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)

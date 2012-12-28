@@ -89,9 +89,12 @@ public class InteractiveGameHandler {
 			GetStateHandler handler = new GetStateHandler(httpClient,httpPost);
 			Thread thread = new Thread(handler);
 			thread.start();
-			thread.join();
-			if (handler .result==-1)
+			thread.join(3000);
+			if (handler .result==-1){
+				update_adapter();
+				i_adapter.notifyDataSetChanged();
 				return;
+			}
 			update_adapter();
 			i_adapter.notifyDataSetChanged();
 		} catch (Exception e) {
@@ -128,6 +131,7 @@ public class InteractiveGameHandler {
 		public void run() {
 			HttpResponse httpResponse;
 			try {
+				result = -1;
 				httpResponse = httpClient.execute(httpPost);
 				String responseString = responseHandler.handleResponse(httpResponse);
 				Log.d("UPDATE STATE",responseString);
@@ -243,7 +247,7 @@ public class InteractiveGameHandler {
 			SendCheers cheer= new SendCheers(httpClient,httpPost);
 			Thread thread = new Thread(cheer);
 			thread.start();
-			thread.join();
+			thread.join(3000);
 			if (cheer.result==-1)
 				Log.d("GCM","Send fail");
 			else

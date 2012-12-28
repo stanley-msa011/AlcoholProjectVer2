@@ -190,7 +190,7 @@ public class BracDataHandler {
 			BracDataToServer BDT = new BracDataToServer(httpClient,httpPost);
 			Thread thread = new Thread(BDT);
 			thread.start();
-			thread.join();
+			thread.join(5000);
 			if (BDT.result==-1)
 				return ERROR;
 			

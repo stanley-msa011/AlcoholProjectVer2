@@ -97,7 +97,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         for (int i=0;i<message.length();++i){
         	coding += message.charAt(i);
         }
-        
+        //context.startActivity(notificationIntent);  
        
         Log.d("MESSAGE CODE",message);
          PendingIntent intent =  PendingIntent.getActivity(context, coding, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);

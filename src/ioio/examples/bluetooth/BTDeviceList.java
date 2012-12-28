@@ -33,7 +33,9 @@ public class BTDeviceList extends Activity {
     
     private final String[] macAddressList = {
     		"00:15:FF:F3:35:48",
-    		"00:15:FF:F3:35:37"
+    		"00:15:FF:F3:35:37",
+    		"00:15:FF:F3:35:45",
+    		"00:15:FF:F3:35:50"
     };
 
     // Return Intent extra
