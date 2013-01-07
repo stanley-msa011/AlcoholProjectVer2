@@ -17,10 +17,12 @@ package ioio.examples.hello;
 
 import static ioio.examples.hello.CommonUtilities.SENDER_ID;
 
+import java.util.List;
 import java.util.Random;
 
 import ioio.examples.hello.R;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -99,11 +101,23 @@ public class GCMIntentService extends GCMBaseIntentService {
         }
         //context.startActivity(notificationIntent);  
        
-        Log.d("MESSAGE CODE",message);
-         PendingIntent intent =  PendingIntent.getActivity(context, coding, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-         notification.setLatestEventInfo(context, title,  "有人為您加油", intent);
-         notification.flags |= Notification.FLAG_AUTO_CANCEL;
-         notificationManager.notify(coding, notification);
+        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        List< ActivityManager.RunningTaskInfo > taskInfo = am.getRunningTasks(1);
+        String topClass = taskInfo.get(0).topActivity.getClassName();
+        Log.d("Activity name target",GameActivity.class.getCanonicalName());
+        if (topClass.equals(GameActivity.class.getCanonicalName())){
+        	Log.d("Activity name OK",taskInfo.get(0).topActivity.getClassName());
+        	GameActivity.showCheerMessage(message);
+        }
+        else{
+        	//Log.d("Activity name",taskInfo.get(0).topActivity.getClassName());
+        
+        	Log.d("MESSAGE CODE",message);
+        	PendingIntent intent =  PendingIntent.getActivity(context, coding, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        	notification.setLatestEventInfo(context, title,  "有人為您加油", intent);
+        	notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        	notificationManager.notify(coding, notification);
+        }
     }
 
 }

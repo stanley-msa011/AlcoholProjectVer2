@@ -44,6 +44,7 @@ import android.widget.ImageView;
 public class GameActivity extends Activity{
 	
 	/*communication with MainACtivity*/
+	private static GameActivity ga = null;
 	public static final int REQUEST_TEST = 99;
 	private static final int MAX_COIN = GameState.MAX_COINS; 
 	private ImageView[] coin_image = new ImageView[MAX_COIN];
@@ -80,7 +81,7 @@ public class GameActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		 
 		 Display display = getWindowManager().getDefaultDisplay();
 		 if (Build.VERSION.SDK_INT<13){
 			 int w = display.getWidth();
@@ -143,12 +144,14 @@ public class GameActivity extends Activity{
 	
 	protected void onPause(){
 		super.onPause();
+		ga = null;
 		if (gInteractiveGame != null)
 			gInteractiveGame.clear();
 
 	}
 	
 	protected void onDestroy(){
+		ga = null;
         if (mRegisterTask != null) {
             mRegisterTask.cancel(true);
         }
@@ -174,6 +177,7 @@ public class GameActivity extends Activity{
 	
 	protected void onResume(){
 		super.onResume();
+		ga = this;
 		System.gc();
 		gInteractiveGame.update();
 	}
@@ -193,7 +197,12 @@ public class GameActivity extends Activity{
 			}
 		}
 	}
-	
+	public static void showCheerMessage(String msg){
+		if (ga!= null){
+			if (msg != null)
+				ga.iPopWindow.showPopWindow(msg);
+		}
+	}
 	
 	
 	private void initBackground(){
