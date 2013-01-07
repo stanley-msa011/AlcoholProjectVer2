@@ -200,6 +200,8 @@ public class GameActivity extends Activity{
 	public static void showCheerMessage(String msg){
 		if (ga!= null){
 			if (msg != null)
+				if (ga.iPopWindow != null)
+					
 				ga.iPopWindow.showPopWindow(msg);
 		}
 	}
