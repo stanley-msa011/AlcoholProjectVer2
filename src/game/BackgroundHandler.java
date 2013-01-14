@@ -18,7 +18,7 @@ public class BackgroundHandler {
 			R.drawable.w30,R.drawable.w31,R.drawable.w32,R.drawable.w33,R.drawable.w34
 	};
 	
-	private static final int[] treePics ={
+	/*private static final int[] treePics ={
 			R.drawable.tree1,
 			R.drawable.tree2,
 			R.drawable.tree3,
@@ -27,7 +27,7 @@ public class BackgroundHandler {
 			R.drawable.tree6,
 			R.drawable.tree7
 		};
-	
+	*/
 	private static Bitmap[] bg_bitmap = null;
 	
 	public static int getBackgroundDrawableId(int state, int coin_num){
@@ -42,17 +42,17 @@ public class BackgroundHandler {
 		return idx;
 	}
 	
-	public static int getTreeDrawableId(int state){
+	/*public static int getTreeDrawableId(int state){
 		return treePics[state];
 	}
-	
+	*/
 	public static Bitmap getBackgroundBitmap(int state, int coin_num,Resources r){
 		synchronized(lock){
 			if (bg_bitmap == null){
 				bg_bitmap = new Bitmap[35];
 				 	for (int i=0;i<bg_bitmap.length;++i){
 				 		Bitmap tmp = BitmapFactory.decodeResource(r, BackgroundHandler.Background_pics[i]);
-				 		bg_bitmap[i] = Bitmap.createScaledBitmap(tmp, 105, 192, true);
+				 		bg_bitmap[i] = Bitmap.createScaledBitmap(tmp, 100, 100, true);//105,192
 				 		tmp.recycle();
 				 	}
 			}

@@ -178,13 +178,13 @@ public class GalleryActivity extends Activity {
 			int coin = stateList[i].coin;
 
 			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(state, coin);
-			int tree_pic = BackgroundHandler.getTreeDrawableId(state);
+			//int tree_pic = BackgroundHandler.getTreeDrawableId(state);
 			brac_test_list.moveToPosition(i);
 			String date = brac_test_list.getString(1);
 			
 			item.put("pic",bg_pic);
-			item.put("tree",tree_pic );
-			item.put("coin", coin);
+			//item.put("tree",tree_pic );
+			//item.put("coin", coin);
 			item.put("date", date);
 			gallery_list.add(item);
 		}

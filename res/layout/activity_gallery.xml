@@ -5,7 +5,7 @@
     android:background="@android:color/black"
 
     tools:context=".StoryActivity" >
-
+<!-- Original:256*420 -->
     <Gallery
         android:id="@+id/gallery_list"
         android:layout_width="match_parent"
@@ -73,12 +73,12 @@
     <ImageView
         android:id="@+id/gallery_anime1"
          android:layout_width="230dp"
-         android:layout_height="380dp"
+         android:layout_height="230dp"
 	    android:scaleType="fitXY"
 	    android:adjustViewBounds="true"
 	    android:layout_centerInParent="true"
-	    android:padding="20dp"
-	    android:background="#FFAA8833"
+	    android:padding="0dp"
+	    android:background="#AACCFFFF"
         />
     
 

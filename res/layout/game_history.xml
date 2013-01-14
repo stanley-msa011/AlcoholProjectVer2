@@ -7,23 +7,33 @@
     android:orientation="vertical" >
 
 	<ImageView
-	    android:id="@+id/gallery_background"
+	    android:id="@+id/gallery_bg_all"
 	    android:layout_width="256dp"
 	    android:layout_height="420dp"
 	    android:scaleType="fitXY"
 	    android:adjustViewBounds="true"
 	    android:layout_centerInParent="true"
+	    android:src="@+drawable/background_all"
+	 />
+	<ImageView
+	    android:id="@+id/gallery_background"
+	    android:layout_width="256dp"
+	    android:layout_height="256dp"
+	    android:scaleType="fitXY"
+	    android:adjustViewBounds="true"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentBottom="true"
 	 />
 	
-	    <ImageView
+	    <!--  ImageView
         android:id="@+id/gallery_tree"
         android:layout_width="192dp"
         android:layout_height="240dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-         />
+         /-->
 
-	    <ImageView
+	    <!-- ImageView
 	        android:id="@+id/gallery_coin1"
 	        android:layout_width="24dp"
 	        android:layout_height="24dp"
@@ -58,14 +68,14 @@
 	        android:layout_toRightOf="@+id/gallery_coin3"
 	        android:layout_marginBottom="24dp"
 	        android:layout_marginLeft="12dp"
-	        android:src="@drawable/coin_n" />
+	        android:src="@drawable/coin_n" /-->
 
     	<TextView
     	    android:id="@+id/gallery_date"
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
-    	    android:layout_alignLeft="@+id/gallery_background"
-    	    android:layout_alignTop="@+id/gallery_background"
+    	    android:layout_alignLeft="@+id/gallery_bg_all"
+    	    android:layout_alignTop="@+id/gallery_bg_all"
     	 	android:textSize="20sp"
     	 	android:textStyle="bold"
     	 	android:textColor="#FFFFFFFF"

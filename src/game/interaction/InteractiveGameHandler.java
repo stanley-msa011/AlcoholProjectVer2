@@ -60,10 +60,10 @@ public class InteractiveGameHandler {
 		for (int i=0;i<stateList.length;++i){
 			HashMap<String,Object> item = new HashMap<String,Object>();
 			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(stateList[i].state, stateList[i].coin);
-			int tree_pic = BackgroundHandler.getTreeDrawableId(stateList[i].state);
+			//int tree_pic = BackgroundHandler.getTreeDrawableId(stateList[i].state);
 			
 			item.put("pic",bg_pic);
-			item.put("tree",tree_pic );
+			//item.put("tree",tree_pic );
 			item.put("pid", stateList[i].PID);
 			if (stateList[i].PID.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))
 				item.put("code_name",myCode);
