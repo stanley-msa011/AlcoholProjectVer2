@@ -12,9 +12,11 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,6 +38,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -52,6 +55,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	private final static String TAG = "IOIO";
 	private final static String TAG_AUDIO = "MainActivity-AudioManager";
@@ -86,7 +90,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 	private int progressStatus = 0;
 	
 	private Camera mCamera;
-	//private Camera.Parameters mCamParameters;
+//	private Camera.Parameters mCamParameters;
 	private SurfaceView mPreview;
 	private SurfaceHolder mPreviewHolder = null;
 	private PictureCallback mPicture;
@@ -823,7 +827,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 		if (locationTrackPermitted) {
 			 if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 				Log.d(TAG, "Showing Enable GPS Dialog");
-		        new EnableGpsDialogFragment().show(getFragmentManager(), "enableGpsDialog");
+				new EnableGpsDialogFragment().show(getFragmentManager(), "enableGpsDialog");
 			} else {
 				 if (!mBTAdapter.isEnabled()) {
 					Log.d(TAG, "Showing Enable Bluetooth Dialog");
@@ -904,10 +908,19 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 		// Preview should become visible and ready to take a photo
 		if (mCamera == null) {
 			mCamera = getCameraInstance();
-			mCamera.setDisplayOrientation(90);
+			if (Build.VERSION.SDK_INT >= 11) {
+				mCamera.setDisplayOrientation(90);
+			}
 			Log.d(TAG, "Camera opened");
 			
 			try {
+				Camera.Parameters params = mCamera.getParameters();
+				params.setPictureSize(320, 240);
+//				List<Camera.Size> sz = params.getSupportedPictureSizes();
+//				for (Camera.Size s : sz) {
+//					Log.d(TAG, "PIC SIZES: " + s.height + "x" + s.width);
+//				}
+				mCamera.setParameters(params);
     			mCamera.setPreviewDisplay(holder);
 //    			mCamera.startPreview();
 	        } catch (IOException e) {
@@ -921,11 +934,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         Camera cam = null;
         try {
         	// Check if the device has a front-facing camera
-        	if (Camera.getNumberOfCameras() > 1) {
-        		cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        	if (Build.VERSION.SDK_INT > 11) {
+	        	if (Camera.getNumberOfCameras() > 1) {
+	        		cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+	        	} else {
+	        		// There is only one back-facing camera
+	        		cam = Camera.open(); // attempt to get a Camera instance
+	        	}
         	} else {
-        		// There is only one back-facing camera
-        		cam = Camera.open(); // attempt to get a Camera instance
+        		cam = Camera.open();
         	}
         }
         catch (Exception e){
