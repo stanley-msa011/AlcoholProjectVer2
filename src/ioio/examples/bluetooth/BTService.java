@@ -13,6 +13,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -258,7 +259,7 @@ public class BTService {
 
             // Create a new listening server socket
             try {
-                if (secure) {
+                if (secure || Build.VERSION.SDK_INT < 11) {
                     tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE,
                         MY_UUID_SECURE);
                 } else {
@@ -348,7 +349,7 @@ public class BTService {
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
-                if (secure) {
+                if (secure || Build.VERSION.SDK_INT < 11) {
                     tmp = device.createRfcommSocketToServiceRecord(
                             MY_UUID_SECURE);
                 } else {
@@ -446,7 +447,12 @@ public class BTService {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
-                    buffer = Arrays.copyOf(buffer, bytes);
+                    if (Build.VERSION.SDK_INT > 8) {
+                    	buffer = Arrays.copyOf(buffer, bytes);
+                    } else {
+                    	for (int i=0; i<bytes; i++)
+                    		buffer[i] = buffer[i];
+                    }
                     for(int i=0; i<bytes; i++) {
                     	if (buffer[i] == 97) { // == 'a'
                     		//Log.i("Run", lineString+" "+lineString.length()+" "+lineString.indexOf("\r"));

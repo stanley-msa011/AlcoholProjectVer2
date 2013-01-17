@@ -4,6 +4,7 @@ import ioio.examples.hello.BracHistoryActivity;
 import ioio.examples.hello.GalleryActivity;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.MainActivity;
+import ioio.examples.hello.MainLegacyActivity;
 import ioio.examples.hello.OldPrefSettingActivity;
 import ioio.examples.hello.PrefSettingActivity;
 import ioio.examples.hello.R;
@@ -90,10 +91,15 @@ public class GameMenuHandler {
 				case 0:	//MainActivity
 					SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(ga);
 			        boolean fake = sp.getBoolean("use_fake_data", false);
-			        if (fake)
+			        if (fake) {
 			        	newActivity = new Intent(context, TestActivity.class);
-			        else
-			        	newActivity = new Intent(context, MainActivity.class);
+			        } else {
+			        	if (Build.VERSION.SDK_INT < 11) {
+							newActivity = new Intent(context, MainLegacyActivity.class);  
+						} else {
+							newActivity = new Intent(context, MainActivity.class);
+						}
+			        }
 					ga.startActivityForResult(newActivity, REQUEST_TEST);  
 					break;
 				case 1: //Dummy (Record of TreeGame)
