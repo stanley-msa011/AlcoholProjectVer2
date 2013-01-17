@@ -220,6 +220,7 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.main);
 		
 		findViews();
@@ -316,7 +317,8 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
             	        				for (int i = 0; i < PHOTO_COUNT; i++) {
             	                			try {
             	                				mCamera.takePicture(null, null, mPicture);
-            	        						Thread.sleep(1000);
+            	        						Thread.sleep(2000);
+            	        						mCamera.startPreview();
             	        					} catch (InterruptedException e) {
             	        						Log.e(TAG, "Camera could not take picture: " + e.getMessage());
             	        					} catch (NullPointerException npe) {
@@ -984,9 +986,6 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	        mediaFile = new File(sessionDir.getPath() + File.separator + "IMG_"+ dirTimeStamp + "_" + pictureCount + ".jpg");
 	        //Log.d(TAG, "File name: " + mediaFile.getPath());
 	        pictureCount++;
-	    /*} else if(type == MEDIA_TYPE_VIDEO) {
-	        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-	        "VID_"+ timeStamp + ".mp4");*/
 	    } else {
 	        return null;
 	    }

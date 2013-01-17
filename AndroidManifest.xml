@@ -22,6 +22,14 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <permission android:name="ioio.examples.hello.permission.C2D_MESSAGE" android:protectionLevel="signature" />
 	<uses-permission android:name="ioio.examples.hello.permission.C2D_MESSAGE" /> 
+	
+	<supports-screens 
+        android:anyDensity="true" 
+    	android:largeScreens="true"
+    	android:normalScreens="true" 
+    	android:smallScreens="true"
+    	android:resizeable="true"/>
+	
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"

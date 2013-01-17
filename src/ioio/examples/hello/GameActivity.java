@@ -117,7 +117,11 @@ public class GameActivity extends Activity{
 			boolean notify = intent.getBooleanExtra("notify", false);
 			if (notify){
 				Intent newActivity;
-				newActivity = new Intent(context, MainActivity.class);  
+				if (Build.VERSION.SDK_INT < 11) {
+					newActivity = new Intent(context, MainLegacyActivity.class);  
+				} else {
+					newActivity = new Intent(context, MainActivity.class);
+				}
 				startActivityForResult(newActivity, REQUEST_TEST);
 			}
 			String msg = intent.getStringExtra("msgmsg");
@@ -184,7 +188,11 @@ public class GameActivity extends Activity{
 			boolean notify = intent.getBooleanExtra("notify", false);
 			if (notify){
 				Intent newActivity;
-				newActivity = new Intent(context, MainActivity.class);  
+				if (Build.VERSION.SDK_INT < 11) {
+					newActivity = new Intent(context, MainLegacyActivity.class);  
+				} else {
+					newActivity = new Intent(context, MainActivity.class);
+				}
 				startActivityForResult(newActivity, REQUEST_TEST);
 			}
 			String msg = intent.getStringExtra("msgmsg");
