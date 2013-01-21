@@ -2,6 +2,7 @@ package ioio.examples.hello;
 
 import ioio.examples.bluetooth.BTDeviceList;
 import ioio.examples.bluetooth.BTService;
+import ioio.examples.hello.MainActivity.CheckDeviceDialogFragment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,6 +18,8 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -130,6 +133,7 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	private LocationManager mLocationManager;
 	private Location mLoc = null;
 	private TextView tvLatLng;
+	private boolean deviceChecked;
 	private boolean locationTrackPermitted;
 	private boolean permissionChecked;
 	private boolean locationChecked;
@@ -188,10 +192,14 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
     		R.drawable.balloon7,
     		R.drawable.balloon8,
     		R.drawable.balloon9,
-    		R.drawable.count_go,
+    		R.drawable.count_go_5,
+    		R.drawable.count_go_4,
+    		R.drawable.count_go_3,
+    		R.drawable.count_go_2,
+    		R.drawable.count_go_1,
     		R.drawable.count_end
     		};
-    private Bitmap[] balloonsBM = new Bitmap[12];
+    private Bitmap[] balloonsBM = new Bitmap[16];
     private int bDraw = 0;
     private long blowStartTime;
     private long blowEndTime;
@@ -302,12 +310,11 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
             	        @Override
             		        public void run() {
             	        		Log.d(TAG, "Countdown animation is stopping");
-            	        		state = STATE_RUN;
+//            	        		state = STATE_RUN;
             	        		runOnUiThread(new Runnable() { 
 	        				        public void run() {
 	        				        	imgCountdown.setVisibility(View.INVISIBLE);
 	        				        	imgCountdown2.setVisibility(View.VISIBLE);
-//	        				        	imgCountdown2.setImageResource(R.drawable.count_go);
 	        				        	imgCountdown2.setImageBitmap(balloonsBM[10]);
 	        				        } 
 	        				    });
@@ -319,10 +326,11 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
             	                				mCamera.takePicture(null, null, mPicture);
             	        						Thread.sleep(2000);
             	        						mCamera.startPreview();
-            	        					} catch (InterruptedException e) {
-            	        						Log.e(TAG, "Camera could not take picture: " + e.getMessage());
+            	        						state = STATE_RUN;
+            	                			} catch (InterruptedException e) {
+            	        						Log.e(TAG, "Thread Interrupted Exception! Camera could not take picture: " + e.getMessage());
             	        					} catch (NullPointerException npe) {
-            	        						Log.e(TAG, "Camera could not take picture: " + npe.getMessage());
+            	        						Log.e(TAG, "Null Pointer Exception! Camera could not take picture: " + npe.getMessage());
             	        					}
             	                    	}
             	        			}
@@ -331,6 +339,8 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
             		    };
             	        timer.schedule(timerTask, totalDuration);
 //            	        updateUILocation(mLoc);
+            	        if (locationTrackPermitted)
+            	        	initLocationTrack();
             		}
                 	
                 	if (state == STATE_RUN) {
@@ -348,7 +358,6 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	                        	if (diff > BLOW_SENSE_THRESHOLD && diff < 20000.f && !isPeak) {
 	                        		isPeak = true;
 	                        		blowStartTime = System.nanoTime();
-//	                        		bDraw = 9;
 	                        		if (bDraw < 18) {
 	                        			bDraw++;
 	                        		}
@@ -365,8 +374,10 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	                        			blowEndTime = System.nanoTime();
 	                        			blowDuration += (blowEndTime - blowStartTime) / NANO_TIME;
 	                        			blowStartTime = blowEndTime;
+	                        			imgCountdown2.setImageBitmap(balloonsBM[(int)blowDuration + 10]);
 	                        			Log.d(TAG, "BT data Blow start time: " + blowStartTime + "Blow end time: " + blowEndTime);
 	                        			Log.d(TAG, "BT data duration: " + blowDuration);
+	                        			
 	                        			if (blowDuration > TOTAL_BLOW_DURATION) {
 	                        				// User has blown the required amount of time
 	                        				// Close the file and finish the activity
@@ -375,8 +386,7 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	                    				    mpBlowEnd.start();
 	                    				    runOnUiThread(new Runnable() { 
 	        	        				        public void run() {
-//	        	        				        	imgCountdown2.setImageResource(R.drawable.count_end);
-	        	        				        	imgCountdown2.setImageBitmap(balloonsBM[11]);
+	        	        				        	imgCountdown2.setImageBitmap(balloonsBM[15]);
 	        	        				        }
 	        	        				    });
 	                        				Intent i_return = new Intent();
@@ -385,12 +395,8 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	                        				i_return.putExtras(bData);
 	                        				setResult(RESULT_OK, i_return);
 	                        				state = STATE_COMPLETE;
-//	                        				for (int i=0; i<11; i++) {
-//	                        					balloonsBM[i].recycle();
-//	                        				}
 	                        				finish();
 	                        			} else {
-//	                        				bDraw = 9;
 	                        				if (bDraw < 18) {
 	                        					bDraw++;
 	                        				}
@@ -417,7 +423,6 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	                        	}
 	                        	runOnUiThread(new Runnable() { 
 	        				        public void run() {
-//	        				        	ivBalloonLoader.setImageResource(balloons[bDraw/2]);
 	        				        	ivBalloonLoader.setImageBitmap(balloonsBM[bDraw/2]);
 	        				        } 
 	        				    });
@@ -627,7 +632,7 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
     public void onResume() {
     	super.onResume();
     	Log.d(TAG, "Resuming...");
-    	for (int i = 0; i < 12; i++) {
+    	for (int i = 0; i < 16; i++) {
     		balloonsBM[i] = BitmapFactory.decodeResource(this.getResources(), balloons[i]);
     	}
     	switch (state) {
@@ -636,16 +641,21 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 	        // This verification should be done during onStart() because the system calls this method
 	        // when the user returns to the activity, which ensures the desired location provider is
 	        // enabled each time the activity resumes from the stopped state.
-			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
-	        if (!sp.getBoolean("enable_gps_check", true)) {
-	        	Log.d(TAG, "Settings FALSE");
-	        	locationTrackPermitted = false;
-	        	permissionChecked = true;
-	        }
-			if (!permissionChecked)
-				runPermissionCheck();
-			else
-				runSensorCheck();
+			if (!deviceChecked) {
+				deviceChecked = true;
+				checkDeviceDialog();
+			} else {
+				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+		        if (!sp.getBoolean("enable_gps_check", true)) {
+		        	Log.d(TAG, "Settings FALSE");
+		        	locationTrackPermitted = false;
+		        	permissionChecked = true;
+		        }
+				if (!permissionChecked)
+					runPermissionCheck();
+				else
+					runSensorCheck();
+			}
 			break;
 		case STATE_BT_FINDING:
 			// Run location tracking after sensor checking is completed
@@ -662,8 +672,8 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 			// The mobile device is trying to connect to the
 			// Bluetooth device. Check if mBTService is connected yet.
 			if (mBTService.getState() == BTService.STATE_NONE) {
-				if (DEBUG_MODE) Log.d(TAG, "Setting state to STATE_RUN");
-				state = STATE_RUN;
+//				if (DEBUG_MODE) Log.d(TAG, "Setting state to STATE_RUN");
+//				state = STATE_RUN;
 				mBTService.start();
 			}
 //			while (mBTService.getState() != BTService.STATE_CONNECTED) {
@@ -683,7 +693,7 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
     	Log.d(TAG, "Camera is released");
     	mLocationManager.removeUpdates(locListener);
     	Log.d(TAG, "Location listener stopped updating");
-    	for (int i = 0; i < 12; i++) {
+    	for (int i = 0; i < 16; i++) {
     		if (!balloonsBM[i].isRecycled()) {
     			balloonsBM[i].recycle();
     		}
@@ -780,12 +790,12 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
             if (resultCode == Activity.RESULT_OK) {
             	Log.d(TAG, "Returned from Bluetooth enablement");
                 // Bluetooth is now enabled, now to look for the device to connect to
-            	Toast.makeText(this, "Bluetooth is enabled", Toast.LENGTH_LONG).show();
+            	Toast.makeText(this, "藍牙已啟動", Toast.LENGTH_LONG).show();
             	state = STATE_BT_FINDING;
             } else {
                 // User did not enable Bluetooth or an error occurred
                 Log.d(TAG, "User did not enable BT");
-                Toast.makeText(this, "User did not enable Bluetooth", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "啟動藍牙失敗，本測試將停止。", Toast.LENGTH_LONG).show();
                 finish();
             }
             break;
@@ -813,7 +823,7 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 //					 state = STATE_BT_CONNECTING;
 					 setupBTTransfer();
 					 Intent serverIntent = new Intent(this, BTDeviceList.class);
-					 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+					 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 				 }
 			}
 		} else if (!mBTAdapter.isEnabled()) {
@@ -823,8 +833,8 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 //			state = STATE_BT_CONNECTING;
 			setupBTTransfer();
         	Intent serverIntent = new Intent(this, BTDeviceList.class);
-//        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
-        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+//        	startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
 		}
 	}
 	
@@ -889,6 +899,9 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
 			Log.d(TAG, "Camera opened");
 			
 			try {
+				Camera.Parameters params = mCamera.getParameters();
+				params.setPictureSize(320, 240);
+				mCamera.setParameters(params);
     			mCamera.setPreviewDisplay(holder);
 //    			mCamera.startPreview();
 	        } catch (IOException e) {
@@ -1267,6 +1280,37 @@ public class MainLegacyActivity extends Activity implements SurfaceHolder.Callba
     /*
      * End Bluetooth-related methods
      */
+    
+    private void checkDeviceDialog() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+    	builder.setTitle(R.string.check_device_title)
+    		.setMessage(R.string.check_device_dialog)
+    		.setPositiveButton(R.string.check_device, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(mContext);
+			        if (!sp.getBoolean("enable_gps_check", true)) {
+			        	Log.d(TAG, "Settings FALSE");
+			        	locationTrackPermitted = false;
+			        	permissionChecked = true;
+			        }
+					if (!permissionChecked)
+						runPermissionCheck();
+					else
+						runSensorCheck();
+				}
+			})
+			.setOnCancelListener(new DialogInterface.OnCancelListener() {
+				// If user cancels this dialog (by pressing back)
+		    	// Leave the activity. Assume device is not turned on.
+		    	@Override
+		    	public void onCancel(DialogInterface dialog) {
+		    		finish();
+		    	}
+			});
+    	AlertDialog dialog = builder.create();
+    	dialog.show();
+    }
     
     private void writeIntoFile(float value) {
 		try {

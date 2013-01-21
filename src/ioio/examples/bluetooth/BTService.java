@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.UUID;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -20,6 +21,7 @@ import android.os.Message;
 import android.util.Log;
 
 
+@SuppressLint("NewApi")
 public class BTService {
 	   // Debugging
     private static final String TAG = "BluetoothChatService";
