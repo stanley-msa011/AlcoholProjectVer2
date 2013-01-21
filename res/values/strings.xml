@@ -52,6 +52,11 @@
     <string name="none_found">No devices found</string>
     <string name="scanning">Scanning for devices&#8230;</string>
     <string name="select_device">Select a device to connect</string>
+    
+    <!-- Check Device Power On/Off -->
+    <string name="check_device_title">開啟酒測裝置</string>
+    <string name="check_device_dialog">請確認您是否已將您的酒測裝置的電源開啟。確認開啟後請按「確定」並開始酒測。</string>
+    <string name="check_device">確定</string>
 
     <!-- Settings Page -->
     <string name="tvSettingsHead">Settings</string>
