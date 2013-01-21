@@ -23,11 +23,13 @@ import java.util.Random;
 import ioio.examples.hello.R;
 
 import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
@@ -105,7 +107,14 @@ public class GCMIntentService extends GCMBaseIntentService {
         List< ActivityManager.RunningTaskInfo > taskInfo = am.getRunningTasks(1);
         String topClass = taskInfo.get(0).topActivity.getClassName();
         Log.d("Activity name target",GameActivity.class.getCanonicalName());
-        if (topClass.equals(GameActivity.class.getCanonicalName())){
+        
+        PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
+        boolean isScreenOn = powerManager.isScreenOn();
+        
+        KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        boolean locked = km.inKeyguardRestrictedInputMode();
+        
+        if (topClass.equals(GameActivity.class.getCanonicalName()) && isScreenOn && !locked){
         	Log.d("Activity name OK",taskInfo.get(0).topActivity.getClassName());
         	GameActivity.showCheerMessage(message);
         }

@@ -20,9 +20,10 @@
 	    android:layout_width="256dp"
 	    android:layout_height="256dp"
 	    android:scaleType="fitXY"
+	    android:layout_marginBottom="26dp"
 	    android:adjustViewBounds="true"
-	    android:layout_alignParentLeft="true"
-	    android:layout_alignParentBottom="true"
+	    android:layout_alignLeft="@+id/gallery_bg_all"
+	    android:layout_alignBottom="@+id/gallery_bg_all"
 	 />
 	
 	    <!--  ImageView

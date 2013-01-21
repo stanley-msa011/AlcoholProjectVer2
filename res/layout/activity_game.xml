@@ -13,6 +13,7 @@
         android:layout_height="400dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
         android:clickable="false"
         android:scaleType="fitXY"
         />
@@ -23,6 +24,7 @@
         android:layout_height="400dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
         android:clickable="false"
         android:scaleType="fitXY"
         />

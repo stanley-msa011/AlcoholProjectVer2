@@ -49,12 +49,14 @@ public class InteractivePopupWindowHandler {
 		}
 	}
 	public void showPopWindow(String pid){
-		if (popupWindow.isShowing() == false){
+		if (popupWindow.isShowing())
+			popupWindow.dismiss();
+		//if (popupWindow.isShowing() == false){
 			String cn = ga.getInteractiveGameHandler().getCodeNameByPID(pid);
 			popText.setText(cn + "\n為您加油");
 			popupWindow.setOutsideTouchable(false);
 			bg.post( showThread);
-		}
+		//}
 	}
 	
 	private class showPopWindowThread implements Runnable{

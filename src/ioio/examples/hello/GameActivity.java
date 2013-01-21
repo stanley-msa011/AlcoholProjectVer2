@@ -262,7 +262,8 @@ public class GameActivity extends Activity{
             GCMRegistrar.register(this, CommonUtilities.SENDER_ID);
         }
 		else {
-            if (GCMRegistrar.isRegisteredOnServer(this))  Log.d("GCM","skip register");
+            if (GCMRegistrar.isRegisteredOnServer(this)) 
+            	Log.d("GCM","skip register");
             else {
             	Log.d("GCM","start register");
                 mRegisterTask = new AsyncTask<Void, Void, Void>() {
