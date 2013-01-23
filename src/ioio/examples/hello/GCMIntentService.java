@@ -18,7 +18,6 @@ package ioio.examples.hello;
 import static ioio.examples.hello.CommonUtilities.SENDER_ID;
 
 import java.util.List;
-import java.util.Random;
 
 import ioio.examples.hello.R;
 
@@ -30,7 +29,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
-import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
@@ -48,7 +46,6 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     protected void onRegistered(Context context, String registrationId) {
         ServerUtilities.register(context, registrationId);
-        Log.d("GCMService","isRegistered");
     }
 
     @Override
@@ -60,11 +57,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onMessage(Context context, Intent intent) {
-    	//String message = "Receive Msg";
-    	Log.d("GCM receive string","Receive");
-    	//String message =  "MESSAGE TEST";
     	String message = intent.getExtras().getString("price");
-    	//Log.d("GCM receive string",message);
         generateNotification(context, message);
     }
 
@@ -82,11 +75,8 @@ public class GCMIntentService extends GCMBaseIntentService {
     }
 
     
-    private static final long[] vibrate = {0,50,100,150,200};
-    /**
-     * Issues a notification to inform the user that server has sent a message.
-     */
-    private static void generateNotification(Context context, String message) {
+    @SuppressWarnings("deprecation")
+	private static void generateNotification(Context context, String message) {
     	int icon = R.drawable.icon;
         long when = System.currentTimeMillis();
         NotificationManager notificationManager = (NotificationManager)  context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -101,12 +91,10 @@ public class GCMIntentService extends GCMBaseIntentService {
         for (int i=0;i<message.length();++i){
         	coding += message.charAt(i);
         }
-        //context.startActivity(notificationIntent);  
        
         ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         List< ActivityManager.RunningTaskInfo > taskInfo = am.getRunningTasks(1);
         String topClass = taskInfo.get(0).topActivity.getClassName();
-        Log.d("Activity name target",GameActivity.class.getCanonicalName());
         
         PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
         boolean isScreenOn = powerManager.isScreenOn();
@@ -115,13 +103,9 @@ public class GCMIntentService extends GCMBaseIntentService {
         boolean locked = km.inKeyguardRestrictedInputMode();
         
         if (topClass.equals(GameActivity.class.getCanonicalName()) && isScreenOn && !locked){
-        	Log.d("Activity name OK",taskInfo.get(0).topActivity.getClassName());
         	GameActivity.showCheerMessage(message);
         }
         else{
-        	//Log.d("Activity name",taskInfo.get(0).topActivity.getClassName());
-        
-        	Log.d("MESSAGE CODE",message);
         	PendingIntent intent =  PendingIntent.getActivity(context, coding, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         	notification.setLatestEventInfo(context, title,  "有人為您加油", intent);
         	notification.flags |= Notification.FLAG_AUTO_CANCEL;

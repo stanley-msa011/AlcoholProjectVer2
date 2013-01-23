@@ -8,35 +8,25 @@ import game.GameDB;
 import game.GameState;
 import game.gallery.GalleryAdapter;
 import ioio.examples.hello.R;
-import ioio.examples.hello.R.drawable;
-import ioio.examples.hello.R.id;
-import ioio.examples.hello.R.layout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Gallery;
 import android.widget.ImageView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class GalleryActivity extends Activity {
@@ -58,7 +48,7 @@ public class GalleryActivity extends Activity {
 	private GameDB gDB;
 	private BracDbAdapter bDb;
 	
-	private static final int TOTAL_VIEW_PAGE = 10;
+	private static final int TOTAL_VIEW_PAGE = 20;
 	private AnimeListener animeListener;
 	
 	
@@ -149,12 +139,8 @@ public class GalleryActivity extends Activity {
 	
 	protected void onStop(){
 		super.onStop();
-		i_adapter.notifyDataSetInvalidated();
-		i_adapter.clearAll();
-		gallery_list.clear();
-		//gallery_adapter.notifyDataSetInvalidated();
+		cleanMemory();
 		BackgroundHandler.cleanBitmaps();
-		System.gc();
 	}
 	
 	private int getGalleryListSize(){
@@ -178,13 +164,10 @@ public class GalleryActivity extends Activity {
 			int coin = stateList[i].coin;
 
 			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(state, coin);
-			//int tree_pic = BackgroundHandler.getTreeDrawableId(state);
 			brac_test_list.moveToPosition(i);
 			String date = brac_test_list.getString(1);
 			
 			item.put("pic",bg_pic);
-			//item.put("tree",tree_pic );
-			//item.put("coin", coin);
 			item.put("date", date);
 			gallery_list.add(item);
 		}
@@ -203,10 +186,7 @@ public class GalleryActivity extends Activity {
 				if (nextButton.isClickable() && nextButton.isEnabled()){
 					nextButton.setEnabled(false);
 					nextButton.setClickable(false);
-					i_adapter.notifyDataSetInvalidated();
-					i_adapter.clearAll();
-					gallery_list.clear();
-					System.gc();
+					cleanMemory();
 					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 					newActivity.putExtra("PAGE", cur_page+1);
 					newActivity.putExtra("SHOW", 0);
@@ -226,10 +206,7 @@ public class GalleryActivity extends Activity {
 				if (prevButton.isClickable() && prevButton.isEnabled()){
 					prevButton.setEnabled(false);
 					prevButton.setClickable(false);
-					i_adapter.notifyDataSetInvalidated();
-					i_adapter.clearAll();
-					gallery_list.clear();
-					System.gc();
+					cleanMemory();
 					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 					newActivity.putExtra("PAGE", cur_page-1);
 					newActivity.putExtra("SHOW", -1);
@@ -248,9 +225,7 @@ public class GalleryActivity extends Activity {
 		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 			int set_page = Integer.parseInt(curPage.getText().toString());
 			if (set_page <= max_page && set_page >=1){
-				i_adapter.notifyDataSetInvalidated();
-				i_adapter.clearAll();
-				gallery_list.clear();
+				cleanMemory();
 				Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 				newActivity.putExtra("PAGE", set_page);
 				galleryActivity.startActivity(newActivity);
@@ -299,6 +274,7 @@ public class GalleryActivity extends Activity {
 			 r = galleryActivity.getResources();
 		 }
 		 
+		@SuppressWarnings("deprecation")
 		@Override
 		public boolean onItemLongClick(AdapterView<?> arg0, View arg1,int arg2, long arg3) {
 			anime1.setClickable(true);
@@ -324,5 +300,12 @@ public class GalleryActivity extends Activity {
 		anime1.setClickable(false);
 		anime1.clearAnimation();
 		anime1.setVisibility(View.INVISIBLE);
+	}
+	
+	private void cleanMemory(){
+		i_adapter.notifyDataSetInvalidated();
+		i_adapter.clearAll();
+		gallery_list.clear();
+		System.gc();
 	}
 }

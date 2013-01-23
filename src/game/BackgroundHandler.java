@@ -14,42 +14,29 @@ public class BackgroundHandler {
 			R.drawable.w10,R.drawable.w11,R.drawable.w12,R.drawable.w13,R.drawable.w14,
 			R.drawable.w15,R.drawable.w16,R.drawable.w17,R.drawable.w18,R.drawable.w19,
 			R.drawable.w20,R.drawable.w21,R.drawable.w22,R.drawable.w23,R.drawable.w24,
-			R.drawable.w25,R.drawable.w26,R.drawable.w27,R.drawable.w28,R.drawable.w29,
-			R.drawable.w30,R.drawable.w31,R.drawable.w32,R.drawable.w33,R.drawable.w34
+			R.drawable.w25,R.drawable.w26,R.drawable.w27
 	};
 	
-	/*private static final int[] treePics ={
-			R.drawable.tree1,
-			R.drawable.tree2,
-			R.drawable.tree3,
-			R.drawable.tree4,
-			R.drawable.tree5,
-			R.drawable.tree6,
-			R.drawable.tree7
-		};
-	*/
 	private static Bitmap[] bg_bitmap = null;
 	
 	public static int getBackgroundDrawableId(int state, int coin_num){
-		int idx = state*(GameState.MAX_COINS+1) + coin_num;
-		idx = Background_pics.length - idx -1;
+		int idx = Background_pics.length - coin_num -1;
+		if (idx<0 || idx >= Background_pics.length)
+			return Background_pics [0];
 		return Background_pics [idx];
 	}
 	
 	public static int getBackgroundIdx(int state, int coin_num){
-		int idx = state*(GameState.MAX_COINS+1) + coin_num;
-		idx = Background_pics.length - idx -1;
+		int idx = Background_pics.length - coin_num -1;
+		if (idx<0 || idx >= Background_pics.length)
+			return 0;
 		return idx;
 	}
 	
-	/*public static int getTreeDrawableId(int state){
-		return treePics[state];
-	}
-	*/
 	public static Bitmap getBackgroundBitmap(int state, int coin_num,Resources r){
 		synchronized(lock){
 			if (bg_bitmap == null){
-				bg_bitmap = new Bitmap[35];
+				bg_bitmap = new Bitmap[Background_pics.length];
 				 	for (int i=0;i<bg_bitmap.length;++i){
 				 		Bitmap tmp = BitmapFactory.decodeResource(r, BackgroundHandler.Background_pics[i]);
 				 		bg_bitmap[i] = Bitmap.createScaledBitmap(tmp, 100, 100, true);//105,192

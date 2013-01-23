@@ -4,14 +4,10 @@ import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.R;
 import android.content.Context;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -100,9 +96,9 @@ public class GamePopupWindowHandler {
         int result = test_result;
         if (result == BracDataHandler.ERROR);
 		else if (result == BracDataHandler.HaveAlcohol)
-			ga.loseCoin();
+			ga.changeView();
 		else if (result == BracDataHandler.NoAlcohol)
-			ga.getCoin();
+			ga.changeView();
 	}
 	private class showPopWindowThread implements Runnable{
 		@Override

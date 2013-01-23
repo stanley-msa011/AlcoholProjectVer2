@@ -15,46 +15,18 @@ public class BracDbAdapter {
 	public final static String KEY_DATE = "date";
 	public final static String KEY_BRAC = "brac";
 	
-//	private final static String DATABASE_NAME = "Brac_History";
 	private final static String DATABASE_TABLE = "user_history";
-//	private final static int DATABASE_VERSION = 2;
-	
-//	private final static String DATABASE_CREATE =
-//			"create table " + DATABASE_TABLE + " (_id integer primary key autoincrement, "
-//	        + KEY_DATE + " text not null, " + KEY_BRAC + " text not null);";
 	
 	private final Context mContext;
 	
-	//private DatabaseHelper mDbHelper;
     private SQLiteOpenHelper mDbHelper;
 	private SQLiteDatabase mDb;
-    
-    /*private class DatabaseHelper extends SQLiteOpenHelper {
-    	
-    	DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-    	
-    	@Override
-        public void onCreate(SQLiteDatabase db) {
-
-            db.execSQL(DATABASE_CREATE);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
-            db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
-            onCreate(db);
-        }
-    }*/
     
     public BracDbAdapter(Context context) {
     	mContext = context;
     }
     
     public BracDbAdapter open() throws SQLException {
-        //mDbHelper = new DatabaseHelper(mContext);
     	mDbHelper = new DBHelper(mContext);
         mDb = mDbHelper.getWritableDatabase();
         return this;

@@ -31,13 +31,10 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 
@@ -46,12 +43,8 @@ public class GameActivity extends Activity{
 	/*communication with MainACtivity*/
 	private static GameActivity ga = null;
 	public static final int REQUEST_TEST = 99;
-	private static final int MAX_COIN = GameState.MAX_COINS; 
-	//private ImageView[] coin_image = new ImageView[MAX_COIN];
 	private ImageView background;
 	private ImageView background_anime;
-	//private ImageView tree;
-	//private ImageView tree_anime;
 	private TreeGame treeGame=null;
 	private GameDB gDB=null;
 	private Animation appear_anim;
@@ -66,8 +59,6 @@ public class GameActivity extends Activity{
 	
 	private Bitmap cur_bg = null;
 	private Bitmap bg_now = null;
-	//private Bitmap tree_now = null;
-	//private Bitmap tree_prev = null;
 	
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 
@@ -98,8 +89,6 @@ public class GameActivity extends Activity{
 		treeGame=new TreeGame(gState);
 		initBackground();
 		initAnim();
-		//initTreeImage();
-		//initCoinImage();
 		initSettingButton();
 		setImage();
 		gPopWindow = new GamePopupWindowHandler(this);
@@ -131,8 +120,6 @@ public class GameActivity extends Activity{
 		
       	Intent service_intent = new Intent(this, TimerService.class);
       	startService(service_intent);
-      	
-      	//iPopWindow.showPopWindow("xxx");
 	}
 	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -169,21 +156,12 @@ public class GameActivity extends Activity{
 			bg_now.recycle();
 			bg_now = null;
 		}
-		/*if (tree_now != null){
-			tree_now.recycle();
-			tree_now = null;
-		}
-		if (tree_prev != null){
-			tree_prev.recycle();
-			tree_prev = null;
-		}*/
 		super.onDestroy();
 	}
 	
 	protected void onResume(){
 		super.onResume();
 		ga = this;
-		//System.gc();
 		gInteractiveGame.update();
 	}
 	
@@ -207,12 +185,9 @@ public class GameActivity extends Activity{
 		}
 	}
 	public static void showCheerMessage(String msg){
-		if (ga!= null){
-			if (msg != null)
+		if (ga!= null && msg != null)
 				if (ga.iPopWindow != null)
-					
-				ga.iPopWindow.showPopWindow(msg);
-		}
+					ga.iPopWindow.showPopWindow(msg);
 	}
 	
 	
@@ -226,30 +201,9 @@ public class GameActivity extends Activity{
 		/*used for initializing animations*/
 		appear_anim = new AlphaAnimation(0.f,1.f);
 		appear_anim.setDuration(1500);
-		//appear_anim.setStartOffset(30);
 		disappear_anim = new AlphaAnimation(0.7f,0.f);
 		disappear_anim.setDuration(1500);
-		//disappear_anim.setStartOffset(30);
 	}
-	
-	/*private final int[] treeImg = {
-			R.drawable.tree1,R.drawable.tree2,R.drawable.tree4,
-			R.drawable.tree4,R.drawable.tree5,R.drawable.tree6,
-			R.drawable.tree7
-	};*/
-	
-	/*private void initTreeImage(){
-		//used for initializing tree images
-		tree = (ImageView) findViewById(R.id.tree1);
-		tree_anime = (ImageView) findViewById(R.id.tree2);
-	}*/
-	/*private void initCoinImage(){
-		//used for initializing coin images
-		coin_image[0] = (ImageView) findViewById(R.id.coin1);
-		coin_image[1] = (ImageView) findViewById(R.id.coin2);
-		coin_image[2] = (ImageView) findViewById(R.id.coin3);
-		coin_image[3] = (ImageView) findViewById(R.id.coin4);
-	}	*/
 	
 	private void initRegistration(){
 		
@@ -257,15 +211,11 @@ public class GameActivity extends Activity{
 		GCMRegistrar.checkManifest(this);
 		registerReceiver(mHandleMessageReceiver,  new IntentFilter("GCM_RECEIVE_ACTION"));
 		regId = GCMRegistrar.getRegistrationId(this);
-        if (regId.equals("")){
-        	Log.d("GCM","start register 0");
+        if (regId.equals(""))
             GCMRegistrar.register(this, CommonUtilities.SENDER_ID);
-        }
 		else {
-            if (GCMRegistrar.isRegisteredOnServer(this)) 
-            	Log.d("GCM","skip register");
+            if (GCMRegistrar.isRegisteredOnServer(this));
             else {
-            	Log.d("GCM","start register");
                 mRegisterTask = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
@@ -293,14 +243,7 @@ public class GameActivity extends Activity{
 		if (cur_bg != null)
 			cur_bg.recycle();
 		GameState gState=treeGame.getGameState();
-		//Bitmap tmp = BitmapFactory.decodeResource(this.getResources(),treeImg[gState.state]);
-		//tree_now = Bitmap.createScaledBitmap(tmp, 256, 256, true);
-		//tmp.recycle();
-		//tree.setImageBitmap(tree_now);
-		/*for (int i=0;i<MAX_COIN;++i)
-			coin_image[i].setVisibility(ImageView.INVISIBLE);
-		for (int i=0;i<gState.coin;++i)
-			coin_image[i].setVisibility(ImageView.VISIBLE);*/
+
 		cur_bg = BitmapFactory.decodeResource(this.getResources(), BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
 		background.setImageBitmap(cur_bg);
 	}
@@ -308,61 +251,9 @@ public class GameActivity extends Activity{
 	
 	private void setImageChange(GameState oldState){
 		GameState gState=treeGame.getGameState();
-		/*if (oldState.coin < gState.coin){
-			if (oldState.coin ==GameState.MIN_COINS && gState.coin == GameState.MAX_COINS){
-				//get coin because state drop
-				for (int i=oldState.coin;i<gState.coin;++i){
-					coin_image[i].setVisibility(View.VISIBLE);
-					coin_image[i].startAnimation(appear_anim);
-				}
-			}
-			else{
-				Animation a;
-				a = AnimationUtils.loadAnimation(this, R.anim.coin_appear_anim);
-				for (int i=oldState.coin;i<gState.coin;++i){
-					coin_image[i].setVisibility(View.VISIBLE);
-					coin_image[i].clearAnimation();
-					coin_image[i].startAnimation(a);
-				}
-			}
-		}
-		else if (oldState.coin > gState.coin){
-			if (oldState.coin ==GameState.MAX_COINS && gState.coin == GameState.MIN_COINS){
-				//lose coin because state increases
-				for (int i=gState.coin;i<oldState.coin;++i){
-					coin_image[i].startAnimation(disappear_anim);
-					coin_image[i].setVisibility(ImageView.INVISIBLE);
-				}
-			}
-			else{
-				Animation a;
-				a = AnimationUtils.loadAnimation(this, R.anim.coin_disappear_anim_type1);
-				for (int i=gState.coin;i<oldState.coin;++i){
-					coin_image[i].clearAnimation();
-					coin_image[i].startAnimation(a);
-					coin_image[i].setVisibility(ImageView.INVISIBLE);
-				}
-			}
-		}*/
 		
-		/*if (oldState.state != gState.state){
-			if (tree_prev != null){
-				tree_prev.recycle();
-				tree_prev = null;
-			}
-			tree_prev = tree_now;
-			Bitmap tmp = BitmapFactory.decodeResource(this.getResources(),treeImg[gState.state]);
-			tree_now = Bitmap.createScaledBitmap(tmp, 256, 256, true);
-			tmp.recycle();
-			tree_anime.setImageBitmap(tree_prev);
-			tree_anime.setVisibility(View.VISIBLE);
-			tree.setImageBitmap(tree_now);
-			tree_anime.startAnimation(disappear_anim);
-			tree.startAnimation(appear_anim);
-			tree_anime.setVisibility(View.INVISIBLE);
-		}*/
-		
-		if (oldState.coin != gState.coin || oldState.state != gState.state){
+		//if (oldState.coin != gState.coin || oldState.state != gState.state){
+		if (oldState.coin != gState.coin){
 			if (bg_now != null){
 				bg_now.recycle();
 				bg_now = null;
@@ -378,11 +269,7 @@ public class GameActivity extends Activity{
 		}
 	}	
 	
-	public void getCoin(){
-		GameState oldState = treeGame.getPrevState();
-		this.setImageChange(oldState);
-	}
-	public void loseCoin(){
+	public void changeView(){
 		GameState oldState = treeGame.getPrevState();
 		this.setImageChange(oldState);
 	}

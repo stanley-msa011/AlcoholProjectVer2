@@ -2,11 +2,8 @@ package database;
 
 import game.BracDataHandler;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
 import android.provider.Settings.Secure;
@@ -14,7 +11,7 @@ import android.util.Log;
 
 public class Reuploader {
 
-	private static Integer lock;
+	private static Object lock;
 	private ReuploadDB rDB;
 	private Context context;
 	private static reUploadData rud;
@@ -24,12 +21,11 @@ public class Reuploader {
 		rDB = new ReuploadDB(activity);
 		context = activity;
 		if (lock == null)
-			lock = new Integer(0);
+			lock = new Object();
 	}
 	
 	
 	public void storeTS(String ts){
-		Log.d("RETRAN","STORING "+ts);
 		synchronized(lock){
 			rDB.storeNotUploadedTimeStamp(ts);
 		}
@@ -41,7 +37,6 @@ public class Reuploader {
 		synchronized(lock){
 				TSs = rDB.getNotUploadedTimeStamps();
 		}
-		Log.d("RETRAN","get TSs");
 		boolean start_run = false;
 		if (rud == null){
 			rud = new reUploadData(TSs);

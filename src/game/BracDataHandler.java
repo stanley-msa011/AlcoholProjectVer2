@@ -4,7 +4,6 @@ import ioio.examples.hello.BracDbAdapter;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
@@ -30,15 +29,12 @@ import database.Reuploader;
 import android.content.Context;
 import android.os.Environment;
 import android.provider.Settings.Secure;
-import android.util.Log;
-
 
 public class BracDataHandler {
 	private String ts;
 	private Context activity_context;
 	private TreeGame treeGame;
 	private GameDB gDB;
-	private String TAG = "BRACDATAHANDLER";
 	private String devId;
 	private Reuploader reuploader;
 	
@@ -80,7 +76,6 @@ public class BracDataHandler {
         
         textFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + ts + ".txt");
         geoFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "geo.txt");
-        boolean hasGeoFile = geoFile.exists();
         
         imageFiles[0] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_1.jpg");
         imageFiles[1] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_2.jpg");
@@ -98,25 +93,22 @@ public class BracDataHandler {
        	}
        	else{
        		result = HaveAlcohol;
-       		treeGame.loseCoin();
+       		treeGame.loseCoin();//Do nothing now
        		gDB.updateState(treeGame.getGameState());
        	}
        	
-       	boolean hasStateFile = false;
        	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");
        	try {
        		BufferedWriter state_writer = new BufferedWriter(new FileWriter(stateFile));
        		state_writer.write(treeGame.toString());
        		state_writer.flush();
        		state_writer.close();
-       		hasStateFile = true;
 		} catch (Exception e) {	
 			e.printStackTrace();	
-			Log.d("Write state", "no state.txt");
 		}
        	
        	/*Connection to server*/
-       	int server_connect = connectingToServer(textFile,geoFile,stateFile,imageFiles,hasGeoFile,hasStateFile);
+       	int server_connect = connectingToServer(textFile,geoFile,stateFile,imageFiles);
 		if (server_connect == ERROR)
 			reuploader.storeTS(ts);
 		
@@ -154,11 +146,11 @@ public class BracDataHandler {
 	
 	public static int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles,boolean hasGeoFile,boolean hasStateFile,String ts,String Id){
 		BracDataHandler bdh = new BracDataHandler(ts,Id);
-		return bdh.connectingToServer(textFile, geoFile, stateFile, imageFiles, hasGeoFile, hasStateFile);
+		return bdh.connectingToServer(textFile, geoFile, stateFile, imageFiles);
 	}
 	
 	
-	private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles,boolean hasGeoFile,boolean hasStateFile){
+	private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles){
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(SERVER_URL);
@@ -172,18 +164,22 @@ public class BracDataHandler {
 			
 			ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
 			mpEntity.addPart("userfile[]", cbFile);
-			if (hasGeoFile){
+			if (geoFile.exists()){
 				ContentBody cbGeoFile = new FileBody(geoFile, "application/octet-stream");
 				mpEntity.addPart("userfile[]", cbGeoFile);
 			}
-			if(hasStateFile){
+			
+			if(stateFile.exists()){
 				ContentBody cbStateFile = new FileBody(stateFile, "application/octet-stream");
 				mpEntity.addPart("userfile[]", cbStateFile);
 			}
 			
-			mpEntity.addPart("userfile[]", new FileBody(imageFiles[0], "image/jpeg"));
-			mpEntity.addPart("userfile[]", new FileBody(imageFiles[1], "image/jpeg"));
-			mpEntity.addPart("userfile[]", new FileBody(imageFiles[2], "image/jpeg"));
+			if (imageFiles[0].exists())
+				mpEntity.addPart("userfile[]", new FileBody(imageFiles[0], "image/jpeg"));
+			if (imageFiles[1].exists())
+				mpEntity.addPart("userfile[]", new FileBody(imageFiles[1], "image/jpeg"));
+			if (imageFiles[2].exists())
+				mpEntity.addPart("userfile[]", new FileBody(imageFiles[2], "image/jpeg"));
 			
 			httpPost.setEntity(mpEntity);
 			

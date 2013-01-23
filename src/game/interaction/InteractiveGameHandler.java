@@ -18,7 +18,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
 import android.provider.Settings.Secure;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Gallery;
@@ -35,7 +34,7 @@ public class InteractiveGameHandler {
 	private InteractiveAdapter i_adapter;
 	private int cur_pos = -1;
 	
-	static private final String myCode = "ME";
+	static private final String myCode = "Me";
 	
 	public InteractiveGameHandler(GameActivity ga){
 		this.ga = ga;
@@ -60,10 +59,7 @@ public class InteractiveGameHandler {
 		for (int i=0;i<stateList.length;++i){
 			HashMap<String,Object> item = new HashMap<String,Object>();
 			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(stateList[i].state, stateList[i].coin);
-			//int tree_pic = BackgroundHandler.getTreeDrawableId(stateList[i].state);
-			
 			item.put("pic",bg_pic);
-			//item.put("tree",tree_pic );
 			item.put("pid", stateList[i].PID);
 			if (stateList[i].PID.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))
 				item.put("code_name",myCode);
@@ -101,8 +97,6 @@ public class InteractiveGameHandler {
 			e.printStackTrace();	
 			return;
 		} 
-		//fake_update();
-		
 	}
 	
 	public String getCodeNameByPID(String pid){
@@ -134,7 +128,6 @@ public class InteractiveGameHandler {
 				result = -1;
 				httpResponse = httpClient.execute(httpPost);
 				String responseString = responseHandler.handleResponse(httpResponse);
-				Log.d("UPDATE STATE",responseString);
 				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
 				if (httpStatusCode == HttpStatus.SC_OK)
 					result = 1;
@@ -153,7 +146,6 @@ public class InteractiveGameHandler {
 	
 	private InteractiveGameState[] parseResponse(String response){
 		response = response.substring(2, response.length()-2);
-		//Log.d("UPDATE STATE",response);
 		String[] tmp = response.split("]," );
 		if (tmp.length==0)
 			return null;
@@ -163,7 +155,6 @@ public class InteractiveGameHandler {
 			if (tmp[i].charAt(0)=='[')
 				tmp[i]=tmp[i].substring(1,tmp[i].length());
 			String[] items = tmp[i].split(",");
-			//Log.d("UPDATE STATE",items[0]+" / " +items[1]+" / "+items[2]);
 			String pid = items[0].substring(1, items[0].length()-1);
 			int state;
 			if (items[1].equals("null"))
@@ -177,8 +168,6 @@ public class InteractiveGameHandler {
 				coin = Integer.valueOf(items[2].substring(1,items[2].length()-1));
 			String name = items[3].substring(1,items[3].length()-1);
 			states[i] = new InteractiveGameState(state,coin,pid,name);
-			
-			Log.d("states update",states[i].toString());
 		}
 		return states;
 	}
@@ -248,10 +237,12 @@ public class InteractiveGameHandler {
 			Thread thread = new Thread(cheer);
 			thread.start();
 			thread.join(3000);
+			/*
 			if (cheer.result==-1)
 				Log.d("GCM","Send fail");
 			else
 				Log.d("GCM","Send Success");
+			*/
 		} catch (Exception e) {
 			e.printStackTrace();	
 			return;
@@ -264,11 +255,9 @@ public class InteractiveGameHandler {
 		public SendCheers(HttpClient httpClient, HttpPost httpPost){
 			this.httpClient = httpClient;
 			this.httpPost = httpPost;
-			 responseHandler=new BasicResponseHandler();
 			result = -1;
 		}
 		public int result;
-		private BasicResponseHandler responseHandler;
 		@Override
 		public void run() {
 			
@@ -277,8 +266,6 @@ public class InteractiveGameHandler {
 			try {
 				httpResponse = httpClient.execute(httpPost);
 				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-				String responseString = responseHandler .handleResponse(httpResponse);
-				Log.e("GCM return", responseString);
 				if (httpStatusCode == HttpStatus.SC_OK)
 					result = 1;
 				else

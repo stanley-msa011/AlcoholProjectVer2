@@ -7,10 +7,8 @@ import android.graphics.Point;
 import android.provider.Settings.Secure;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -81,14 +79,11 @@ public class InteractiveGamePopupWindowHandler {
         
         String my_pid = Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID);
         if (pid.equals(my_pid)){
-        	//popupWindow.setOutsideTouchable(true);
-        	
         	 popText.setText("為自己加油!!");
         	 ok_button.setVisibility(View.INVISIBLE);
         	 no_button.setVisibility(View.INVISIBLE);
         }
         else{
-        	//popupWindow.setOutsideTouchable(false);
         	popText.setText("為"+code_name+"加油?");
        	 	ok_button.setVisibility(View.VISIBLE);
        	 	no_button.setVisibility(View.VISIBLE);

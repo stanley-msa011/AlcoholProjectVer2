@@ -29,76 +29,6 @@
         android:scaleType="fitXY"
         />
     
-    
-    <!-- ImageView
-        android:id="@+id/tree1"
-        android:layout_width="256dp"
-        android:layout_height="256dp"
-        android:scaleType="fitXY"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        /-->
-
-    <!-- ImageView
-        android:id="@+id/tree2"
-        android:layout_width="256dp"
-        android:layout_height="256dp"
-        android:scaleType="fitXY"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        android:visibility="invisible"
-        /-->
-    
-	<!-- ImageView
-	    android:id="@+id/coin1"
-	    android:layout_alignParentLeft="true"
-	    android:layout_alignParentBottom="true"
-	    android:layout_marginLeft="16dp"
-	    android:layout_marginBottom="16dp"
-	    android:layout_width="32dp"
-	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" 
-	    android:clickable="false"
-	    />
-
-	<ImageView
-	    android:id="@+id/coin2"
-	    android:layout_alignParentBottom="true"
-	    android:layout_toRightOf="@+id/coin1"
-	    android:layout_marginLeft="16dp"
-	    android:layout_marginBottom="16dp"
-	    android:layout_width="32dp"
-	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" 
-	    android:clickable="false"
-	    />
-	<ImageView
-	    android:id="@+id/coin3"
-	    android:layout_alignParentBottom="true"
-	    android:layout_toRightOf="@+id/coin2"
-	    android:layout_marginLeft="16dp"
-	    android:layout_marginBottom="16dp"
-	    android:layout_width="32dp"
-	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n"
-	    android:clickable="false"
-	     />
-	<ImageView
-	    android:id="@+id/coin4"
-	    android:layout_alignParentBottom="true"
-	    android:layout_toRightOf="@+id/coin3"
-	    android:layout_marginLeft="16dp"
-	    android:layout_marginBottom="16dp"
-	    android:layout_width="32dp"
-	    android:layout_height="32dp"
-	    android:src="@drawable/coin_n" 
-	    android:clickable="false"
-	    /-->
-
 
 	<ImageView
 	    android:id="@+id/setting_button"
@@ -115,7 +45,7 @@
 	<Gallery
 	    android:id="@+id/interactive_game_bar"
 	    android:layout_width="match_parent"
-	    android:layout_height="140dp"
+	    android:layout_height="100dp"
 	    android:layout_alignParentTop="true"
 	    android:layout_centerHorizontal="true"
 	    android:background="#AAFFFFFF"

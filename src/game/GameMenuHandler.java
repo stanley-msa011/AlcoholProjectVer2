@@ -25,9 +25,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 public class GameMenuHandler {
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 	private SimpleAdapter game_adapter;
@@ -94,11 +91,10 @@ public class GameMenuHandler {
 			        if (fake) {
 			        	newActivity = new Intent(context, TestActivity.class);
 			        } else {
-			        	if (Build.VERSION.SDK_INT < 11) {
+			        	if (Build.VERSION.SDK_INT < 11) 
 							newActivity = new Intent(context, MainLegacyActivity.class);  
-						} else {
+						else 
 							newActivity = new Intent(context, MainActivity.class);
-						}
 			        }
 					ga.startActivityForResult(newActivity, REQUEST_TEST);  
 					break;

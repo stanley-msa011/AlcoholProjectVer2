@@ -25,62 +25,16 @@
 	    android:layout_alignLeft="@+id/gallery_bg_all"
 	    android:layout_alignBottom="@+id/gallery_bg_all"
 	 />
-	
-	    <!--  ImageView
-        android:id="@+id/gallery_tree"
-        android:layout_width="192dp"
-        android:layout_height="240dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-         /-->
-
-	    <!-- ImageView
-	        android:id="@+id/gallery_coin1"
-	        android:layout_width="24dp"
-	        android:layout_height="24dp"
-	        android:layout_alignParentBottom="true"
-	        android:layout_alignParentLeft="true"
-	        android:layout_marginBottom="24dp"
-	        android:layout_marginLeft="4dp"
-	        android:src="@drawable/coin_n" />
-    	<ImageView
-	        android:id="@+id/gallery_coin2"
-	        android:layout_width="24dp"
-	        android:layout_height="24dp"
-	        android:layout_alignParentBottom="true"
-	        android:layout_toRightOf="@+id/gallery_coin1"
-	        android:layout_marginBottom="24dp"
-	        android:layout_marginLeft="12dp"
-	        android:src="@drawable/coin_n" />
-    	<ImageView
-	        android:id="@+id/gallery_coin3"
-	        android:layout_width="24dp"
-	        android:layout_height="24dp"
-	        android:layout_alignParentBottom="true"
-	        android:layout_toRightOf="@+id/gallery_coin2"
-	        android:layout_marginBottom="24dp"
-	        android:layout_marginLeft="12dp"
-	        android:src="@drawable/coin_n" />
-    	<ImageView
-	        android:id="@+id/gallery_coin4"
-	        android:layout_width="24dp"
-	        android:layout_height="24dp"
-	        android:layout_alignParentBottom="true"
-	        android:layout_toRightOf="@+id/gallery_coin3"
-	        android:layout_marginBottom="24dp"
-	        android:layout_marginLeft="12dp"
-	        android:src="@drawable/coin_n" /-->
-
-    	<TextView
-    	    android:id="@+id/gallery_date"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_alignLeft="@+id/gallery_bg_all"
-    	    android:layout_alignTop="@+id/gallery_bg_all"
-    	 	android:textSize="20sp"
-    	 	android:textStyle="bold"
-    	 	android:textColor="#FFFFFFFF"
-    	 	android:background="#44000000"
-    	 />
+   	<TextView
+   	    android:id="@+id/gallery_date"
+   	    android:layout_width="wrap_content"
+   	    android:layout_height="wrap_content"
+   	    android:layout_alignLeft="@+id/gallery_bg_all"
+   	    android:layout_alignTop="@+id/gallery_bg_all"
+   	 	android:textSize="20sp"
+   	 	android:textStyle="bold"
+   	 	android:textColor="#FFFFFFFF"
+   	 	android:background="#44000000"
+   	 />
     	
 </RelativeLayout>

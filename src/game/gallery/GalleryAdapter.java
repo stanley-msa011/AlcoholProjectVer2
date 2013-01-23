@@ -57,11 +57,8 @@ public class GalleryAdapter extends BaseAdapter {
 		HashMap<String, Object> item_info = list.get(position);
 		
 		Bitmap cur_bg = bitmap_map.get("bg"+String.valueOf(position));
-		//Bitmap cur_tree = bitmap_map.get("tree"+String.valueOf(position));
 		
 		int bg = (Integer) item_info.get("pic");
-		//int tree = (Integer) item_info.get("tree");
-		//int coin = (Integer) item_info.get("coin");
 		String date = (String) item_info.get("date");
 		
 		if (cur_bg == null){
@@ -70,39 +67,17 @@ public class GalleryAdapter extends BaseAdapter {
 			tmp.recycle();
 			bitmap_map.put("bg"+String.valueOf(position),cur_bg);
 		}
-		/*if (cur_tree == null){
-			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), tree);
-			cur_tree = Bitmap.createScaledBitmap(tmp,192, 240, true);
-			tmp.recycle();
-			bitmap_map.put("tree"+String.valueOf(position),cur_tree);
-		}*/
 		v_tag.bg.setImageBitmap(cur_bg);
-		//v_tag.tree.setImageBitmap(cur_tree);
 		v_tag.date.setText(date);
-		/*for (int i=0;i<coin;++i){
-			v_tag.c[i].setVisibility(View.VISIBLE);
-		}
-		for (int i=coin;i<4;++i){
-			v_tag.c[i].setVisibility(View.INVISIBLE);
-		}*/
 		
 		return convertView;
 	}
 	
 	private class vTag{
 		ImageView bg;
-		//ImageView tree;
-		//ImageView[] c;
 		TextView date;
 		public vTag(View convertView){
-			
 			bg = (ImageView) convertView.findViewById(R.id.gallery_background);
-			//tree = (ImageView) convertView.findViewById(R.id.gallery_tree);
-			//c = new ImageView[4];
-			/*c[0] = (ImageView) convertView.findViewById(R.id.gallery_coin1);
-			c[1] = (ImageView) convertView.findViewById(R.id.gallery_coin2);
-			c[2] = (ImageView) convertView.findViewById(R.id.gallery_coin3);
-			c[3] = (ImageView) convertView.findViewById(R.id.gallery_coin4);*/
 			date = (TextView) convertView.findViewById(R.id.gallery_date);
 		}
 	}
@@ -111,21 +86,13 @@ public class GalleryAdapter extends BaseAdapter {
 		int len = list.size() + 1;
 		for (int i=0;i<len;++i){
 			Bitmap bg = bitmap_map.get("bg"+String.valueOf(i));
-			//Bitmap tree = bitmap_map.get("tree"+String.valueOf(i));
 			if (bg != null){
 				bitmap_map.remove("bg"+String.valueOf(i));
 				Bitmap tmp = bg;
 				tmp.recycle();
 				bg = null;
 			}
-			/*if (tree != null){
-				bitmap_map.remove("tree"+String.valueOf(i));
-				Bitmap tmp = tree;
-				tmp.recycle();
-				tree = null;
-			}*/
 		}
 		bitmap_map.clear();
 	}
-
 }

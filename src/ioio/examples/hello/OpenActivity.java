@@ -8,8 +8,6 @@ import android.widget.Button;
 
 public class OpenActivity extends Activity implements View.OnClickListener {
 	
-	private static final String TAG = "OpenActivity";
-	
 	private Button btnInit;
 	private Button btnBracHistory;
 	private Button gameButton;
@@ -19,15 +17,9 @@ public class OpenActivity extends Activity implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.open_activity);
-        
         findViews();
         setListeners();
         
-        // Start service at back
-
-      	Intent intent = new Intent(this, TimerService.class);
-      	startService(intent);
-
 	}
 	
 	private void findViews() {

@@ -7,7 +7,6 @@ import android.graphics.Point;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -19,12 +18,10 @@ public class InteractivePopupWindowHandler {
 	private PopupWindow popupWindow;
 	private ImageView bg;
 	private View v_pop;
-    //private Drawable smile;
     private showPopWindowThread showThread;
 	public InteractivePopupWindowHandler(GameActivity ga){
 		this.ga = ga;
 		this.bg = (ImageView)ga.findViewById(R.id.background);
-	    //smile = ga.getResources().getDrawable(R.drawable.smile);
 		initPopWindow();
 	}
 	
@@ -49,14 +46,13 @@ public class InteractivePopupWindowHandler {
 		}
 	}
 	public void showPopWindow(String pid){
-		if (popupWindow.isShowing())
-			popupWindow.dismiss();
-		//if (popupWindow.isShowing() == false){
+		if (popupWindow.isShowing());
+		else{
 			String cn = ga.getInteractiveGameHandler().getCodeNameByPID(pid);
 			popText.setText(cn + "\n為您加油");
 			popupWindow.setOutsideTouchable(false);
 			bg.post( showThread);
-		//}
+		}
 	}
 	
 	private class showPopWindowThread implements Runnable{

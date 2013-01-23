@@ -4,14 +4,15 @@ import ioio.examples.hello.R;
 
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.util.Log;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class PrefSettingActivity extends PreferenceActivity {
 
 	private FragmentManager fragmentManager;
@@ -23,11 +24,8 @@ public class PrefSettingActivity extends PreferenceActivity {
 	        fragmentManager = getFragmentManager();  
 	        fragmentTransaction = fragmentManager.beginTransaction();  
 	        prefFragment = new PrefFragment();  
-	        Log.d("Pref","Before replace");
 	        fragmentTransaction.replace(android.R.id.content, prefFragment);          
-	        Log.d("Pref","Before commit");
 	        fragmentTransaction.commit();
-	        Log.d("Pref","end");
 	        
 	 }
 	 

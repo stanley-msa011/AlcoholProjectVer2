@@ -2,8 +2,6 @@ package ioio.examples.hello;
 
 
 import java.util.Calendar;
-import java.util.Date;
-
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -37,8 +35,6 @@ public class TimerService extends Service {
 	@Override
 	public void onStart(Intent intent, int startId){
 		startTime = System.currentTimeMillis();
-		Log.i("...","onStart");
-		Log.i("startTime = ",String.valueOf(startTime) );
 		handler.postDelayed(showTime, 1000);
 		super.onStart(intent, startId);
 		
@@ -53,22 +49,14 @@ public class TimerService extends Service {
 	}
 	
 	private Runnable showTime = new Runnable(){
+		@SuppressWarnings("deprecation")
 		public void run(){
-			//log current time
-			//Log.i("time :", new Date().toString() );
-			//Log.i("startTime = ",String.valueOf(startTime) );
 			handler.postDelayed(this, 1000);
 			
-			Long spentTime = System.currentTimeMillis() - startTime;
-			//Log.i("spentTime start = ",String.valueOf(System.currentTimeMillis()) );
+			//Long spentTime = System.currentTimeMillis() - startTime;
 
-			Long minutes = (spentTime/1000)/60;
-			//Long hour = minutes/60;
-			Long seconds = (spentTime/1000)%60;
-			
-			if(minutes == 0 && seconds == 0){
-				Log.i("一小時摟","hello");
-			}
+			//Long minutes = (spentTime/1000)/60;
+			//Long seconds = (spentTime/1000)%60;
 			
 			Calendar calendar = Calendar.getInstance();
 			int minute = calendar.get(Calendar.MINUTE);
@@ -105,8 +93,6 @@ public class TimerService extends Service {
 				notificationManager.notify(0, notification); //前面的只是一個tag而已 ＝ ＝
 				
 			}
-			
-			
 		}
 	};
 	

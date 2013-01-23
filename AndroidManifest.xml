@@ -57,10 +57,6 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="ioio.examples.hello.ShowBracActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
             android:name="ioio.examples.hello.SensorCheckActivity"
             android:screenOrientation="portrait" >
         </activity>

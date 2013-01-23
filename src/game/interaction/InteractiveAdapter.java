@@ -59,10 +59,8 @@ public class InteractiveAdapter extends BaseAdapter {
 
 		
 		Bitmap cur_bg = bitmap_map.get("bg"+String.valueOf(position));
-		//Bitmap cur_tree = bitmap_map.get("tree"+String.valueOf(position));
 		
 		int bg = (Integer) item_info.get("pic");
-		//int tree = (Integer) item_info.get("tree");
 		String code = (String) item_info.get("code_name");
 		
 		if (cur_bg == null){
@@ -71,14 +69,7 @@ public class InteractiveAdapter extends BaseAdapter {
 			tmp.recycle();
 			bitmap_map.put("bg"+String.valueOf(position),cur_bg);
 		}
-		/*if (cur_tree == null){
-			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), tree);
-			cur_tree = Bitmap.createScaledBitmap(tmp,64, 70, true);
-			tmp.recycle();
-			bitmap_map.put("tree"+String.valueOf(position),cur_tree);
-		}*/
 		v_tag.bg.setImageBitmap(cur_bg);
-		//v_tag.tree.setImageBitmap(cur_tree);
 		v_tag.code_name.setText(code);
 		
 		return convertView;
@@ -86,11 +77,9 @@ public class InteractiveAdapter extends BaseAdapter {
 	
 	private class vTag{
 		ImageView bg;
-		//ImageView tree;
 		TextView code_name;
 		public vTag(View convertView){
 			bg = (ImageView) convertView.findViewById(R.id.interactive_state);
-			//tree = (ImageView) convertView.findViewById(R.id.interactive_tree);
 			code_name = (TextView) convertView.findViewById(R.id.interactive_code);
 		}
 	}
@@ -99,19 +88,12 @@ public class InteractiveAdapter extends BaseAdapter {
 		int len = list.size() + 1;
 		for (int i=0;i<len;++i){
 			Bitmap bg = bitmap_map.get("bg"+String.valueOf(i));
-			//Bitmap tree = bitmap_map.get("tree"+String.valueOf(i));
 			if (bg != null){
 				bitmap_map.remove("bg"+String.valueOf(i));
 				Bitmap tmp = bg;
 				tmp.recycle();
 				bg = null;
 			}
-			/*if (tree != null){
-				bitmap_map.remove("tree"+String.valueOf(i));
-				Bitmap tmp = tree;
-				tmp.recycle();
-				tree = null;
-			}*/
 		}
 		bitmap_map.clear();
 	}

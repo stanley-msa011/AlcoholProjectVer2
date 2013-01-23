@@ -6,28 +6,19 @@
 
     <ImageView
         android:id="@+id/interactive_state"
-        android:layout_width="81dp"
-        android:layout_height="81dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:layout_alignParentBottom="true"
         android:scaleType="fitXY"
         android:adjustViewBounds="true"
         />
-    <!-- ImageView
-        android:id="@+id/interactive_tree"
-        android:layout_width="64dp"
-        android:layout_height="70dp"
-        android:layout_alignLeft="@+id/interactive_state"
-        android:layout_alignBottom="@+id/interactive_state"
-        android:scaleType="fitXY"
-        android:adjustViewBounds="true"
-         /-->
-    <TextView
+        <TextView
         android:id="@+id/interactive_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_above="@+id/interactive_state"
         android:textColor="#FFFFFFFF"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:background="#55000000"
         />
 
