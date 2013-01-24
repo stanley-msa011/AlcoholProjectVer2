@@ -50,14 +50,13 @@ public final class ServerUtilities {
      * @return whether the registration succeeded or not.
      */
     public static boolean register(final Context context, final String regId) {
-        String serverUrl = SERVER_URL;// + "/register";
+        String serverUrl = SERVER_URL;
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
         params.put("pid", Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
         long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
         for (int i = 1; i <= MAX_ATTEMPTS; i++) {
             try {
-            	Log.d("GCM","post to server");
                 post(serverUrl, params);
                 GCMRegistrar.setRegisteredOnServer(context, true);
                 return true;
