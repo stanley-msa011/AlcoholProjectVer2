@@ -31,7 +31,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(
                 "CREATE TABLE AlcoholTreeGame (" +
                         " _ID INTEGER PRIMARY KEY, " +
-                        " _STATE INTEGER NOT NULL, " +
+                        " _STAGE INTEGER NOT NULL, " +
                         " _COIN INTEGER NOT NULL" +
                 ")"
         );
@@ -41,7 +41,7 @@ public class DBHelper extends SQLiteOpenHelper {
         				"_ID INTEGER PRIMARY KEY," +
         				"_PID CHAR[50] NOT NULL," +
         				"_NAME CHAR[50] NOT NULL,"+
-        				"_STATE INTEGER NOT NULL," +
+        				"_STAGE INTEGER NOT NULL," +
         				"_COIN INTEGER NOT NULL )" 
         		);
         db.execSQL(

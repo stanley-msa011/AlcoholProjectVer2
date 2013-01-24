@@ -21,7 +21,7 @@ import android.provider.Settings.Secure;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Gallery;
-import game.BackgroundHandler;
+import game.TreeImageHandler;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.R;
 
@@ -58,7 +58,7 @@ public class InteractiveGameHandler {
 		}
 		for (int i=0;i<stateList.length;++i){
 			HashMap<String,Object> item = new HashMap<String,Object>();
-			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(stateList[i].state, stateList[i].coin);
+			int bg_pic =  TreeImageHandler.getTreeImageDrawableId(stateList[i].stage, stateList[i].coin);
 			item.put("pic",bg_pic);
 			item.put("pid", stateList[i].PID);
 			if (stateList[i].PID.equals(Secure.getString(ga.getContentResolver(), Secure.ANDROID_ID)))

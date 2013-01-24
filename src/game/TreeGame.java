@@ -31,7 +31,7 @@ public class TreeGame {
 	}
 	
 	public String toString(){
-		return String.valueOf(gState.state)+" "+String.valueOf(gState.coin);
+		return String.valueOf(gState.stage)+" "+String.valueOf(gState.coin);
 	}
 	
 }

@@ -27,7 +27,7 @@ public class GamePopupWindowHandler {
     private showPopWindowThread showThread;
 	public GamePopupWindowHandler(GameActivity ga){
 		this.ga = ga;
-		this.bg = (ImageView)ga.findViewById(R.id.background);
+		this.bg = (ImageView)ga.findViewById(R.id.game_background);
 		good_apple = ga.getResources().getDrawable(R.drawable.apple_good);
 	    bad_apple = ga.getResources().getDrawable(R.drawable.apple_bad);
 		initPopWindow();

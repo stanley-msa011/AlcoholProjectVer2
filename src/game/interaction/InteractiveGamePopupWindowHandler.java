@@ -30,7 +30,7 @@ public class InteractiveGamePopupWindowHandler {
 	public InteractiveGamePopupWindowHandler(GameActivity ga,InteractiveGameHandler igh){
 		this.ga = ga;
 		this.igh=igh;
-		this.bg = (ImageView)ga.findViewById(R.id.background);
+		this.bg = (ImageView)ga.findViewById(R.id.game_background);
 		initPopWindow();
 	}
 	private OnClickListener listener;

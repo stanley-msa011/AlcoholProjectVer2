@@ -6,8 +6,8 @@ public class InteractiveGameState extends GameState {
 
 	public String PID;
 	public String name;
-	public InteractiveGameState(int state, int coin, String PID,String name) {
-		super(state, coin);
+	public InteractiveGameState(int stage, int coin, String PID,String name) {
+		super(stage, coin);
 		this.PID = PID;
 		if (name == null)
 			name = "no name";

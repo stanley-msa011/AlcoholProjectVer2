@@ -3,7 +3,7 @@ package ioio.examples.hello;
 
 
 
-import game.BackgroundHandler;
+import game.TreeImageHandler;
 import game.GameDB;
 import game.GameState;
 import game.gallery.GalleryAdapter;
@@ -140,7 +140,7 @@ public class GalleryActivity extends Activity {
 	protected void onStop(){
 		super.onStop();
 		cleanMemory();
-		BackgroundHandler.cleanBitmaps();
+		TreeImageHandler.cleanBitmaps();
 	}
 	
 	private int getGalleryListSize(){
@@ -160,10 +160,10 @@ public class GalleryActivity extends Activity {
 		
 		for (int i=start;i<=end;++i){
 			HashMap<String,Object> item = new HashMap<String,Object>();
-			int state = stateList[i].state;
+			int state = stateList[i].stage;
 			int coin = stateList[i].coin;
 
-			int bg_pic =  BackgroundHandler.getBackgroundDrawableId(state, coin);
+			int bg_pic =  TreeImageHandler.getTreeImageDrawableId(state, coin);
 			brac_test_list.moveToPosition(i);
 			String date = brac_test_list.getString(1);
 			
@@ -286,9 +286,9 @@ public class GalleryActivity extends Activity {
 			 animation = new AnimationDrawable();
 			 anime1.setImageDrawable(animation);
 			for (;idx<states.length;++idx){
-				int state = states[idx].state;
+				int state = states[idx].stage;
 				int coin = states[idx].coin;
-				Drawable d = new BitmapDrawable(BackgroundHandler.getBackgroundBitmap(state, coin, r));
+				Drawable d = new BitmapDrawable(TreeImageHandler.getTreeImageBitmap(state, coin, r));
 				animation.addFrame(d,300);
 			}
 			animation.start();

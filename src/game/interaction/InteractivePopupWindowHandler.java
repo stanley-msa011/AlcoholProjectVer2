@@ -21,7 +21,7 @@ public class InteractivePopupWindowHandler {
     private showPopWindowThread showThread;
 	public InteractivePopupWindowHandler(GameActivity ga){
 		this.ga = ga;
-		this.bg = (ImageView)ga.findViewById(R.id.background);
+		this.bg = (ImageView)ga.findViewById(R.id.game_background);
 		initPopWindow();
 	}
 	

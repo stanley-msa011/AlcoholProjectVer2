@@ -18,12 +18,18 @@
             />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Developer Setting">
+    <PreferenceCategory android:title="Developer Setting" android:key="Developer_Setting">
         <CheckBoxPreference 
             android:summaryOn="Yes" 
             android:summaryOff="No" 
             android:title="Use fake data?" 
             android:key="use_fake_data"/>
+        <ListPreference 
+            android:title="change stage" 
+            android:key="change_stage" 
+            android:dialogTitle="ChangeStage" 
+           android:entries="@array/stage_options"
+           android:entryValues="@array/stage_values" android:defaultValue="0"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

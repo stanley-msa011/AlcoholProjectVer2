@@ -56,28 +56,28 @@ public class GalleryAdapter extends BaseAdapter {
 		
 		HashMap<String, Object> item_info = list.get(position);
 		
-		Bitmap cur_bg = bitmap_map.get("bg"+String.valueOf(position));
+		Bitmap cur_tree = bitmap_map.get("tree"+String.valueOf(position));
 		
 		int bg = (Integer) item_info.get("pic");
 		String date = (String) item_info.get("date");
 		
-		if (cur_bg == null){
+		if (cur_tree == null){
 			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), bg);
-			cur_bg = Bitmap.createScaledBitmap(tmp, 250, 250, true);
+			cur_tree = Bitmap.createScaledBitmap(tmp, 250, 250, true);
 			tmp.recycle();
-			bitmap_map.put("bg"+String.valueOf(position),cur_bg);
+			bitmap_map.put("tree"+String.valueOf(position),cur_tree);
 		}
-		v_tag.bg.setImageBitmap(cur_bg);
+		v_tag.tree.setImageBitmap(cur_tree);
 		v_tag.date.setText(date);
 		
 		return convertView;
 	}
 	
 	private class vTag{
-		ImageView bg;
+		ImageView tree;
 		TextView date;
 		public vTag(View convertView){
-			bg = (ImageView) convertView.findViewById(R.id.gallery_background);
+			tree = (ImageView) convertView.findViewById(R.id.gallery_tree);
 			date = (TextView) convertView.findViewById(R.id.gallery_date);
 		}
 	}
@@ -85,9 +85,9 @@ public class GalleryAdapter extends BaseAdapter {
 	public void clearAll(){
 		int len = list.size() + 1;
 		for (int i=0;i<len;++i){
-			Bitmap bg = bitmap_map.get("bg"+String.valueOf(i));
+			Bitmap bg = bitmap_map.get("tree"+String.valueOf(i));
 			if (bg != null){
-				bitmap_map.remove("bg"+String.valueOf(i));
+				bitmap_map.remove("tree"+String.valueOf(i));
 				Bitmap tmp = bg;
 				tmp.recycle();
 				bg = null;

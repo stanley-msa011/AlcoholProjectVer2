@@ -10,7 +10,7 @@ import com.google.android.gcm.GCMRegistrar;
 
 import database.Reuploader;
 
-import game.BackgroundHandler;
+import game.TreeImageHandler;
 import game.BracDataHandler;
 import game.GameDB;
 import game.GameMenuHandler;
@@ -43,8 +43,8 @@ public class GameActivity extends Activity{
 	/*communication with MainACtivity*/
 	private static GameActivity ga = null;
 	public static final int REQUEST_TEST = 99;
-	private ImageView background;
-	private ImageView background_anime;
+	private ImageView tree;
+	private ImageView tree_anime;
 	private TreeGame treeGame=null;
 	private GameDB gDB=null;
 	private Animation appear_anim;
@@ -57,8 +57,8 @@ public class GameActivity extends Activity{
 	private Reuploader reuploader;
 	
 	
-	private Bitmap cur_bg = null;
-	private Bitmap bg_now = null;
+	private Bitmap cur_tree = null;
+	private Bitmap prev_tree = null;
 	
 	ArrayList<HashMap<String,Object>> game_list = new ArrayList<HashMap<String,Object>>();
 
@@ -87,7 +87,7 @@ public class GameActivity extends Activity{
 		gDB = new GameDB(this);
 		GameState gState = gDB.getLatestGameState();
 		treeGame=new TreeGame(gState);
-		initBackground();
+		initTree();
 		initAnim();
 		initSettingButton();
 		setImage();
@@ -148,13 +148,13 @@ public class GameActivity extends Activity{
             mRegisterTask.cancel(true);
         }
         unregisterReceiver(mHandleMessageReceiver);
-		if (cur_bg != null){
-			cur_bg.recycle();
-			cur_bg = null;
+		if (cur_tree != null){
+			cur_tree.recycle();
+			cur_tree = null;
 		}
-		if (bg_now != null){
-			bg_now.recycle();
-			bg_now = null;
+		if (prev_tree != null){
+			prev_tree.recycle();
+			prev_tree = null;
 		}
 		super.onDestroy();
 	}
@@ -191,10 +191,10 @@ public class GameActivity extends Activity{
 	}
 	
 	
-	private void initBackground(){
-		background = (ImageView) findViewById(R.id.background);
-		background_anime = (ImageView) findViewById(R.id.background_anime);
-		background_anime.setVisibility(View.INVISIBLE);
+	private void initTree(){
+		tree = (ImageView) findViewById(R.id.game_tree);
+		tree_anime = (ImageView) findViewById(R.id.game_tree_anime);
+		tree_anime.setVisibility(View.INVISIBLE);
 	}
 	
 	private void initAnim(){
@@ -240,12 +240,12 @@ public class GameActivity extends Activity{
 	
 	private void setImage(){
 		/*set image visibility*/
-		if (cur_bg != null)
-			cur_bg.recycle();
+		if (cur_tree != null)
+			cur_tree.recycle();
 		GameState gState=treeGame.getGameState();
 
-		cur_bg = BitmapFactory.decodeResource(this.getResources(), BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
-		background.setImageBitmap(cur_bg);
+		cur_tree = BitmapFactory.decodeResource(this.getResources(), TreeImageHandler.getTreeImageDrawableId(gState.stage, gState.coin));
+		tree.setImageBitmap(cur_tree);
 	}
 	
 	
@@ -254,18 +254,18 @@ public class GameActivity extends Activity{
 		
 		//if (oldState.coin != gState.coin || oldState.state != gState.state){
 		if (oldState.coin != gState.coin){
-			if (bg_now != null){
-				bg_now.recycle();
-				bg_now = null;
+			if (prev_tree != null){
+				prev_tree.recycle();
+				prev_tree = null;
 			}
-			bg_now = cur_bg;
-			cur_bg = BitmapFactory.decodeResource(this.getResources(), BackgroundHandler.getBackgroundDrawableId(gState.state, gState.coin));
-			background_anime.setImageBitmap(bg_now);
-			background_anime.setVisibility(View.VISIBLE);
-			background.setImageBitmap(cur_bg);
-			background_anime.startAnimation(disappear_anim);
-			background.setAnimation(appear_anim);
-			background_anime.setVisibility(View.INVISIBLE);			
+			prev_tree = cur_tree;
+			cur_tree = BitmapFactory.decodeResource(this.getResources(), TreeImageHandler.getTreeImageDrawableId(gState.stage, gState.coin));
+			tree_anime.setImageBitmap(prev_tree);
+			tree_anime.setVisibility(View.VISIBLE);
+			tree.setImageBitmap(cur_tree);
+			tree_anime.startAnimation(disappear_anim);
+			tree.setAnimation(appear_anim);
+			tree_anime.setVisibility(View.INVISIBLE);			
 		}
 	}	
 	
