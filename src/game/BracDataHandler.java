@@ -89,13 +89,12 @@ public class BracDataHandler {
        	if (avg_result < THRESHOLD){
 			result = NoAlcohol;
 			treeGame.getCoin();
-			gDB.updateState(treeGame.getGameState());
        	}
        	else{
        		result = HaveAlcohol;
        		treeGame.loseCoin();//Do nothing now
-       		gDB.updateState(treeGame.getGameState());
        	}
+       	gDB.updateState(treeGame.getGameState());
        	
        	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");
        	try {

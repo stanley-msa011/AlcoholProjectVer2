@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 public class InteractiveAdapter extends BaseAdapter {
 
+	private static int[] STAGE_BG_COLOR = {0x22FF0000,0x22FFFF00,0x2200FF00,0x220000FF};
+	
 	private ArrayList<HashMap<String,Object>> list;
 	private HashMap<String,Bitmap> bitmap_map;
 	private Context context;
@@ -60,11 +62,14 @@ public class InteractiveAdapter extends BaseAdapter {
 		
 		Bitmap cur_tree = bitmap_map.get("tree"+String.valueOf(position));
 		
-		int bg = (Integer) item_info.get("pic");
+		int stage = (Integer)item_info.get("stage");
+		convertView.setBackgroundColor(STAGE_BG_COLOR [stage]);
+		
+		int tree = (Integer) item_info.get("pic");
 		String code = (String) item_info.get("code_name");
 		
 		if (cur_tree == null){
-			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), bg);
+			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), tree);
 			cur_tree = Bitmap.createScaledBitmap(tmp, 72,72, true);//81,144
 			tmp.recycle();
 			bitmap_map.put("tree"+String.valueOf(position),cur_tree);

@@ -34,4 +34,9 @@ public class TreeGame {
 		return String.valueOf(gState.stage)+" "+String.valueOf(gState.coin);
 	}
 	
+	public void resetStage(GameState newState){
+		oldState = gState;
+		gState = newState;
+	}
+	
 }

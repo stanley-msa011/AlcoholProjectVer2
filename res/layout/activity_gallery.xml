@@ -72,8 +72,8 @@
 
     <ImageView
         android:id="@+id/gallery_anime1"
-         android:layout_width="230dp"
-         android:layout_height="230dp"
+         android:layout_width="150dp"
+         android:layout_height="150dp"
 	    android:scaleType="fitXY"
 	    android:adjustViewBounds="true"
 	    android:layout_centerInParent="true"

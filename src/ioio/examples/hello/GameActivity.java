@@ -10,6 +10,7 @@ import com.google.android.gcm.GCMRegistrar;
 
 import database.Reuploader;
 
+import game.BackgroundImageHandler;
 import game.TreeImageHandler;
 import game.BracDataHandler;
 import game.GameDB;
@@ -22,15 +23,19 @@ import game.interaction.InteractivePopupWindowHandler;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -43,6 +48,8 @@ public class GameActivity extends Activity{
 	/*communication with MainACtivity*/
 	private static GameActivity ga = null;
 	public static final int REQUEST_TEST = 99;
+	private ImageView background;
+	
 	private ImageView tree;
 	private ImageView tree_anime;
 	private TreeGame treeGame=null;
@@ -73,6 +80,8 @@ public class GameActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		 
+		ga = this;
+		
 		 Display display = getWindowManager().getDefaultDisplay();
 		 if (Build.VERSION.SDK_INT<13){
 			 int w = display.getWidth();
@@ -160,8 +169,13 @@ public class GameActivity extends Activity{
 	}
 	
 	protected void onResume(){
-		super.onResume();
 		ga = this;
+		super.onResume();
+		resetState();
+		//Should move to OnNewIntent after applying GCM for changing stages
+		initBackground();
+		//initImage();
+		//------------------------------
 		gInteractiveGame.update();
 	}
 	
@@ -190,6 +204,11 @@ public class GameActivity extends Activity{
 					ga.iPopWindow.showPopWindow(msg);
 	}
 	
+	private void initBackground(){
+		background = (ImageView) findViewById(R.id.game_background);
+		int bg_stage = getPrefStage();
+		background.setBackgroundDrawable(BackgroundImageHandler.getBackgroundImageDrawable(bg_stage, this));
+	}
 	
 	private void initTree(){
 		tree = (ImageView) findViewById(R.id.game_tree);
@@ -200,9 +219,9 @@ public class GameActivity extends Activity{
 	private void initAnim(){
 		/*used for initializing animations*/
 		appear_anim = new AlphaAnimation(0.f,1.f);
-		appear_anim.setDuration(1500);
+		appear_anim.setDuration(2000);
 		disappear_anim = new AlphaAnimation(0.7f,0.f);
-		disappear_anim.setDuration(1500);
+		disappear_anim.setDuration(1400);
 	}
 	
 	private void initRegistration(){
@@ -239,15 +258,27 @@ public class GameActivity extends Activity{
 	}
 	
 	private void setImage(){
-		/*set image visibility*/
-		if (cur_tree != null)
+		if (cur_tree!=null){
 			cur_tree.recycle();
+			cur_tree = null;
+		}
+		if (prev_tree!=null){
+			prev_tree.recycle();
+		}
+		resetState();
 		GameState gState=treeGame.getGameState();
-
 		cur_tree = BitmapFactory.decodeResource(this.getResources(), TreeImageHandler.getTreeImageDrawableId(gState.stage, gState.coin));
 		tree.setImageBitmap(cur_tree);
 	}
 	
+	private void resetState(){
+		GameState gState=treeGame.getGameState();
+		int pref_stage = getPrefStage();
+		if (gState.stage != pref_stage){
+			GameState gs = gDB.getLatestGameState();
+			treeGame.resetStage(gs);
+		}
+	}
 	
 	private void setImageChange(GameState oldState){
 		GameState gState=treeGame.getGameState();
@@ -306,4 +337,10 @@ public class GameActivity extends Activity{
         public void onReceive(Context context, Intent intent) {
         }
     };
+    
+    private int getPrefStage(){
+    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+		String bg_type = sp.getString("change_stage", "0");
+		return  Integer.valueOf(bg_type);
+    }
 }

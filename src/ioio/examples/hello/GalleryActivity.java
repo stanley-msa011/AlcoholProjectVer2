@@ -48,7 +48,7 @@ public class GalleryActivity extends Activity {
 	private GameDB gDB;
 	private BracDbAdapter bDb;
 	
-	private static final int TOTAL_VIEW_PAGE = 20;
+	private static final int TOTAL_VIEW_PAGE = 10;
 	private AnimeListener animeListener;
 	
 	
@@ -160,13 +160,14 @@ public class GalleryActivity extends Activity {
 		
 		for (int i=start;i<=end;++i){
 			HashMap<String,Object> item = new HashMap<String,Object>();
-			int state = stateList[i].stage;
+			int stage = stateList[i].stage;
 			int coin = stateList[i].coin;
 
-			int bg_pic =  TreeImageHandler.getTreeImageDrawableId(state, coin);
+			int bg_pic =  TreeImageHandler.getTreeImageDrawableId(stage, coin);
 			brac_test_list.moveToPosition(i);
 			String date = brac_test_list.getString(1);
 			
+			item.put("stage", stage);
 			item.put("pic",bg_pic);
 			item.put("date", date);
 			gallery_list.add(item);

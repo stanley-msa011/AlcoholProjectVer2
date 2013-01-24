@@ -1,5 +1,7 @@
 package game.gallery;
 
+import game.BackgroundImageHandler;
+import game.GameState;
 import ioio.examples.hello.R;
 
 import java.util.ArrayList;
@@ -56,17 +58,27 @@ public class GalleryAdapter extends BaseAdapter {
 		
 		HashMap<String, Object> item_info = list.get(position);
 		
+		int stage = (Integer) item_info.get("stage");
+		Bitmap cur_stage = bitmap_map.get("bg"+String.valueOf(stage));
 		Bitmap cur_tree = bitmap_map.get("tree"+String.valueOf(position));
 		
-		int bg = (Integer) item_info.get("pic");
+		int tree = (Integer) item_info.get("pic");
 		String date = (String) item_info.get("date");
 		
+		if (cur_stage == null){
+			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), BackgroundImageHandler.getBackgroundImageDrawableId(stage));
+			cur_stage = Bitmap.createScaledBitmap(tmp, 192, 315, true);
+			tmp.recycle();
+			bitmap_map.put("bg"+String.valueOf(stage),cur_stage);
+		}
+		
 		if (cur_tree == null){
-			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), bg);
-			cur_tree = Bitmap.createScaledBitmap(tmp, 250, 250, true);
+			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), tree);
+			cur_tree = Bitmap.createScaledBitmap(tmp, 192, 192, true);
 			tmp.recycle();
 			bitmap_map.put("tree"+String.valueOf(position),cur_tree);
 		}
+		v_tag.bg.setImageBitmap(cur_stage);
 		v_tag.tree.setImageBitmap(cur_tree);
 		v_tag.date.setText(date);
 		
@@ -74,9 +86,11 @@ public class GalleryAdapter extends BaseAdapter {
 	}
 	
 	private class vTag{
+		ImageView bg;
 		ImageView tree;
 		TextView date;
 		public vTag(View convertView){
+			bg = (ImageView) convertView.findViewById(R.id.gallery_bg);
 			tree = (ImageView) convertView.findViewById(R.id.gallery_tree);
 			date = (TextView) convertView.findViewById(R.id.gallery_date);
 		}
@@ -84,13 +98,23 @@ public class GalleryAdapter extends BaseAdapter {
 
 	public void clearAll(){
 		int len = list.size() + 1;
-		for (int i=0;i<len;++i){
-			Bitmap bg = bitmap_map.get("tree"+String.valueOf(i));
+		
+		for (int i=0;i<=GameState.MAX_STAGE;++i){
+			Bitmap bg = bitmap_map.get("bg"+String.valueOf(i));
 			if (bg != null){
-				bitmap_map.remove("tree"+String.valueOf(i));
-				Bitmap tmp = bg;
+				bitmap_map.remove("bg"+String.valueOf(i));
+				Bitmap tmp =bg;
 				tmp.recycle();
 				bg = null;
+			}
+		}
+		for (int i=0;i<len;++i){
+			Bitmap tree = bitmap_map.get("tree"+String.valueOf(i));
+			if (tree != null){
+				bitmap_map.remove("tree"+String.valueOf(i));
+				Bitmap tmp = tree;
+				tmp.recycle();
+				tree = null;
 			}
 		}
 		bitmap_map.clear();
