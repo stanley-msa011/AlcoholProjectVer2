@@ -90,11 +90,6 @@ public class InteractiveGameHandler {
 			Thread thread = new Thread(handler);
 			thread.start();
 			thread.join(3000);
-			if (handler .result==-1){
-				update_adapter();
-				i_adapter.notifyDataSetChanged();
-				return;
-			}
 			update_adapter();
 			i_adapter.notifyDataSetChanged();
 		} catch (Exception e) {

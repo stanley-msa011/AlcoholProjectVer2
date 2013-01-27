@@ -6,7 +6,7 @@ public class GameState {
 	static final public int MAX_STAGE = 3;
 	
 	static final public int MIN_COINS = 0;
-	static final public int[] MAX_COINS = {34,69,104,104};
+	static final public int[] MAX_COINS = {34,69,139,139};
 	public int stage;
 	public int coin;
 	
