@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,7 @@ import android.widget.TextView;
 
 public class InteractiveAdapter extends BaseAdapter {
 
-	private static int[] STAGE_BG_COLOR = {0x22FF0000,0x22FFFF00,0x2200FF00,0x220000FF};
+	private static int[] STAGE_BG_COLOR = {0x22FF0000,0x2200FF00};
 	
 	private ArrayList<HashMap<String,Object>> list;
 	private HashMap<String,Bitmap> bitmap_map;
@@ -58,12 +60,14 @@ public class InteractiveAdapter extends BaseAdapter {
 		
 		HashMap<String, Object> item_info = list.get(position);
 		
-
-		
 		Bitmap cur_tree = bitmap_map.get("tree"+String.valueOf(position));
 		
 		int stage = (Integer)item_info.get("stage");
-		convertView.setBackgroundColor(STAGE_BG_COLOR [stage]);
+		int pref_stage = getPrefStage();
+		if (stage == pref_stage)
+			convertView.setBackgroundColor(STAGE_BG_COLOR [1]);
+		else
+			convertView.setBackgroundColor(STAGE_BG_COLOR [0]);
 		
 		int tree = (Integer) item_info.get("pic");
 		String code = (String) item_info.get("code_name");
@@ -102,5 +106,11 @@ public class InteractiveAdapter extends BaseAdapter {
 		}
 		bitmap_map.clear();
 	}
+
+    private int getPrefStage(){
+    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+		String bg_type = sp.getString("change_stage", "0");
+		return  Integer.valueOf(bg_type);
+    }
 	
 }

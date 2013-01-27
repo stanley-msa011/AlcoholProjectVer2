@@ -5,14 +5,12 @@
     android:background="@android:color/black"
 
     tools:context=".StoryActivity" >
-<!-- Original:256*420 -->
     <Gallery
         android:id="@+id/gallery_list"
         android:layout_width="match_parent"
         android:layout_height="420dp"
         android:layout_centerInParent="true"
         android:spacing="@dimen/gallery_space" />
-
     <LinearLayout
         android:id="@+id/gallery_controlbar"
         android:layout_width="match_parent"
@@ -69,7 +67,6 @@
              android:textSize="16sp" />
      
      </LinearLayout>
-
     <ImageView
         android:id="@+id/gallery_anime1"
          android:layout_width="150dp"

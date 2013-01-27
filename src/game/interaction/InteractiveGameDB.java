@@ -19,17 +19,32 @@ public class InteractiveGameDB {
     	gDB = gDBHelper.getWritableDatabase();
     	if (newStates == null)
     		return;
-    	boolean need_to_create = false;
+    	//boolean need_to_create = false;
 		Cursor cursor;
-		cursor = gDB.rawQuery("SELECT _ID FROM AlcoholInteractiveGame",null);
-		if (cursor.getCount()==0)
-			need_to_create = true;
+		//cursor = gDB.rawQuery("SELECT _ID FROM AlcoholInteractiveGame",null);
+		//if (cursor.getCount()==0)
+		//	need_to_create = true;
     	for (int i=0;i<newStates.length;++i){
     		int stage = newStates[i].stage;
     		int coin = newStates[i].coin;
     		String pid = newStates[i].PID;
     		String name = newStates[i].name;
-    		if (need_to_create){
+    		
+    		cursor = gDB.rawQuery("SELECT _ID FROM AlcoholInteractiveGame WHERE _PID='"+pid+"'",null);
+    		if (cursor.getCount() == 0){
+    			gDB.execSQL(
+    					"INSERT INTO AlcoholInteractiveGame ( _STAGE,_COIN,_PID,_NAME ) VALUES (" + String.valueOf(stage)+","+String.valueOf(coin)+",'"+pid+"',"+"'"+name+"')"
+    					);
+    		}
+    		else{
+    			gDB.execSQL(
+    					"UPDATE AlcoholInteractiveGame SET _STAGE = "+String.valueOf(stage) 
+    					+ ", _COIN ="+String.valueOf(coin)
+    					+ ", _NAME = '"+name+"'"
+    					+" WHERE _PID ='"+pid+"'"
+    					);
+    		}
+    		/*if (need_to_create){
     			gDB.execSQL(
     					"INSERT INTO AlcoholInteractiveGame ( _STAGE,_COIN,_PID,_NAME ) VALUES (" + String.valueOf(stage)+","+String.valueOf(coin)+",'"+pid+"',"+"'"+name+"')"
     					);
@@ -38,7 +53,7 @@ public class InteractiveGameDB {
     			gDB.execSQL(
     					"UPDATE AlcoholInteractiveGame SET _STAGE = "+String.valueOf(stage) + ", _COIN ="+String.valueOf(coin)+" WHERE _PID ='"+pid+"'"
     					);
-    		}
+    		}*/
     	}
     	gDB.close();
     }

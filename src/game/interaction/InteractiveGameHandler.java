@@ -17,6 +17,8 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.View;
@@ -70,7 +72,6 @@ public class InteractiveGameHandler {
 				item.put("code_name",stateList[i].name );
 			partner_list.add(item);
 		}
-		
 		i_adapter = new InteractiveAdapter(partner_list,ga);
 	}
 	
@@ -278,4 +279,7 @@ public class InteractiveGameHandler {
 			}
 		}
 	}
+	
+
+	
 }

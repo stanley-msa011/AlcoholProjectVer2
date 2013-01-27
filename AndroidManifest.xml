@@ -4,7 +4,10 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="16" android:maxSdkVersion="17"/>
+    <uses-sdk
+        android:maxSdkVersion="17"
+        android:minSdkVersion="8"
+        android:targetSdkVersion="16" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -20,17 +23,21 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.GET_TASKS"/>
-    <permission android:name="ioio.examples.hello.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-	<uses-permission android:name="ioio.examples.hello.permission.C2D_MESSAGE" /> 
-	
-	<supports-screens 
-        android:anyDensity="true" 
-    	android:largeScreens="true"
-    	android:normalScreens="true" 
-    	android:smallScreens="true"
-    	android:resizeable="true"/>
-	
+    <uses-permission android:name="android.permission.GET_TASKS" />
+
+    <permission
+        android:name="ioio.examples.hello.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="ioio.examples.hello.permission.C2D_MESSAGE" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true" />
+
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"
@@ -71,10 +78,9 @@
 
         <service android:name="ioio.examples.hello.TimerService" >
         </service>
-
         <service android:name="ioio.examples.hello.GCMIntentService" >
         </service>
-        
+
         <activity
             android:name="ioio.examples.hello.TestActivity"
             android:screenOrientation="portrait" >
@@ -85,31 +91,40 @@
         </activity>
         <activity
             android:name="ioio.examples.hello.GalleryActivity"
-            android:screenOrientation="portrait" 
-            android:noHistory="true">
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ioio.examples.hello.BracHistoryActivity"
-            android:screenOrientation="portrait" 
-            android:noHistory="true">
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ioio.examples.hello.PrefSettingActivity"
-            android:screenOrientation="portrait" 
-            android:noHistory="true">
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ioio.examples.hello.OldPrefSettingActivity"
-            android:screenOrientation="portrait" 
-            android:noHistory="true">
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
         </activity>
-        <receiver android:name="com.google.android.gcm.GCMBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
-  			<intent-filter>
-    			<action android:name="com.google.android.c2dm.intent.RECEIVE" />
-    			<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-    			<category android:name="ioio.examples.hello" />
-  			</intent-filter>
-		</receiver>
+
+        <receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="ioio.examples.hello" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name="ioio.examples.hello.GalleryIndexActivity"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

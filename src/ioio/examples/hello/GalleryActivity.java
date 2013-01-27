@@ -3,14 +3,19 @@ package ioio.examples.hello;
 
 
 
+import game.BracGameState;
 import game.TreeImageHandler;
 import game.GameDB;
 import game.GameState;
 import game.gallery.GalleryAdapter;
 import ioio.examples.hello.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -20,6 +25,7 @@ import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -43,12 +49,11 @@ public class GalleryActivity extends Activity {
 	
 	private int max_page;
 	private int cur_page;
-	private int first_show_view;
+	
+	private int start_pos,end_pos;
 	
 	private GameDB gDB;
-	private BracDbAdapter bDb;
 	
-	private static final int TOTAL_VIEW_PAGE = 10;
 	private AnimeListener animeListener;
 	
 	
@@ -63,58 +68,42 @@ public class GalleryActivity extends Activity {
 		setContentView(R.layout.activity_gallery);
 		galleryActivity = this;
 		galleryListView = (Gallery) findViewById(R.id.gallery_list);
-
 		anime1 = (ImageView) findViewById(R.id.gallery_anime1);
-		
-		cur_page = this.getIntent().getIntExtra("PAGE", -1);
-		first_show_view = this.getIntent().getIntExtra("SHOW", -1);
-		
 		gDB=new GameDB(this);
-		bDb = new BracDbAdapter(this);
+		
+		
+		int cur = this.getIntent().getIntExtra("PAGE", 0);
+		init(cur);
+		
+		
 		
 		stopAnimeSetting();
 		anime1.setOnClickListener(new AnimeFrameClickListener());
 		
-		int adapter_len = getGalleryListSize();
-		 init(adapter_len);
-		
-		 int start_pos = (cur_page-1)*TOTAL_VIEW_PAGE ;
-		 int end_pos = start_pos+TOTAL_VIEW_PAGE  -1 ;
-		 if (end_pos > adapter_len-1)
-			 end_pos = adapter_len-1;
-		 
 		 setGalleryList(start_pos, end_pos);
 		 
 		 i_adapter = new GalleryAdapter(gallery_list,galleryActivity);
-		 if (adapter_len>0){
+		 if (start_pos<=end_pos){
 			 galleryListView.setAdapter(i_adapter);
-			int select_pos;
-			if (first_show_view == -1)
-				select_pos = end_pos-start_pos;
-			else 
-				select_pos = first_show_view;
-			galleryListView.setSelection(select_pos);
+			galleryListView.setSelection(0);
 			animeListener = new AnimeListener();
 			galleryListView.setOnItemLongClickListener(animeListener);
 			galleryListView.setOnItemSelectedListener(new GallerySelectedListener());
 		}
 	}
 	
-	private void init(int len){
+	private void init(int cur){
 		nextButton = (Button)findViewById(R.id.gallery_next);
 		prevButton = (Button)findViewById(R.id.gallery_prev);
 		curPage = (EditText)findViewById(R.id.gallery_cur_page);
 		maxPage = (TextView)findViewById(R.id.gallery_page_max);
 		
-		if (len == 0)//# state == 0
-			max_page=cur_page=1;
-		else{//# state >0
-			max_page = len/TOTAL_VIEW_PAGE;
-			if (len%TOTAL_VIEW_PAGE >0)
-				++max_page;
-			if (cur_page == -1)
-				cur_page = max_page;
-		}
+		int[] info = getGalleryPage(cur);
+		
+		max_page = info[0];
+		cur_page = info[1];
+		start_pos = info[2];
+		end_pos = info[3];
 		
 		maxPage.setText(String.valueOf(max_page));
 		curPage.setText(String.valueOf(cur_page));
@@ -143,17 +132,15 @@ public class GalleryActivity extends Activity {
 		TreeImageHandler.cleanBitmaps();
 	}
 	
-	private int getGalleryListSize(){
+	/*private int getGalleryListSize(){
 		GameState[] stateList = gDB.getAllStates();
 		if (stateList == null)
 			return 0;
 		return stateList.length;
-	}
+	}*/
 	
 	private int setGalleryList(int start, int end){
-		GameState[] stateList = gDB.getAllStates();
-		bDb.open();
-		Cursor brac_test_list =  bDb.fetchAllHistory();
+		BracGameState[] stateList = gDB.getAllStates();
 
 		if (stateList == null)
 			return 0;
@@ -163,16 +150,16 @@ public class GalleryActivity extends Activity {
 			int stage = stateList[i].stage;
 			int coin = stateList[i].coin;
 
-			int bg_pic =  TreeImageHandler.getTreeImageDrawableId(stage, coin);
-			brac_test_list.moveToPosition(i);
-			String date = brac_test_list.getString(1);
+			int tree_pic =  TreeImageHandler.getTreeImageIdx(stage, coin);
+			long _date = stateList[i].date;
+			Date time = new Date(_date*1000L);
+			String date = new SimpleDateFormat("MM/dd/yyyy\nkk:mm",Locale.TAIWAN).format(time);
 			
 			item.put("stage", stage);
-			item.put("pic",bg_pic);
+			item.put("pic",tree_pic);
 			item.put("date", date);
 			gallery_list.add(item);
 		}
-		bDb.close();
 		return stateList.length;
 	}
 	
@@ -189,8 +176,7 @@ public class GalleryActivity extends Activity {
 					nextButton.setClickable(false);
 					cleanMemory();
 					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
-					newActivity.putExtra("PAGE", cur_page+1);
-					newActivity.putExtra("SHOW", 0);
+					newActivity.putExtra("PAGE", cur_page);
 					galleryActivity.startActivity(newActivity);
 				}
 				lock = false;
@@ -209,8 +195,7 @@ public class GalleryActivity extends Activity {
 					prevButton.setClickable(false);
 					cleanMemory();
 					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
-					newActivity.putExtra("PAGE", cur_page-1);
-					newActivity.putExtra("SHOW", -1);
+					newActivity.putExtra("PAGE", cur_page-2);
 					galleryActivity.startActivity(newActivity);
 					galleryActivity.finish();
 				}
@@ -228,7 +213,7 @@ public class GalleryActivity extends Activity {
 			if (set_page <= max_page && set_page >=1){
 				cleanMemory();
 				Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
-				newActivity.putExtra("PAGE", set_page);
+				newActivity.putExtra("PAGE", set_page-1);
 				galleryActivity.startActivity(newActivity);
 				galleryActivity.finish();
 			}
@@ -252,6 +237,8 @@ public class GalleryActivity extends Activity {
 		@Override
 		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 				long arg3) {
+			i_adapter.clearSelected((int)arg3);
+			System.gc();
 			stopAnimeSetting();
 		}
 
@@ -283,7 +270,7 @@ public class GalleryActivity extends Activity {
 			anime1.setVisibility(View.VISIBLE);
 			start = (int) arg3;
 			states = gDB.getAllStates();
-			idx =start + TOTAL_VIEW_PAGE*(cur_page-1);
+			idx =start_pos+start;;
 			 animation = new AnimationDrawable();
 			 anime1.setImageDrawable(animation);
 			for (;idx<states.length;++idx){
@@ -309,4 +296,60 @@ public class GalleryActivity extends Activity {
 		gallery_list.clear();
 		System.gc();
 	}
+	
+	//@return {total_page,cur_page,start_pos,end_pos}
+	private int[] getGalleryPage(int cur){
+		Log.d("GALLERY",String.valueOf(cur));
+		BracGameState[] stateList = gDB.getAllStates();
+
+		if (stateList == null)
+			return new int[]{1,1,-1,-1};
+		
+		int total_page = 0;
+		int[] return_value = new int[4];
+		
+		int end = stateList.length;
+		int i = 0;
+		while ( i < end){ 
+			long time = stateList[i].date*1000L;
+			Calendar cal_from = Calendar.getInstance();
+			cal_from.setTimeInMillis(time);
+			cal_from.set(Calendar.HOUR, 0);
+			cal_from.set(Calendar.MINUTE, 0);
+			cal_from.set(Calendar.SECOND, 0);
+			cal_from.set(Calendar.MILLISECOND, 0);
+			
+			int next = end;
+			
+			for (int j=i+1;j<end;++j){
+				long mili =  stateList[j].date*1000L;
+				long diff_day = (mili - cal_from.getTimeInMillis()) / 86400000;
+				if (diff_day  == 0){
+					if (j == end-1){//last
+						if (cur == total_page){
+							return_value[1] = cur+1;
+							return_value[2] = i;
+							return_value[3] = j;
+						}
+						++total_page;
+					}
+				}else{
+					next = j;
+					if (cur == total_page){
+						Log.d("GALLERY",String.valueOf(cur)+"/"+String.valueOf(total_page)+" "+String.valueOf(i)+"/"+String.valueOf(j-1));
+						return_value[1] = cur+1;
+						return_value[2] = i;
+						return_value[3] = j-1;
+					}
+					++total_page;
+					break;
+				}
+			}
+			i = next;
+		}
+		return_value[0] = total_page;
+		return return_value;
+	}
+	
+	
 }

@@ -51,9 +51,15 @@ public class TreeImageHandler {
 		return Tree_pics [idx];
 	}
 	
+	public static int getTreeImageDrawableId(int idx){
+		if (idx<0 || idx >=Tree_pics.length)
+			return Tree_pics [0];
+		return Tree_pics [idx];
+	}
+	
 	public static int getTreeImageIdx(int stage, int coin_num){
 		int idx = coin_num;
-		if (idx<0 || idx >= GameState.MAX_COINS[stage] || idx >=Tree_pics.length)
+		if (idx<0 || idx > GameState.MAX_COINS[stage] || idx >=Tree_pics.length)
 			return 0;
 		return idx;
 	}

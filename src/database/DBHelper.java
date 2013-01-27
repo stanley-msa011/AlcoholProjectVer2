@@ -7,11 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
-	private static final String DATABASE_NAME = "Brac_History";
-	private static final int DB_VERSION = 2;
+	private static final String DATABASE_NAME = "Alcohol Project";
+	private static final int DB_VERSION = 3;
 	
 	
-	public final static String KEY_ROWID = "_id";
+	/*public final static String KEY_ROWID = "_id";
 	public final static String KEY_DATE = "date";
 	public final static String KEY_BRAC = "brac";
 	
@@ -20,7 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	private final static String DATABASE_CREATE =
 			"create table " + DATABASE_TABLE + " (_id integer primary key autoincrement, "
 	        + KEY_DATE + " text not null, " + KEY_BRAC + " text not null);";
-	
+	*/
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -32,10 +32,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE AlcoholTreeGame (" +
                         " _ID INTEGER PRIMARY KEY, " +
                         " _STAGE INTEGER NOT NULL, " +
-                        " _COIN INTEGER NOT NULL" +
+                        " _COIN INTEGER NOT NULL," +
+                        " _DATE INTEGER NOT NULL,"+
+                        " _BRAC FLOAT NOT NULL"+
                 ")"
         );
-        db.execSQL(DATABASE_CREATE);
+        //db.execSQL(DATABASE_CREATE);
         db.execSQL(
         		"CREATE TABLE AlcoholInteractiveGame ("+
         				"_ID INTEGER PRIMARY KEY," +
@@ -55,7 +57,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int old_ver, int new_ver){
 		db.execSQL("DROP TABLE IF EXISTS AlcoholTreeGame");
-		db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
+		//db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
 		db.execSQL("DROP TABLE IF EXISTS  AlcoholInteractiveGame");
 		onCreate(db);
 	}

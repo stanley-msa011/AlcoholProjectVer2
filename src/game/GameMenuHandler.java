@@ -2,6 +2,7 @@ package game;
 
 import ioio.examples.hello.BracHistoryActivity;
 import ioio.examples.hello.GalleryActivity;
+import ioio.examples.hello.GalleryIndexActivity;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.MainActivity;
 import ioio.examples.hello.MainLegacyActivity;
@@ -99,8 +100,9 @@ public class GameMenuHandler {
 					ga.startActivityForResult(newActivity, REQUEST_TEST);  
 					break;
 				case 1: //Dummy (Record of TreeGame)
-					newActivity = new Intent(context, GalleryActivity.class); 
-					newActivity.putExtra("PAGE", -1);
+					//newActivity = new Intent(context, GalleryActivity.class); 
+					//newActivity.putExtra("PAGE", -1);
+					newActivity = new Intent(context, GalleryIndexActivity.class); 
 					ga.startActivity(newActivity);  
 					break;
 				case 2: //BracListActivity

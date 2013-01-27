@@ -52,6 +52,19 @@ public class GameDB {
     	return new GameState(stage,coin);
     }
     
+    public void updateState(BracGameState newState){
+    	gDB = gDBHelper.getWritableDatabase();
+    	int stage = newState.stage;
+    	int coin = newState.coin;
+    	long date = newState.date;
+    	float brac = newState.brac;
+    	gDB.execSQL( 
+    	"INSERT INTO AlcoholTreeGame (_STAGE,_COIN,_DATE,_BRAC) VALUES ("+String.valueOf(stage)+", "+String.valueOf(coin)+", "+String.valueOf(date)+", "+String.valueOf(brac)+")");
+    	gDB.close();
+    }
+    
+    
+    /*
     public GameState updateState(GameState newState){
     	GameState oldState = getLatestGameState();
     	gDB = gDBHelper.getWritableDatabase();
@@ -62,12 +75,46 @@ public class GameDB {
     	gDB.close();
     	return oldState;
     }
+    */
     
-    public GameState[] getAllStates(){
+    public BracGameState[] getAllStates(){
     	gDB = gDBHelper.getReadableDatabase();
     	Cursor cursor;
     	
-    	cursor = gDB.rawQuery("SELECT _ID,_STAGE,_COIN FROM AlcoholTreeGame ORDER BY _ID ASC",null);
+    	cursor = gDB.rawQuery("SELECT _ID,_STAGE,_COIN,_DATE,_BRAC FROM AlcoholTreeGame ORDER BY _DATE ASC",null);
+    	if (cursor.getCount()==0){
+    		gDB.close();
+    		return null;
+    	}
+    	int list_size = cursor.getCount();
+    	
+    	BracGameState[] stateList = new BracGameState[list_size];
+    	
+    	cursor.moveToFirst();
+    	int stage = cursor.getInt(1);
+    	int coin = cursor.getInt(2);
+    	long date = cursor.getLong(3);
+    	float brac = cursor.getFloat(4);
+    	
+    	stateList[0]=new BracGameState(stage,coin,date,brac);
+    	int i = 1;
+    	while(cursor.moveToNext()){
+        	stage = cursor.getInt(1);
+        	coin = cursor.getInt(2);
+        	date = cursor.getLong(3);
+        	brac = cursor.getFloat(4);
+        	stateList[i]=new BracGameState(stage,coin,date,brac);
+        	++i;
+    	}
+    	gDB.close();
+    	return stateList;
+    }
+
+    public GameState[] getStatesIndex(){
+    	gDB = gDBHelper.getReadableDatabase();
+    	Cursor cursor;
+    	
+    	cursor = gDB.rawQuery("SELECT _ID,_STAGE,_COIN FROM AlcoholTreeGame WHERE _ID % 10 = 1 ORDER BY _ID ASC",null);
     	if (cursor.getCount()==0){
     		gDB.close();
     		return null;
@@ -90,5 +137,4 @@ public class GameDB {
     	gDB.close();
     	return stateList;
     }
-    
 }

@@ -1,17 +1,24 @@
 package ioio.examples.hello;
 
+import game.BracGameState;
+import game.GameDB;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.database.Cursor;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+
 public class BracHistoryActivity extends Activity {
 
-	private BracDbAdapter mBracDbAdapter;
+	private GameDB gdb ;
 	private SimpleAdapter brac_adapter;
 	private ListView brac_list_view;
 	private ArrayList<HashMap<String,Object>> brac_list;
@@ -27,9 +34,10 @@ public class BracHistoryActivity extends Activity {
 		System.gc();
 		setContentView(R.layout.activity_brac_history);
 		brac_list_view = (ListView)findViewById(R.id.brac_history_listview);
-		mBracDbAdapter = new BracDbAdapter(this);
-		mBracDbAdapter.open();
-		brac_list = fillData();
+		
+		gdb = new GameDB(this);
+		BracGameState[] list = gdb.getAllStates();
+		fillData(list);
 		brac_adapter = new SimpleAdapter(
 					this, 
 					brac_list,
@@ -46,30 +54,24 @@ public class BracHistoryActivity extends Activity {
 		brac_adapter.notifyDataSetInvalidated();
 	}
 	
-	private ArrayList<HashMap<String,Object>> fillData() {
-        Cursor cursor = mBracDbAdapter.fetchAllHistory();
-        
-        cursor.moveToFirst();
-        
-        int number_history = cursor.getCount();
-        ArrayList<HashMap<String,Object>> brac_list = new ArrayList<HashMap<String,Object>>();
-        
-        for (int i=0;i<number_history;++i){
-        	HashMap<String,Object> item = new HashMap<String,Object>();
-        	cursor.moveToPosition(i);
-        	String _date = cursor.getString(1);
-        	String _brac = cursor.getString(2);
-        	int _bg = getBg(_brac);
-        	
+	private void fillData(BracGameState[] gs){
+		int len = gs.length;
+		brac_list = new ArrayList<HashMap<String,Object>>();
+		for (int i=0;i<len;++i){
+			HashMap<String,Object> item = new HashMap<String,Object>();
+			long date = gs[i].date;
+			Date time = new Date(date*1000L);
+			String _date = new SimpleDateFormat("MM/dd/yyyy\nkk:mm",Locale.TAIWAN).format(time);
 			item.put("date",_date);
-			item.put("brac",_brac );
+			DecimalFormat df = new DecimalFormat("0.000");
+			String _brac = df.format(gs[i].brac);
+			item.put("brac", _brac);
+			int _bg = getBg(_brac);
 			item.put("bg", _bg);
-        	brac_list.add(item);
-        }
-        mBracDbAdapter.close();
-		return brac_list;
-    }
-
+			brac_list.add(item);
+		}
+	}
+	
 	private int getBg(String _brac){
 		double brac_v = Double.valueOf(_brac);
 		if (brac_v < limit[0])

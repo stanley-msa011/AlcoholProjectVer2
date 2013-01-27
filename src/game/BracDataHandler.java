@@ -1,17 +1,11 @@
 package game;
 
-import ioio.examples.hello.BracDbAdapter;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 import org.apache.http.HttpVersion;
@@ -29,6 +23,7 @@ import database.Reuploader;
 import android.content.Context;
 import android.os.Environment;
 import android.provider.Settings.Secure;
+import android.util.Log;
 
 public class BracDataHandler {
 	private String ts;
@@ -94,7 +89,13 @@ public class BracDataHandler {
        		result = HaveAlcohol;
        		treeGame.loseCoin();//Do nothing now
        	}
-       	gDB.updateState(treeGame.getGameState());
+       	
+       	GameState gs = treeGame.getGameState();
+       	
+       	Long _ts = Long.parseLong(ts);
+       	BracGameState bgs = new BracGameState(gs.stage,gs.coin,_ts,(float)avg_result);
+       	Log.d("NEW TS",String.valueOf(bgs.date));
+       	gDB.updateState(bgs);
        	
        	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");
        	try {
@@ -111,8 +112,6 @@ public class BracDataHandler {
 		if (server_connect == ERROR)
 			reuploader.storeTS(ts);
 		
-		saveToDB(avg_result);
-       	
 		return result;
 		
 	}
@@ -194,18 +193,4 @@ public class BracDataHandler {
 		} 
 		return SUCCESS;
 	}
-	
-	private void saveToDB(double avg_value){
-		Date time = new Date(Long.parseLong(ts)*1000L);
-		String dateStamp = new SimpleDateFormat("MM/dd/yyyy\nkk:mm",Locale.TAIWAN).format(time);
-		
-		DecimalFormat df = new DecimalFormat("0.000");
-		String strAvg = df.format(avg_value);
-
-	    BracDbAdapter mBracDbAdapter = new BracDbAdapter(activity_context);
-        mBracDbAdapter.open();
-	    mBracDbAdapter.createEntry(dateStamp, strAvg);
-		mBracDbAdapter.close();
-	}
-	
 }
