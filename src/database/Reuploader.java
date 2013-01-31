@@ -49,6 +49,11 @@ public class Reuploader {
 			runThread = new Thread(rud);
 			runThread.run();
 		}
+		try {
+			runThread.join();
+		} catch (InterruptedException e) {
+		}
+		Log.d("REUPLOAD","END");
 	}
 	
 	

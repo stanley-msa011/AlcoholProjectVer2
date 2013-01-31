@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -61,7 +62,7 @@ public class GameActivity extends Activity{
 	private GameMenuHandler gMenu;
 	private InteractiveGameHandler gInteractiveGame;
 	private Reuploader reuploader;
-	
+	private ReuploadTask reuploadTask;
 	
 	private Bitmap cur_tree = null;
 	private Bitmap prev_tree = null;
@@ -104,9 +105,11 @@ public class GameActivity extends Activity{
 		gMenu = new GameMenuHandler(this);
 		gInteractiveGame = new InteractiveGameHandler(this);
 		context = this;
-		reuploader = new Reuploader(this);
-		reuploader.reTransmission();
+		reuploadTask = new ReuploadTask();
+		reuploadTask.execute("");
 		initRegistration();
+		
+		
 		
 		Intent intent = this.getIntent();
 		if (intent != null){
@@ -342,4 +345,18 @@ public class GameActivity extends Activity{
 		String bg_type = sp.getString("change_stage", "0");
 		return  Integer.valueOf(bg_type);
     }
+    
+    private class ReuploadTask extends AsyncTask<String, Void, Object> {
+        protected Object doInBackground(String... args) {
+        	reuploader = new Reuploader(ga);
+        	reuploader.reTransmission();
+            return null;
+        }
+
+        protected void onPostExecute(Object result) {
+            /*if (ga.pd != null) {
+                ga.pd.dismiss();
+            }*/
+        }
+   }   
 }

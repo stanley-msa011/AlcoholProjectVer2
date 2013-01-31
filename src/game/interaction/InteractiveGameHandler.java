@@ -91,11 +91,15 @@ public class InteractiveGameHandler {
 			thread.start();
 			thread.join(3000);
 			update_adapter();
-			i_adapter.notifyDataSetChanged();
+			//i_adapter.notifyDataSetChanged();
 		} catch (Exception e) {
 			e.printStackTrace();	
 			return;
 		} 
+	}
+	
+	public void notifyUpdate(){
+		i_adapter.notifyDataSetChanged();
 	}
 	
 	public String getCodeNameByPID(String pid){

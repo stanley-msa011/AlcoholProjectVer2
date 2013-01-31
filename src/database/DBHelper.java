@@ -8,19 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 3;
-	
-	
-	/*public final static String KEY_ROWID = "_id";
-	public final static String KEY_DATE = "date";
-	public final static String KEY_BRAC = "brac";
-	
-	private final static String DATABASE_TABLE = "user_history";
-	
-	private final static String DATABASE_CREATE =
-			"create table " + DATABASE_TABLE + " (_id integer primary key autoincrement, "
-	        + KEY_DATE + " text not null, " + KEY_BRAC + " text not null);";
-	*/
+	private static final int DB_VERSION = 4;
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -37,7 +25,6 @@ public class DBHelper extends SQLiteOpenHelper {
                         " _BRAC FLOAT NOT NULL"+
                 ")"
         );
-        //db.execSQL(DATABASE_CREATE);
         db.execSQL(
         		"CREATE TABLE AlcoholInteractiveGame ("+
         				"_ID INTEGER PRIMARY KEY," +
@@ -51,14 +38,22 @@ public class DBHelper extends SQLiteOpenHelper {
         				"_ID INTEGER PRIMARY KEY," +
         				"_TS CHAR[50] NOT NULL )"
         		);
-        
+        db.execSQL(
+        		"CREATE TABLE DayCompletion ("+
+        				" _ID INTEGER PRIMARY KEY," +
+        				" _YEAR INTEGER NOT NULL," +
+        				" _MONTH INTEGER NOT NULL," +
+        				" _DATE INTEGER NOT NULL," +
+        				" _BLOCK INTEGER NOT NULL)"
+        		);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int old_ver, int new_ver){
 		db.execSQL("DROP TABLE IF EXISTS AlcoholTreeGame");
-		//db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
 		db.execSQL("DROP TABLE IF EXISTS  AlcoholInteractiveGame");
+		db.execSQL("DROP TABLE IF EXISTS NotUploadedTimeStamp");
+		db.execSQL("DROP TABLE IF EXISTS DayCompletion");
 		onCreate(db);
 	}
 	

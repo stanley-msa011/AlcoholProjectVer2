@@ -8,7 +8,8 @@ public class BackgroundImageHandler {
 	
 	private static final int[] Bg_pics = {
 		R.drawable.background_all_0,R.drawable.background_all_1,
-		R.drawable.background_all_2,R.drawable.background_all_3
+		R.drawable.background_all_2,R.drawable.background_all_3,
+		R.drawable.background_all_4
 	};
 	
 	private static int BG_STAGE = GameState.MAX_STAGE+1;
@@ -28,6 +29,7 @@ public class BackgroundImageHandler {
 			Bg_drawables[1] = context.getResources().getDrawable(R.drawable.background_all_1);
 			Bg_drawables[2] = context.getResources().getDrawable(R.drawable.background_all_2);
 			Bg_drawables[3] = context.getResources().getDrawable(R.drawable.background_all_3);
+			Bg_drawables[4] = context.getResources().getDrawable(R.drawable.background_all_4);
 		}
 		return Bg_drawables[stage];
 	}

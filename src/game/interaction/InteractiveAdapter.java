@@ -5,10 +5,12 @@ import ioio.examples.hello.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +21,7 @@ import android.widget.TextView;
 
 public class InteractiveAdapter extends BaseAdapter {
 
-	private static int[] STAGE_BG_COLOR = {0x22FF0000,0x2200FF00};
+	private static int[] STAGE_BG_COLOR = {0x88FF0000,0x8800FF00};
 	
 	private ArrayList<HashMap<String,Object>> list;
 	private HashMap<String,Bitmap> bitmap_map;
@@ -47,6 +49,7 @@ public class InteractiveAdapter extends BaseAdapter {
 		return position;
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		vTag v_tag = null;
@@ -64,10 +67,16 @@ public class InteractiveAdapter extends BaseAdapter {
 		
 		int stage = (Integer)item_info.get("stage");
 		int pref_stage = getPrefStage();
-		if (stage == pref_stage)
-			convertView.setBackgroundColor(STAGE_BG_COLOR [1]);
-		else
-			convertView.setBackgroundColor(STAGE_BG_COLOR [0]);
+		if (stage == pref_stage){
+			v_tag.code_name.setBackgroundColor(STAGE_BG_COLOR [1]);
+			if (Build.VERSION.SDK_INT >=11)
+				convertView.setAlpha(1.f);
+		}
+		else{
+			v_tag.code_name.setBackgroundColor(STAGE_BG_COLOR [0]);
+			if (Build.VERSION.SDK_INT >=11)
+				convertView.setAlpha(0.5f);
+		}
 		
 		int tree = (Integer) item_info.get("pic");
 		String code = (String) item_info.get("code_name");

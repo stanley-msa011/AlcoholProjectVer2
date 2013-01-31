@@ -16,25 +16,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.GridView;
 import android.widget.Spinner;
 
 public class GalleryIndexActivity extends Activity {
 
-	private static final String[] spinner_content={"全部","一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"};  
-	
 	private GalleryIndexAdapter gi_adapter;
 	private GameDB gDB;
-	private ArrayAdapter<CharSequence> month_adapter;  
-	private int cur_month = 0;
+	private ArrayAdapter<CharSequence> session_adapter;  
+	private int cur_session = 0;
 	
-	ListView galleryIdxListView;
-	Spinner galleryIdxSpinner;
-	ArrayList<HashMap<String,Object>> gallery_idx_list = new ArrayList<HashMap<String,Object>>();
-	ArrayList<HashMap<String,Object>> show_gallery_idx_list = new ArrayList<HashMap<String,Object>>();
+	
+	private GridView galleryIdxGridView;
+	private Spinner galleryIdxSpinner;
+	private ArrayList<HashMap<String,Object>> gallery_idx_list = new ArrayList<HashMap<String,Object>>();
 	
 	private Context context;
 	@Override
@@ -49,25 +48,20 @@ public class GalleryIndexActivity extends Activity {
 		super.onResume();
 		context  = this;
 		gDB=new GameDB(this);
-		galleryIdxListView = (ListView) this.findViewById(R.id.Gallery_Index_List);
-		galleryIdxSpinner = (Spinner) this.findViewById(R.id.gallery_index_month_spinner);
-		month_adapter =ArrayAdapter.createFromResource(this, R.array.gallery_index_month, android.R.layout.simple_spinner_item);
-		month_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
-		galleryIdxSpinner.setAdapter(month_adapter);  
+		galleryIdxGridView = (GridView) this.findViewById(R.id.Gallery_Index_List);
+		galleryIdxSpinner = (Spinner) this.findViewById(R.id.gallery_index_session_spinner);
+		session_adapter =ArrayAdapter.createFromResource(this, R.array.gallery_index_session, android.R.layout.simple_spinner_item);
+		session_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
+		galleryIdxSpinner.setAdapter(session_adapter);  
 		
-		galleryIdxListView.setOnItemClickListener(new GalleryIndexOnItemClickListener() );
-		//int adapter_len = setGalleryIndexList();
-		setGalleryIndexList();
-		//gi_adapter = new GalleryIndexAdapter(gallery_idx_list,this);
-		 //if (adapter_len>0)
-		//	 galleryIdxListView.setAdapter(gi_adapter);
+		galleryIdxGridView.setOnItemClickListener(new GalleryIndexOnItemClickListener() );
+		
+		 gi_adapter = new GalleryIndexAdapter(gallery_idx_list,this);
 		 
-		 //setShowIndexList(0);
-		 gi_adapter = new GalleryIndexAdapter(show_gallery_idx_list,this);
-		 galleryIdxListView.setAdapter(gi_adapter);
+		 galleryIdxGridView.setAdapter(gi_adapter);
 		
 		 galleryIdxSpinner.setOnItemSelectedListener(new MonthOnItemSelectedListener());
-		 galleryIdxSpinner.setSelection(cur_month);
+		 galleryIdxSpinner.setSelection(cur_session);
 		 
 	}
 	
@@ -77,9 +71,9 @@ public class GalleryIndexActivity extends Activity {
 		cleanMemory();
 	}
 	
-	private int setGalleryIndexList(){
-		BracGameState[] stateList = gDB.getAllStates();
-
+	private int setGalleryIndexList(int cur_session){
+		gallery_idx_list.clear();
+		BracGameState[] stateList = gDB.getAllStates(cur_session);
 		if (stateList == null)
 			return 0;
 		
@@ -108,12 +102,7 @@ public class GalleryIndexActivity extends Activity {
 			int day = cal_from.get(Calendar.DATE);
 			int year = cal_from.get(Calendar.YEAR);
 			
-			/*
-			int hour = cal_from.get(Calendar.HOUR);
-			int min = cal_from.get(Calendar.MINUTE);
-			int sec = cal_from.get(Calendar.SECOND);
-			*/
-			String DateString = month+"/"+day+"/"+year;//+"\n"+hour+":"+min+":"+sec;
+			String DateString = month+"/"+day+"\n"+year;
 			
 			int next = end;
 			for (int j=i+1;j<end;++j){
@@ -137,24 +126,6 @@ public class GalleryIndexActivity extends Activity {
 		return gallery_idx_list.size();
 	}
 	
-	private int setShowIndexList(int mon){
-		int len = gallery_idx_list.size();
-		show_gallery_idx_list.clear();
-		if (mon == 0){
-				show_gallery_idx_list.addAll(gallery_idx_list);
-				return len;
-		}
-		
-		for (int i=0;i<len;++i){
-			HashMap<String,Object> item = gallery_idx_list.get(i);
-			String date = (String) item.get("date");
-			String[] dates = date.split("/");
-			int month = Integer.valueOf(dates[0]);
-			if (month == mon)
-				show_gallery_idx_list.add(item);
-		}
-		return show_gallery_idx_list.size();
-	}
 	
 	class GalleryIndexOnItemClickListener implements AdapterView.OnItemClickListener{
 
@@ -164,8 +135,9 @@ public class GalleryIndexActivity extends Activity {
 			Intent newActivity;
 			int target = (int) arg3;
 			newActivity = new Intent(context, GalleryActivity.class);
-			int page = (Integer) show_gallery_idx_list.get(target).get("page");
+			int page = (Integer) gallery_idx_list.get(target).get("page");
 			newActivity.putExtra("PAGE", page);
+			newActivity.putExtra("SESSION", cur_session);
 			context.startActivity(newActivity);
 		}
 	}
@@ -176,21 +148,20 @@ public class GalleryIndexActivity extends Activity {
 		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 				long arg3) {
 			
-			 int selected = (int)arg3;
-			 cur_month = selected;
-			 
-			 setShowIndexList(cur_month);
+			 cur_session = (int)arg3;
+			 Log.d("INDEX",String.valueOf(cur_session));
+			 setGalleryIndexList(cur_session-1);
 			 gi_adapter.clearAll();
-			 gi_adapter.Reset(show_gallery_idx_list);
+			 gi_adapter.Reset(gallery_idx_list);
 			 gi_adapter.notifyDataSetChanged();
 			
 		}
 
 		@Override
 		public void onNothingSelected(AdapterView<?> arg0) {
-			setShowIndexList(cur_month);
+			setGalleryIndexList(cur_session-1);
 			 gi_adapter.clearAll();
-			 gi_adapter.Reset(show_gallery_idx_list);
+			 gi_adapter.Reset(gallery_idx_list);
 			 gi_adapter.notifyDataSetChanged();
 		}
 		

@@ -3,10 +3,10 @@ package game;
 public class GameState {
 	/*Total 7 states*/ // state -> therapy stage
 	static final public int MIN_STAGE = 0;
-	static final public int MAX_STAGE = 3;
+	static final public int MAX_STAGE = 4;
 	
 	static final public int MIN_COINS = 0;
-	static final public int[] MAX_COINS = {34,69,139,139};
+	static final public int[] MAX_COINS = {34,34,69,139,139};
 	public int stage;
 	public int coin;
 	

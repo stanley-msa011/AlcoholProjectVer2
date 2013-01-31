@@ -29,7 +29,12 @@
             android:key="change_stage" 
             android:dialogTitle="ChangeStage" 
            android:entries="@array/stage_options"
-           android:entryValues="@array/stage_values" android:defaultValue="0"/>
+           android:entryValues="@array/stage_values" 
+           android:defaultValue="0"/>
+        <CheckBoxPreference 
+            android:title="check Time Block" 
+            android:key="check_time" 
+            android:defaultValue="true"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

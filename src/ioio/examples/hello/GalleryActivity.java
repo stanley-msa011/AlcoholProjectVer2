@@ -3,6 +3,7 @@ package ioio.examples.hello;
 
 
 
+import game.BracDataHandler;
 import game.BracGameState;
 import game.TreeImageHandler;
 import game.GameDB;
@@ -49,6 +50,7 @@ public class GalleryActivity extends Activity {
 	
 	private int max_page;
 	private int cur_page;
+	private int cur_session;
 	
 	private int start_pos,end_pos;
 	
@@ -73,9 +75,8 @@ public class GalleryActivity extends Activity {
 		
 		
 		int cur = this.getIntent().getIntExtra("PAGE", 0);
+		cur_session = this.getIntent().getIntExtra("SESSION", 0);
 		init(cur);
-		
-		
 		
 		stopAnimeSetting();
 		anime1.setOnClickListener(new AnimeFrameClickListener());
@@ -132,15 +133,8 @@ public class GalleryActivity extends Activity {
 		TreeImageHandler.cleanBitmaps();
 	}
 	
-	/*private int getGalleryListSize(){
-		GameState[] stateList = gDB.getAllStates();
-		if (stateList == null)
-			return 0;
-		return stateList.length;
-	}*/
-	
 	private int setGalleryList(int start, int end){
-		BracGameState[] stateList = gDB.getAllStates();
+		BracGameState[] stateList = gDB.getAllStates( cur_session-1);
 
 		if (stateList == null)
 			return 0;
@@ -154,6 +148,11 @@ public class GalleryActivity extends Activity {
 			long _date = stateList[i].date;
 			Date time = new Date(_date*1000L);
 			String date = new SimpleDateFormat("MM/dd/yyyy\nkk:mm",Locale.TAIWAN).format(time);
+			float brac = stateList[i].brac;
+			if (brac > BracDataHandler.THRESHOLD)
+				item.put("brac", true);
+			else
+				item.put("brac", false);
 			
 			item.put("stage", stage);
 			item.put("pic",tree_pic);
@@ -177,6 +176,7 @@ public class GalleryActivity extends Activity {
 					cleanMemory();
 					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 					newActivity.putExtra("PAGE", cur_page);
+					newActivity.putExtra("SESSION",  cur_session);
 					galleryActivity.startActivity(newActivity);
 				}
 				lock = false;
@@ -196,6 +196,7 @@ public class GalleryActivity extends Activity {
 					cleanMemory();
 					Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 					newActivity.putExtra("PAGE", cur_page-2);
+					newActivity.putExtra("SESSION",  cur_session);
 					galleryActivity.startActivity(newActivity);
 					galleryActivity.finish();
 				}
@@ -214,6 +215,7 @@ public class GalleryActivity extends Activity {
 				cleanMemory();
 				Intent newActivity = new Intent(galleryActivity, GalleryActivity.class); 
 				newActivity.putExtra("PAGE", set_page-1);
+				newActivity.putExtra("SESSION",  cur_session);
 				galleryActivity.startActivity(newActivity);
 				galleryActivity.finish();
 			}
@@ -300,7 +302,7 @@ public class GalleryActivity extends Activity {
 	//@return {total_page,cur_page,start_pos,end_pos}
 	private int[] getGalleryPage(int cur){
 		Log.d("GALLERY",String.valueOf(cur));
-		BracGameState[] stateList = gDB.getAllStates();
+		BracGameState[] stateList = gDB.getAllStates(cur_session-1);
 
 		if (stateList == null)
 			return new int[]{1,1,-1,-1};
@@ -321,9 +323,10 @@ public class GalleryActivity extends Activity {
 			
 			int next = end;
 			
-			for (int j=i+1;j<end;++j){
+			for (int j=i;j<end;++j){
 				long mili =  stateList[j].date*1000L;
 				long diff_day = (mili - cal_from.getTimeInMillis()) / 86400000;
+				Log.d("Gallery diff",String.valueOf(diff_day));
 				if (diff_day  == 0){
 					if (j == end-1){//last
 						if (cur == total_page){

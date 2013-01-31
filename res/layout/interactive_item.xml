@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="72dp"
+    android:layout_height="128dp"
+    android:background="@drawable/interactive_item" 
     >
 
     <ImageView
         android:id="@+id/interactive_state"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:scaleType="fitXY"
         android:adjustViewBounds="true"
         />
         <TextView
         android:id="@+id/interactive_code"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/interactive_state"
-        android:textColor="#FFFFFFFF"
-        android:textSize="20sp"
-        android:background="#55000000"
+        android:layout_width="72dp"
+        android:layout_height="36dp"
+        android:layout_below="@+id/interactive_state"
+        android:textColor="#FF000000"
+        android:textSize="18sp"
         />
 
 

@@ -110,31 +110,42 @@ public class GameDB {
     	return stateList;
     }
 
-    public GameState[] getStatesIndex(){
+    public BracGameState[] getAllStates(int show_stage){
     	gDB = gDBHelper.getReadableDatabase();
     	Cursor cursor;
     	
-    	cursor = gDB.rawQuery("SELECT _ID,_STAGE,_COIN FROM AlcoholTreeGame WHERE _ID % 10 = 1 ORDER BY _ID ASC",null);
+    	if (show_stage == -1)//all
+    		cursor = gDB.rawQuery("SELECT _ID,_STAGE,_COIN,_DATE,_BRAC FROM AlcoholTreeGame ORDER BY _DATE ASC",null);
+    	else{
+    		String _sstage = String.valueOf(show_stage);
+    		cursor = gDB.rawQuery("SELECT _ID,_STAGE,_COIN,_DATE,_BRAC FROM AlcoholTreeGame WHERE _STAGE="+_sstage+" ORDER BY _DATE ASC",null);
+    	}
     	if (cursor.getCount()==0){
     		gDB.close();
     		return null;
     	}
     	int list_size = cursor.getCount();
     	
-    	GameState[] stateList = new GameState[list_size];
+    	BracGameState[] stateList = new BracGameState[list_size];
     	
     	cursor.moveToFirst();
     	int stage = cursor.getInt(1);
     	int coin = cursor.getInt(2);
-    	stateList[0]=new GameState(stage,coin);
+    	long date = cursor.getLong(3);
+    	float brac = cursor.getFloat(4);
+    	
+    	stateList[0]=new BracGameState(stage,coin,date,brac);
     	int i = 1;
     	while(cursor.moveToNext()){
         	stage = cursor.getInt(1);
         	coin = cursor.getInt(2);
-        	stateList[i]=new GameState(stage,coin);
+        	date = cursor.getLong(3);
+        	brac = cursor.getFloat(4);
+        	stateList[i]=new BracGameState(stage,coin,date,brac);
         	++i;
     	}
     	gDB.close();
     	return stateList;
     }
+    
 }

@@ -125,6 +125,14 @@
             android:name="ioio.examples.hello.GalleryIndexActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="ioio.examples.hello.NewTestActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ioio.examples.hello.BracStatisticActivity"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

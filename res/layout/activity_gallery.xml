@@ -2,15 +2,40 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
-
+    android:background="@drawable/gallery_background"
     tools:context=".StoryActivity" >
-    <Gallery
-        android:id="@+id/gallery_list"
+    
+    
+     <RelativeLayout
+        android:id = "@+id/gallery_title_bar"
         android:layout_width="match_parent"
-        android:layout_height="420dp"
-        android:layout_centerInParent="true"
-        android:spacing="@dimen/gallery_space" />
+        android:layout_height="wrap_content" 
+        android:background="#55000000"
+        android:layout_alignParentTop="true">
+        <TextView
+            android:id = "@+id/gallery_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:textSize="28sp"
+            android:text="歷史紀錄" 
+            android:gravity="center"
+            android:textColor="#FFFFFFFF"/>
+        
+    </RelativeLayout>
+     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_centerInParent="true">
+    	<Gallery
+        	android:id="@+id/gallery_list"
+        	android:layout_width="match_parent"
+        	android:layout_height="420dp"
+        	android:layout_centerInParent="true"
+        	android:spacing="12dp"
+        	/>
+    </RelativeLayout>
     <LinearLayout
         android:id="@+id/gallery_controlbar"
         android:layout_width="match_parent"
@@ -19,7 +44,8 @@
         android:alpha="0.8"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:scrollbars="none" >
+        android:scrollbars="none" 
+        >
 
     <Button
         android:id="@+id/gallery_prev"
@@ -37,7 +63,7 @@
         android:background="@null"
         android:ems="3"
         android:inputType="number"
-        android:textColor="#FFFFFFFF"
+        android:textColor="#FF000000"
         android:textSize="18sp" >
 
     </EditText>
@@ -48,14 +74,16 @@
         android:layout_height="wrap_content"
         android:textSize="32sp"
         android:layout_marginBottom="4dp"
-        android:text="/" />
+        android:text="/" 
+        android:textColor="#FF000000"/>
     
      <TextView
          android:id="@+id/gallery_page_max"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:text="999"
-         android:textSize="24sp" />
+         android:textSize="24sp"
+          android:textColor="#FF000000" />
      
          <Button
              android:id="@+id/gallery_next"

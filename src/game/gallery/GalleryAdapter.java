@@ -24,6 +24,8 @@ public class GalleryAdapter extends BaseAdapter {
 	private Context context;
 	private LayoutInflater inflater;
 	
+	static int[] brac_result_image_id = {R.drawable.apple_good,R.drawable.apple_bad};
+	
 	public GalleryAdapter(ArrayList<HashMap<String,Object>> list, Context context){
 		this.list = list;
 		this.context = context;
@@ -61,11 +63,26 @@ public class GalleryAdapter extends BaseAdapter {
 		
 		int stage = (Integer) item_info.get("stage");
 		int tree = (Integer) item_info.get("pic");
+		boolean brac = (Boolean) item_info.get("brac");
+		Bitmap cur_brac = bitmap_map.get("brac"+String.valueOf(brac));
 		Bitmap cur_stage = bitmap_map.get("bg"+String.valueOf(stage));
 		Bitmap cur_tree = bitmap_map.get("tree"+String.valueOf(tree));
 		
 		
 		String date = (String) item_info.get("date");
+		
+		if (cur_brac == null){
+			int id;
+			if (brac)
+				id = brac_result_image_id [1];
+			else
+				id = brac_result_image_id [0];
+			
+			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(),id );
+			cur_brac = Bitmap.createScaledBitmap(tmp, 36, 36, true);
+			tmp.recycle();
+			bitmap_map.put("brac"+String.valueOf(brac),cur_brac);
+		}
 		
 		if (cur_stage == null){
 			Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), BackgroundImageHandler.getBackgroundImageDrawableId(stage));
@@ -82,6 +99,7 @@ public class GalleryAdapter extends BaseAdapter {
 		}
 		v_tag.bg.setImageBitmap(cur_stage);
 		v_tag.tree.setImageBitmap(cur_tree);
+		v_tag.brac.setImageBitmap(cur_brac);
 		v_tag.date.setText(date);
 		
 		return convertView;
@@ -91,15 +109,16 @@ public class GalleryAdapter extends BaseAdapter {
 		ImageView bg;
 		ImageView tree;
 		TextView date;
+		ImageView brac;
 		public vTag(View convertView){
 			bg = (ImageView) convertView.findViewById(R.id.gallery_bg);
 			tree = (ImageView) convertView.findViewById(R.id.gallery_tree);
 			date = (TextView) convertView.findViewById(R.id.gallery_date);
+			brac = (ImageView) convertView.findViewById(R.id.gallery_result);
 		}
 	}
 
 	public void clearAll(){
-		//int len = list.size() + 1;
 		
 		for (int i=0;i<=GameState.MAX_STAGE;++i){
 			Bitmap bg = bitmap_map.get("bg"+String.valueOf(i));
@@ -118,6 +137,21 @@ public class GalleryAdapter extends BaseAdapter {
 				tmp.recycle();
 				tree = null;
 			}
+		}
+		
+		Bitmap brac = bitmap_map.get("brac"+String.valueOf(true));
+		if (brac != null){
+			bitmap_map.remove("brac"+String.valueOf(true));
+			Bitmap tmp =brac;
+			tmp.recycle();
+			brac = null;
+		}
+		brac = bitmap_map.get("brac"+String.valueOf(false));
+		if (brac != null){
+			bitmap_map.remove("brac"+String.valueOf(false));
+			Bitmap tmp =brac;
+			tmp.recycle();
+			brac = null;
 		}
 		bitmap_map.clear();
 	}
