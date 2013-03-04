@@ -75,7 +75,7 @@ public class InteractiveGameHandler {
 		i_adapter = new InteractiveAdapter(partner_list,ga);
 	}
 	
-	private static final String SERVER_URL = "http://140.112.30.165/develop/drunk_detection/userStates.php";
+	private static final String SERVER_URL = "http://140.112.30.165/drunk_detection/userStates.php";
 	
 	public void update(){
 		try {
