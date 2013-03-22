@@ -1,0 +1,68 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NewMainActivity" >
+
+    <TextView
+        android:id="@+id/latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+         />
+    <TextView
+        android:id="@+id/longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/latitude"
+         />
+     <TextView
+        android:id="@+id/bt_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/longitude"
+        android:textSize="20sp"
+         />
+
+
+     <Button
+         android:id="@+id/GPS_enable"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentLeft="true"
+         android:layout_alignParentTop="true"
+         android:text="GPS-enable" />
+     <Button
+         android:id="@+id/GPS_disable"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_toRightOf="@+id/GPS_enable"
+         android:layout_alignParentTop="true"
+         android:text="GPS-disable" />
+     <Button
+         android:id="@+id/end_test"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/GPS_enable"
+         android:text="END" />
+	<Button
+         android:id="@+id/move_to_statistic"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/GPS_enable"
+         android:layout_toRightOf="@+id/end_test"
+         android:text="move to statistic" />
+
+	<FrameLayout
+	    android:id="@+id/new_camera_preview"
+	    android:layout_width="90dp"
+	    android:layout_height="120dp"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignParentBottom="true"
+	    android:background="#FFFF0000"/>
+
+
+</RelativeLayout>

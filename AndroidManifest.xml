@@ -42,6 +42,19 @@
         android:debuggable="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
+        
+         <activity
+            android:name="ioio.examples.hello.FragmentTabs"
+            android:label="new_alcohol"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
         <activity
             android:name="ioio.examples.hello.GameActivity"
             android:label="@string/app_name"
@@ -53,6 +66,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+       
         <activity
             android:name="ioio.examples.hello.MainActivity"
             android:screenOrientation="portrait" >
@@ -81,10 +95,8 @@
         <service android:name="ioio.examples.hello.GCMIntentService" >
         </service>
 
-        <activity
-            android:name="ioio.examples.hello.TestActivity"
-            android:screenOrientation="portrait" >
-        </activity>
+        
+        
         <activity
             android:name="ioio.examples.hello.GameListActivity"
             android:screenOrientation="portrait" >
@@ -132,6 +144,8 @@
         <activity
             android:name="ioio.examples.hello.BracStatisticActivity"
             android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="ioio.examples.hello.TestFragment" >
         </activity>
     </application>
 

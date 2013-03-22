@@ -7,11 +7,11 @@ import ioio.examples.hello.GalleryIndexActivity;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.MainActivity;
 import ioio.examples.hello.MainLegacyActivity;
+import ioio.examples.hello.TestFragment;
 import ioio.examples.hello.NewTestActivity;
 import ioio.examples.hello.OldPrefSettingActivity;
 import ioio.examples.hello.PrefSettingActivity;
 import ioio.examples.hello.R;
-import ioio.examples.hello.TestActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,7 +92,7 @@ public class GameMenuHandler {
 					SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(ga);
 			        boolean fake = sp.getBoolean("use_fake_data", false);
 			        if (fake) {
-			        	newActivity = new Intent(context, NewTestActivity.class);
+			        	newActivity = new Intent(context, TestFragment.class);
 			        } else {
 			        	if (Build.VERSION.SDK_INT < 11) 
 							newActivity = new Intent(context, MainLegacyActivity.class);  
@@ -108,7 +108,7 @@ public class GameMenuHandler {
 					ga.startActivity(newActivity);  
 					break;
 				case 2: //BracListActivity
-					newActivity = new Intent(context, BracStatisticActivity.class);     
+					newActivity = new Intent(context, BracHistoryActivity.class);     
 	                ga.startActivity(newActivity);
 					break;
 				case 3: //Setting
