@@ -1,6 +1,5 @@
 package statisticPageView;
 
-import ioio.examples.hello.R;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;

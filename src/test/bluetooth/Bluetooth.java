@@ -2,7 +2,6 @@ package test.bluetooth;
 
 
 import ioio.examples.hello.TestFragment;
-import ioio.examples.hello.R;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -12,7 +11,6 @@ import java.util.UUID;
 import test.camera.CameraRunHandler;
 import test.file.BracValueFileHandler;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -24,7 +22,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
-import android.widget.TextView;
 
 public class Bluetooth {
 
@@ -83,7 +80,7 @@ public class Bluetooth {
 			btAdapter.enable();
 			int state = btAdapter.getState();
 			while (state!=BluetoothAdapter.STATE_ON){
-				try { Thread.sleep(300);} catch (InterruptedException e) {}
+				try { Thread.sleep(100);} catch (InterruptedException e) {}
 				state =  btAdapter.getState();
 			}
 		}
@@ -121,9 +118,9 @@ public class Bluetooth {
 		}
 	}
 	
-	public void connect(){
+	public int connect(){
 		if (sensor == null)
-			return;
+			return -1;
 		try {
 			if (Build.VERSION.SDK_INT<11)
 				socket = sensor.createRfcommSocketToServiceRecord(uuid);
@@ -133,7 +130,9 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CONNECT THE SENSOR");
 			close();
+			return -1;
 		}
+		return 1;
 	}
 	
 	public void read(){
@@ -242,7 +241,8 @@ public class Bluetooth {
 	
 	public void close(){
 		try {
-			in.close();
+			if (in != null)
+				in.close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
 		}

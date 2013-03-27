@@ -1,14 +1,11 @@
 package game;
 
 import ioio.examples.hello.BracHistoryActivity;
-import ioio.examples.hello.BracStatisticActivity;
-import ioio.examples.hello.GalleryActivity;
 import ioio.examples.hello.GalleryIndexActivity;
 import ioio.examples.hello.GameActivity;
 import ioio.examples.hello.MainActivity;
 import ioio.examples.hello.MainLegacyActivity;
 import ioio.examples.hello.TestFragment;
-import ioio.examples.hello.NewTestActivity;
 import ioio.examples.hello.OldPrefSettingActivity;
 import ioio.examples.hello.PrefSettingActivity;
 import ioio.examples.hello.R;

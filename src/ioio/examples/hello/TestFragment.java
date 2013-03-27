@@ -9,6 +9,7 @@ import test.bluetooth.Bluetooth;
 import test.camera.CameraInitTask;
 import test.camera.CameraRecorder;
 import test.camera.CameraRunHandler;
+import test.data.BracDataHandler;
 import test.file.BracValueFileHandler;
 import test.file.ImageFileHandler;
 import test.gps.GPSInitTask;
@@ -32,7 +33,7 @@ public class TestFragment extends Fragment {
 	private Activity context;
 	private TestFragment testFragment;
 	private View view;
-	private String timeStamp;
+	private String timestamp;
 	
 	private final boolean[] INIT_PROGRESS={false,false,false};
 	private final boolean[] DONE_PROGRESS={false,false,false};
@@ -62,6 +63,9 @@ public class TestFragment extends Fragment {
 	private BracValueFileHandler bracFileHandler;
 	private ImageFileHandler imgFileHandler;
 	
+	//Uploader
+	private BracDataHandler BDH;
+	
 	private Button gps_enable_button,gps_disable_button,end_button,move_to_statistic_button;
 	
 	
@@ -86,7 +90,7 @@ public class TestFragment extends Fragment {
 	
 	
 	public void reset(){
-		timeStamp = setTimeStamp();
+		timestamp = setTimeStamp();
 		setStorage();
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		cameraRecorder = new CameraRecorder(testFragment,imgFileHandler);
@@ -171,21 +175,23 @@ public class TestFragment extends Fragment {
 			dir = new File(this.getActivity().getFilesDir(),"drunk_detection");
 			Log.d("TEST_STORAGE","NO MEDIA");
 		}
+		String path = dir.getAbsolutePath();
+		Log.d("TEST_STORAGE","PATH: "+path);
 		if (!dir.exists()){
 			Log.d("TEST_STORAGE","NO DIR");
 			if (!dir.mkdirs())
 				Log.d("TEST_STORAGE","FAIL TO CREATE DIR");
 		}
 		
-		mainDirectory = new File(dir,timeStamp);
+		mainDirectory = new File(dir,timestamp);
 		if (!mainDirectory.exists())
 			if (!mainDirectory.mkdirs()){
 				Log.e("TEST_STORAGE", "CANNOT CREATE DIRECTORY");
 				return;
 			}
 		
-		bracFileHandler = new BracValueFileHandler(mainDirectory,timeStamp);
-		imgFileHandler = new ImageFileHandler(mainDirectory,timeStamp);
+		bracFileHandler = new BracValueFileHandler(mainDirectory,timestamp);
+		imgFileHandler = new ImageFileHandler(mainDirectory,timestamp);
 		
 	}
 	
@@ -244,6 +250,16 @@ public class TestFragment extends Fragment {
 			if (DONE_PROGRESS[0]&&DONE_PROGRESS[1]&&DONE_PROGRESS[2]){
 				Log.d("NEW MAIN","ALL PROGRESS DONE");
 				stop();
+				BDH = new BracDataHandler(timestamp, testFragment);
+				int bdh_result = BDH.start();
+				if (bdh_result == BDH.ERROR){
+					//Show error message
+				}
+				else{
+					double result = BDH.getResult();
+					Log.d("TEST RESULT",String.valueOf(result));
+					//Show success or fail message
+				}
 			}
 		}
 	}
@@ -259,7 +275,8 @@ public class TestFragment extends Fragment {
 		bt_view.setText("Start");
 	}
 	
-	private void stop(){
+	public void stop(){
+		Log.d("STOP","STOP");
 		if (btRunTask!=null){
 			bt.close();
 			btRunTask.cancel(true);

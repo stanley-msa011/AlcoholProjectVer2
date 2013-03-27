@@ -22,8 +22,12 @@ public class BTInitTask extends AsyncTask<Void, Void, Void> {
 		Log.d("BT","BT ENABLE ADAPTER");
 		bt.pair();
 		Log.d("BT","BT PAIR");
-		bt.connect();
-		Log.d("BT","BT CONNECT");
+		int success = bt.connect();
+		if (success == 1)
+			Log.d("BT","BT CONNECT");
+		else{
+			testFragment.stop();
+		}
 		return null;
 	}
 	

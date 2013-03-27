@@ -5,7 +5,6 @@ import statisticPageView.analysis.AnalysisDrunkView;
 import statisticPageView.analysis.AnalysisPerformanceView;
 import statisticPageView.analysis.AnalysisRatingView;
 import statisticPageView.analysis.AnalysisSuccessView;
-import statisticPageView.statistics.StatisticDayView;
 import statisticPageView.statistics.StatisticPagerAdapter;
 import android.app.Activity;
 import android.os.Bundle;
@@ -17,10 +16,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 public class StatisticFragment extends Fragment {
 	private View view;

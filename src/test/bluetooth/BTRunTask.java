@@ -27,6 +27,6 @@ public class BTRunTask extends AsyncTask<Void, Void, Void> {
 	};
 
 	protected void onPostExecute(Void result) {
-		//testFragment.updateDoneState(TestFragment._BT);
+		testFragment.updateDoneState(TestFragment._BT);
    }
 }

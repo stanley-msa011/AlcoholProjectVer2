@@ -2,7 +2,6 @@ package test.camera;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,6 +38,7 @@ public class CameraRecorder {
     	this.testFragment = testFragment;
     	this.activity = testFragment.getActivity();
     	this.imgFileHandler =  imgFileHandler;
+    	imgFileHandler.setRecorder(this);
     	pictureCallback = new PictureCallback();
     }
     
@@ -110,30 +110,12 @@ public class CameraRecorder {
 			msg.what=picture_count;
 			
 			imgFileHandler.sendMessage(msg);
-			if (picture_count == 3){
-				close();
-				testFragment.updateDoneState(TestFragment._CAMERA);
-			}
 		}
-    	
     }
     
-    
-    
-    class SavePictureTask extends AsyncTask<Integer,Void,Void>{
-        @Override
-        protected Void doInBackground(Integer... params) {
-            File picture = new File(Environment.getExternalStorageDirectory(),"picture.jpg");
-            if(picture.exists())picture.delete();
-            try {
-                FileOutputStream  fos = new FileOutputStream(picture.getPath());
-                fos.write(params[0]);
-                fos.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-			return null;
-        }
+    public void CloseSuccess(){
+    	close();
+		testFragment.updateDoneState(TestFragment._CAMERA);
     }
     
 }
