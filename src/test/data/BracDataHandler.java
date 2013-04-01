@@ -1,11 +1,14 @@
 package test.data;
 
+import history.BracGameHistory;
 import ioio.examples.hello.R;
 import ioio.examples.hello.TestFragment;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.ArrayList;
@@ -13,6 +16,8 @@ import java.util.List;
 import java.util.Scanner;
 
 import javax.net.ssl.HostnameVerifier;
+
+import new_database.HistoryDB;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
@@ -50,10 +55,12 @@ public class BracDataHandler {
 	private Context context;
 	private String devId;
 	private double avg_result = 0;
+	private HistoryDB db;
 	
 	public BracDataHandler(String timestamp_string, TestFragment fragment){
 		ts = timestamp_string;
 		context = fragment.getActivity();
+		db = new HistoryDB(fragment.getActivity());
 		this.devId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 	}
 	
@@ -84,18 +91,33 @@ public class BracDataHandler {
         imageFiles[2] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_3.jpg");
        	
         avg_result = parseTextFile(textFile);
+        
+        BracGameHistory history= db.getLatestBracGameHistory();
+        
+        history.brac = (float)avg_result;
+        history.timestamp = Long.parseLong(ts);
+        
         if (avg_result != ERROR){
-        	if (avg_result > THRESHOLD){
-        		//change state
-        	}else{
-        		//change
-        	}
+        	if (avg_result > THRESHOLD)
+        		history.changeLevel(-1);
+        	else
+        		history.changeLevel(+1);
         }
         else{
         	result = ERROR;
         }
        	
+        db.insertNewState(history);
+        
        	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");
+       	try {
+       		BufferedWriter state_writer = new BufferedWriter(new FileWriter(stateFile));
+       		state_writer.write(String.valueOf(history.level));
+       		state_writer.flush();
+       		state_writer.close();
+		} catch (Exception e) {	
+			e.printStackTrace();	
+		}
        	
        	/*Connection to server*/
        	int server_connect = connectingToServer(textFile,geoFile,stateFile,imageFiles);

@@ -3,6 +3,7 @@ package test.bluetooth;
 
 import ioio.examples.hello.TestFragment;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class Bluetooth {
 	
 	private InputStream in;
 	private Context context;
+	private TestFragment testFragment;
 	
 	private int counter = 0;
 	private float prev_pressure;
@@ -46,7 +48,10 @@ public class Bluetooth {
 	private final static long MAX_DURATION_MILLIS = 5000;
 	private long start_time;
 	private long end_time;
+	private long first_start_time;
 	private long duration = 0;
+	
+	private boolean start;
 	
 	private final static int READ_NULL = 0;
 	private final static int READ_ALCOHOL = 1;
@@ -62,8 +67,11 @@ public class Bluetooth {
 	private CameraRunHandler cameraRunHandler;
 	private BracValueFileHandler bracFileHandler;
 	
+	private boolean successful;
+	
 	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler){
+		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.cameraRunHandler = cameraRunHandler;
 		this.bracFileHandler = bracFileHandler;
@@ -72,7 +80,9 @@ public class Bluetooth {
 			Log.e("BT","NOT SUPPORT BT");
 		prev_pressure = 0.f;
 		now_pressure = 0.f;
+		
 		btUIHandler=new BTUIHandler(testFragment);
+		start = false;
 	}
 	
 	public void enableAdapter(){
@@ -135,6 +145,11 @@ public class Bluetooth {
 		return 1;
 	}
 	
+	public void start(){
+		start = true;
+	}
+	
+	
 	public void read(){
 		
 		byte[] temp = new byte[1024];
@@ -147,12 +162,26 @@ public class Bluetooth {
 		duration = 0;
 		sum = 0;
 		counter = 0;
+		first_start_time = -1;
 		image_count  =0;
+		successful = false;
 		try {
 			in = socket.getInputStream();
 			bytes =in.read(temp);
 			while(bytes>0){
+				if (!start){
+					bytes =in.read(temp);
+					continue;
+				}
 				//Log.d("BT","READ");
+				long time = System.currentTimeMillis();
+				if (first_start_time == -1){
+					first_start_time = time;
+				}
+				else if (time - first_start_time > 10000){
+					close();
+					cameraRunHandler.sendEmptyMessage(-1);
+				}
 				for (int i=0;i<bytes;++i){
 					if ((char)temp[i]=='a'){
 						sendMsgToApp(msg);
@@ -194,6 +223,8 @@ public class Bluetooth {
 				}
 			}
 			else if (msg.charAt(0)=='m'){
+				
+				
 				//Log.d("BT","READ-M");
 				if (prev_pressure == 0.f){
 					prev_pressure = Float.valueOf(msg.substring(1));
@@ -203,14 +234,15 @@ public class Bluetooth {
 					prev_pressure = now_pressure;
 					now_pressure = Float.valueOf(msg.substring(1));
 					float diff = now_pressure - prev_pressure;
-					String diff_str = "<"+diff+">:"+now_pressure+"/"+prev_pressure;
-					Log.d("Pressure",diff_str);
+					
+					long time = System.currentTimeMillis();
+					
 					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
 						isPeak = true;
-						start_time = System.currentTimeMillis();
+						start_time = time;
 					}else if ( diff < PRESSURE_DIFF_MIN && diff > -PRESSURE_DIFF_MIN){
 						if (isPeak){
-							end_time = System.currentTimeMillis();
+							end_time = time;
 							duration += (end_time-start_time);
 							start_time = end_time;
 							
@@ -224,6 +256,7 @@ public class Bluetooth {
 							}else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
+								successful = true;
 								close();
 								String output = "<"+sum/counter+">";
 								show_in_UI(output);

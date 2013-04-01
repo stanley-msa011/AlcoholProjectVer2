@@ -1,6 +1,7 @@
 package test.gps;
 
 import ioio.examples.hello.TestFragment;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Handler;
@@ -27,11 +28,12 @@ public class GPSHandler extends Handler {
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,1000,locationListener);
 		if(network_enabled)
 			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,1000,locationListener);
-		String enabled = gps_enabled+"/"+network_enabled;
-		Log.d("LOCATION",enabled);
+		
+		//String enabled = gps_enabled+"/"+network_enabled;
+		//Log.d("LOCATION",enabled);
 	}
 	
-
+	
 
 	
 

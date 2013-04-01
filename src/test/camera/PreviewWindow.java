@@ -16,24 +16,24 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,int height) {
-		  try {
-			   camera.setPreviewDisplay(holder);
-			   camera.startPreview();
-			  } catch (Exception e) { }
+		 
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
+		 try {
+			   camera.setPreviewDisplay(holder);
+			   camera.startPreview();
+			  } catch (Exception e) { }
 		
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		if (camera != null){
+		/*if (camera != null){
 			camera.stopPreview();
 			camera.release();
-		}
+		}*/
 	}
 
 }

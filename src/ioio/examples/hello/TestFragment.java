@@ -14,6 +14,7 @@ import test.file.BracValueFileHandler;
 import test.file.ImageFileHandler;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
+import test.ui.UIMsgBox;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,10 +24,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 
 public class TestFragment extends Fragment {
 
@@ -66,7 +70,10 @@ public class TestFragment extends Fragment {
 	//Uploader
 	private BracDataHandler BDH;
 	
-	private Button gps_enable_button,gps_disable_button,end_button,move_to_statistic_button;
+	private Button end_button;
+	private Button start_button;
+	private RelativeLayout main_layout;
+	private UIMsgBox msgBox;
 	
 	
 	private static Object init_lock  = new Object();
@@ -79,12 +86,16 @@ public class TestFragment extends Fragment {
 	public void onPause(){
 		super.onPause();
 		stop();
+		if (msgBox != null){
+			msgBox.deleteAll();
+		}
 	}
 	
 	public void onResume(){
 		super.onResume();
 		context = this.getActivity();
 		testFragment = this;
+		FragmentTabs.enableTab(true);
 	}
 	
 	
@@ -96,6 +107,9 @@ public class TestFragment extends Fragment {
 		cameraRecorder = new CameraRecorder(testFragment,imgFileHandler);
 		cameraRunHandler = new CameraRunHandler(cameraRecorder);
 		bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler);
+		for (int i=0;i<3;++i)
+			INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
+		
 	}
 	
 	
@@ -107,38 +121,87 @@ public class TestFragment extends Fragment {
     }
 	
 	void setViews(){
-		gps_enable_button = (Button) view.findViewById(R.id.GPS_enable);
-		gps_disable_button = (Button) view.findViewById(R.id.GPS_disable);
 		end_button = (Button) view.findViewById(R.id.end_test);
-		GPSOnClickListener  gpsOnclickListener= new GPSOnClickListener();
-		gps_enable_button.setOnClickListener(gpsOnclickListener);
-		gps_disable_button.setOnClickListener(gpsOnclickListener);
 		end_button.setOnClickListener(new EndTestOnClickListener());
+		end_button.setEnabled(true);
 		
-		move_to_statistic_button = (Button) view.findViewById(R.id.move_to_statistic);
-		move_to_statistic_button.setOnClickListener(new MoveToStatisticOnClickListener());
+		
+		main_layout = (RelativeLayout) view.findViewById(R.id.test_layout);
+		start_button = (Button) view.findViewById(R.id.start_testing);
+		start_button.setOnClickListener(new StartOnClickListener());
+		
 	}
 	
-	private class GPSOnClickListener implements View.OnClickListener{
+	private class StartOnClickListener implements View.OnClickListener{
 
 		@Override
 		public void onClick(View v) {
 			reset();
-			for (int i=0;i<3;++i)
-				INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
-			
-			if (v.getId() == R.id.GPS_enable){
-				Log.d("GPS","ENABLE GPS");
-				gps_state = true;
-				Object[] gps_enable={gps_state};
-				gpsInitTask = new GPSInitTask(testFragment,locationManager);
-				gpsInitTask.execute(gps_enable);
-			}
-			else if (v.getId() == R.id.GPS_disable){
-				gps_state = false;
-				updateGPSInitState();
-			}
+			if (msgBox == null)
+				msgBox = new UIMsgBox(testFragment);
+			msgBox.generateGPSCheckBox(main_layout);
 		}
+		
+	}
+	
+	
+	public void startGPS(boolean enable){
+		if (enable){
+			Log.d("GPS","ENABLE GPS");
+			gps_state = true;
+			Object[] gps_enable={gps_state};
+			gpsInitTask = new GPSInitTask(testFragment,locationManager);
+			gpsInitTask.execute(gps_enable);
+		}
+		else{
+			gps_state = false;
+			runGPS();
+		}
+	}
+	
+	public void runGPS(){
+		if (gps_state){
+			gpsInitTask.cancel(true);
+			Object[] gps_enable={gps_state};
+			gpsRunTask = new GPSRunTask(this,locationManager,mainDirectory);
+			gpsRunTask.execute(gps_enable);
+		}
+		else{
+			updateDoneState(_GPS);
+		}
+		if (msgBox == null)
+			msgBox = new UIMsgBox(testFragment);
+		msgBox.generateBTCheckBox(main_layout);
+	}
+	
+	public void startBT(){
+		if (msgBox == null)
+			msgBox = new UIMsgBox(testFragment);
+		msgBox.generateInitializingBox(main_layout);
+		//initialize bt task
+		btInitTask = new BTInitTask(testFragment,bt);
+		btInitTask.execute();
+		Log.d("INIT","BT TASK STARTED");
+		
+		//initialize camera task
+		cameraInitTask = new CameraInitTask(testFragment,cameraRecorder);
+		cameraInitTask.execute();
+		Log.d("INIT","Camera TASK STARTED");
+	}
+	
+	public void runBT(){
+		
+		if (bt!=null && cameraRecorder!=null){
+			bt.start();
+			cameraRecorder.start();
+		}
+	}
+	
+	public void failBT(){
+		if (msgBox == null)
+			msgBox = new UIMsgBox(testFragment);
+		msgBox.closeInitializingBox();
+		msgBox.generateBTFailBox(main_layout);
 	}
 	
 	private class EndTestOnClickListener implements View.OnClickListener{
@@ -147,24 +210,15 @@ public class TestFragment extends Fragment {
 		public void onClick(View v) {
 			stop();
 		}
-		
 	}
 	
-	private class MoveToStatisticOnClickListener implements View.OnClickListener{
-
-		@Override
-		public void onClick(View v) {
-			FragmentTabs.changeTab(0);
-		}
-	}
-	
-	String setTimeStamp(){
+	private String setTimeStamp(){
 		long time_in_sec = System.currentTimeMillis() / 1000L;
 		DecimalFormat d = new DecimalFormat("0");
 		return d.format(time_in_sec);
 	}
 	
-	void setStorage(){
+	private void setStorage(){
 		String state = Environment.getExternalStorageState();
 		File dir = null;
 		if (state.equals(Environment.MEDIA_MOUNTED)){
@@ -195,46 +249,22 @@ public class TestFragment extends Fragment {
 		
 	}
 	
-	public void updateGPSInitState(){
-		synchronized(init_lock){
-			Log.d("INIT","GPS INIT END");
-			if (gps_state){
-				gpsInitTask.cancel(true);
-				Object[] gps_enable={gps_state};
-				gpsRunTask = new GPSRunTask(this,locationManager,mainDirectory);
-				gpsRunTask.execute(gps_enable);
-			}
-			else{
-				updateDoneState(_GPS);
-			}
-			
-			//initialize bt task after gps init task
-			
-			btInitTask = new BTInitTask(testFragment,bt);
-			btInitTask.execute();
-			Log.d("INIT","BT TASK STARTED");
-			
-			//initialize camera task after gps init task
-			cameraInitTask = new CameraInitTask(testFragment,cameraRecorder);
-			cameraInitTask.execute();
-		}
-	}
 	
 	public void updateInitState(int type){
 		synchronized(init_lock){
 			if (INIT_PROGRESS[type]==true)
 				return;
 			INIT_PROGRESS[type]=true;
-			String init_str=INIT_PROGRESS[0]+"/"+INIT_PROGRESS[1]+"/"+INIT_PROGRESS[2];
-			Log.d("INIT",init_str);
 			
 			if (INIT_PROGRESS[_BT] && INIT_PROGRESS[_CAMERA]){
 				btInitTask.cancel(true);
 				cameraInitTask.cancel(true);
 				btRunTask = new BTRunTask(this,bt);
 				btRunTask.execute();
-				
-				showStart();
+				if (msgBox == null)
+					msgBox = new UIMsgBox(testFragment);
+				msgBox.closeInitializingBox();
+				msgBox.generateBTSuccessBox(main_layout);
 			}
 		}
 	}
@@ -258,6 +288,7 @@ public class TestFragment extends Fragment {
 				else{
 					double result = BDH.getResult();
 					Log.d("TEST RESULT",String.valueOf(result));
+					FragmentTabs.changeTab(1);
 					//Show success or fail message
 				}
 			}
@@ -266,7 +297,7 @@ public class TestFragment extends Fragment {
 	
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (requestCode==_GPS){
-			updateGPSInitState();
+			runGPS();
 		}
 	}
 	
@@ -277,6 +308,17 @@ public class TestFragment extends Fragment {
 	
 	public void stop(){
 		Log.d("STOP","STOP");
+
+		if (gpsInitTask!=null){
+			gpsInitTask.cancel(true);
+		}
+		if (btInitTask!=null){
+			btInitTask.cancel(true);
+		}
+		if (cameraInitTask!=null){
+			cameraInitTask.cancel(true);
+		}
+		
 		if (btRunTask!=null){
 			bt.close();
 			btRunTask.cancel(true);
@@ -287,9 +329,12 @@ public class TestFragment extends Fragment {
 			gpsRunTask.cancel(true);
 			gpsRunTask = null;
 		}
-			
 		if (cameraRecorder!=null)
 			cameraRecorder.close();
+		
+		if (msgBox != null){
+			msgBox.hideAll();
+		}
 	}
 	
 }

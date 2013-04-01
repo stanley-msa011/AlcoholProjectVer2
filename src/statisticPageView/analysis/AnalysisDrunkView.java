@@ -1,52 +1,60 @@
 package statisticPageView.analysis;
 
+import java.text.DecimalFormat;
+
+import new_database.HistoryDB;
+import history.BracGameHistory;
 import ioio.examples.hello.R;
 import android.content.Context;
-import android.os.Build;
-import android.view.animation.AlphaAnimation;
-import android.widget.ImageView;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import statisticPageView.StatisticPageView;
 
 public class AnalysisDrunkView extends StatisticPageView {
 
-	private ImageView[] levelImageViews;
-	
+	private RelativeLayout[] values;
+	private TextView[] texts;
+	private HistoryDB db;
+	private DecimalFormat format ;
 	
 	public AnalysisDrunkView(Context context){
 		super(context, R.layout.analysis_drunk_view);
+		db = new HistoryDB(context);
+		format = new DecimalFormat();
+		format.setMaximumIntegerDigits(1);
+		format.setMinimumIntegerDigits(1);
+		format.setMinimumFractionDigits(2);
+		format.setMaximumFractionDigits(2);
 		setting();
 	}
 	
 	private void setting(){
-		levelImageViews = new ImageView[5];
-		
-		levelImageViews[0] = (ImageView) view.findViewById(R.id.analysis_drunk_level_1);
-		levelImageViews[1] = (ImageView) view.findViewById(R.id.analysis_drunk_level_2);
-		levelImageViews[2] = (ImageView) view.findViewById(R.id.analysis_drunk_level_3);
-		levelImageViews[3] = (ImageView) view.findViewById(R.id.analysis_drunk_level_4);
-		levelImageViews[4] = (ImageView) view.findViewById(R.id.analysis_drunk_level_5);
-		
-		//dummy setting
-		if (Build.VERSION.SDK_INT<11){
-			AlphaAnimation alpha_1 = new AlphaAnimation(1F, 1F);
-			AlphaAnimation alpha_2 = new AlphaAnimation(0.2F, 0.2F);
-			alpha_1.setDuration(0); 
-			alpha_2.setDuration(0); 
-			alpha_1.setFillAfter(true);
-			alpha_2.setFillAfter(true);
+		values = new RelativeLayout[4];
+		texts = new TextView[4];
+		BracGameHistory[] historys = db.getTodayBracGameHistory();
+		LinearLayout content_layout = (LinearLayout) view.findViewById(R.id.analysis_drunk_view_content);
+		for (int i=0;i<4;++i){
+			values[i] = new RelativeLayout(context);
+			texts[i] = new TextView(context);
+			texts[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+			content_layout.addView(texts[i]);
+			LayoutParams param = (LayoutParams) texts[i].getLayoutParams();
+			param.gravity = Gravity.CENTER_HORIZONTAL;
+			param.gravity = Gravity.CENTER_VERTICAL;
+			param.weight = 0.25F;
+			if (historys[i]==null)
+				texts[i].setText("X");
+			else{
+				String out = format.format(historys[i].brac);
+				texts[i].setText(out);
+			}
+			texts[i].setGravity(Gravity.CENTER);
 			
-			levelImageViews[0].setAnimation(alpha_1);
-			levelImageViews[1].setAnimation(alpha_1);
-			levelImageViews[2].setAnimation(alpha_1);
-			levelImageViews[3].setAnimation(alpha_2);
-			levelImageViews[4].setAnimation(alpha_2);
 		}
-		else{
-			levelImageViews[0].setAlpha(1.f);
-			levelImageViews[1].setAlpha(1.f);
-			levelImageViews[2].setAlpha(1.f);
-			levelImageViews[3].setAlpha(0.2f);
-			levelImageViews[4].setAlpha(0.2f);
-		}
+		
 	}
 }

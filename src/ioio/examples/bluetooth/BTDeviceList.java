@@ -38,8 +38,6 @@ public class BTDeviceList extends Activity {
     		"00:15:FF:F3:35:48",
     		"00:15:FF:F3:35:37",
     		"00:15:FF:F3:35:45"
-    		
-    		
     };
 
     // Return Intent extra

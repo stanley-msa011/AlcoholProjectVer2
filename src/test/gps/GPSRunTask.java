@@ -21,17 +21,15 @@ import android.widget.TextView;
 public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 
 	private TestFragment testFragment;
-	private Activity activity;
 	private GPSHandler gpsHandler;
-	private LocationListener locationListener;
+	private mLocationListener locationListener;
 	private LocationManager locationManager;
 	private File file;
 	private BufferedWriter writer;
-	
+	private static final int TWO_MINUTES = 1000*120;
 	
 	public GPSRunTask(TestFragment a,LocationManager lm,File directory){
 		testFragment = a;
-		activity = a.getActivity();
 		locationManager = lm;
 		locationListener = new mLocationListener();
 		gpsHandler = new GPSHandler(a, locationManager, locationListener);
@@ -39,8 +37,9 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 		file = new File(directory,"geo.txt");
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
+			Log.d("GEO WRITER","open successfully");
 		} catch (IOException e) {
-			Log.d("GEO WRITER","FAIL TO OPEN");
+			Log.d("GEO WRITER","Fail to open");
 			writer = null;
 		}
 	}
@@ -65,12 +64,19 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 	
 	private class mLocationListener implements LocationListener{
 
+		public Location bestLoc = null;
+		
 		@Override
 		public void onLocationChanged(Location location) {
 			if (location!=null){
-				sendLocation(location);
-				locationManager.removeUpdates(this);
-				testFragment.updateDoneState(TestFragment._GPS);
+				Log.d("GPS_RUN_TASK","GET LOCATION");
+				if (bestLoc == null){
+					bestLoc = location;
+				}
+				else{
+					Location tempLoc = bestLoc;
+					bestLoc = getBetterLocation(location, tempLoc);
+				}
 			}
 		}
 		@Override
@@ -93,16 +99,10 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 			double latitude = loc.getLatitude();
 			double longitude = loc.getLongitude();
 		
-			TextView lat = (TextView) activity.findViewById(R.id.latitude);
-			TextView lon = (TextView) activity.findViewById(R.id.longitude);
-		
 			String location_str = latitude+"\t"+longitude;
 			Log.d("LOCATION",location_str);
 		
 			write_to_file(location_str);
-			
-			lat.setText(String.valueOf(latitude));
-			lon.setText(String.valueOf(longitude));
 		}
 		else{
 			Log.d("LOCATION","NULL");
@@ -115,6 +115,7 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 				Log.d("GEO WRITER","WRITE");
 				writer.write(str);
 			} catch (IOException e) {
+				Log.d("GEO WRITER",e.toString());
 				Log.d("GEO WRITER","FAIL TO WRITE");
 			}
 		}else{
@@ -141,12 +142,17 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 		public void run() {
 			Log.d("GPS TIMER","RUN");
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(8000);
 				Log.d("GPS TIMER","END");
-				try {
-					writer.close();
-				} catch (IOException e) {
-				}
+
+				 if (locationListener.bestLoc!=null){
+					 sendLocation(locationListener.bestLoc);
+				 }else{
+						try {
+							writer.close();
+						} catch (IOException e) {
+						}
+				 }
 				locationManager.removeUpdates(locationListener);
 				testFragment.updateDoneState(TestFragment._GPS);
 			} catch (InterruptedException e) {
@@ -154,5 +160,55 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 			}
 		}
 	}
+	
+//----------------------------------------------------------------------------------------------------------------------	
+	private Location getBetterLocation(Location newLocation, Location currentBestLocation) {
+		if (currentBestLocation == null) {
+			// A new location is always better than no location
+			return newLocation;
+		}
+
+		// Check whether the new location fix is newer or older
+		long timeDelta = newLocation.getTime() - currentBestLocation.getTime();
+		boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+		boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+		boolean isNewer = timeDelta > 0;
+
+		// If it's been more than two minutes since the current location, use the new location
+		// because the user has likely moved.
+		if (isSignificantlyNewer) {
+			return newLocation;
+			// If the new location is more than two minutes older, it must be worse
+		} else if (isSignificantlyOlder) {
+			return currentBestLocation;
+		}
+
+		// Check whether the new location fix is more or less accurate
+		int accuracyDelta = (int) (newLocation.getAccuracy() - currentBestLocation.getAccuracy());
+		boolean isLessAccurate = accuracyDelta > 0;
+		boolean isMoreAccurate = accuracyDelta < 0;
+		boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+		// Check if the old and new location are from the same provider
+		boolean isFromSameProvider = isSameProvider(newLocation.getProvider(), currentBestLocation.getProvider());
+
+		// Determine location quality using a combination of timeliness and accuracy
+		if (isMoreAccurate) {
+			return newLocation;
+		} else if (isNewer && !isLessAccurate) {
+			return newLocation;
+		} else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+			return newLocation;
+		}
+		return currentBestLocation;
+	}
+
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+          return provider2 == null;
+        }
+        return provider1.equals(provider2);
+    }
+	
 	
 }

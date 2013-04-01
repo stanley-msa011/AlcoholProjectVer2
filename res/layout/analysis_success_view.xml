@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:background="#99333333"
-        android:text="戒酒成功率" />
+        android:text="整體表現" />
 
    <RelativeLayout
         android:layout_width="match_parent"

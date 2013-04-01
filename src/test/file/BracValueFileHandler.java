@@ -26,7 +26,7 @@ public class BracValueFileHandler extends Handler {
 		String str = msg.getData().getString("ALCOHOL");
 		if (writer!=null){
 			try {
-				Log.d("BRAC WRITER","WRITE");
+				//Log.d("BRAC WRITER","WRITE");
 				writer.write(str);
 			} catch (IOException e) {
 				Log.d("BRAC WRITER","FAIL TO WRITE");

@@ -2,6 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/test_layout"
+    android:background="#FFAAAAFF"
     tools:context=".NewMainActivity" >
 
     <FrameLayout
@@ -9,62 +11,27 @@
 	    android:layout_width="240dp"
 	    android:layout_height="320dp"
 	    android:layout_centerInParent="true"
-	    android:background="#FFFF0000"/>
-    
-    
-    <TextView
-        android:id="@+id/latitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-         />
-    <TextView
-        android:id="@+id/longitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/latitude"
-         />
+	    />
      <TextView
         android:id="@+id/bt_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/longitude"
-        android:textSize="20sp"
+        android:layout_centerInParent="true"
+        android:textColor="#FFFF0000"
+        android:textSize="24sp"
          />
-
-
-     <Button
-         android:id="@+id/GPS_enable"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_alignParentLeft="true"
-         android:layout_alignParentTop="true"
-         android:text="GPS-enable" />
-     <Button
-         android:id="@+id/GPS_disable"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_toRightOf="@+id/GPS_enable"
-         android:layout_alignParentTop="true"
-         android:text="GPS-disable" />
      <Button
          android:id="@+id/end_test"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_below="@+id/GPS_enable"
          android:text="END" />
+
 	<Button
-         android:id="@+id/move_to_statistic"
+         android:id="@+id/start_testing"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_below="@+id/GPS_enable"
          android:layout_toRightOf="@+id/end_test"
-         android:text="move to statistic" />
-
-	
+         android:text="START" />
 
 
 </RelativeLayout>

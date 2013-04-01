@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:background="#99333333"
-        android:text="您的表現分布" />
+        android:text="群體表現" />
 
    <RelativeLayout
         android:layout_width="match_parent"

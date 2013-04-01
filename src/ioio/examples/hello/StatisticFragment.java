@@ -2,7 +2,6 @@ package ioio.examples.hello;
 
 import statisticPageView.StatisticPageView;
 import statisticPageView.analysis.AnalysisDrunkView;
-import statisticPageView.analysis.AnalysisPerformanceView;
 import statisticPageView.analysis.AnalysisRatingView;
 import statisticPageView.analysis.AnalysisSuccessView;
 import statisticPageView.statistics.StatisticPagerAdapter;
@@ -17,7 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.TextView;
 
 public class StatisticFragment extends Fragment {
 	private View view;
@@ -25,7 +24,6 @@ public class StatisticFragment extends Fragment {
 	private ViewPager statisticView;
 	private PagerAdapter statisticViewAdapter;
 	private LinearLayout analysisLayout;
-	private ScrollView analysisView;
 	private StatisticPageView[] analysisViews;
 	
 	static final public int TYPE_DAY = 0;
@@ -47,19 +45,39 @@ public class StatisticFragment extends Fragment {
     		Log.d("STATISTIC FRAGMENT","VIEW NULL");
     	}
     	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
-    	analysisView =  (ScrollView) view.findViewById(R.id.brac_analysis);
     	statisticViewAdapter = new StatisticPagerAdapter(activity);
     	statisticView.setAdapter(statisticViewAdapter);
-		statisticView.setOnPageChangeListener( new StatisticOnPagerChangeListener());
+    	statisticView.setOnPageChangeListener(new StatisticOnPageChangeListener());
+    	
+    	statisticView.setSelected(true);
+    	
     	analysisLayout  = (LinearLayout)  view.findViewById(R.id.brac_analysis_layout);
     	
+    	analysisViews = new StatisticPageView[3];
+		analysisViews[0] = new AnalysisDrunkView(activity);
+		analysisViews[1] = new AnalysisSuccessView(activity,TYPE_DAY);
+		analysisViews[2] = new AnalysisRatingView(activity,TYPE_DAY);
+    	
+		for (int i=0;i<analysisViews.length;++i)
+			analysisLayout.addView(analysisViews[i].getView());
+		
     	statisticView.setCurrentItem(1);
     	statisticView.setCurrentItem(0);
         return view;
     }
     
-    private class StatisticOnPagerChangeListener implements OnPageChangeListener{
+    
+    private class StatisticOnPageChangeListener implements OnPageChangeListener{
 
+    	TextView[] dots;
+    	public StatisticOnPageChangeListener(){
+    		dots = new TextView[3];
+    		dots[0]=(TextView) view.findViewById(R.id.statistics_page_day);
+    		dots[1]=(TextView) view.findViewById(R.id.statistics_page_week);
+    		dots[2]=(TextView) view.findViewById(R.id.statistics_page_month);
+    	}
+    	
+    	
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
 			
@@ -67,36 +85,15 @@ public class StatisticFragment extends Fragment {
 
 		@Override
 		public void onPageScrolled(int arg0, float arg1, int arg2) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
-		public void onPageSelected(int pos) {
-			analysisLayout.removeAllViews();
-			if (pos == TYPE_DAY){//DAY
-				analysisViews = new StatisticPageView[4];
-				analysisViews[0] = new AnalysisDrunkView(activity);
-				analysisViews[1] = new AnalysisSuccessView(activity,TYPE_DAY);
-				analysisViews[2] = new AnalysisRatingView(activity,TYPE_DAY);
-				analysisViews[3] = new AnalysisPerformanceView(activity,TYPE_DAY);
-			}else if (pos == 1){//WEEK
-				analysisViews = new StatisticPageView[3];
-				analysisViews[0] = new AnalysisSuccessView(activity,TYPE_WEEK);
-				analysisViews[1] = new AnalysisRatingView(activity,TYPE_WEEK);
-				analysisViews[2] = new AnalysisPerformanceView(activity,TYPE_WEEK);
-			}else{ // MONTH
-				analysisViews = new StatisticPageView[3];
-				analysisViews[0] = new AnalysisSuccessView(activity,TYPE_MONTH);
-				analysisViews[1] = new AnalysisRatingView(activity,TYPE_MONTH);
-				analysisViews[2] = new AnalysisPerformanceView(activity,TYPE_MONTH);
+		public void onPageSelected(int arg0) {
+			for (int i=0;i<3;++i){
+				dots[i].setTextColor(0xFF9999FF);
 			}
-			
-			for (int i=0;i<analysisViews.length;++i)
-				analysisLayout.addView(analysisViews[i].getView());
-			analysisView.scrollTo(0, 0);
+			dots[arg0].setTextColor(0xFFFFFFFF);
 		}
     	
     }
-    
 }

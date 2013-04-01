@@ -37,7 +37,8 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 	 protected void onPostExecute(Boolean result) {
 		if (!result.booleanValue()){
 			Log.d("GPS","NO INTENT");
-			testFragment.updateGPSInitState();
+			//testFragment.updateGPSInitState();
+			testFragment.runGPS();
 		}
      }
 	

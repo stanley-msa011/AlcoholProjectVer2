@@ -19,6 +19,7 @@ import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.View;
 import android.widget.FrameLayout;
 
 public class CameraRecorder {
@@ -70,6 +71,10 @@ public class CameraRecorder {
 		}
     }
     
+    public void start(){
+    	preview.setVisibility(View.VISIBLE);
+    }
+    
     public void setSurfaceCallback(){
     	previewFrame = null;
     	previewFrame =(FrameLayout) activity.findViewById(R.id.new_camera_preview);
@@ -77,7 +82,8 @@ public class CameraRecorder {
     	previewHolder = preview.getHolder();
     	previewHolder.addCallback(preview);
     	previewFrame.addView(preview);
-    	camera.startPreview();
+    	preview.setVisibility(View.INVISIBLE);
+    	//camera.startPreview();
     }
     
     public void takePicture(){
@@ -89,8 +95,9 @@ public class CameraRecorder {
     public void close(){
     	if (previewFrame!=null){
     		previewFrame.removeAllViews();
+    		previewFrame.removeAllViewsInLayout();
     	}
-    	else if (camera!=null){
+    	if (camera!=null){
     		camera.stopPreview();
     		camera.release();
     		camera = null;
@@ -116,6 +123,11 @@ public class CameraRecorder {
     public void CloseSuccess(){
     	close();
 		testFragment.updateDoneState(TestFragment._CAMERA);
+    }
+    
+    public void CloseFail(){
+    	close();
+    	testFragment.stop();
     }
     
 }

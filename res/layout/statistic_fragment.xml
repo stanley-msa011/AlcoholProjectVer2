@@ -10,7 +10,46 @@
         android:layout_width="match_parent"
         />
         
-
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    >
+	    
+	    <TextView
+	        android:id="@+id/statistics_page_week"
+	        android:textSize="10sp"
+	        android:text=" ● "
+	        android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	        android:textColor="#FFFFFFFF"
+	        android:layout_centerInParent="true"
+	     />
+	    
+	    <TextView
+	        android:id="@+id/statistics_page_day"
+	        android:textSize="10sp"
+	        android:text=" ● "
+	        android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	        android:textColor="#FFFFFFFF"
+	        android:layout_centerVertical="true"
+	        android:layout_toLeftOf="@+id/statistics_page_week"
+	     />
+	    
+	    <TextView
+	        android:id="@+id/statistics_page_month"
+	        android:textSize="10sp"
+	        android:text=" ● "
+	        android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	        android:textColor="#FFFFFFFF"
+	        android:layout_centerVertical="true"
+	        android:layout_toRightOf="@+id/statistics_page_week"
+	     />
+	    
+	</RelativeLayout>
+    
+    
     <ScrollView
         android:id="@+id/brac_analysis"
         android:layout_width="match_parent"
