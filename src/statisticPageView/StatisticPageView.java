@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
-public class StatisticPageView {
+public abstract class StatisticPageView {
 	protected Context context;
 	protected View view;
 	private LayoutInflater inflater;
@@ -18,4 +18,7 @@ public class StatisticPageView {
 	public View getView(){
 		return view;
 	}
+	
+	abstract public void clear();
+	abstract public void resume();
 }

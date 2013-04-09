@@ -2,6 +2,7 @@ package test.camera;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import test.file.ImageFileHandler;
 import ioio.examples.hello.R;
 import ioio.examples.hello.TestFragment;
 import android.app.Activity;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
@@ -26,14 +28,15 @@ public class CameraRecorder {
     
     private TestFragment testFragment;
     private Activity activity;
-    private Camera camera;
-    private Camera.PictureCallback pictureCallback;
-    private int picture_count;
+    Camera camera;
+    private PictureCallback pictureCallback;
     private ImageFileHandler imgFileHandler;
     
     private PreviewWindow preview;
     private FrameLayout previewFrame = null;
-    private SurfaceHolder previewHolder;
+    SurfaceHolder previewHolder;
+    
+    public int picture_count=0;
     
     public CameraRecorder(TestFragment testFragment, ImageFileHandler imgFileHandler){
     	this.testFragment = testFragment;
@@ -50,10 +53,16 @@ public class CameraRecorder {
 			camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
 		else
 			camera = Camera.open();
+		
 		camera.setDisplayOrientation(90);
 		Parameters params = camera.getParameters();
 		List<Size> list = params.getSupportedPictureSizes();
-		
+		Point bestSize = getBestSize(list);
+		params.setPictureSize(bestSize.x, bestSize.y);
+		camera.setParameters(params);
+    }
+    
+    private Point getBestSize(List<Size> list){
 		int bestWidth = Integer.MAX_VALUE;
 		int bestHeight = Integer.MAX_VALUE;
 		if (list.size()>1){
@@ -66,9 +75,8 @@ public class CameraRecorder {
 					bestHeight = cur.height;
 				}
 			}
-			params.setPictureSize(bestWidth, bestHeight);
-			camera.setParameters(params);
 		}
+		return new Point(bestWidth,bestHeight);
     }
     
     public void start(){
@@ -78,17 +86,17 @@ public class CameraRecorder {
     public void setSurfaceCallback(){
     	previewFrame = null;
     	previewFrame =(FrameLayout) activity.findViewById(R.id.new_camera_preview);
-    	preview = new PreviewWindow(activity,camera);
+    	preview = new PreviewWindow(activity,this);
     	previewHolder = preview.getHolder();
     	previewHolder.addCallback(preview);
     	previewFrame.addView(preview);
     	preview.setVisibility(View.INVISIBLE);
-    	//camera.startPreview();
     }
     
+    
     public void takePicture(){
-    	picture_count++;
-    	camera.takePicture(null,null, pictureCallback);
+    		Log.d("TAKE PICTURE","TAKE PICTURE");
+    		camera.takePicture(null,null, pictureCallback);
     }
     
     
@@ -98,16 +106,19 @@ public class CameraRecorder {
     		previewFrame.removeAllViewsInLayout();
     	}
     	if (camera!=null){
-    		camera.stopPreview();
-    		camera.release();
+    		Camera tmp = camera;
     		camera = null;
+    		tmp.stopPreview();
+    		tmp.release();
+    		tmp = null;
     	}
     }
     
-    private class PictureCallback implements Camera.PictureCallback{
-
+    public class PictureCallback implements Camera.PictureCallback{
+    	
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
+			picture_count++;
 			Log.d("CAMERA","TAKE PICTURE "+picture_count);
 			
 			Message msg = new Message();
@@ -115,8 +126,8 @@ public class CameraRecorder {
 			data_b.putByteArray("Img", data);
 			msg.setData(data_b);
 			msg.what=picture_count;
-			
 			imgFileHandler.sendMessage(msg);
+			preview.restartPreview();
 		}
     }
     

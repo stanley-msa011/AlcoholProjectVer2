@@ -1,6 +1,7 @@
 package test.data;
 
 import history.BracGameHistory;
+import history.DateBracGameHistory;
 import ioio.examples.hello.R;
 import ioio.examples.hello.TestFragment;
 
@@ -12,12 +13,14 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
 
 import javax.net.ssl.HostnameVerifier;
 
 import new_database.HistoryDB;
+import new_database.TimeBlock;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
@@ -97,16 +100,42 @@ public class BracDataHandler {
         history.brac = (float)avg_result;
         history.timestamp = Long.parseLong(ts);
         
-        if (avg_result != ERROR){
-        	if (avg_result > THRESHOLD)
-        		history.changeLevel(-1);
-        	else
-        		history.changeLevel(+1);
-        }
-        else{
-        	result = ERROR;
-        }
-       	
+        DateBracGameHistory prevHistory = db.getLatestBracGameHistory();
+        int year,month,date,timeblock,hour;
+        
+    	Calendar cal = Calendar.getInstance();
+    	cal.setTimeInMillis(history.timestamp*1000);
+    	year = cal.get(Calendar.YEAR);
+    	month = cal.get(Calendar.MONTH)+1;
+    	date = cal.get(Calendar.DATE);
+    	hour = cal.get(Calendar.HOUR_OF_DAY);
+    	timeblock = TimeBlock.getTimeBlock(hour);
+    
+    	//check time block
+    	boolean check_time_block = false;
+    	if (check_time_block){
+    		if (timeblock==-1);
+    		else if (year == prevHistory.year && month == prevHistory.month && date == prevHistory.date && timeblock == prevHistory.timeblock);
+    		else{
+    			if (avg_result != ERROR){
+    				if (avg_result > THRESHOLD)
+    					history.changeLevel(0);
+    				else
+    					history.changeLevel(+1);
+    			}
+    			else{
+    				result = ERROR;
+    			}
+    		}
+    	}else{
+			if (avg_result != ERROR){
+				if (avg_result > THRESHOLD)
+					history.changeLevel(0);
+				else
+					history.changeLevel(+1);
+			}
+    	}
+        
         db.insertNewState(history);
         
        	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");

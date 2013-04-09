@@ -4,7 +4,7 @@ public class GameHistory {
 
 	public int level;
 	private static final int MIN_LEVEL = 0;
-	private static final int MAX_LEVEL = 10;
+	private static final int MAX_LEVEL = 16;
 	
 	public GameHistory(int level){
 		this.level = level;

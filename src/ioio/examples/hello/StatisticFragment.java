@@ -6,6 +6,9 @@ import statisticPageView.analysis.AnalysisRatingView;
 import statisticPageView.analysis.AnalysisSuccessView;
 import statisticPageView.statistics.StatisticPagerAdapter;
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
@@ -15,16 +18,27 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class StatisticFragment extends Fragment {
 	private View view;
 	private Activity activity;
 	private ViewPager statisticView;
-	private PagerAdapter statisticViewAdapter;
+	private StatisticPagerAdapter statisticViewAdapter;
+	private RelativeLayout statisticLayout,dots_layout;
+	private ImageView[] dots;
 	private LinearLayout analysisLayout;
 	private StatisticPageView[] analysisViews;
+	private static Point statistic_px,analysis_px;
+	private ScrollView analysisView;
+	private Bitmap dot_on, dot_off;
+	private static final int[] DOT_ID={0xFF0,0xFF1,0xFF2};
 	
 	static final public int TYPE_DAY = 0;
 	static final public int TYPE_WEEK = 1;
@@ -44,6 +58,21 @@ public class StatisticFragment extends Fragment {
     	if (view == null){
     		Log.d("STATISTIC FRAGMENT","VIEW NULL");
     	}
+    	
+
+    	
+        return view;
+    }
+    
+    public void onResume(){
+    	super.onResume();
+    	Point screen = FragmentTabs.getSize();
+    	statistic_px = new Point(screen.x,(int) (screen.x*467.0/720.0));
+    	
+    	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
+    	LayoutParams statisticViewLayoutParam =  statisticLayout.getLayoutParams();
+    	statisticViewLayoutParam.height = statistic_px.y;
+    	
     	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
     	statisticViewAdapter = new StatisticPagerAdapter(activity);
     	statisticView.setAdapter(statisticViewAdapter);
@@ -52,32 +81,93 @@ public class StatisticFragment extends Fragment {
     	statisticView.setSelected(true);
     	
     	analysisLayout  = (LinearLayout)  view.findViewById(R.id.brac_analysis_layout);
+    	analysisLayout.removeAllViews();
+    	
+    	analysisView = (ScrollView) view.findViewById(R.id.brac_analysis);
+    	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
+    	analysisViewLayoutParam.height = screen.y - statistic_px.y;
     	
     	analysisViews = new StatisticPageView[3];
 		analysisViews[0] = new AnalysisDrunkView(activity);
 		analysisViews[1] = new AnalysisSuccessView(activity,TYPE_DAY);
 		analysisViews[2] = new AnalysisRatingView(activity,TYPE_DAY);
     	
-		for (int i=0;i<analysisViews.length;++i)
+		for (int i=0;i<analysisViews.length;++i){
+			analysisViews[i].resume();
 			analysisLayout.addView(analysisViews[i].getView());
-		
+		}
+		LayoutParams analysisViewParam0 =  analysisViews[0].getView().getLayoutParams();
+		analysisViewParam0.width = screen.x;
+		analysisViewParam0.height = (int) (screen.x*345.0/720.0);
+    	
+    	int dot_size = (int) (screen.x*12.0/720.0);
+    	int dot_gap = (int) (dot_size*4/3);
+    	Bitmap tmp = BitmapFactory.decodeResource(this.getResources(), R.drawable.drunk_record_dot_on);
+    	dot_on = Bitmap.createScaledBitmap(tmp, dot_size, dot_size, true);
+    	tmp.recycle();
+    	tmp = BitmapFactory.decodeResource(this.getResources(), R.drawable.drunk_record_dot_off);
+    	dot_off = Bitmap.createScaledBitmap(tmp, dot_size, dot_size, true);
+    	tmp.recycle();
+    	
+    	dots_layout = (RelativeLayout) view.findViewById(R.id.brac_statistics_dots);
+    	RelativeLayout.LayoutParams dotsLayoutParam = (android.widget.RelativeLayout.LayoutParams) dots_layout.getLayoutParams();
+    	dotsLayoutParam.topMargin = (int) (statistic_px.y*378.0/467.0); 
+    			
+    	dots = new ImageView[3];
+    	for (int i=0;i<3;++i){
+    		dots[i] = new ImageView(dots_layout.getContext());
+    		dots_layout.addView(dots[i]);
+    		RelativeLayout.LayoutParams dotParam = (android.widget.RelativeLayout.LayoutParams) dots[i].getLayoutParams();
+    		dotParam.width = dot_size;
+    		dotParam.height = dot_size;
+    		dots[i].setId(DOT_ID[i]);
+    	}
+    	RelativeLayout.LayoutParams dot1Param = (android.widget.RelativeLayout.LayoutParams) dots[1].getLayoutParams();
+    	dot1Param.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
+    	RelativeLayout.LayoutParams dot0Param = (android.widget.RelativeLayout.LayoutParams) dots[0].getLayoutParams();
+    	dot0Param.addRule(RelativeLayout.LEFT_OF,DOT_ID[1]);
+    	dot0Param.rightMargin = dot_gap;
+    	RelativeLayout.LayoutParams dot2Param = (android.widget.RelativeLayout.LayoutParams) dots[2].getLayoutParams();
+    	dot2Param.addRule(RelativeLayout.RIGHT_OF,DOT_ID[1]);
+    	dot2Param.leftMargin = dot_gap;
+    	
     	statisticView.setCurrentItem(1);
     	statisticView.setCurrentItem(0);
-        return view;
+    	statisticViewAdapter.resume();
     }
     
+    public void onPause(){
+    	super.onPause();
+    	if (dot_on!=null && !dot_on.isRecycled()){
+    		dot_on.recycle();
+    		dot_on=null;
+    	}
+    	if (dot_off!=null && !dot_off.isRecycled()){
+    		dot_off.recycle();
+    		dot_off=null;
+    	}
+    	statisticViewAdapter.clear();
+    	for (int i=0;i<analysisViews.length;++i){
+    		analysisViews[i].clear();
+    	}
+    	
+    }
+    
+    public static Point getStatisticPx(){
+    	if (statistic_px!=null)
+    		return statistic_px;
+    	else
+    		return null;
+    }
+    public static Point getAnalysisPx(){
+    	if (analysis_px!=null)
+    		return analysis_px;
+    	else
+    		return null;
+    }
     
     private class StatisticOnPageChangeListener implements OnPageChangeListener{
 
-    	TextView[] dots;
-    	public StatisticOnPageChangeListener(){
-    		dots = new TextView[3];
-    		dots[0]=(TextView) view.findViewById(R.id.statistics_page_day);
-    		dots[1]=(TextView) view.findViewById(R.id.statistics_page_week);
-    		dots[2]=(TextView) view.findViewById(R.id.statistics_page_month);
-    	}
-    	
-    	
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
 			
@@ -89,10 +179,9 @@ public class StatisticFragment extends Fragment {
 
 		@Override
 		public void onPageSelected(int arg0) {
-			for (int i=0;i<3;++i){
-				dots[i].setTextColor(0xFF9999FF);
-			}
-			dots[arg0].setTextColor(0xFFFFFFFF);
+			for (int i=0;i<3;++i)
+				dots[i].setImageBitmap(dot_off);
+			dots[arg0].setImageBitmap(dot_on);
 		}
     	
     }

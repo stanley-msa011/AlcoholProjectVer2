@@ -2,6 +2,9 @@ package new_database;
 
 public class TimeBlock {
 
+	public final static int MAX = 3,MIN=0;
+	
+	
 	public static int getTimeBlock(int hour_24){
 		if (hour_24 >= 6 && hour_24 <11)
 			return 0;

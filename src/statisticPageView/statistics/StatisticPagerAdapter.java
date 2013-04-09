@@ -46,5 +46,17 @@ public class StatisticPagerAdapter extends PagerAdapter {
 	@Override  
     public void destroyItem(View collection, int position, Object view) {  
         ((ViewPager) collection).removeView(viewsList.get(position));  
-    }  
+    } 
+	
+	public void clear(){
+		for (int i=0;i<statisticViews.length;++i){
+			statisticViews[i].clear();
+		}
+	}
+	
+	public void resume(){
+		for (int i=0;i<statisticViews.length;++i){
+			statisticViews[i].resume();
+		}
+	}
 }

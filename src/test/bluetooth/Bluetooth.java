@@ -30,6 +30,7 @@ public class Bluetooth {
 	
 	private static final UUID uuid=  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	private static String DEVICE_NAME = "BOLUTEK";
+	private static String DEVICE_NAME2 = "AEGIN";
 	private BluetoothDevice sensor;
 	private BluetoothSocket socket;
 	
@@ -102,7 +103,7 @@ public class Bluetooth {
 		Iterator<BluetoothDevice> iter = devices.iterator();
 		while (iter.hasNext()){
 			BluetoothDevice device = iter.next();
-			if (device.getName().equals(DEVICE_NAME)){
+			if (device.getName().equals(DEVICE_NAME)||device.getName().equals(DEVICE_NAME2)){
 				sensor = device;
 				break;
 			}
@@ -152,6 +153,7 @@ public class Bluetooth {
 	
 	public void read(){
 		
+		int end=0;
 		byte[] temp = new byte[1024];
 		int bytes;
 		String msg = "";
@@ -179,17 +181,19 @@ public class Bluetooth {
 					first_start_time = time;
 				}
 				else if (time - first_start_time > 10000){
-					close();
+					Log.d("BT","TIME OUT");
+					//close();
+					end =-1; 
 					cameraRunHandler.sendEmptyMessage(-1);
 				}
 				for (int i=0;i<bytes;++i){
 					if ((char)temp[i]=='a'){
-						sendMsgToApp(msg);
+						end = sendMsgToApp(msg);
 						msg="a";
 						read_type = READ_ALCOHOL;
 					}
 					else if ((char)temp[i]=='m'){
-						sendMsgToApp(msg);
+						end = sendMsgToApp(msg);
 						msg="m";
 						read_type = READ_PRESSURE;
 					}
@@ -197,15 +201,20 @@ public class Bluetooth {
 							msg += (char)temp[i];
 					}
 				}
-				bytes =in.read(temp);
+				if (end == -1){
+					break;
+				}
+				if (socket.isConnected())
+					bytes =in.read(temp);
 			}
+			close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
 			close();
 		}
 	}
 	
-	private void sendMsgToApp(String msg){
+	private int sendMsgToApp(String msg){
 		synchronized(lock){
 			if (msg=="");
 				//Do nothing
@@ -223,7 +232,6 @@ public class Bluetooth {
 				}
 			}
 			else if (msg.charAt(0)=='m'){
-				
 				
 				//Log.d("BT","READ-M");
 				if (prev_pressure == 0.f){
@@ -251,15 +259,18 @@ public class Bluetooth {
 								++image_count;
 							}
 							else if (image_count == 1 && duration > IMAGE_MILLIS_1){
-								cameraRunHandler.sendEmptyMessage(0);
+								cameraRunHandler.sendEmptyMessage(1);
 								++image_count;
-							}else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
-								cameraRunHandler.sendEmptyMessage(0);
+							}
+							else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
+								cameraRunHandler.sendEmptyMessage(2);
 								++image_count;
 								successful = true;
-								close();
+								
 								String output = "<"+sum/counter+">";
 								show_in_UI(output);
+								Log.d("Show in UI","SHOW");
+								return -1;
 							}
 							
 						}
@@ -270,23 +281,25 @@ public class Bluetooth {
 				}
 			}
 		}
+		return 0;
 	}
 	
 	public void close(){
-		try {
-			if (in != null)
-				in.close();
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
-		}
 		try {
 			socket.close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CLOSE THE SENSOR");
 		}
-		if (bracFileHandler!= null)
-			bracFileHandler.close();
-	}
+		
+		try {
+				if (in != null)
+					in.close();
+			} catch (Exception e) {
+				Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
+			}
+			if (bracFileHandler!= null)
+				bracFileHandler.close();
+			}
 	
 	private void write_to_file(String str){
 		Message msg = new Message();

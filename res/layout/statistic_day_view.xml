@@ -2,20 +2,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/drunk_record_bg1" 
+    android:id="@+id/statistic_day_layout"
     >
 
     <TextView
         android:id="@+id/statistic_day_brac_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:textSize="60sp"/>
-	<TextView
-	    android:id="@+id/statistic_day_brac_result"
+        />
+    
+    <ImageView
+        android:id="@+id/statistic_day_brac_result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-		android:layout_toRightOf="@+id/statistic_day_brac_value"
-	    android:layout_centerVertical="true"
-        android:textSize="30sp"/>
+     />
 </RelativeLayout>

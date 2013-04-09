@@ -10,4 +10,16 @@ public class AnalysisRatingView extends StatisticPageView {
 		super(context, R.layout.analysis_rating_view);
 	}
 
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
