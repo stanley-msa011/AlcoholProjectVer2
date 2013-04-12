@@ -18,7 +18,6 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 	public static final int gaps = 90;
 	private static final int clip_time = 2700;
 	private static final int sleep_time = clip_time/gaps;
-	//private Bitmap[] bgs;
 	private int[] bgs;
 	private HistoryFragment historyFragment;
 	

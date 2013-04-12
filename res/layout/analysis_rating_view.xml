@@ -4,21 +4,62 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-    <TextView
+   <RelativeLayout
+       android:id ="@+id/analysis_rating_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+       
+       <ImageView
+        android:id ="@+id/analysis_rating_title_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:background="#99333333"
-        android:text="群體表現" />
-
-   <RelativeLayout
+        android:scaleType="fitXY"
+        />
+       
+       <TextView
+        android:id ="@+id/analysis_rating_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+        
+        <TextView
+        android:id ="@+id/analysis_rating_title"
         android:layout_width="match_parent"
-        android:layout_height="90dp" 
-        android:background="#FFFFFFFF">
-
+        android:layout_height="wrap_content"
+        android:text="群體表現" />
+       
+       
+        <ImageView
+            android:id="@+id/analysis_rating_bar"
+       		android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        />
         
 
- 		
+
+        <TextView
+            android:id="@+id/analysis_rating_low"
+       		android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_alignParentLeft="true"
+        />
+        
+        <TextView
+            android:id="@+id/analysis_rating_high"
+       		android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_alignParentRight="true"
+        />
+        
+        <ImageView
+            android:id="@+id/analysis_rating_pointer"
+       		android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        />
     </RelativeLayout>
 
 </LinearLayout>

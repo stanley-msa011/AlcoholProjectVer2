@@ -28,17 +28,26 @@ public class DBHelper extends SQLiteOpenHelper {
                         " _BRAC FLOAT NOT NULL"+
                 ")"
         );
-        /*db.execSQL(
-        		"CREATE TABLE NotUploadedTimeStamp ("+
+        db.execSQL(
+        		"CREATE TABLE InteractionGame ("+
+        				"_ID INTEGER PRIMERY KEY," +
+        				"_UID CHAR[10] NOT NULL," +
+        				"_LEVEL INTEGER NOT NULL" +
+        				")"
+        );
+        db.execSQL(
+        		"CREATE TABLE NotUploadedTS ("+
         				"_ID INTEGER PRIMARY KEY," +
-        				"_TS CHAR[50] NOT NULL )"
+        				"_TS INTEGER NOT NULL )"
         		);
-        		*/
+        		
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int old_ver, int new_ver){
 		db.execSQL("DROP TABLE IF EXISTS HistoryGame");
+		db.execSQL("DROP TABLE IF EXISTS InteractionGame");
+		db.execSQL("DROP TABLE IF EXISTS NotUploadedTS");
 		onCreate(db);
 	}
 	

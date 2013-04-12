@@ -8,115 +8,47 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.ImageView.ScaleType;
 import statisticPageView.StatisticPageView;
 import test.data.BracDataHandler;
 
 public class StatisticMonthView extends StatisticPageView {
 
 	private HistoryDB db;
-	private ImageView textImage, lineImage1, lineImage2;
+	private ImageView  lineImage1, lineImage2;
 	private Bitmap block_green, block_yellow, block_red;
 	private Bitmap textBmp, lineBmp1, lineBmp2; 
 	private RelativeLayout mainLayout;
+	private TextView help;
 	
 	private ImageView[] blocks;
 	
-	public StatisticMonthView(Context context) {
-		super(context, R.layout.statistic_month_view);
+	private ImageView bg;
+	private Bitmap bgBmp;
+	
+	private LoadingTask task;
+	
+	public StatisticMonthView(Context context,StatisticFragment statisticFragment) {
+		super(context, R.layout.statistic_month_view,statisticFragment);
 		db = new HistoryDB(context);
-	}
-
-	private void init(){
-		Point screen = StatisticFragment.getStatisticPx();
-		
-		Bitmap tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line3);
-		int lineWidth1 =screen.x;
-		int lineHeight1 = (int) (screen.y*5.0/443.0);
-		lineBmp1 = Bitmap.createScaledBitmap(tmp, lineWidth1,lineHeight1 , true);
-		tmp.recycle();
-		lineImage1 = (ImageView) view.findViewById(R.id.statistic_month_line1);
-		lineImage1.setImageBitmap(lineBmp1);
-		RelativeLayout.LayoutParams lineParam1 = (RelativeLayout.LayoutParams) lineImage1.getLayoutParams();
-		lineParam1.height = lineHeight1;
-		lineParam1.width = lineWidth1;
-		lineParam1.leftMargin = 0;
-		lineParam1.topMargin = (int)(screen.y*310.0/443.0);
-		
-		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line2);
-		int lineWidth2 = (int) (screen.x*10.0/720.0);
-		int lineHeight2 = (int) (screen.y*102.0/443.0);
-		lineBmp2 = Bitmap.createScaledBitmap(tmp, lineWidth2,lineHeight2, true);
-		tmp.recycle();
-		lineImage2 = (ImageView) view.findViewById(R.id.statistic_month_line2);
-		lineImage2.setImageBitmap(lineBmp2);
-		RelativeLayout.LayoutParams lineParam2 = (RelativeLayout.LayoutParams) lineImage2.getLayoutParams();
-		lineParam2.height = lineHeight2;
-		lineParam2.width = lineWidth2;
-		lineParam2.leftMargin = (int) (screen.x * 34.0/720.0);
-		lineParam2.topMargin = (int)(screen.y*158.0/443.0);
-	
-		int blockWidth =  (int) (screen.x * 20.0/720.0);
-		int blockHeight =  (int) (screen.y * 50.0/443.0);
-		int blockGap = (int)(screen.x * 2.0/720.0);
-		if (blockGap < 1)
-			blockGap = 1;
-		
-		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_green);
-		block_green = Bitmap.createScaledBitmap(tmp, blockWidth, blockHeight, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_yellow);
-		block_yellow = Bitmap.createScaledBitmap(tmp, blockWidth, blockHeight, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_red);
-		block_red = Bitmap.createScaledBitmap(tmp, blockWidth, blockHeight, true);
-		tmp.recycle();
-		
-		mainLayout = (RelativeLayout) view.findViewById(R.id.statistic_month_layout);
-		
-		blocks = new ImageView[28*4];
-		int leftMargin = (int) (screen.x * 70.0/720.0);
-		for (int i=0;i<28;++i){
-			int topMargin = lineParam1.topMargin - blockHeight;
-			for (int j=0;j<4;++j){
-				int c = 4*i+j;
-				blocks[c] = new ImageView(context);
-				mainLayout.addView(blocks[c]);
-				RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) blocks[c].getLayoutParams();
-				param.width = blockWidth;
-				param.height = blockHeight;
-				param.leftMargin = leftMargin;
-				param.topMargin = topMargin;
-				topMargin -= blockHeight;
-			}
-			leftMargin+=blockWidth+blockGap;
-		}
-	}
-	
-	private void setting(){
-		init();
-		BracGameHistory[] historys = db.getMultiDayInfo(28);
-		for (int i=0;i<historys.length;++i){
-			if (historys[i]==null){
-				//MISS
-				blocks[i].setImageBitmap(block_yellow);
-			}
-			else{
-				if (historys[i].brac>BracDataHandler.THRESHOLD){
-					//FAIL
-					blocks[i].setImageBitmap(block_red);
-				}
-				else{
-					//PASS
-					blocks[i].setImageBitmap(block_green);
-				}
-			}
-		}
+		task = new LoadingTask();
+		task.execute();
 	}
 
 	@Override
 	public void clear() {
+		Log.d("CLEAR","MONTH");
+		if (task!=null){
+			task.cancel(true);
+			task = null;
+		}
+		
 		if (textBmp!=null && !textBmp.isRecycled()){
 			textBmp.recycle();
 			textBmp = null;
@@ -141,10 +73,119 @@ public class StatisticMonthView extends StatisticPageView {
 			block_green.recycle();
 			block_green = null;
 		}
+		if (bgBmp!=null && !bgBmp.isRecycled()){
+			bgBmp.recycle();
+			bgBmp = null;
+		}
 	}
 
-	@Override
-	public void resume() {
-		setting();
-	}
+	private class LoadingTask extends AsyncTask<Void, Void, Void>{
+
+		private int blockTopMargin;
+		
+    	protected void onPreExecute(){
+    		
+    		Point screen = StatisticFragment.getStatisticPx();
+    		lineBmp1 =BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line3);
+    		lineImage1 = (ImageView) view.findViewById(R.id.statistic_month_line1);
+    		lineImage1.setImageBitmap(lineBmp1);
+    		lineImage1.setScaleType(ScaleType.FIT_XY);
+    		
+    		lineBmp2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line2);
+    		lineImage2 = (ImageView) view.findViewById(R.id.statistic_month_line2);
+    		lineImage2.setImageBitmap(lineBmp2);
+    		lineImage2.setScaleType(ScaleType.FIT_XY);
+    		
+    		mainLayout = (RelativeLayout) view.findViewById(R.id.statistic_month_layout);
+    		
+    		bg = (ImageView) view.findViewById(R.id.statistic_month_bg);
+    		
+    		help = (TextView) view.findViewById(R.id.statistic_month_help);
+    		help.setTextColor(0xFFFFFFFF);
+    		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+    	}
+    	
+		@Override
+		protected Void doInBackground(Void... params) {
+			
+			Point screen = StatisticFragment.getStatisticPx();
+    		
+    		int lineWidth1 =screen.x;
+    		int lineHeight1 = (int) (screen.y*5.0/443.0);
+			
+			RelativeLayout.LayoutParams lineParam1 = (RelativeLayout.LayoutParams) lineImage1.getLayoutParams();
+    		lineParam1.height = lineHeight1;
+    		lineParam1.width = lineWidth1;
+    		lineParam1.leftMargin = 0;
+    		lineParam1.topMargin = blockTopMargin = (int)(screen.y*310.0/443.0);
+			
+    		int lineWidth2 = (int) (screen.x*10.0/720.0);
+    		int lineHeight2 = (int) (screen.y*102.0/443.0);
+    		RelativeLayout.LayoutParams lineParam2 = (RelativeLayout.LayoutParams) lineImage2.getLayoutParams();
+    		lineParam2.height = lineHeight2;
+    		lineParam2.width = lineWidth2;
+    		lineParam2.leftMargin = (int) (screen.x * 34.0/720.0);
+    		lineParam2.topMargin = (int)(screen.y*158.0/443.0);
+    		
+    		block_green = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_green);
+    		block_yellow = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_yellow);
+    		block_red = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_red);
+    		
+    		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg2);
+    		
+    		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
+    		helpParam.leftMargin =  (int) (screen.x * 130.0/720.0);
+    		helpParam.topMargin = (int)(screen.y*310.0/443.0);
+    		
+			return null;
+		}
+		@Override
+		 protected void onPostExecute(Void result) {
+			
+			Point screen = StatisticFragment.getStatisticPx();
+			
+			int blockWidth =  (int) (screen.x * 20.0/720.0);
+    		int blockHeight =  (int) (screen.y * 50.0/443.0);
+    		int blockGap = (int)(screen.x * 2.0/720.0);
+    		if (blockGap < 1)
+    			blockGap = 1;
+			
+    		blocks = new ImageView[28*4];
+    		int leftMargin = (int) (screen.x * 70.0/720.0);
+    		for (int i=0;i<28;++i){
+    			int topMargin = blockTopMargin - blockHeight;
+    			for (int j=0;j<4;++j){
+    				int c = 4*i+j;
+    				blocks[c] = new ImageView(context);
+    				blocks[c].setScaleType(ScaleType.FIT_XY);
+    				mainLayout.addView(blocks[c]);
+    				RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) blocks[c].getLayoutParams();
+    				param.width = blockWidth;
+    				param.height = blockHeight;
+    				param.leftMargin = leftMargin;
+    				param.topMargin = topMargin;
+    				topMargin -= blockHeight;
+    			}
+    			leftMargin+=blockWidth+blockGap;
+    		}
+			
+    		BracGameHistory[] historys = db.getMultiDayInfo(28);
+    		for (int i=0;i<historys.length;++i){
+    			if (historys[i]==null)//MISS
+    				blocks[i].setImageBitmap(block_yellow);
+    			else if (historys[i].brac>BracDataHandler.THRESHOLD)//FAIL
+    				blocks[i].setImageBitmap(block_red);
+    			else//PASS
+    				blocks[i].setImageBitmap(block_green);
+    		}
+    		
+    		bg.setImageBitmap(bgBmp);
+    		
+    		help.setText("四週統計測試");
+		}
+		
+		protected void onCancelled(){
+			clear();
+		}
+	}	
 }

@@ -42,8 +42,7 @@
         android:debuggable="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
-        
-         <activity
+        <activity
             android:name="ioio.examples.hello.FragmentTabs"
             android:label="new_alcohol"
             android:launchMode="singleTop"
@@ -54,7 +53,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
         <activity
             android:name="ioio.examples.hello.GameActivity"
             android:label="@string/app_name"
@@ -66,7 +64,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-       
         <activity
             android:name="ioio.examples.hello.MainActivity"
             android:screenOrientation="portrait" >
@@ -95,8 +92,6 @@
         <service android:name="ioio.examples.hello.GCMIntentService" >
         </service>
 
-        
-        
         <activity
             android:name="ioio.examples.hello.GameListActivity"
             android:screenOrientation="portrait" >
@@ -146,6 +141,10 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity android:name="ioio.examples.hello.TestFragment" >
+        </activity>
+        <activity
+            android:name="ioio.examples.hello.PreSettingActivity"
+            android:label="@string/title_activity_pre_setting" >
         </activity>
     </application>
 

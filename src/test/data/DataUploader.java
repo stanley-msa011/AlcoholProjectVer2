@@ -2,12 +2,15 @@ package test.data;
 
 import java.io.IOException;
 
+import new_database.HistoryDB;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -17,12 +20,14 @@ public class DataUploader extends AsyncTask<Void, Void, Integer> {
 	private HttpClient httpClient;
 	private String ts;
 	private AsyncTask<Void, Void, Integer> mTask;
+	private Context context;
 	
-	public DataUploader(HttpClient httpClient, HttpPost httpPost,String ts){
+	public DataUploader(HttpClient httpClient, HttpPost httpPost,String ts,Context context){
 		mTask = this;
 		this.ts = ts;
 		this.httpClient = httpClient;
 		this.httpPost = httpPost;
+		this.context = context;
 	}
 	
 	@Override
@@ -62,6 +67,9 @@ public class DataUploader extends AsyncTask<Void, Void, Integer> {
 		if (result == -1){
 			Log.d("UPLOADER","UPLOAD FAILED");
 			//put ts to the uploader
+			HistoryDB db = new HistoryDB(context);
+			long _ts =Long.valueOf(ts);
+			db.insertNotUploadedTS(_ts);
 		}
 		else{
 			Log.d("UPLOADER","UPLOAD SUCCESS");

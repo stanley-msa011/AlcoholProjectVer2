@@ -7,6 +7,7 @@ import test.data.BracDataHandler;
 
 import history.BracGameHistory;
 import history.DateBracGameHistory;
+import history.InteractionHistory;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -108,11 +109,11 @@ public class HistoryDB {
     
     public int getAllBracGameScore(){
 
-    	int MIN = 0;
-    	int MAX = 20;
-    	int MISS = -4;
+    	int MIN = 1;
+    	int MAX = 9;
+    	int MISS = -2;
     	int PASS = +1;
-    	int FAIL = -2;
+    	int FAIL = -1;
     	
     	int score = (MIN+MAX)/2;
     	db = dbHelper.getReadableDatabase();
@@ -265,4 +266,74 @@ public class HistoryDB {
     	return historys;
     }
     
+    public void insertNotUploadedTS(long ts){
+    	db = dbHelper.getWritableDatabase();
+    	String sql = "SELECT * FROM NotUploadedTS WHERE _TS = "+ts;
+    	Cursor cursor = db.rawQuery(sql, null);
+    	if (cursor.getCount() == 0){
+    		sql = "INSERT INTO NotUploadedTS (_TS) VALUES ("+ts+")";
+    		db.execSQL(sql);
+    	}
+    	db.close();
+    }
+    
+    public void removeNotUploadedTimeStamp(long ts){
+    	db = dbHelper.getWritableDatabase();
+    	String sql = "DELETE FROM NotUploadedTS WHERE _TS = "+ts;
+    	db.execSQL( sql);
+    	db.close();
+    }
+    
+    public long[] getAllNotUploadedTS(){
+    	db = dbHelper.getReadableDatabase();
+    	String sql = "SELECT * FROM NotUploadedTS ORDER BY _ID ASC";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	int count = cursor.getCount();
+    	if (count == 0)
+    		return null;
+    	long[] ts = new long[count];
+    	int ts_idx = cursor.getColumnIndex("_TS");
+    	for (int i=0;i<count;++i){
+    		cursor.moveToPosition(i);
+    		ts[i] =cursor.getLong(ts_idx); 
+    	}
+    	db.close();
+    	return ts;
+    }
+    
+    public InteractionHistory[] getAllUsersHistory(){
+    	InteractionHistory[] historys = null;
+    	db = dbHelper.getReadableDatabase();
+    	String sql = "SELECT * FROM InteractionGame ORDER BY _LEVEL DESC,  _UID ASC";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	int count = cursor.getCount();
+    	if (count == 0)
+    		return null;
+    	historys = new InteractionHistory[count];
+    	int uid_idx = cursor.getColumnIndex("_UID");
+    	int level_idx = cursor.getColumnIndex("_LEVEL");
+    	for (int i=0;i<count;++i){
+    		cursor.moveToPosition(i);
+    		String uid = cursor.getString(uid_idx);
+    		int level = cursor.getInt(level_idx);
+    		historys[i] = new InteractionHistory(level,uid);
+    	}
+    	db.close();
+    	return historys;
+    }
+    
+    public void insertInteractionHistory(InteractionHistory history){
+    	db = dbHelper.getWritableDatabase();
+    	String sql = "SELECT * FROM InteractionGame WHERE _UID = '"+history.uid+"'";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	if (cursor.getCount() == 0){
+    		sql = "INSERT INTO InteractionGame (_UID,_LEVEL) VALUES ('"+history.uid+"',"+history.level+")";
+    		db.execSQL(sql);
+    	}
+    	else{
+    		sql =  "UPDATE InteractionGame SET _LEVEL = "+history.level	+" WHERE _UID ='"+history.uid+"'";
+    		db.execSQL(sql);
+    	}
+    	db.close();
+    }
 }

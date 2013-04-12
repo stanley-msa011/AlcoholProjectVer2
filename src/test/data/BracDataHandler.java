@@ -2,6 +2,7 @@ package test.data;
 
 import history.BracGameHistory;
 import history.DateBracGameHistory;
+import ioio.examples.hello.PreSettingActivity;
 import ioio.examples.hello.R;
 import ioio.examples.hello.TestFragment;
 
@@ -49,7 +50,10 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
@@ -72,7 +76,7 @@ public class BracDataHandler {
 	public static final int SUCCESS = 1;
 	public static final double THRESHOLD = 0.09;
 	
-	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detect_upload.php";
+	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload.php";
 	
 	public int start(){
 		
@@ -112,7 +116,7 @@ public class BracDataHandler {
     	timeblock = TimeBlock.getTimeBlock(hour);
     
     	//check time block
-    	boolean check_time_block = false;
+    	boolean check_time_block = true;
     	if (check_time_block){
     		if (timeblock==-1);
     		else if (year == prevHistory.year && month == prevHistory.month && date == prevHistory.date && timeblock == prevHistory.timeblock);
@@ -153,7 +157,8 @@ public class BracDataHandler {
 		if (server_connect == ERROR) // error happens when preparing files
 			result = ERROR;
 		if (result == ERROR){
-			//put ts into Reuploader
+			long _ts = Long.valueOf(ts);
+			db.insertNotUploadedTS(_ts);
 		}
 		return result;
 	}
@@ -216,8 +221,11 @@ public class BracDataHandler {
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 			MultipartEntity mpEntity = new MultipartEntity();
 			
-			mpEntity.addPart("userData[]", new StringBody(devId));
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			String uid = sp.getString("uid", "");
+			mpEntity.addPart("userData[]", new StringBody(uid));
 			mpEntity.addPart("userData[]", new StringBody(ts));
+			mpEntity.addPart("userData[]", new StringBody(devId));
 			
 			ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
 			mpEntity.addPart("userfile[]", cbFile);
@@ -238,7 +246,7 @@ public class BracDataHandler {
 				mpEntity.addPart("userfile[]", new FileBody(imageFiles[2], "image/jpeg"));
 			
 			httpPost.setEntity(mpEntity);
-			DataUploader uploader = new DataUploader(httpClient,httpPost,ts);
+			DataUploader uploader = new DataUploader(httpClient,httpPost,ts,context);
 			Log.d("DataHandler","uploader execute");
 			uploader.execute();
 			

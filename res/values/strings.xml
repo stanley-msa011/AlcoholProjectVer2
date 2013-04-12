@@ -79,5 +79,6 @@
     <string name="title_activity_new_main">NewMainActivity</string>
     <string name="title_activity_new_statistic">NewStatisticActivity</string>
     <string name="title_activity_tab">TabActivity</string>
+    <string name="title_activity_pre_setting">PreSettingActivity</string>
 
 </resources>

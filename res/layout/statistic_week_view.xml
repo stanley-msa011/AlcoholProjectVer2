@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?><RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/drunk_record_bg2"
     android:id = "@+id/statistic_week_layout" 
     >
 
+    <ImageView
+       	android:id="@+id/statistic_week_bg"
+       	android:layout_width="match_parent"
+       	android:layout_height="match_parent"
+       	android:scaleType="fitXY"
+     />
+    
     <ImageView
         android:id = "@+id/statistic_week_text"
         android:layout_width="wrap_content"
@@ -19,6 +25,12 @@
     
     <ImageView
         android:id ="@+id/statistic_week_line2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    
+    <TextView
+        android:id ="@+id/statistic_week_help"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />

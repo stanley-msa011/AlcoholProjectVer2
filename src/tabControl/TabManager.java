@@ -1,5 +1,7 @@
 package tabControl;
 
+import ioio.examples.hello.FragmentTabs;
+
 import java.util.HashMap;
 
 import android.content.Context;
@@ -12,7 +14,7 @@ import android.widget.TabHost;
 
 public class TabManager implements TabHost .OnTabChangeListener{
 
-	private final FragmentActivity activity;
+	private final FragmentTabs fragmentTabs;
 	private final TabHost tabHost;
 	private final int containerId;
 	private final HashMap<String, TabInfo> tabs = new HashMap<String, TabInfo>();
@@ -49,22 +51,22 @@ public class TabManager implements TabHost .OnTabChangeListener{
 		
 	}
 	
-	public TabManager(FragmentActivity activity, TabHost tabHost, int containerId) {
-        this.activity = activity;
+	public TabManager(FragmentTabs activity, TabHost tabHost, int containerId) {
+        this.fragmentTabs = activity;
         this.tabHost = tabHost;
         this.containerId = containerId;
         this.tabHost.setOnTabChangedListener(this);
     }
 	
 	public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args) {
-        tabSpec.setContent(new DummyTabFactory(activity));
+        tabSpec.setContent(new DummyTabFactory(fragmentTabs));
         String tag = tabSpec.getTag();
 
         TabInfo info = new TabInfo(tag, clss, args);
 
-        info.fragment = activity.getSupportFragmentManager().findFragmentByTag(tag);
+        info.fragment = fragmentTabs.getSupportFragmentManager().findFragmentByTag(tag);
         if (info.fragment != null && !info.fragment.isDetached()) {
-            FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+            FragmentTransaction ft = fragmentTabs.getSupportFragmentManager().beginTransaction();
             ft.detach(info.fragment);
             ft.commit();
         }
@@ -78,7 +80,7 @@ public class TabManager implements TabHost .OnTabChangeListener{
 	     TabInfo newTab = tabs.get(tabId);
 
 	        if (lastTab != newTab) {
-	            FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+	            FragmentTransaction ft = fragmentTabs.getSupportFragmentManager().beginTransaction();
 	            if (lastTab != null) {
 	                if (lastTab.fragment != null) {
 	                    ft.detach(lastTab.fragment);
@@ -86,12 +88,12 @@ public class TabManager implements TabHost .OnTabChangeListener{
 	            }
 
 	            if (newTab != null) {
-	                newTab.fragment = Fragment.instantiate(activity, newTab.t_class.getName(), newTab.args);
+	                newTab.fragment = Fragment.instantiate(fragmentTabs, newTab.t_class.getName(), newTab.args);
 	                ft.add(containerId, newTab.fragment, newTab.tag);
 	                if (newTab.fragment == null) {
 	                    ft.detach(lastTab.fragment);
 	                } else {
-	                    activity.getSupportFragmentManager().popBackStack();
+	                    fragmentTabs.getSupportFragmentManager().popBackStack();
 	                    ft.replace(containerId, newTab.fragment);
 	                    ft.attach(newTab.fragment);
 	                }
@@ -99,8 +101,9 @@ public class TabManager implements TabHost .OnTabChangeListener{
 	            
 	            lastTab = newTab;
 	            ft.commit();
-	            activity.getSupportFragmentManager().executePendingTransactions();
-	        }		
+	            fragmentTabs.getSupportFragmentManager().executePendingTransactions();
+	        }
+	     fragmentTabs.setTabState(tabId);
 	}
 
 }

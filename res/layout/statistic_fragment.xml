@@ -3,11 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" 
-    android:background="#FFFFFFFF">
+    android:background="#FFFFFFFF"
+    >
 
     <RelativeLayout
         android:id="@+id/brac_statistics_layout"
-        android:layout_height="160dp"
+        android:layout_height="0dp"
         android:layout_width="match_parent"
         >
     	<android.support.v4.view.ViewPager
@@ -34,6 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" 
             android:orientation="vertical" 
+            
              >
         </LinearLayout>
     </ScrollView>

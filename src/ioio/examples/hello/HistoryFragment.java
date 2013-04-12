@@ -5,6 +5,7 @@ import history.pageEffect.PageAnimationHandler;
 import history.pageEffect.PageAnimationTask;
 import history.pageEffect.PageWidget;
 import new_database.HistoryDB;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -13,6 +14,7 @@ import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -36,6 +38,7 @@ public class HistoryFragment extends Fragment {
 	private ImageView bgView;
 	private ImageView playButton;
 	private TextView playText;
+	private TextView uidText;
 	private RelativeLayout buttonLayout;
 	private RelativeLayout main_layout;
 	private HistoryDB db;
@@ -70,16 +73,25 @@ public class HistoryFragment extends Fragment {
    
 	public void onResume(){
 		super.onResume();
-		initView_step1();
+		System.gc();
 		loadTask = new LoadingTask();
 		loadTask.execute();
 	}
     
     public void onPause(){
-    	if (loadTask!=null)
+    	clear();
+    	super.onPause();
+    }
+	
+    private void clear(){
+    	if (loadTask!=null){
     		loadTask.cancel(true);
-    	if (pageAnimationTask!=null)
+    		loadTask = null;
+    	}
+    	if (pageAnimationTask!=null){
     		pageAnimationTask.cancel(true);
+    		pageAnimationTask = null;
+    	}
     	if (cur_bg_bmp!=null && !cur_bg_bmp.isRecycled()){
     		cur_bg_bmp.recycle();
     		cur_bg_bmp=null;
@@ -96,17 +108,15 @@ public class HistoryFragment extends Fragment {
     		play_button_bmp.recycle();
     		play_button_bmp = null;
     	}
-    	main_layout.removeAllViews();
-    	main_layout.removeAllViewsInLayout();
-    	pageWidget.destroyDrawingCache();
-    	pageWidget.clear();
-    	pageWidget=null;
+    	if (pageWidget!=null){
+    		pageWidget.destroyDrawingCache();
+    		pageWidget.clear();
+    		pageWidget=null;
+    	}
     	System.gc();
-    	super.onPause();
     }
-	
+    
     private void initView_step1(){
-    	
     	
     	Point screen = FragmentTabs.getSize();
     	
@@ -115,17 +125,12 @@ public class HistoryFragment extends Fragment {
     	bg_x = screen.x;
     	bg_y = screen.y;
     	
-    	bgView = (ImageView) view.findViewById(R.id.history_bg);
-    	LayoutParams bgParam = (LayoutParams) bgView.getLayoutParams();
-    	bgParam.width = bg_x;
-    	bgParam.height = bg_y;
     	
     	top_margin = (int) (bg_y*224.0/1280.0);
     	
-    	Bitmap tmp = BitmapFactory.decodeResource(this.getResources(), R.drawable.drunk_history_bg);
-    	background = Bitmap.createScaledBitmap(tmp, bg_x,bg_y , true);
-    	bgView.setImageBitmap(background);
-    	tmp.recycle();
+    	bgView = (ImageView) view.findViewById(R.id.history_background);
+    	bgView.setScaleType(ScaleType.FIT_XY);
+    	
     	
     	width = (int)(bg_x*630.0/720.0);
     	height = (int)(bg_y*856.0/1280.0);
@@ -150,11 +155,13 @@ public class HistoryFragment extends Fragment {
     	curPageIdx = level/4;
     	int curPageClip =level%4;
     	curPageTouch = touchPoints[curPageClip];
-    	
     }
     
     private void initView_step2(){
     	setPage();
+    	
+    	bgView.setImageBitmap(background);
+    	
     	main_layout.addView(pageWidget);
     	LayoutParams param = (LayoutParams) pageWidget.getLayoutParams();
     	param.width = width;
@@ -196,6 +203,21 @@ public class HistoryFragment extends Fragment {
     	playTextParam.alignWithParent=true;
     	playTextParam.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
     	playTextParam.topMargin = (int)(playWidth*0.325F);
+    	
+    	uidText = new TextView(main_layout.getContext());
+    	SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(main_layout.getContext());
+    	String uid = settings.getString("uid", "");
+    	uidText.setText(uid);
+    	Typeface face2=Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/helvetica-lt-std-ultra-compressed.otf");
+    	uidText.setTypeface(face2);
+    	uidText.setTextColor(0xFFF97306);
+    	uidText.setTextSize(TypedValue.COMPLEX_UNIT_PX,playText.getTextSize()*1.2F);
+    	uidText.setGravity(Gravity.CENTER);
+    	main_layout.addView(uidText);
+    	LayoutParams uidTextParam = (LayoutParams) uidText.getLayoutParams();
+    	uidTextParam.leftMargin = (int) (bg_x*535.0/720.0);
+    	uidTextParam.topMargin = (int) (bg_y*150.0/1280.0);
+    	
     }
     
     private class PageOnClickListener implements View.OnClickListener{
@@ -226,9 +248,22 @@ public class HistoryFragment extends Fragment {
     
     private class LoadingTask extends AsyncTask<Void, Void, Void>{
 
+    	protected void onPreExecute(){
+    		initView_step1();
+    	}
+    	
 		@Override
 		protected Void doInBackground(Void... params) {
-			Bitmap tmp = BitmapFactory.decodeResource(historyFragment.getResources(), bgs[curPageIdx]);
+			
+			Bitmap tmp= BitmapFactory.decodeResource(historyFragment.getResources(), R.drawable.drunk_history_bg);
+	    	background = Bitmap.createScaledBitmap(tmp, bg_x, bg_y, true);
+	    	tmp.recycle();
+	    	LayoutParams bgParam = (LayoutParams) bgView.getLayoutParams();
+	    	bgParam.width = bg_x;
+	    	bgParam.height = bg_y;
+	    	
+			
+			tmp = BitmapFactory.decodeResource(historyFragment.getResources(), bgs[curPageIdx]);
 			cur_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
 			tmp.recycle();
 			if (curPageIdx == bgs.length-1)
@@ -238,21 +273,25 @@ public class HistoryFragment extends Fragment {
 				next_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
 				tmp.recycle();
 			}
-			tmp = BitmapFactory.decodeResource(historyFragment.getResources(), R.drawable.drunk_history_play);
 	    	playWidth = (int) (bg_x*220.0/720.0);
 	    	playHeight = (int) (bg_y*220.0/1280.0);
 	    	if (playWidth > playHeight)
 	    		playHeight = playWidth;
 	    	else
 	    		playWidth = playHeight;
-	    	play_button_bmp =Bitmap.createScaledBitmap(tmp, playWidth, playHeight, true);
+	    	play_button_bmp =BitmapFactory.decodeResource(historyFragment.getResources(), R.drawable.drunk_history_play);
 	    	
 			return null;
 		}
 		@Override
 		 protected void onPostExecute(Void result) {
+			
 			initView_step2();
 			endAnimation();
+		}
+		
+		protected void onCancelled(){
+			clear();
 		}
     }
 

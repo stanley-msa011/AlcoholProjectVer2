@@ -1,9 +1,14 @@
 package ioio.examples.hello;
 
+import tabControl.CustomTab;
 import tabControl.TabManager;
+import test.data.Reuploader;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -11,6 +16,7 @@ import android.view.Display;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 
 public class FragmentTabs extends FragmentActivity {
@@ -20,11 +26,18 @@ public class FragmentTabs extends FragmentActivity {
 	private static Point screen_px;
 	private static Point tab_px;
 	private static float screen_density;
+	private TabSpec[] tabs;
+	private CustomTab[] customTabs;
+	
+	private static final String[] tabName ={"Test","Record","Social","History"}; 
+	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_social,R.drawable.tab_history}; 
+	private static final String[] iconText ={"測試","紀錄","社交","歷程"}; 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
 			int w = display.getWidth();
@@ -37,6 +50,8 @@ public class FragmentTabs extends FragmentActivity {
 		}
 		screen_density =this.getResources().getDisplayMetrics().density;
 
+		tab_px = new Point(screen_px.x,(int)(screen_px.y*(110.0/1280.0)));
+		
 		Log.d("SCREEN_PX",screen_px.toString());
 		
 		setContentView(R.layout.tab_layout);
@@ -45,27 +60,35 @@ public class FragmentTabs extends FragmentActivity {
 		tabManager = new TabManager(this,tabHost,R.id.real_tabcontent);
 		
 
+		tabs = new TabSpec[4];
+		customTabs = new CustomTab[4];
+		
+		for (int i=0;i<4;++i){
+			customTabs[i] = new CustomTab(this,iconId[i],iconText[i]);
+			tabs[i] = tabHost.newTabSpec(tabName[i]).setIndicator(customTabs[i].getTab());
+			
+		}
 		
 		tabManager.addTab(
-				tabHost.newTabSpec("Test").setIndicator("測試"),
+				tabs[0],
 				TestFragment.class,
 				null
 				);
 		
 		tabManager.addTab(
-				tabHost.newTabSpec("Statistic").setIndicator("紀錄"),
+				tabs[1],
 				StatisticFragment.class,
 				null
 				);
 		
 		tabManager.addTab(
-				tabHost.newTabSpec("Interaction").setIndicator("社交"),
+				tabs[2],
 				InteractionFragment.class,
 				null
 				);
 		
 		tabManager.addTab(
-				tabHost.newTabSpec("History").setIndicator("歷程"),
+				tabs[3],
 				HistoryFragment.class,
 				null
 				);
@@ -84,10 +107,50 @@ public class FragmentTabs extends FragmentActivity {
 		for (int i=0;i<count;++i)
 			tabWidget.getChildTabViewAt(i).setMinimumWidth(screenWidth/count);
 		LayoutParams widgetParam = tabWidget.getLayoutParams();
-		widgetParam.height = (int)(screen_px.y*(100.0/1280.0));
-		tab_px = new Point(widgetParam.width,widgetParam.height);
+		widgetParam.width = tab_px.x;
+		widgetParam.height = tab_px.y;
+		
 		Log.d("TAB PX",tab_px.toString());
+		
 	}
+	
+	protected void onResume(){
+		super.onResume();
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+		String uid = sp.getString("uid", "");
+		if (uid.length() == 0){
+			Intent newIntent = new Intent(this, PreSettingActivity.class);
+			this.startActivity(newIntent);
+			return;
+		}
+		Reuploader.reuploader(this);
+	}
+	
+	protected void onPause(){
+		Reuploader.cancel();
+		System.gc();
+		super.onPause();
+	}
+
+	protected void onDestory(){
+		if (customTabs!=null){
+			for (int i=0; i<customTabs.length;++i)
+				customTabs[i].clear();
+		}
+		super.onDestroy();;
+	}
+	
+	
+	public void setTabState(String tabId){
+		for (int i=0;i<4;++i){
+			if (tabId.equals(tabName[i]))
+				customTabs[i].changeState(true);
+			else
+				customTabs[i].changeState(false);
+		}
+	}
+	
+	
 	
 	static public Point getSize(){
 		if (screen_px == null){
@@ -131,5 +194,6 @@ public class FragmentTabs extends FragmentActivity {
 			tabWidget.getChildAt(i).setEnabled(s);
 		}
 	}
+	
 	
 }

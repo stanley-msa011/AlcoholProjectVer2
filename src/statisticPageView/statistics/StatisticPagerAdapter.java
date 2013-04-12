@@ -1,5 +1,7 @@
 package statisticPageView.statistics;
 
+import ioio.examples.hello.StatisticFragment;
+
 import java.util.ArrayList;
 
 import statisticPageView.StatisticPageView;
@@ -7,6 +9,7 @@ import statisticPageView.StatisticPageView;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 
 public class StatisticPagerAdapter extends PagerAdapter {
@@ -14,12 +17,12 @@ public class StatisticPagerAdapter extends PagerAdapter {
 	private ArrayList<View> viewsList;
 	private StatisticPageView[] statisticViews;
 	
-	public StatisticPagerAdapter(Context context){
+	public StatisticPagerAdapter(Context context,StatisticFragment statisticFragment){
 		viewsList = new ArrayList<View>();
 		statisticViews = new StatisticPageView[3];
-		statisticViews[0] = new StatisticDayView(context);
-		statisticViews[1] = new StatisticWeekView(context);
-		statisticViews[2] = new StatisticMonthView(context);
+		statisticViews[0] = new StatisticDayView(context,statisticFragment);
+		statisticViews[1] = new StatisticWeekView(context,statisticFragment);
+		statisticViews[2] = new StatisticMonthView(context,statisticFragment);
 		
 		viewsList.add(statisticViews[0].getView());
 		viewsList.add(statisticViews[1].getView());
@@ -49,14 +52,10 @@ public class StatisticPagerAdapter extends PagerAdapter {
     } 
 	
 	public void clear(){
+		Log.d("CLEAR","STATISTIC");
 		for (int i=0;i<statisticViews.length;++i){
 			statisticViews[i].clear();
 		}
 	}
 	
-	public void resume(){
-		for (int i=0;i<statisticViews.length;++i){
-			statisticViews[i].resume();
-		}
-	}
 }
