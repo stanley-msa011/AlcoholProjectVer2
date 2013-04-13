@@ -8,12 +8,52 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:scaleType="fitXY"
+	    android:layout_centerInParent="true"
 	    />
 	
 	<TextView
 	    android:id ="@+id/test_msg_box_help"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
+	    android:layout_centerHorizontal="true"
+	    android:textColor="#FF545454"
+	    android:gravity="center"
+	    />
+	
+	<ImageView
+	    android:id ="@+id/test_msg_box_x_bg"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:scaleType="fitXY"
+	    android:layout_alignParentLeft="true"
+	    />
+	
+	<TextView
+	    android:id ="@+id/test_msg_box_x"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="X"
+	    android:textColor="#FFF97306"
+	    android:layout_alignParentLeft="true"
+	    android:gravity="center"
+	    />
+	
+	<ImageView
+	    android:id ="@+id/test_msg_box_o_bg"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:scaleType="fitXY"
+	    android:layout_alignParentRight="true"
+	    />
+	
+	<TextView
+	    android:id ="@+id/test_msg_box_o"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="O"
+	    android:textColor="#FFF97306"
+	    android:layout_alignParentRight="true"
+	    android:gravity="center"
 	    />
     
 </RelativeLayout>

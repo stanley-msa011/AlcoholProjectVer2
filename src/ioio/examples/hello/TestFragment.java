@@ -1,5 +1,7 @@
 package ioio.examples.hello;
 
+import game.TreeImageHandler;
+
 import java.io.File;
 import java.text.DecimalFormat;
 
@@ -15,22 +17,34 @@ import test.file.ImageFileHandler;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
 import test.ui.UIMsgBox;
+import test.ui.UIRotate;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 
 public class TestFragment extends Fragment {
 
@@ -70,14 +84,33 @@ public class TestFragment extends Fragment {
 	//Uploader
 	private BracDataHandler BDH;
 	
-	private Button end_button;
-	private Button start_button;
 	private RelativeLayout main_layout;
 	private UIMsgBox msgBox;
+	private UIRotate rotate;
+
+	private LoadingHandler loadingHandler;
+	private AnimationHandler animationHandler;
+	private AnimationTimerTask animationTimerTask;
+	private FailBgHandler failBgHandler;
+	private MsgLoadingHandler msgLoadingHandler;
+	private TestHandler testHandler;
 	
+	private ImageView bg, startLine, startCircle;
+	private Bitmap bgBmp, startLineBmp, startCircleBmp;
+	private TextView startText;
+	
+	private ImageView animation;
+	private Bitmap[] animationBmp;
+	private AnimationDrawable animationDrawable;
+	
+	private FrameLayout preview_layout;
 	
 	private static Object init_lock  = new Object();
 	private static Object done_lock  = new Object();
+	
+	private TextView failHelp;
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -86,9 +119,7 @@ public class TestFragment extends Fragment {
 	public void onPause(){
 		super.onPause();
 		stop();
-		if (msgBox != null){
-			msgBox.deleteAll();
-		}
+		clear();
 	}
 	
 	public void onResume(){
@@ -96,6 +127,32 @@ public class TestFragment extends Fragment {
 		context = this.getActivity();
 		testFragment = this;
 		FragmentTabs.enableTab(true);
+		setting();
+		
+		loadingHandler.sendEmptyMessage(0);
+	}
+	
+	private void setting(){
+		bg = (ImageView) view.findViewById(R.id.test_background);
+		startLine = (ImageView) view.findViewById(R.id.test_background_line);
+		startCircle = (ImageView) view.findViewById(R.id.test_start_button);
+		startText =(TextView) view.findViewById(R.id.test_start_text);
+		Point screen = FragmentTabs.getSize();
+		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 74.0/720.0));
+		animation = (ImageView) view.findViewById(R.id.test_animation);
+		animation.setVisibility(View.INVISIBLE);
+		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
+		failHelp = (TextView) view.findViewById(R.id.test_fail_help);
+		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 56.0/720.0));
+		msgBox = new UIMsgBox(testFragment,main_layout);
+		rotate = new UIRotate(testFragment,main_layout);
+		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
+		
+		loadingHandler = new LoadingHandler();
+		msgLoadingHandler = new MsgLoadingHandler();
+		failBgHandler = new FailBgHandler();
+		testHandler = new TestHandler();
+		animationHandler = new AnimationHandler();
 	}
 	
 	
@@ -109,40 +166,14 @@ public class TestFragment extends Fragment {
 		bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler);
 		for (int i=0;i<3;++i)
 			INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
-		
 	}
 	
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    	view = inflater.inflate(R.layout.test_fragment, container,false);
-    	setViews();
+    	view = inflater.inflate(R.layout.new_test_fragment, container,false);
     	return view;
     }
-	
-	void setViews(){
-		end_button = (Button) view.findViewById(R.id.end_test);
-		end_button.setOnClickListener(new EndTestOnClickListener());
-		end_button.setEnabled(true);
-		
-		
-		main_layout = (RelativeLayout) view.findViewById(R.id.test_layout);
-		start_button = (Button) view.findViewById(R.id.start_testing);
-		start_button.setOnClickListener(new StartOnClickListener());
-		
-	}
-	
-	private class StartOnClickListener implements View.OnClickListener{
-
-		@Override
-		public void onClick(View v) {
-			reset();
-			if (msgBox == null)
-				msgBox = new UIMsgBox(testFragment);
-			msgBox.generateGPSCheckBox(main_layout);
-		}
-		
-	}
 	
 	
 	public void startGPS(boolean enable){
@@ -169,15 +200,11 @@ public class TestFragment extends Fragment {
 		else{
 			updateDoneState(_GPS);
 		}
-		if (msgBox == null)
-			msgBox = new UIMsgBox(testFragment);
-		msgBox.generateBTCheckBox(main_layout);
+		msgBox.generateBTCheckBox();
 	}
 	
 	public void startBT(){
-		if (msgBox == null)
-			msgBox = new UIMsgBox(testFragment);
-		msgBox.generateInitializingBox(main_layout);
+		msgBox.generateInitializingBox();
 		//initialize bt task
 		btInitTask = new BTInitTask(testFragment,bt);
 		btInitTask.execute();
@@ -191,24 +218,41 @@ public class TestFragment extends Fragment {
 	
 	public void runBT(){
 		
-		if (bt!=null && cameraRecorder!=null){
-			bt.start();
-			cameraRecorder.start();
-		}
+		cleanMsgBox();
+		testHandler.sendEmptyMessage(0);
+
 	}
 	
 	public void failBT(){
-		if (msgBox == null)
-			msgBox = new UIMsgBox(testFragment);
 		msgBox.closeInitializingBox();
-		msgBox.generateBTFailBox(main_layout);
+		cleanMsgBox();
+		Message msg = new Message();
+		Bundle data = new Bundle();
+		data.putString("msg","未啟用  \n酒測裝置及藍芽功能");
+		msg.setData(data);
+		msg.what = 0;
+		failBgHandler.sendMessage(msg);
 	}
 	
-	private class EndTestOnClickListener implements View.OnClickListener{
+	
+	private class StartOnClickListener implements View.OnClickListener{
 
 		@Override
 		public void onClick(View v) {
+			startLine.setVisibility(View.INVISIBLE);
+			startCircle.setVisibility(View.INVISIBLE);
+			startText.setVisibility(View.INVISIBLE);
+			reset();
+			animationHandler.sendEmptyMessage(0);
+		}
+	}
+	
+	private class EndTestOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
 			stop();
+			failHelp.setVisibility(View.INVISIBLE);
+			loadingHandler.sendEmptyMessage(0);
 		}
 	}
 	
@@ -261,10 +305,8 @@ public class TestFragment extends Fragment {
 				cameraInitTask.cancel(true);
 				btRunTask = new BTRunTask(this,bt);
 				btRunTask.execute();
-				if (msgBox == null)
-					msgBox = new UIMsgBox(testFragment);
 				msgBox.closeInitializingBox();
-				msgBox.generateBTSuccessBox(main_layout);
+				msgBox.generateBTSuccessBox();
 			}
 		}
 	}
@@ -289,7 +331,6 @@ public class TestFragment extends Fragment {
 					double result = BDH.getResult();
 					Log.d("TEST RESULT",String.valueOf(result));
 					FragmentTabs.changeTab(1);
-					//Show success or fail message
 				}
 			}
 		}
@@ -301,40 +342,277 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
-	public void showStart(){
-		TextView bt_view = (TextView) this.getActivity().findViewById(R.id.bt_value);
-		bt_view.setText("Start");
-	}
-	
 	public void stop(){
-		Log.d("STOP","STOP");
-
-		if (gpsInitTask!=null){
-			gpsInitTask.cancel(true);
-		}
-		if (btInitTask!=null){
-			btInitTask.cancel(true);
-		}
-		if (cameraInitTask!=null){
-			cameraInitTask.cancel(true);
-		}
-		
-		if (btRunTask!=null){
-			bt.close();
-			btRunTask.cancel(true);
-			btRunTask = null;
-		}
-		if (gpsRunTask!=null){
-			gpsRunTask.close();
-			gpsRunTask.cancel(true);
-			gpsRunTask = null;
-		}
 		if (cameraRecorder!=null)
 			cameraRecorder.close();
 		
-		if (msgBox != null){
-			msgBox.hideAll();
+		if (bt!=null)
+			bt.close();
+		
+		if (gpsInitTask!=null)
+			gpsInitTask.cancel(true);
+		
+		if (btInitTask!=null)
+			btInitTask.cancel(true);
+		
+		if (cameraInitTask!=null)
+			cameraInitTask.cancel(true);
+		
+		if (btRunTask!=null)
+			btRunTask.cancel(true);
+
+		if (gpsRunTask!=null){
+			gpsRunTask.close();
+			gpsRunTask.cancel(true);
 		}
+		
+		loadingHandler.removeMessages(0);
+		msgLoadingHandler.removeMessages(0);
+		testHandler.removeMessages(0);
+		failBgHandler.removeMessages(0);
+		animationHandler.removeMessages(0);
+		if (animationTimerTask!=null)
+			animationTimerTask.cancel(true);
+	}
+	
+	private void clear(){
+		
+		if (bgBmp!=null && !bgBmp.isRecycled()){
+			bgBmp.recycle();
+			bgBmp = null;
+		}
+		if (startLineBmp!=null && !startLineBmp.isRecycled()){
+			startLineBmp.recycle();
+			startLineBmp = null;
+		}
+		if (startCircleBmp!=null && !startCircleBmp.isRecycled()){
+			startCircleBmp.recycle();
+			startCircleBmp = null;
+		}
+		if (animation!=null){
+			animation.setImageDrawable(null);
+		}
+		if (animationBmp!=null){
+			for (int i=0;i<animationBmp.length;++i){
+				if(animationBmp[i]!=null && !animationBmp[i].isRecycled()){
+					animationBmp[i].recycle();
+					animationBmp[i] = null;
+				}
+			}
+		}
+		cleanMsgBox();
+		cleanRotate();
+	}
+	
+    private void cleanMsgBox(){
+    	if (msgBox!=null){
+    		msgBox.clear();
+    	}
+    }
+	
+    private void cleanRotate(){
+    	if (rotate!=null){
+    		rotate.clear();
+    	}
+    }
+    
+	private class LoadingHandler extends Handler{
+		
+		private Resources r;
+		public void handleMessage(Message msg){
+			
+			r = getResources();
+    		bg.setImageBitmap(null);
+    		
+    		Point screen = FragmentTabs.getSize();
+			
+			if (bgBmp!=null && !bgBmp.isRecycled()){
+				bgBmp.recycle();
+				bgBmp = null;
+			}
+			bgBmp = BitmapFactory.decodeResource(r, R.drawable.test_start_bg);
+			
+			if (startLineBmp==null ||startLineBmp.isRecycled()){
+				startLineBmp = BitmapFactory.decodeResource(r, R.drawable.test_start_line);
+				RelativeLayout.LayoutParams startLineParam = (LayoutParams) startLine.getLayoutParams();
+				startLineParam.height = (int)(screen.x * 146.0/720.0);
+				startLineParam.topMargin = (int)(screen.x * 223.0/720.0);
+			}
+			
+			if (startCircleBmp==null ||startCircleBmp.isRecycled()){
+				startCircleBmp = BitmapFactory.decodeResource(r, R.drawable.test_start_start);
+				RelativeLayout.LayoutParams startCircleParam = (LayoutParams) startCircle.getLayoutParams();
+				startCircleParam.width = (int)(screen.x * 358.0/720.0);
+				startCircleParam.height = (int)(screen.x * 356.0/720.0);
+				startCircleParam.leftMargin = (int)(screen.x * 357.0/720.0);
+				startCircleParam.topMargin = (int)(screen.x * 112.0/720.0);
+			}
+			
+			RelativeLayout.LayoutParams startTextParam = (LayoutParams) startText.getLayoutParams();
+			startTextParam.topMargin = (int)(screen.x * 240.0/720.0);
+			startTextParam.leftMargin =(int)(screen.x * 480.0/720.0);
+			
+			RelativeLayout.LayoutParams animationParam = (LayoutParams) animation.getLayoutParams();
+			animationParam.width = (int)(screen.x * 573.0/720.0);
+			animationParam.height = (int)(screen.x * 631.0/720.0);
+			animationParam.leftMargin = 0;
+			animationParam.topMargin = (int)(screen.x * 44.0/720.0);
+			
+			
+			RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
+			previewParam.width = (int)(screen.x * 588.0/720.0);
+			previewParam.height = (int)(screen.x * 750.0/720.0);
+			previewParam.leftMargin = (int)(screen.x * 62.0/720.0);
+			previewParam.topMargin = (int)(screen.x * 233.0/720.0);
+			
+			bg.setImageBitmap(bgBmp);
+			startLine.setImageBitmap(startLineBmp);
+			startLine.setVisibility(View.VISIBLE);
+			startCircle.setImageBitmap(startCircleBmp);
+			startCircle.setVisibility(View.VISIBLE);
+			startText.setText("開始");
+			startText.setVisibility(View.VISIBLE);
+			
+			startCircle.setOnClickListener(new StartOnClickListener());
+			bg.setOnClickListener(null);
+		}
+	}
+    
+    
+	private class MsgLoadingHandler extends Handler{
+		
+		public void handleMessage(Message msg){
+			msgBox.settingPreTask();
+			msgBox.settingInBackground();
+			msgBox.settingPostTask();
+			msgBox.generateGPSCheckBox();
+		}
+	}
+    
+	private class FailBgHandler extends Handler{
+		
+		private String msgStr;
+		private int topMargin;
+	
+		public void handleMessage(Message msg){
+			this.msgStr = msg.getData().getString("msg");
+			
+			cleanRotate();
+			
+			Point screen = FragmentTabs.getSize();
+			failHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 56.0/720.0));
+			topMargin = (int)(screen.x*240.0/720.0);
+			bg.setImageBitmap(null);
+			if(bgBmp!=null && !bgBmp.isRecycled()){
+				bgBmp.recycle();
+				bgBmp = null;
+			}
+			bgBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_notusing_bg);
+			
+			RelativeLayout.LayoutParams msgParam = (LayoutParams) failHelp.getLayoutParams();
+			msgParam.topMargin = topMargin;
+			
+			bg.setImageBitmap(bgBmp);
+			bg.setOnClickListener(new EndTestOnClickListener());
+			failHelp.setText(msgStr);
+			failHelp.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	
+	
+	private class AnimationHandler extends Handler{
+		
+		public void handleMessage(Message msg){
+			animationBmp = new Bitmap[4];
+			animationBmp[0] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_0);
+			animationBmp[1] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_1);
+			animationBmp[2] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_2);
+			animationBmp[3] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_3);
+			
+			animationDrawable = new AnimationDrawable();
+			animation.setImageDrawable(animationDrawable);
+			for (int i=0;i<8;++i){
+				Drawable d = new BitmapDrawable(animationBmp[i%4]);
+				animationDrawable.addFrame(d,300);
+			}
+			animation.setVisibility(View.VISIBLE);
+			animationDrawable.start();
+			animationTimerTask = new AnimationTimerTask();
+			animationTimerTask.execute();
+		}
+	}
+	
+	private class AnimationTimerTask extends AsyncTask<Void, Void, Void>{
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				Thread.sleep(2400);
+			} catch (InterruptedException e) {}
+			return null;
+		}
+		@Override
+		 protected void onPostExecute(Void result) {
+			animation.setVisibility(View.INVISIBLE);
+			animationDrawable.stop();
+			animation.setImageDrawable(null);
+			if (animationBmp!=null){
+				for (int i=0;i<animationBmp.length;++i){
+					if(animationBmp[i]!=null && !animationBmp[i].isRecycled()){
+						animationBmp[i].recycle();
+						animationBmp[i] = null;
+					}
+				}
+			}
+			msgLoadingHandler.sendEmptyMessage(0);
+		}
+		
+		protected void onCancelled(){
+			clear();
+		}
+	}
+	
+	
+	private class TestHandler extends Handler{
+		public void handleMessage(Message msg){
+			bg.setImageBitmap(null);
+			rotate.settingPreTask();
+			
+			if(bgBmp!=null && !bgBmp.isRecycled()){
+				bgBmp.recycle();
+				bgBmp = null;
+			}
+			bgBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_camera_bg);
+			rotate.settingInBackground();
+			
+			bg.setImageBitmap(bgBmp);
+			bg.setOnClickListener(null);
+			rotate.settingPostTask();
+			
+			if (bt!=null && cameraRecorder!=null){
+				bt.start();
+				cameraRecorder.start();
+			}
+		}
+	}
+	
+	public void changeTestMessage(int time){
+		rotate.setText(time);
+	}
+	
+	public void changeTestSpeed(int change){
+		rotate.setSpeed(change);
+	}
+	
+	public void stopByFail(){
+		Log.d("test","stop by time out");
+		Message msg = new Message();
+		Bundle data = new Bundle();
+		data.putString("msg","測試失敗             \n可能因為測試超時\n或酒測器沒電了");
+		msg.setData(data);
+		msg.what = 0;
+		failBgHandler.sendMessage(msg);
 	}
 	
 }

@@ -255,15 +255,13 @@ public class HistoryFragment extends Fragment {
 		@Override
 		protected Void doInBackground(Void... params) {
 			
-			Bitmap tmp= BitmapFactory.decodeResource(historyFragment.getResources(), R.drawable.drunk_history_bg);
-	    	background = Bitmap.createScaledBitmap(tmp, bg_x, bg_y, true);
-	    	tmp.recycle();
+			background = BitmapFactory.decodeResource(historyFragment.getResources(), R.drawable.drunk_history_bg);
 	    	LayoutParams bgParam = (LayoutParams) bgView.getLayoutParams();
 	    	bgParam.width = bg_x;
 	    	bgParam.height = bg_y;
 	    	
 			
-			tmp = BitmapFactory.decodeResource(historyFragment.getResources(), bgs[curPageIdx]);
+			Bitmap tmp = BitmapFactory.decodeResource(historyFragment.getResources(), bgs[curPageIdx]);
 			cur_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
 			tmp.recycle();
 			if (curPageIdx == bgs.length-1)

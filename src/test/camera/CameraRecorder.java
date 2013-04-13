@@ -85,7 +85,7 @@ public class CameraRecorder {
     
     public void setSurfaceCallback(){
     	previewFrame = null;
-    	previewFrame =(FrameLayout) activity.findViewById(R.id.new_camera_preview);
+    	previewFrame =(FrameLayout) activity.findViewById(R.id.test_camera_preview_layout);
     	preview = new PreviewWindow(activity,this);
     	previewHolder = preview.getHolder();
     	previewHolder.addCallback(preview);
@@ -101,9 +101,10 @@ public class CameraRecorder {
     
     
     public void close(){
+    	if (preview !=null)
+    		preview.setVisibility(View.INVISIBLE);
     	if (previewFrame!=null){
-    		previewFrame.removeAllViews();
-    		previewFrame.removeAllViewsInLayout();
+    		previewFrame.removeView(preview);
     	}
     	if (camera!=null){
     		Camera tmp = camera;
@@ -112,6 +113,7 @@ public class CameraRecorder {
     		tmp.release();
     		tmp = null;
     	}
+    	
     }
     
     public class PictureCallback implements Camera.PictureCallback{
@@ -138,7 +140,7 @@ public class CameraRecorder {
     
     public void CloseFail(){
     	close();
-    	testFragment.stop();
+    	testFragment.stopByFail();
     }
     
 }

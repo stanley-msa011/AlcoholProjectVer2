@@ -101,6 +101,8 @@ public class AnalysisRatingView extends StatisticPageView {
 				prev_level = historys[i].level;
 			}
 		}
+		Log.d("rating",String.valueOf(rank)+"/"+String.valueOf(nPeople));
+		
 		int margin = minLeftPointer;
 		
 		if (nPeople == 0)

@@ -332,6 +332,7 @@ public class HistoryDB {
     	}
     	else{
     		sql =  "UPDATE InteractionGame SET _LEVEL = "+history.level	+" WHERE _UID ='"+history.uid+"'";
+    		Log.d("update",sql);
     		db.execSQL(sql);
     	}
     	db.close();

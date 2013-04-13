@@ -47,6 +47,13 @@ public class Bluetooth {
 	private final static long IMAGE_MILLIS_0 = 500;
 	private final static long IMAGE_MILLIS_1 = 2500;
 	private final static long MAX_DURATION_MILLIS = 5000;
+	
+	private final static long MILLIS_1 = 1000;
+	private final static long MILLIS_2 = 2000;
+	private final static long MILLIS_3 = 3000;
+	private final static long MILLIS_4 = 4000;
+	private final static long MILLIS_5 = 5000;
+	
 	private long start_time;
 	private long end_time;
 	private long first_start_time;
@@ -182,9 +189,9 @@ public class Bluetooth {
 				}
 				else if (time - first_start_time > 10000){
 					Log.d("BT","TIME OUT");
-					//close();
 					end =-1; 
-					cameraRunHandler.sendEmptyMessage(-1);
+					//cameraRunHandler.closeFail();
+					cameraRunHandler.sendEmptyMessage(1);
 				}
 				for (int i=0;i<bytes;++i){
 					if ((char)temp[i]=='a'){
@@ -211,6 +218,8 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
 			close();
+			cameraRunHandler.sendEmptyMessage(1);
+			
 		}
 	}
 	
@@ -228,7 +237,6 @@ public class Bluetooth {
 					sum+=alcohol;
 					/*write to the file*/
 					write_to_file(output);
-					show_in_UI(output);
 				}
 			}
 			else if (msg.charAt(0)=='m'){
@@ -247,36 +255,54 @@ public class Bluetooth {
 					
 					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
 						isPeak = true;
+						change_speed(0);
 						start_time = time;
-					}else if ( diff < PRESSURE_DIFF_MIN && diff > -PRESSURE_DIFF_MIN){
+					}else if ( diff < PRESSURE_DIFF_MIN && diff > -PRESSURE_DIFF_MIN/2){
 						if (isPeak){
 							end_time = time;
 							duration += (end_time-start_time);
 							start_time = end_time;
 							
+							if (diff >= 0)
+								change_speed(1);
+							
+							if (duration > MILLIS_5){
+								show_in_UI(5);
+							}else if (duration > MILLIS_4){
+								show_in_UI(4);
+							}else if (duration > MILLIS_3){
+								show_in_UI(3);
+							}else if (duration > MILLIS_2){
+								show_in_UI(2);
+							}else if (duration > MILLIS_1){
+								show_in_UI(1);
+							}
+							
 							if (image_count == 0 && duration > IMAGE_MILLIS_0){
+								//cameraRunHandler.takePicture();
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
 							}
 							else if (image_count == 1 && duration > IMAGE_MILLIS_1){
-								cameraRunHandler.sendEmptyMessage(1);
+								//cameraRunHandler.takePicture();
+								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
 							}
 							else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
-								cameraRunHandler.sendEmptyMessage(2);
+								//cameraRunHandler.takePicture();
+								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
 								successful = true;
 								
-								String output = "<"+sum/counter+">";
-								show_in_UI(output);
-								Log.d("Show in UI","SHOW");
+								show_in_UI(6);
 								return -1;
 							}
 							
 						}
-					}else if (diff <-PRESSURE_DIFF_MIN ){
+					}else if (diff <-PRESSURE_DIFF_MIN/2 ){
 						isPeak = false;
 						start_time = end_time = 0;
+						change_speed(-1);
 					}
 				}
 			}
@@ -308,11 +334,22 @@ public class Bluetooth {
 		msg.setData(data);
 		bracFileHandler.sendMessage(msg);
 	}
-	private void show_in_UI(String str){
+	
+	private void show_in_UI(int time){
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("ALCOHOL", str);
+		data.putInt("TIME", time);
 		msg.setData(data);
+		msg.what = 0;
+		btUIHandler.sendMessage(msg);
+	}
+	
+	private void change_speed(int change){
+		Message msg = new Message();
+		Bundle data = new Bundle();
+		data.putInt("CHANGE", change);
+		msg.setData(data);
+		msg.what = 1;
 		btUIHandler.sendMessage(msg);
 	}
 }
