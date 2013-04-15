@@ -2,11 +2,12 @@ package statisticPageView.analysis;
 
 import java.text.DecimalFormat;
 
-import new_database.HistoryDB;
+import database.HistoryDB;
+
+import main.activities.Lang;
+import main.activities.R;
+import main.activities.StatisticFragment;
 import history.BracGameHistory;
-import ioio.examples.hello.Lang;
-import ioio.examples.hello.R;
-import ioio.examples.hello.StatisticFragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

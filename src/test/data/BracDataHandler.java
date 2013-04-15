@@ -2,8 +2,6 @@ package test.data;
 
 import history.BracGameHistory;
 import history.DateBracGameHistory;
-import ioio.examples.hello.R;
-import ioio.examples.hello.TestFragment;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,8 +15,8 @@ import java.util.List;
 import java.util.Scanner;
 
 
-import new_database.HistoryDB;
-import new_database.TimeBlock;
+import main.activities.R;
+import main.activities.TestFragment;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpPost;
@@ -30,6 +28,9 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
+
+import database.HistoryDB;
+import database.TimeBlock;
 
 import android.content.Context;
 import android.content.SharedPreferences;

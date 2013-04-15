@@ -5,7 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import ioio.examples.hello.TestFragment;
+import main.activities.TestFragment;
+
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;

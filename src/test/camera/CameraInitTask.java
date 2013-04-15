@@ -1,6 +1,6 @@
 package test.camera;
 
-import ioio.examples.hello.TestFragment;
+import main.activities.TestFragment;
 
 import android.os.AsyncTask;
 import android.util.Log;

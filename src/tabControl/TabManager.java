@@ -1,8 +1,9 @@
 package tabControl;
 
-import ioio.examples.hello.FragmentTabs;
 
 import java.util.HashMap;
+
+import main.activities.FragmentTabs;
 
 import android.content.Context;
 import android.os.Bundle;

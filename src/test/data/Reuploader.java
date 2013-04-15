@@ -1,6 +1,5 @@
 package test.data;
 
-import ioio.examples.hello.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +21,9 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
-import new_database.HistoryDB;
+import database.HistoryDB;
+
+import main.activities.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;

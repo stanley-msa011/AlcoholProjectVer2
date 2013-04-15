@@ -3,10 +3,11 @@ package test.camera;
 import java.util.Iterator;
 import java.util.List;
 
+import main.activities.R;
+import main.activities.TestFragment;
+
 import test.file.ImageFileHandler;
 
-import ioio.examples.hello.R;
-import ioio.examples.hello.TestFragment;
 import android.app.Activity;
 import android.graphics.Point;
 import android.hardware.Camera;

@@ -1,6 +1,6 @@
 package test.gps;
 
-import ioio.examples.hello.TestFragment;
+import main.activities.TestFragment;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Handler;

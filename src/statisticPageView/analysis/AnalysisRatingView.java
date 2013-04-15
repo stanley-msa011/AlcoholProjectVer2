@@ -1,10 +1,10 @@
 package statisticPageView.analysis;
 
-import new_database.HistoryDB;
+import database.HistoryDB;
+import main.activities.R;
+import main.activities.StatisticFragment;
 import history.InteractionHistory;
 import interaction.UserLevelCollector;
-import ioio.examples.hello.R;
-import ioio.examples.hello.StatisticFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;

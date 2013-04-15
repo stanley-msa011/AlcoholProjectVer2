@@ -1,12 +1,13 @@
 package test.bluetooth;
 
 
-import ioio.examples.hello.TestFragment;
 
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+
+import main.activities.TestFragment;
 
 import test.camera.CameraRunHandler;
 import test.file.BracValueFileHandler;

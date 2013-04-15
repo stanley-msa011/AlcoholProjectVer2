@@ -1,10 +1,10 @@
 package statisticPageView.statistics;
 
 
-import new_database.HistoryDB;
+import database.HistoryDB;
+import main.activities.R;
+import main.activities.StatisticFragment;
 import history.BracGameHistory;
-import ioio.examples.hello.R;
-import ioio.examples.hello.StatisticFragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

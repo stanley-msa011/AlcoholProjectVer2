@@ -1,8 +1,9 @@
 package statisticPageView.statistics;
 
-import ioio.examples.hello.StatisticFragment;
 
 import java.util.ArrayList;
+
+import main.activities.StatisticFragment;
 
 import statisticPageView.StatisticPageView;
 

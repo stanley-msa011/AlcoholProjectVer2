@@ -1,6 +1,6 @@
 package statisticPageView;
 
-import ioio.examples.hello.StatisticFragment;
+import main.activities.StatisticFragment;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;

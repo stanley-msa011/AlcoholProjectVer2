@@ -2,7 +2,8 @@ package history;
 
 import java.util.Calendar;
 
-import new_database.TimeBlock;
+import database.TimeBlock;
+
 
 public class DateBracGameHistory extends BracGameHistory {
 

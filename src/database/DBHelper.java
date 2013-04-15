@@ -8,7 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 4;
+	private static final int DB_VERSION = 5;
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -17,43 +17,37 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
         db.execSQL(
-                "CREATE TABLE AlcoholTreeGame (" +
+                "CREATE TABLE HistoryGame (" +
                         " _ID INTEGER PRIMARY KEY, " +
-                        " _STAGE INTEGER NOT NULL, " +
-                        " _COIN INTEGER NOT NULL," +
-                        " _DATE INTEGER NOT NULL,"+
+                        " _LEVEL INTEGER NOT NULL," +
+                        " _YEAR INTEGER NOT NULL," +
+        				" _MONTH INTEGER NOT NULL," +
+        				" _DATE INTEGER NOT NULL,"+
+        				" _TS INTEGER NOT NULL," +
+        				" _TIMEBLOCK INTEGER NOT NULL,"+
                         " _BRAC FLOAT NOT NULL"+
                 ")"
         );
         db.execSQL(
-        		"CREATE TABLE AlcoholInteractiveGame ("+
-        				"_ID INTEGER PRIMARY KEY," +
-        				"_PID CHAR[50] NOT NULL," +
-        				"_NAME CHAR[50] NOT NULL,"+
-        				"_STAGE INTEGER NOT NULL," +
-        				"_COIN INTEGER NOT NULL )" 
-        		);
+        		"CREATE TABLE InteractionGame ("+
+        				"_ID INTEGER PRIMERY KEY," +
+        				"_UID CHAR[10] NOT NULL," +
+        				"_LEVEL INTEGER NOT NULL" +
+        				")"
+        );
         db.execSQL(
-        		"CREATE TABLE NotUploadedTimeStamp ("+
+        		"CREATE TABLE NotUploadedTS ("+
         				"_ID INTEGER PRIMARY KEY," +
-        				"_TS CHAR[50] NOT NULL )"
+        				"_TS INTEGER NOT NULL )"
         		);
-        db.execSQL(
-        		"CREATE TABLE DayCompletion ("+
-        				" _ID INTEGER PRIMARY KEY," +
-        				" _YEAR INTEGER NOT NULL," +
-        				" _MONTH INTEGER NOT NULL," +
-        				" _DATE INTEGER NOT NULL," +
-        				" _BLOCK INTEGER NOT NULL)"
-        		);
+        		
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int old_ver, int new_ver){
-		db.execSQL("DROP TABLE IF EXISTS AlcoholTreeGame");
-		db.execSQL("DROP TABLE IF EXISTS  AlcoholInteractiveGame");
-		db.execSQL("DROP TABLE IF EXISTS NotUploadedTimeStamp");
-		db.execSQL("DROP TABLE IF EXISTS DayCompletion");
+		db.execSQL("DROP TABLE IF EXISTS HistoryGame");
+		db.execSQL("DROP TABLE IF EXISTS InteractionGame");
+		db.execSQL("DROP TABLE IF EXISTS NotUploadedTS");
 		onCreate(db);
 	}
 	

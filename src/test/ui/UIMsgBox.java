@@ -1,8 +1,8 @@
 package test.ui;
 
-import ioio.examples.hello.FragmentTabs;
-import ioio.examples.hello.R;
-import ioio.examples.hello.TestFragment;
+import main.activities.FragmentTabs;
+import main.activities.R;
+import main.activities.TestFragment;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;

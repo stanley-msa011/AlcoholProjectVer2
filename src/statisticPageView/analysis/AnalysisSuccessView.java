@@ -1,11 +1,11 @@
 package statisticPageView.analysis;
 
 
-import new_database.HistoryDB;
-import ioio.examples.hello.FragmentTabs;
-import ioio.examples.hello.Lang;
-import ioio.examples.hello.R;
-import ioio.examples.hello.StatisticFragment;
+import database.HistoryDB;
+import main.activities.FragmentTabs;
+import main.activities.Lang;
+import main.activities.R;
+import main.activities.StatisticFragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

@@ -1,7 +1,7 @@
 package tabControl;
 
-import ioio.examples.hello.FragmentTabs;
-import ioio.examples.hello.R;
+import main.activities.FragmentTabs;
+import main.activities.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

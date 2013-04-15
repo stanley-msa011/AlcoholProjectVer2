@@ -2,13 +2,14 @@ package test.data;
 
 import java.io.IOException;
 
-import new_database.HistoryDB;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+
+import database.HistoryDB;
 
 import android.content.Context;
 import android.os.AsyncTask;

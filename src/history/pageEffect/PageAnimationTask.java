@@ -1,6 +1,6 @@
 package history.pageEffect;
 
-import ioio.examples.hello.HistoryFragment;
+import main.activities.HistoryFragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;
