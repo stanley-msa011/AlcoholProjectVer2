@@ -1,5 +1,6 @@
 package history.pageEffect;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,9 +12,9 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Region;
 import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.view.View;
 
+@SuppressLint("ViewConstructor")
 public class PageWidget extends View {
 
 	private int width, height, cornerX, cornerY;

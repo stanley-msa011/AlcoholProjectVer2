@@ -7,7 +7,6 @@ import java.util.HashMap;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.TabHost;
@@ -51,8 +50,8 @@ public class TabManager implements TabHost .OnTabChangeListener{
 		
 	}
 	
-	public TabManager(FragmentTabs activity, TabHost tabHost, int containerId) {
-        this.fragmentTabs = activity;
+	public TabManager(FragmentTabs fragmentTabs, TabHost tabHost, int containerId) {
+        this.fragmentTabs = fragmentTabs;
         this.tabHost = tabHost;
         this.containerId = containerId;
         this.tabHost.setOnTabChangedListener(this);

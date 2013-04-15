@@ -3,7 +3,6 @@ package tabControl;
 import ioio.examples.hello.FragmentTabs;
 import ioio.examples.hello.R;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;

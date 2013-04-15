@@ -6,15 +6,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import ioio.examples.hello.TestFragment;
-import ioio.examples.hello.R;
-import android.app.Activity;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
 
 

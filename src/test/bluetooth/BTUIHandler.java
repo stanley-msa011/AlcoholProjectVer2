@@ -1,12 +1,8 @@
 package test.bluetooth;
 
 import ioio.examples.hello.TestFragment;
-import ioio.examples.hello.R;
-import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
-import android.view.View;
-import android.widget.TextView;
 
 public class BTUIHandler extends Handler {
 	

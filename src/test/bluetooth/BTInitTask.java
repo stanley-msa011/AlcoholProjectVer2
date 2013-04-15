@@ -2,21 +2,17 @@ package test.bluetooth;
 
 import ioio.examples.hello.TestFragment;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 
 public class BTInitTask extends AsyncTask<Void, Void, Void> {
 
 	private TestFragment testFragment;
 	private Bluetooth bt;
-	private BTUIHandler btUIHandler;
 	private boolean Init_success;
 	
 	public BTInitTask(TestFragment testFragment,Bluetooth bt){
 		this.testFragment = testFragment;
 		this.bt = bt;
-		this.btUIHandler = new BTUIHandler(testFragment);
 	}
 	
 	
@@ -35,14 +31,7 @@ public class BTInitTask extends AsyncTask<Void, Void, Void> {
 		else{
 			Log.d("BT","CONNECT FAIL");
 			
-			/*Message msg = new Message();
-			Bundle data = new Bundle();
-			data.putString("ALCOHOL", "FAIL TO CONNECT");
-			msg.setData(data);
-			btUIHandler.sendMessage(msg);
-			*/
 			Init_success = false;
-			//testFragment.stop();
 		}
 		return null;
 	}

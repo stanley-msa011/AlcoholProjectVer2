@@ -1,7 +1,6 @@
 package statisticPageView.analysis;
 
 import new_database.HistoryDB;
-import history.GameHistory;
 import history.InteractionHistory;
 import interaction.UserLevelCollector;
 import ioio.examples.hello.R;
@@ -11,7 +10,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -34,7 +32,6 @@ public class AnalysisRatingView extends StatisticPageView {
 	private ImageView bar, pointer;
 	private Bitmap barBmp, pointerBmp;
 	
-	private LoadingTask task;
 	private NetworkLoadingTask nTask;
 	
 	private int minLeftPointer, maxLeftPointer;
@@ -42,16 +39,10 @@ public class AnalysisRatingView extends StatisticPageView {
 	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
 		db = new HistoryDB(context);
-		task = new LoadingTask();
-		task.execute();
 	}
 
 	@Override
 	public void clear() {
-		if (task !=null){
-			task.cancel(true);
-			task = null;
-		}
 		if (nTask !=null){
 			nTask.cancel(true);
 			nTask = null;
@@ -116,99 +107,6 @@ public class AnalysisRatingView extends StatisticPageView {
 	
 	
 	
-	
-	private class LoadingTask extends AsyncTask<Void, Void, Void>{
-
-    	protected void onPreExecute(){
-    		
-    		Point screen = StatisticFragment.getStatisticPx();
-    		
-    		title = (TextView) view.findViewById(R.id.analysis_rating_title);
-    		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 44.0/720.0));
-    		title.setTextColor(0xFFFFFFFF);
-    		
-    		title_bg = (ImageView) view.findViewById(R.id.analysis_rating_title_bg);
-    		
-    		help = (TextView) view.findViewById(R.id.analysis_rating_help);
-    		help.setTextColor(0xFF545454);
-    		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 46.0/720.0));
-
-    		bar = (ImageView) view.findViewById(R.id.analysis_rating_bar);
-    		pointer  = (ImageView) view.findViewById(R.id.analysis_rating_pointer);
-    		
-    		high = (TextView) view.findViewById(R.id.analysis_rating_high);
-    		high.setTextColor(0xFF545454);
-    		high.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
-    		low = (TextView) view.findViewById(R.id.analysis_rating_low);
-    		low.setTextColor(0xFF545454);
-    		low.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
-    	}
-    	
-		@Override
-		protected Void doInBackground(Void... params) {
-			
-			Point screen = StatisticFragment.getStatisticPx();
-			RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
-    		titleParam.height = (int)(screen.x * 50.0/720.0);
-    		titleParam.leftMargin = (int)(screen.x * 120.0/720.0);
-    		titleParam.topMargin = 0;
-			
-    		RelativeLayout.LayoutParams titleBgParam = (RelativeLayout.LayoutParams)title_bg.getLayoutParams();
-    		titleBgParam.width = screen.x;
-    		titleBgParam.height = (int)(screen.x * 69.0/720.0);
-    		
-    		titleBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_titlebg);
-			
-    		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams)help.getLayoutParams();
-    		helpParam.leftMargin = (int)(screen.x * 120.0/720.0);
-    		helpParam.topMargin = (int)(screen.x * 100.0/720.0);
-    		
-    		
-    		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)bar.getLayoutParams();
-    		barParam.width = (int)(screen.x * 480.0/720.0);
-    		barParam.height = (int)(screen.x * 58.0/720.0);
-    		barParam.leftMargin = minLeftPointer = (int)(screen.x * 121.0/720.0);
-    		barParam.topMargin = (int)(screen.x * 231.0/720.0);
-    		barBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_group_bg);
-    		maxLeftPointer = minLeftPointer +  (int)(screen.x * 420.0/720.0);
-    		
-    		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
-    		pointerParam.width = (int)(screen.x * 75.0/720.0);
-    		pointerParam.height = (int)(screen.x * 120.0/720.0);
-    		
-    		pointerParam.topMargin = (int)(screen.x * 233.0/720.0);
-    		pointerBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_group);
-    		
-    		
-    		RelativeLayout.LayoutParams highParam = (RelativeLayout.LayoutParams)high.getLayoutParams();
-    		highParam.topMargin = (int)(screen.x * 291.0/720.0);
-    		highParam.rightMargin = (int)(screen.x * 120.0/720.0);
-    		RelativeLayout.LayoutParams lowParam = (RelativeLayout.LayoutParams)low.getLayoutParams();
-    		lowParam.topMargin = (int)(screen.x * 291.0/720.0);
-    		lowParam.leftMargin = (int)(screen.x * 120.0/720.0);
-    		
-			return null;
-		}
-		@Override
-		 protected void onPostExecute(Void result) {
-			title_bg.setImageBitmap(titleBmp);
-			bar.setImageBitmap(barBmp);
-			pointer.setImageBitmap(pointerBmp);
-			
-    		help.setText("與其他戒酒同伴的表現相比，您的表現排名" );
-    		high.setText("高" );
-    		low.setText("低" );
-    		setPointer();
-    		nTask = new NetworkLoadingTask();
-    		nTask.execute();
-    		
-		}
-		
-		protected void onCancelled(){
-			clear();
-		}
-	}	
-	
     private class NetworkLoadingTask extends AsyncTask<Void, Void, Void>{
 
     	private InteractionHistory[] historys;
@@ -229,7 +127,100 @@ public class AnalysisRatingView extends StatisticPageView {
 				db.insertInteractionHistory(historys[i]);
 			setPointer();
 		}
+		protected void onCancelled(){
+			clear();
+		}
     }
+
+	@Override
+	public void onPreTask() {
+		Point screen = StatisticFragment.getStatisticPx();
+		
+		title = (TextView) view.findViewById(R.id.analysis_rating_title);
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 44.0/720.0));
+		title.setTextColor(0xFFFFFFFF);
+		
+		title_bg = (ImageView) view.findViewById(R.id.analysis_rating_title_bg);
+		
+		help = (TextView) view.findViewById(R.id.analysis_rating_help);
+		help.setTextColor(0xFF545454);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 46.0/720.0));
+
+		bar = (ImageView) view.findViewById(R.id.analysis_rating_bar);
+		pointer  = (ImageView) view.findViewById(R.id.analysis_rating_pointer);
+		
+		high = (TextView) view.findViewById(R.id.analysis_rating_high);
+		high.setTextColor(0xFF545454);
+		high.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
+		low = (TextView) view.findViewById(R.id.analysis_rating_low);
+		low.setTextColor(0xFF545454);
+		low.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
+		
+	}
+
+	@Override
+	public void onInBackground() {
+		Point screen = StatisticFragment.getStatisticPx();
+		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
+		titleParam.height = (int)(screen.x * 50.0/720.0);
+		titleParam.leftMargin = (int)(screen.x * 120.0/720.0);
+		titleParam.topMargin = 0;
+		
+		RelativeLayout.LayoutParams titleBgParam = (RelativeLayout.LayoutParams)title_bg.getLayoutParams();
+		titleBgParam.width = screen.x;
+		titleBgParam.height = (int)(screen.x * 69.0/720.0);
+		
+		titleBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_titlebg);
+		
+		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams)help.getLayoutParams();
+		helpParam.leftMargin = (int)(screen.x * 120.0/720.0);
+		helpParam.topMargin = (int)(screen.x * 100.0/720.0);
+		
+		
+		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)bar.getLayoutParams();
+		barParam.width = (int)(screen.x * 480.0/720.0);
+		barParam.height = (int)(screen.x * 58.0/720.0);
+		barParam.leftMargin = minLeftPointer = (int)(screen.x * 121.0/720.0);
+		barParam.topMargin = (int)(screen.x * 231.0/720.0);
+		barBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_group_bg);
+		maxLeftPointer = minLeftPointer +  (int)(screen.x * 420.0/720.0);
+		
+		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
+		pointerParam.width = (int)(screen.x * 75.0/720.0);
+		pointerParam.height = (int)(screen.x * 120.0/720.0);
+		
+		pointerParam.topMargin = (int)(screen.x * 233.0/720.0);
+		pointerBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_group);
+		
+		
+		RelativeLayout.LayoutParams highParam = (RelativeLayout.LayoutParams)high.getLayoutParams();
+		highParam.topMargin = (int)(screen.x * 291.0/720.0);
+		highParam.rightMargin = (int)(screen.x * 120.0/720.0);
+		RelativeLayout.LayoutParams lowParam = (RelativeLayout.LayoutParams)low.getLayoutParams();
+		lowParam.topMargin = (int)(screen.x * 291.0/720.0);
+		lowParam.leftMargin = (int)(screen.x * 120.0/720.0);
+		
+	}
+
+	@Override
+	public void onPostTask() {
+		title_bg.setImageBitmap(titleBmp);
+		bar.setImageBitmap(barBmp);
+		pointer.setImageBitmap(pointerBmp);
+		
+		help.setText("與其他戒酒同伴的表現相比，您的表現排名" );
+		high.setText("高" );
+		low.setText("低" );
+		setPointer();
+		nTask = new NetworkLoadingTask();
+		nTask.execute();
+		
+	}
+
+	@Override
+	public void onCancel() {
+		clear();
+	}
 	
 
 }

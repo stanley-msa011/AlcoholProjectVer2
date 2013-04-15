@@ -213,6 +213,7 @@ public class InteractionFragment extends Fragment {
 			
 			return null;
 		}
+		@SuppressWarnings("deprecation")
 		@Override
 		 protected void onPostExecute(Void result) {
 			
@@ -254,6 +255,9 @@ public class InteractionFragment extends Fragment {
 				db.insertInteractionHistory(historys[i]);
 			historys_all = db.getAllUsersHistory();
 			setImages(historys_all);
+		}
+		protected void onCancelled(){
+			clear();
 		}
     }
     

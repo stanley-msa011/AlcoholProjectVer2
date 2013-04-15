@@ -1,7 +1,6 @@
 package test.gps;
 
 import ioio.examples.hello.TestFragment;
-import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.AsyncTask;

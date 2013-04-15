@@ -1,14 +1,12 @@
 package ioio.examples.hello;
 
 import history.GameHistory;
-import history.pageEffect.PageAnimationHandler;
 import history.pageEffect.PageAnimationTask;
 import history.pageEffect.PageWidget;
 import new_database.HistoryDB;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Typeface;
@@ -21,12 +19,9 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -190,7 +185,10 @@ public class HistoryFragment extends Fragment {
     	
     	
     	playText = new TextView(main_layout.getContext());
-    	playText.setText("播放 ");
+    	if (Lang.eng)
+    		playText.setText("Play ");
+    	else
+    		playText.setText("播放 ");
     	playText.setTextSize(TypedValue.COMPLEX_UNIT_PX,playWidth*0.25F);
     	playText.setGravity(Gravity.CENTER);
     	playText.setTextColor(0xFFF97306);

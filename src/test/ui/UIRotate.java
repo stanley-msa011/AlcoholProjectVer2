@@ -1,6 +1,7 @@
 package test.ui;
 
 import ioio.examples.hello.FragmentTabs;
+import ioio.examples.hello.Lang;
 import ioio.examples.hello.R;
 import ioio.examples.hello.TestFragment;
 import android.content.Context;
@@ -9,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +22,6 @@ import android.widget.TextView;
 
 public class UIRotate {
 
-	private TestFragment testFragment;
 	private Context context;
 	private LayoutInflater inflater;
 	
@@ -46,7 +45,6 @@ public class UIRotate {
 	
 	
 	public UIRotate(TestFragment testFragment,RelativeLayout mainLayout){
-		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.r = context.getResources();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -133,6 +131,12 @@ public class UIRotate {
 	}
 	
 	public void setText(int i){
+		if (Lang.eng && i==0){
+			help.setText("Start");
+			RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
+			helpParam.addRule(RelativeLayout.CENTER_IN_PARENT);
+		}
+		else
 		help.setText(MSG[i]);
 	}
 }

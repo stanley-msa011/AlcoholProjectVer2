@@ -2,7 +2,6 @@ package test.bluetooth;
 
 import ioio.examples.hello.TestFragment;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class BTRunTask extends AsyncTask<Void, Void, Void> {
 

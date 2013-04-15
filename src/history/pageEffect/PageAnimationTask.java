@@ -4,7 +4,6 @@ import ioio.examples.hello.HistoryFragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,7 +11,6 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 
 	private PageWidget pageWidget;
 	private PointF from;
-	private PointF to;
 	private float width_gap;
 	private float height_gap;
 	public static final int gaps = 90;
@@ -27,7 +25,6 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 	public PageAnimationTask(PageWidget pageWidget, PointF from, PointF to, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int endImageIdx){
 		this.pageWidget = pageWidget;
 		this.from = from;
-		this.to = to;
 		this.endTouch = endTouch;
 		this.endImageIdx = endImageIdx;
 		

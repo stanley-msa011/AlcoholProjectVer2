@@ -2,7 +2,6 @@ package test.camera;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 public class CameraRunHandler extends Handler {
 	

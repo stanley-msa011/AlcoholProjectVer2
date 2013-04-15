@@ -2,7 +2,6 @@ package statisticPageView;
 
 import ioio.examples.hello.StatisticFragment;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -22,6 +21,11 @@ public abstract class StatisticPageView {
 	public View getView(){
 		return view;
 	}
+	
+	abstract public void onPreTask();
+	abstract public void onInBackground();
+	abstract public void onPostTask();
+	abstract public void onCancel();
 	
 	abstract public void clear();
 	

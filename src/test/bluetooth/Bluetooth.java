@@ -3,7 +3,6 @@ package test.bluetooth;
 
 import ioio.examples.hello.TestFragment;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Set;
@@ -36,9 +35,7 @@ public class Bluetooth {
 	
 	private InputStream in;
 	private Context context;
-	private TestFragment testFragment;
 	
-	private int counter = 0;
 	private float prev_pressure;
 	private float now_pressure;
 	private boolean isPeak = false;
@@ -68,18 +65,13 @@ public class Bluetooth {
 	private Object lock = new Object();
 	private BTUIHandler btUIHandler;
 	
-	private double sum;
-	
 	private int image_count;
 	
 	private CameraRunHandler cameraRunHandler;
 	private BracValueFileHandler bracFileHandler;
 	
-	private boolean successful;
-	
 	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler){
-		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.cameraRunHandler = cameraRunHandler;
 		this.bracFileHandler = bracFileHandler;
@@ -169,11 +161,8 @@ public class Bluetooth {
 		prev_pressure = 0;
 		int read_type = READ_NULL;
 		duration = 0;
-		sum = 0;
-		counter = 0;
 		first_start_time = -1;
 		image_count  =0;
-		successful = false;
 		try {
 			in = socket.getInputStream();
 			bytes =in.read(temp);
@@ -232,9 +221,7 @@ public class Bluetooth {
 					long timeStamp = System.currentTimeMillis()/1000L;
 					
 					float alcohol = Float.valueOf(msg.substring(1));
-					String output = timeStamp+" "+alcohol+"\n";
-					counter++;
-					sum+=alcohol;
+					String output = timeStamp+"\t"+alcohol+"\n";
 					/*write to the file*/
 					write_to_file(output);
 				}
@@ -279,20 +266,16 @@ public class Bluetooth {
 							}
 							
 							if (image_count == 0 && duration > IMAGE_MILLIS_0){
-								//cameraRunHandler.takePicture();
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
 							}
 							else if (image_count == 1 && duration > IMAGE_MILLIS_1){
-								//cameraRunHandler.takePicture();
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
 							}
 							else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
-								//cameraRunHandler.takePicture();
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
-								successful = true;
 								
 								show_in_UI(6);
 								return -1;

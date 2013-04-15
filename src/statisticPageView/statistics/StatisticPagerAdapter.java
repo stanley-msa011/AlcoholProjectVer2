@@ -51,6 +51,28 @@ public class StatisticPagerAdapter extends PagerAdapter {
         ((ViewPager) collection).removeView(viewsList.get(position));  
     } 
 	
+	public void onPreTask(){
+		for (int i=0;i<statisticViews.length;++i){
+			statisticViews[i].onPreTask();
+		}
+	}
+	public void onInBackground(){
+		for (int i=0;i<statisticViews.length;++i){
+			statisticViews[i].onInBackground();
+		}
+	}
+	
+	public void onPostTask(){
+		for (int i=0;i<statisticViews.length;++i){
+			statisticViews[i].onPostTask();
+		}
+	}
+	public void onCancel(){
+		for (int i=0;i<statisticViews.length;++i){
+			statisticViews[i].onCancel();
+		}
+	}
+	
 	public void clear(){
 		Log.d("CLEAR","STATISTIC");
 		for (int i=0;i<statisticViews.length;++i){

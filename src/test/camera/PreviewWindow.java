@@ -1,11 +1,11 @@
 package test.camera;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.hardware.Camera;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+@SuppressLint("ViewConstructor")
 public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callback{
 
 	private CameraRecorder cameraRecorder;

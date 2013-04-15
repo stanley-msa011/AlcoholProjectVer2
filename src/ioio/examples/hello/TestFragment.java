@@ -1,6 +1,5 @@
 package ioio.examples.hello;
 
-import game.TreeImageHandler;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -35,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -250,8 +250,8 @@ public class TestFragment extends Fragment {
 	private class EndTestOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			stop();
 			failHelp.setVisibility(View.INVISIBLE);
+			stop();
 			loadingHandler.sendEmptyMessage(0);
 		}
 	}
@@ -324,7 +324,7 @@ public class TestFragment extends Fragment {
 				stop();
 				BDH = new BracDataHandler(timestamp, testFragment);
 				int bdh_result = BDH.start();
-				if (bdh_result == BDH.ERROR){
+				if (bdh_result == BracDataHandler.ERROR){
 					//Show error message
 				}
 				else{
@@ -416,6 +416,7 @@ public class TestFragment extends Fragment {
     	}
     }
     
+	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
 		
 		private Resources r;
@@ -479,6 +480,7 @@ public class TestFragment extends Fragment {
 	}
     
     
+	@SuppressLint("HandlerLeak")
 	private class MsgLoadingHandler extends Handler{
 		
 		public void handleMessage(Message msg){
@@ -489,6 +491,7 @@ public class TestFragment extends Fragment {
 		}
 	}
     
+	@SuppressLint("HandlerLeak")
 	private class FailBgHandler extends Handler{
 		
 		private String msgStr;
@@ -521,8 +524,10 @@ public class TestFragment extends Fragment {
 	
 	
 	
+	@SuppressLint("HandlerLeak")
 	private class AnimationHandler extends Handler{
 		
+		@SuppressWarnings("deprecation")
 		public void handleMessage(Message msg){
 			animationBmp = new Bitmap[4];
 			animationBmp[0] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_0);
@@ -574,6 +579,7 @@ public class TestFragment extends Fragment {
 	}
 	
 	
+	@SuppressLint("HandlerLeak")
 	private class TestHandler extends Handler{
 		public void handleMessage(Message msg){
 			bg.setImageBitmap(null);

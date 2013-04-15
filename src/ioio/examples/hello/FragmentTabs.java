@@ -25,14 +25,15 @@ public class FragmentTabs extends FragmentActivity {
 	private TabManager tabManager;
 	private static Point screen_px;
 	private static Point tab_px;
-	private static float screen_density;
 	private TabSpec[] tabs;
 	private CustomTab[] customTabs;
 	
 	private static final String[] tabName ={"Test","Record","Social","History"}; 
 	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_social,R.drawable.tab_history}; 
 	private static final String[] iconText ={"測試","紀錄","社交","歷程"}; 
+	private static final String[] iconTextEng ={"Test","Record","Social","History"}; 
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -48,7 +49,6 @@ public class FragmentTabs extends FragmentActivity {
 			screen_px = new Point();
 			display.getSize(screen_px);
 		}
-		screen_density =this.getResources().getDisplayMetrics().density;
 
 		tab_px = new Point(screen_px.x,(int)(screen_px.y*(110.0/1280.0)));
 		
@@ -64,6 +64,9 @@ public class FragmentTabs extends FragmentActivity {
 		customTabs = new CustomTab[4];
 		
 		for (int i=0;i<4;++i){
+			if (Lang.eng)
+				customTabs[i] = new CustomTab(this,iconId[i],iconTextEng[i]);
+			else
 			customTabs[i] = new CustomTab(this,iconId[i],iconText[i]);
 			tabs[i] = tabHost.newTabSpec(tabName[i]).setIndicator(customTabs[i].getTab());
 			
