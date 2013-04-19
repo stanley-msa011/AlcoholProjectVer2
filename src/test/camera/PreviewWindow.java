@@ -2,6 +2,7 @@ package test.camera;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -33,8 +34,12 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 
 	public void restartPreview(){
 		if (cameraRecorder.camera!=null){
-			cameraRecorder.camera.stopPreview();
-			cameraRecorder.camera.startPreview();
+			try{
+				cameraRecorder.camera.stopPreview();
+				cameraRecorder.camera.startPreview();
+			}catch(Exception e){
+				Log.d("preview window",e.getMessage().toString());
+			}
 		}
 	}
 	

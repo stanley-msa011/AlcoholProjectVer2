@@ -1,5 +1,7 @@
 package statisticPageView.statistics;
 
+import java.util.Calendar;
+
 import database.HistoryDB;
 import main.activities.Lang;
 import main.activities.R;
@@ -26,6 +28,8 @@ public class StatisticMonthView extends StatisticPageView {
 	private Bitmap textBmp, lineBmp1, lineBmp2; 
 	private RelativeLayout mainLayout;
 	private TextView help;
+	private TextView[] labels;
+	private TextView[] days;
 	
 	private ImageView[] blocks;
 	
@@ -88,9 +92,21 @@ public class StatisticMonthView extends StatisticPageView {
 		
 		bg = (ImageView) view.findViewById(R.id.statistic_month_bg);
 		
+		int textSize = (int)(screen.x * 36.0/720.0);
 		help = (TextView) view.findViewById(R.id.statistic_month_help);
 		help.setTextColor(0xFFFFFFFF);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+		
+		labels = new TextView[4];
+		labels[0] =  (TextView) view.findViewById(R.id.statistic_month_label_1);
+		labels[1] =  (TextView) view.findViewById(R.id.statistic_month_label_2);
+		labels[2] =  (TextView) view.findViewById(R.id.statistic_month_label_3);
+		labels[3] =  (TextView) view.findViewById(R.id.statistic_month_label_4);
+		
+		for (int i=0;i<4;++i){
+			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		}
 		
 	}
 
@@ -122,8 +138,15 @@ public class StatisticMonthView extends StatisticPageView {
 		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg2);
 		
 		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
-		helpParam.leftMargin =  (int) (screen.x * 130.0/720.0);
-		helpParam.topMargin = (int)(screen.y*310.0/443.0);
+		helpParam.leftMargin =  (int) (screen.x * 60.0/720.0);
+		helpParam.topMargin = (int)(screen.y*61.0/443.0);
+		
+		for (int i=0;i<4;++i){
+			RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[i].getLayoutParams();
+			labelParam.leftMargin = (int) (screen.x *22.0/720.0);
+		}
+		RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[0].getLayoutParams();
+		labelParam.topMargin = (int)(screen.y*115.0/443.0);
 		
 	}
 
@@ -166,7 +189,34 @@ public class StatisticMonthView extends StatisticPageView {
 				blocks[i].setImageBitmap(block_green);
 		}
 		
+		
+		days = new TextView[2];
+		leftMargin-=blockWidth+blockGap;
+		int textSize =(int) (screen.x * 18.0/720.0);
+		Calendar cal = Calendar.getInstance();
+		long monthMillis = 86400*1000L*27L;
+		for (int i=1;i>=0;--i){
+			days[i] = new TextView(context);
+			days[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			int date = cal.get(Calendar.DATE);
+			int month = cal.get(Calendar.MONTH)+1;
+			String date_str= month+"\n/"+date;
+			if (month<10)
+				date_str = "0"+date_str;
+			days[i].setText(date_str);
+			days[i].setLineSpacing(-textSize/2, 1.1F);
+			days[i].setTextColor(0xFFFFFFFF);
+			mainLayout.addView(days[i]);
+			RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) days[i].getLayoutParams();
+			param.leftMargin = leftMargin;
+			param.topMargin = (int)(screen.y*312.0/443.0);
+			leftMargin-=(blockWidth+blockGap)*27;
+			cal.setTimeInMillis(cal.getTimeInMillis()-monthMillis);
+		}
+		
 		bg.setImageBitmap(bgBmp);
+		
+		
 		
 		if (Lang.eng)
 			help.setText("Monthly Statistic");

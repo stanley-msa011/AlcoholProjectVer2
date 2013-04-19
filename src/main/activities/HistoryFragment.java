@@ -4,14 +4,16 @@ import database.HistoryDB;
 import history.GameHistory;
 import history.pageEffect.PageAnimationTask;
 import history.pageEffect.PageWidget;
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -53,9 +55,10 @@ public class HistoryFragment extends Fragment {
 	
 	private int curPageIdx;
 	private PointF curPageTouch;
-	private LoadingTask loadTask;
+	private LoadingHandler loadHandler;
 	
 	private boolean runAnimation;
+	private ImageView load;
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,8 +72,26 @@ public class HistoryFragment extends Fragment {
 	public void onResume(){
 		super.onResume();
 		System.gc();
-		loadTask = new LoadingTask();
-		loadTask.execute();
+		
+		RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.history_main_layout);
+		load = new ImageView(view.getContext());
+		if (!FragmentTabs.loadingBmp.isRecycled())
+			load.setImageBitmap(FragmentTabs.loadingBmp);
+		else{
+			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
+			FragmentTabs.loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
+			tmp.recycle();
+			load.setImageBitmap(FragmentTabs.loadingBmp);
+		}
+		layout.addView(load);
+		RelativeLayout.LayoutParams loadParam = (LayoutParams) load.getLayoutParams();
+		loadParam.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+		loadParam.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+		load.setScaleType(ScaleType.FIT_XY);
+		
+		if (loadHandler == null)
+			loadHandler = new LoadingHandler();
+		loadHandler.sendEmptyMessage(0);
 	}
     
     public void onPause(){
@@ -79,10 +100,9 @@ public class HistoryFragment extends Fragment {
     }
 	
     private void clear(){
-    	if (loadTask!=null){
-    		loadTask.cancel(true);
-    		loadTask = null;
-    	}
+    	if (loadHandler !=null)
+    		loadHandler.removeMessages(0);
+    	
     	if (pageAnimationTask!=null){
     		pageAnimationTask.cancel(true);
     		pageAnimationTask = null;
@@ -206,15 +226,15 @@ public class HistoryFragment extends Fragment {
     	SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(main_layout.getContext());
     	String uid = settings.getString("uid", "");
     	uidText.setText(uid);
-    	Typeface face2=Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/helvetica-lt-std-ultra-compressed.otf");
+    	Typeface face2=Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/helvetica-lt-std-bold.otf");
     	uidText.setTypeface(face2);
     	uidText.setTextColor(0xFFF97306);
     	uidText.setTextSize(TypedValue.COMPLEX_UNIT_PX,playText.getTextSize()*1.2F);
     	uidText.setGravity(Gravity.CENTER);
     	main_layout.addView(uidText);
     	LayoutParams uidTextParam = (LayoutParams) uidText.getLayoutParams();
-    	uidTextParam.leftMargin = (int) (bg_x*535.0/720.0);
-    	uidTextParam.topMargin = (int) (bg_y*150.0/1280.0);
+    	uidTextParam.leftMargin = (int) (bg_x*515.0/720.0);
+    	uidTextParam.topMargin = (int) (bg_y*148.0/1280.0);
     	
     }
     
@@ -243,15 +263,11 @@ public class HistoryFragment extends Fragment {
     	
     }
     
-    
-    private class LoadingTask extends AsyncTask<Void, Void, Void>{
-
-    	protected void onPreExecute(){
-    		initView_step1();
-    	}
-    	
-		@Override
-		protected Void doInBackground(Void... params) {
+	@SuppressLint("HandlerLeak")
+	private class LoadingHandler extends Handler{
+		
+		public void handleMessage(Message msg){
+			initView_step1();
 			
 			background = BitmapFactory.decodeResource(historyFragment.getResources(), R.drawable.drunk_history_bg);
 	    	LayoutParams bgParam = (LayoutParams) bgView.getLayoutParams();
@@ -277,18 +293,12 @@ public class HistoryFragment extends Fragment {
 	    		playWidth = playHeight;
 	    	play_button_bmp =BitmapFactory.decodeResource(historyFragment.getResources(), R.drawable.drunk_history_play);
 	    	
-			return null;
-		}
-		@Override
-		 protected void onPostExecute(Void result) {
-			
 			initView_step2();
 			endAnimation();
+	    	
+			RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.history_main_layout);
+			layout.removeView(load);
 		}
-		
-		protected void onCancelled(){
-			clear();
-		}
-    }
+	}
 
 }

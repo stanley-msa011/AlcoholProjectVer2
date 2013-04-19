@@ -1,6 +1,8 @@
 package statisticPageView.statistics;
 
 
+import java.util.Calendar;
+
 import database.HistoryDB;
 import main.activities.R;
 import main.activities.StatisticFragment;
@@ -26,6 +28,8 @@ public class StatisticWeekView extends StatisticPageView {
 	private Bitmap textBmp, lineBmp1, lineBmp2; 
 	private RelativeLayout mainLayout;
 	private TextView help;
+	private TextView[] labels;
+	private TextView[] days;
 	
 	private ImageView bg;
 	private Bitmap bgBmp;
@@ -88,11 +92,23 @@ public class StatisticWeekView extends StatisticPageView {
 		
 		mainLayout = (RelativeLayout) view.findViewById(R.id.statistic_week_layout);
 		
+		int textSize = (int)(screen.x * 36.0/720.0);
 		help = (TextView) view.findViewById(R.id.statistic_week_help);
-		help.setTextColor(0xFFFFFFFF);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		
+		labels = new TextView[4];
+		labels[0] =  (TextView) view.findViewById(R.id.statistic_week_label_1);
+		labels[1] =  (TextView) view.findViewById(R.id.statistic_week_label_2);
+		labels[2] =  (TextView) view.findViewById(R.id.statistic_week_label_3);
+		labels[3] =  (TextView) view.findViewById(R.id.statistic_week_label_4);
+		
+		for (int i=0;i<4;++i){
+			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		}
+			
 		bg = (ImageView) view.findViewById(R.id.statistic_week_bg);
+		days = new TextView[7];
 		
 	}
 
@@ -139,9 +155,15 @@ public class StatisticWeekView extends StatisticPageView {
 		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg2);
 		
 		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
-		helpParam.leftMargin =  (int) (screen.x * 130.0/720.0);
-		helpParam.topMargin = (int)(screen.y*310.0/443.0);
+		helpParam.leftMargin =  (int) (screen.x * 199.0/720.0);
+		helpParam.topMargin = (int)(screen.y*61.0/443.0);
 		
+		for (int i=0;i<4;++i){
+			RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[i].getLayoutParams();
+			labelParam.leftMargin = (int) (screen.x * 147.0/720.0);
+		}
+		RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[0].getLayoutParams();
+		labelParam.topMargin = (int)(screen.y*115.0/443.0);
 		
 	}
 
@@ -156,7 +178,8 @@ public class StatisticWeekView extends StatisticPageView {
 		
 		int blockWidth =  (int) (screen.x * 44.0/720.0);
 		int blockHeight =  (int) (screen.y * 50.0/443.0);
-		int blockGap = (int)(screen.x * 2.0/720.0);
+		int blockGapVer =  (int) (screen.y * 50.0/443.0);
+		int blockGap = (int)(screen.x * 3.0/720.0);
 		if (blockGap < 1)
 			blockGap = 1;
 		
@@ -168,13 +191,14 @@ public class StatisticWeekView extends StatisticPageView {
 				int c = 4*i+j;
 				blocks[c] = new ImageView(context);
 				blocks[c].setScaleType(ScaleType.FIT_XY);
+				blocks[c].setAdjustViewBounds(true);
 				mainLayout.addView(blocks[c]);
 				RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) blocks[c].getLayoutParams();
 				param.width = blockWidth;
 				param.height = blockHeight;
 				param.leftMargin = leftMargin;
 				param.topMargin = topMargin;
-				topMargin -= blockHeight;
+				topMargin -= blockGapVer;
 			}
 			leftMargin+=blockWidth+blockGap;
 		}
@@ -188,6 +212,29 @@ public class StatisticWeekView extends StatisticPageView {
 				blocks[i].setImageBitmap(block_red);
 			else//PASS
 				blocks[i].setImageBitmap(block_green);
+		}
+		
+		leftMargin-=blockWidth+blockGap;
+		int textSize =(int) (screen.x * 18.0/720.0);
+		Calendar cal = Calendar.getInstance();
+		long dateMillis = 86400*1000L;
+		for (int i=6;i>=0;--i){
+			days[i] = new TextView(context);
+			days[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			int date = cal.get(Calendar.DATE);
+			int month = cal.get(Calendar.MONTH)+1;
+			String date_str= month+"\n   /"+date;
+			if (month<10)
+				date_str = "0"+date_str;
+			days[i].setText(date_str);
+			days[i].setLineSpacing(-textSize/2, 1.1F);
+			days[i].setTextColor(0xFFFFFFFF);
+			mainLayout.addView(days[i]);
+			RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) days[i].getLayoutParams();
+			param.leftMargin = leftMargin;
+			param.topMargin = (int)(screen.y*312.0/443.0);
+			leftMargin-=blockWidth+blockGap;
+			cal.setTimeInMillis(cal.getTimeInMillis()-dateMillis);
 		}
 		
 		bg.setImageBitmap(bgBmp);

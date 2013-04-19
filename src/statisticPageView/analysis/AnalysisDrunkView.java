@@ -16,6 +16,7 @@ import android.graphics.Typeface;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
@@ -31,6 +32,7 @@ public class AnalysisDrunkView extends StatisticPageView {
 	private Bitmap titleBmp;
 	private TextView help;
 	private TextView[] texts;
+	private TextView[] labels;
 	private ImageView[] bgs;
 	private Bitmap[] bgBmps;
 	private HistoryDB db;
@@ -119,21 +121,23 @@ public class AnalysisDrunkView extends StatisticPageView {
 	public void onPostTask() {
 		title_bg.setImageBitmap(titleBmp);
 		if (Lang.eng)
-			help.setText("Your test result today");
+			help.setText("Your test results today");
 		else
 		help.setText("您今天的酒測次數與結果" );
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
-		Typeface face=Typeface.createFromAsset(context.getAssets(), "fonts/helvetica-lt-std-ultra-compressed.otf");
+		Typeface face=Typeface.createFromAsset(context.getAssets(), "fonts/helvetica-lt-std-bold.otf");
 		int bgSize = (int)(screen.x * 106.0/720.0);
 		int bgGap = (int)(screen.x * 18.0/720.0);
 		int textWidth = (int)(screen.x * 64.0/720.0);
-		int textHeight = (int)(screen.x * 50.0/720.0);
 		int textSize = (int)(screen.x * 48.0/720.0);
 		int textGap = (int)(screen.x * 60.0/720.0);
 
+		int labelGap = (int)(screen.x * 124.0/720.0);
+		
 		texts = new TextView[4];
+		labels = new TextView[4];
 		bgs = new ImageView[4];
 		
 		for (int i=0;i<4;++i){
@@ -146,6 +150,15 @@ public class AnalysisDrunkView extends StatisticPageView {
 			bgParam.leftMargin = (int)(screen.x * 120.0/720.0) +  (bgSize + bgGap)*i;
 			bgParam.topMargin = (int)(screen.x * 179.0/720.0);
 			
+			labels[i]  = new TextView(context);
+			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+			labels[i].setTypeface(face);
+			labels[i].setGravity(Gravity.CENTER);
+			content_layout.addView(labels[i]);
+			RelativeLayout.LayoutParams labelParam = (LayoutParams) labels[i].getLayoutParams();
+			labelParam.leftMargin = (int)(screen.x * 146.0/720.0) +labelGap*i;
+			labelParam.topMargin = (int)(screen.x * 215.0/720.0);
+			
 			texts[i] = new TextView(context);
 			texts[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			texts[i].setTypeface(face);
@@ -154,15 +167,15 @@ public class AnalysisDrunkView extends StatisticPageView {
 			content_layout.addView(texts[i]);
 			
 			RelativeLayout.LayoutParams textParam = (LayoutParams) texts[i].getLayoutParams();
-			textParam.width = textWidth;
-			textParam.height = textHeight;
-			textParam.leftMargin = (int)(screen.x * 141.0/720.0) + (textWidth + textGap)*i;
+			textParam.leftMargin = (int)(screen.x * 127.0/720.0) + (textWidth + textGap)*i;
 			textParam.topMargin = (int)(screen.x * 205.0/720.0);
+			
 			
 			if (historys[i]==null){
 				texts[i].setText("");
 				if (bgBmps!=null)
 					bgs[i].setImageBitmap(bgBmps[2]);
+				labels[i].setVisibility(View.VISIBLE);
 			}
 			else{
 				String out = format.format(historys[i].brac);
@@ -171,9 +184,24 @@ public class AnalysisDrunkView extends StatisticPageView {
 					bgs[i].setImageBitmap(bgBmps[1]);
 				else if (bgBmps!=null)
 					bgs[i].setImageBitmap(bgBmps[0]);
+				labels[i].setVisibility(View.INVISIBLE);
 			}
 		}
-		
+		if (Lang.eng){
+			labels[0].setText("am");
+			labels[0].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize/2);
+			labels[1].setText("noon");
+			labels[1].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize/2);
+			labels[2].setText("pm");
+			labels[2].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize/2);
+			labels[3].setText("night");
+			labels[3].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize/2);
+		}else{
+			labels[0].setText("早");
+			labels[1].setText("中");
+			labels[2].setText("下");
+			labels[3].setText("晚");
+		}
 	}
 
 	@Override

@@ -61,7 +61,7 @@ public class UIRotate {
 		bg = (ImageView) view.findViewById(R.id.test_rotate_bg);
 		
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 56.0/720.0));
-		Typeface face=Typeface.createFromAsset(context.getAssets(),"fonts/helvetica-lt-std-ultra-compressed.otf");
+		Typeface face=Typeface.createFromAsset(context.getAssets(),"fonts/helvetica-lt-std-bold.otf");
     	help.setTypeface(face);
 		
 		RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
@@ -78,11 +78,6 @@ public class UIRotate {
 		ringParam.height = (int)(screen.x * 266.0/720.0);
 		ringParam.leftMargin =  (int)(screen.x * 54.0/720.0);
 		ringParam.topMargin =  (int)(screen.x * 43.0/720.0);
-		
-		//int pivot = ringParam.width/2;
-		
-		//ring.setPivotX(0);
-		//ring.setPivotY(0);
 		
 		anim = new RotateAnimation(0F,+360F, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
 		anim.setRepeatCount(100);
@@ -111,6 +106,7 @@ public class UIRotate {
 		setText(0);
 		ring.setAnimation(anim);
 		anim.start();
+		anim.setDuration(99999);
 	}
 	
 	public void clear(){
@@ -120,13 +116,10 @@ public class UIRotate {
 	public void setSpeed(int modify){
 		
 		if (modify == 0){//start
-			anim.setDuration(2000);
-		}
-		if (modify == 1){//start
 			anim.setDuration(1000);
 		}
 		if (modify == -1){
-			anim.setDuration(10000000);
+			anim.setDuration(99999);
 		}
 	}
 	

@@ -3,13 +3,15 @@ package main.activities;
 import database.HistoryDB;
 import interaction.UserLevelCollector;
 import history.InteractionHistory;
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -20,8 +22,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.ImageView.ScaleType;
+import android.widget.RelativeLayout.LayoutParams;
 
-public class InteractionFragment extends Fragment {
+public class SocialFragment extends Fragment {
 
 	private View view;
 	
@@ -34,10 +38,13 @@ public class InteractionFragment extends Fragment {
 	private int horizontalGap, verticalGap;
 	
 	private LayoutInflater inflater;
-	private ImageLoadingTask imageLoadingTask;
-	private NetworkLoadingTask networkLoadingTask;
-
-	InteractionHistory[] historys_all;
+	private LoadingHandler loadHandler;
+	private NetworkHandler netHandler;
+	
+	
+	private InteractionHistory[] historys_all;
+	
+	private ImageView load;
 	
 	private HistoryDB db;
 	
@@ -51,6 +58,23 @@ public class InteractionFragment extends Fragment {
     @Override
     public void onResume(){
 		super.onResume();
+		
+		RelativeLayout layout = (RelativeLayout) view;
+		load = new ImageView(view.getContext());
+		if (!FragmentTabs.loadingBmp.isRecycled())
+			load.setImageBitmap(FragmentTabs.loadingBmp);
+		else{
+			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
+			FragmentTabs.loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
+			tmp.recycle();
+			load.setImageBitmap(FragmentTabs.loadingBmp);
+		}
+		layout.addView(load);
+		RelativeLayout.LayoutParams loadParam = (LayoutParams) load.getLayoutParams();
+		loadParam.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+		loadParam.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+		load.setScaleType(ScaleType.FIT_XY);
+		
 		this.db = new HistoryDB(this.getActivity());
 		Point screen = FragmentTabs.getSize();
 		
@@ -61,10 +85,11 @@ public class InteractionFragment extends Fragment {
 		mainViewParam.height = screen.y;
 		
 		horizontalGap = (int)(screen.x * 5.0/720.0);
-		verticalGap = (int)(screen.x * 14.0/720.0);
+		verticalGap = (int)(screen.x * 42.0/720.0);
 		
-		imageLoadingTask = new ImageLoadingTask();
-		imageLoadingTask.execute();
+		if (loadHandler ==null)
+			loadHandler = new LoadingHandler();
+		loadHandler.sendEmptyMessage(0);
 	}
     
     public void onPause(){
@@ -72,20 +97,19 @@ public class InteractionFragment extends Fragment {
     	super.onPause();
     }
     
-    private void clear(){
+    @SuppressWarnings("deprecation")
+	private void clear(){
     	Log.d("CLEAR","interaction onPause");
     	this.db = null;
-    	main_layout.removeAllViews();
-    	if (imageLoadingTask != null){
-    		Log.d("RECYCLE","CANCEL1");
-    		imageLoadingTask.cancel(true);
-    		imageLoadingTask = null;
-    	}
-    	if (networkLoadingTask != null){
-    		Log.d("RECYCLE","CANCEL2");
-    		networkLoadingTask.cancel(true);
-    		networkLoadingTask = null;
-    	}
+    	if (main_layout!=null)
+    		main_layout.removeAllViews();
+    	
+    	if (netHandler!=null)
+    		netHandler.removeMessages(1);
+    	
+    	if (loadHandler!=null)
+    		loadHandler.removeMessages(0);
+    	
     	if (iconsBmp!=null)
     		for(int i=0;i<iconsBmp.length;++i){
     			if (iconsBmp[i]!=null && !iconsBmp[i].isRecycled()){
@@ -191,14 +215,12 @@ public class InteractionFragment extends Fragment {
     	}
     	
     }
-    
-    
-    private class ImageLoadingTask extends AsyncTask<Void, Void, Void>{
-
-		@Override
-		protected Void doInBackground(Void... params) {
+    @SuppressLint("HandlerLeak")
+	private class LoadingHandler extends Handler{
+    	
+		@SuppressWarnings("deprecation")
+		public void handleMessage(Message msg){
 			iconsBmp = new Bitmap[ICON_TYPES];
-			//Bitmap tmp = 
 			iconsBmp[0] = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_social_icon1);
 			iconsBmp[1] = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_social_icon2);
 			iconsBmp[2] = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_social_icon3);
@@ -211,12 +233,6 @@ public class InteractionFragment extends Fragment {
 			
 			bgBmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_social_bg);
 			
-			return null;
-		}
-		@SuppressWarnings("deprecation")
-		@Override
-		 protected void onPostExecute(Void result) {
-			
 			BitmapDrawable bgDrawable = new BitmapDrawable(bgBmp);
 			mainView.setBackgroundDrawable(bgDrawable);
 
@@ -224,41 +240,33 @@ public class InteractionFragment extends Fragment {
 			 historys_all = historys;
 			 setImages(historys_all);
 			 
-			networkLoadingTask = new NetworkLoadingTask();
-			networkLoadingTask.execute();
-		}
-		
-		protected void onCancelled(){
-			clear();
-		}
+			 RelativeLayout layout = (RelativeLayout) view;
+			 layout.removeView(load);
+			 
+			 if (netHandler !=null)
+				 netHandler.sendEmptyMessage(1);
+			 
+			 
+    	}
     }
     
     
-    private class NetworkLoadingTask extends AsyncTask<Void, Void, Void>{
-
-    	private InteractionHistory[] historys;
-    	private UserLevelCollector levelCollector;
-    	
-		@Override
-		protected Void doInBackground(Void... params) {
-			Log.d("NetworkLoadingTask","StartLoading");
+    private InteractionHistory[] historys;
+	private UserLevelCollector levelCollector;
+    
+    @SuppressLint("HandlerLeak")
+	private class NetworkHandler extends Handler{
+    	public void handleMessage(Message msg){
+    		Log.d("NetworkLoadingTask","StartLoading");
 			levelCollector = new UserLevelCollector(view.getContext());
 			historys = levelCollector.update();
-			return null;
-		}
-		@Override
-		 protected void onPostExecute(Void result) {
-			/*insert to db*/
 			if (historys == null)
 				return;
 			for (int i=0;i<historys.length;++i)
 				db.insertInteractionHistory(historys[i]);
 			historys_all = db.getAllUsersHistory();
 			setImages(historys_all);
-		}
-		protected void onCancelled(){
-			clear();
-		}
+    	}
     }
     
 }

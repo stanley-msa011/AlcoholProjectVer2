@@ -4,10 +4,10 @@ package main.activities;
 import java.io.File;
 import java.text.DecimalFormat;
 
-import test.bluetooth.BTInitTask;
+import test.bluetooth.BTInitHandler;
 import test.bluetooth.BTRunTask;
 import test.bluetooth.Bluetooth;
-import test.camera.CameraInitTask;
+import test.camera.CameraInitHandler;
 import test.camera.CameraRecorder;
 import test.camera.CameraRunHandler;
 import test.data.BracDataHandler;
@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -60,6 +61,8 @@ public class TestFragment extends Fragment {
 	public static final int _BT = 1;
 	public static final int _CAMERA = 2;
 	
+	private boolean keepMsgBox;
+	
 	//GPS
 	private LocationManager locationManager;
 	private GPSInitTask gpsInitTask;
@@ -68,11 +71,11 @@ public class TestFragment extends Fragment {
 	
 	//Bluetooth
 	private Bluetooth bt;
-	private BTInitTask btInitTask;
+	private BTInitHandler btInitHandler;
 	private BTRunTask btRunTask;
 	
 	//Camera
-	private CameraInitTask cameraInitTask;
+	private CameraInitHandler cameraInitHandler;
 	private CameraRecorder cameraRecorder;
 	private CameraRunHandler cameraRunHandler;
 	
@@ -110,26 +113,56 @@ public class TestFragment extends Fragment {
 	
 	private TextView failHelp;
 	
+	private ImageView load;
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		keepMsgBox = false;
 	}
 	
 	public void onPause(){
+		if (!isKeepMsgBox()){
+			Log.d("onpause","do");
+			stop();
+			clear();
+		}
+		else{
+			Log.d("onpause","skip");
+		}
 		super.onPause();
-		stop();
-		clear();
 	}
 	
 	public void onResume(){
 		super.onResume();
-		context = this.getActivity();
-		testFragment = this;
-		FragmentTabs.enableTab(true);
-		setting();
-		
-		loadingHandler.sendEmptyMessage(0);
+		if (!isKeepMsgBox()){
+			RelativeLayout layout = (RelativeLayout) view;
+			load = new ImageView(view.getContext());
+			if (!FragmentTabs.loadingBmp.isRecycled())
+				load.setImageBitmap(FragmentTabs.loadingBmp);
+			else{
+				Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
+				FragmentTabs.loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
+				tmp.recycle();
+				load.setImageBitmap(FragmentTabs.loadingBmp);
+			}
+			layout.addView(load);
+			RelativeLayout.LayoutParams loadParam = (LayoutParams) load.getLayoutParams();
+			loadParam.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+			loadParam.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+			load.setScaleType(ScaleType.FIT_XY);
+			
+			context = this.getActivity();
+			testFragment = this;
+			FragmentTabs.enableTab(true);
+			setting();
+			loadingHandler.sendEmptyMessage(0);
+		}
+		else{
+			setKeepMsgBox(false);
+		}
+		Log.d("test","onresume end");
 	}
 	
 	private void setting(){
@@ -193,9 +226,9 @@ public class TestFragment extends Fragment {
 	public void runGPS(){
 		if (gps_state){
 			gpsInitTask.cancel(true);
-			Object[] gps_enable={gps_state};
 			gpsRunTask = new GPSRunTask(this,locationManager,mainDirectory);
-			gpsRunTask.execute(gps_enable);
+			Object[] a = {gps_state};
+			gpsRunTask.execute(a);
 		}
 		else{
 			updateDoneState(_GPS);
@@ -206,13 +239,13 @@ public class TestFragment extends Fragment {
 	public void startBT(){
 		msgBox.generateInitializingBox();
 		//initialize bt task
-		btInitTask = new BTInitTask(testFragment,bt);
-		btInitTask.execute();
+		btInitHandler = new BTInitHandler(testFragment,bt);
+		btInitHandler.sendEmptyMessage(0);
 		Log.d("INIT","BT TASK STARTED");
 		
 		//initialize camera task
-		cameraInitTask = new CameraInitTask(testFragment,cameraRecorder);
-		cameraInitTask.execute();
+		cameraInitHandler = new CameraInitHandler(testFragment,cameraRecorder);
+		cameraInitHandler.sendEmptyMessage(0);
 		Log.d("INIT","Camera TASK STARTED");
 	}
 	
@@ -273,10 +306,7 @@ public class TestFragment extends Fragment {
 			dir = new File(this.getActivity().getFilesDir(),"drunk_detection");
 			Log.d("TEST_STORAGE","NO MEDIA");
 		}
-		String path = dir.getAbsolutePath();
-		Log.d("TEST_STORAGE","PATH: "+path);
 		if (!dir.exists()){
-			Log.d("TEST_STORAGE","NO DIR");
 			if (!dir.mkdirs())
 				Log.d("TEST_STORAGE","FAIL TO CREATE DIR");
 		}
@@ -301,8 +331,8 @@ public class TestFragment extends Fragment {
 			INIT_PROGRESS[type]=true;
 			
 			if (INIT_PROGRESS[_BT] && INIT_PROGRESS[_CAMERA]){
-				btInitTask.cancel(true);
-				cameraInitTask.cancel(true);
+				btInitHandler.removeMessages(0);
+				cameraInitHandler.removeMessages(0);
 				btRunTask = new BTRunTask(this,bt);
 				btRunTask.execute();
 				msgBox.closeInitializingBox();
@@ -352,17 +382,16 @@ public class TestFragment extends Fragment {
 		if (gpsInitTask!=null)
 			gpsInitTask.cancel(true);
 		
-		if (btInitTask!=null)
-			btInitTask.cancel(true);
+		if (btInitHandler!=null)
+			btInitHandler.removeMessages(0);
 		
-		if (cameraInitTask!=null)
-			cameraInitTask.cancel(true);
+		if (cameraInitHandler!=null)
+			cameraInitHandler.removeMessages(0);
 		
 		if (btRunTask!=null)
 			btRunTask.cancel(true);
 
 		if (gpsRunTask!=null){
-			gpsRunTask.close();
 			gpsRunTask.cancel(true);
 		}
 		
@@ -376,7 +405,7 @@ public class TestFragment extends Fragment {
 	}
 	
 	private void clear(){
-		
+
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;
@@ -422,8 +451,12 @@ public class TestFragment extends Fragment {
 		private Resources r;
 		public void handleMessage(Message msg){
 			
+			Log.d("test","load handler");
+			
 			r = getResources();
     		bg.setImageBitmap(null);
+    		
+    		failHelp.setVisibility(View.INVISIBLE);
     		
     		Point screen = FragmentTabs.getSize();
 			
@@ -466,16 +499,23 @@ public class TestFragment extends Fragment {
 			previewParam.leftMargin = (int)(screen.x * 62.0/720.0);
 			previewParam.topMargin = (int)(screen.x * 233.0/720.0);
 			
-			bg.setImageBitmap(bgBmp);
-			startLine.setImageBitmap(startLineBmp);
+			if(bgBmp!=null)
+				bg.setImageBitmap(bgBmp);
+			if(startLineBmp!=null)
+				startLine.setImageBitmap(startLineBmp);
 			startLine.setVisibility(View.VISIBLE);
-			startCircle.setImageBitmap(startCircleBmp);
+			if (startCircleBmp!=null)
+				startCircle.setImageBitmap(startCircleBmp);
 			startCircle.setVisibility(View.VISIBLE);
 			startText.setText("開始");
 			startText.setVisibility(View.VISIBLE);
 			
 			startCircle.setOnClickListener(new StartOnClickListener());
 			bg.setOnClickListener(null);
+		
+			RelativeLayout layout = (RelativeLayout) view;
+			layout.removeView(load);
+			
 		}
 	}
     
@@ -619,6 +659,14 @@ public class TestFragment extends Fragment {
 		msg.setData(data);
 		msg.what = 0;
 		failBgHandler.sendMessage(msg);
+	}
+
+	public boolean isKeepMsgBox() {
+		return keepMsgBox;
+	}
+
+	public void setKeepMsgBox(boolean keepMsgBox) {
+		this.keepMsgBox = keepMsgBox;
 	}
 	
 }

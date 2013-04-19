@@ -5,12 +5,14 @@ import main.activities.R;
 import main.activities.StatisticFragment;
 import history.InteractionHistory;
 import interaction.UserLevelCollector;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -32,21 +34,24 @@ public class AnalysisRatingView extends StatisticPageView {
 	private ImageView bar, pointer;
 	private Bitmap barBmp, pointerBmp;
 	
-	private NetworkLoadingTask nTask;
+	//private NetworkLoadingTask nTask;
+	
+	private NetworkHandler netHandler;
 	
 	private int minLeftPointer, maxLeftPointer;
 	
 	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
 		db = new HistoryDB(context);
+		if (netHandler==null)
+			netHandler = new NetworkHandler();
+		netHandler.sendEmptyMessage(0);
 	}
 
 	@Override
 	public void clear() {
-		if (nTask !=null){
-			nTask.cancel(true);
-			nTask = null;
-		}
+		if (netHandler!=null)
+			netHandler.removeMessages(0);
 		if (titleBmp!=null && !titleBmp.isRecycled()){
 			titleBmp.recycle();
 			titleBmp = null;
@@ -106,32 +111,6 @@ public class AnalysisRatingView extends StatisticPageView {
 	}
 	
 	
-	
-    private class NetworkLoadingTask extends AsyncTask<Void, Void, Void>{
-
-    	private InteractionHistory[] historys;
-    	private UserLevelCollector levelCollector;
-    	
-		@Override
-		protected Void doInBackground(Void... params) {
-			Log.d("NetworkLoadingTask","StartLoading");
-			levelCollector = new UserLevelCollector(view.getContext());
-			historys = levelCollector.update();
-			return null;
-		}
-		@Override
-		 protected void onPostExecute(Void result) {
-			if (historys == null)
-				return;
-			for (int i=0;i<historys.length;++i)
-				db.insertInteractionHistory(historys[i]);
-			setPointer();
-		}
-		protected void onCancelled(){
-			clear();
-		}
-    }
-
 	@Override
 	public void onPreTask() {
 		Point screen = StatisticFragment.getStatisticPx();
@@ -212,14 +191,30 @@ public class AnalysisRatingView extends StatisticPageView {
 		high.setText("高" );
 		low.setText("低" );
 		setPointer();
-		nTask = new NetworkLoadingTask();
-		nTask.execute();
 		
 	}
 
 	@Override
 	public void onCancel() {
 		clear();
+	}
+	
+	private InteractionHistory[] historys;
+	private UserLevelCollector levelCollector;
+	
+	@SuppressLint("HandlerLeak")
+	private class NetworkHandler extends Handler{
+		public void handleMessage(Message msg){
+			Log.d("NetworkLoadingTask","StartLoading");
+			levelCollector = new UserLevelCollector(view.getContext());
+			historys = levelCollector.update();
+			
+			if (historys == null)
+				return;
+			for (int i=0;i<historys.length;++i)
+				db.insertInteractionHistory(historys[i]);
+			setPointer();
+		}
 	}
 	
 

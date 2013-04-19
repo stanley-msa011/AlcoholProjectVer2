@@ -2,7 +2,6 @@ package statisticPageView.analysis;
 
 
 import database.HistoryDB;
-import main.activities.FragmentTabs;
 import main.activities.Lang;
 import main.activities.R;
 import main.activities.StatisticFragment;
@@ -11,7 +10,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -154,15 +155,20 @@ public class AnalysisSuccessView extends StatisticPageView {
 		all.setImageBitmap(allBmp);
 		niddle.setImageBitmap(niddleBmp);
 		
-		niddle.setPivotX(niddlePivotX);
-		niddle.setPivotY(niddlePivotY);
-		niddle.setRotation(niddleRotate);
+		if (Build.VERSION.SDK_INT>=11){
+			niddle.setPivotX(niddlePivotX);
+			niddle.setPivotY(niddlePivotY);
+			niddle.setRotation(niddleRotate);
+		}
+		else{
+			niddle.setVisibility(View.INVISIBLE);
+		}
 		text.setText(String.valueOf(score));
 		if (Lang.eng){
-			help.setText("Depends on the tests, your overall result");
-			Point screen = FragmentTabs.getSize();
-			RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams)help.getLayoutParams();
-    		helpParam.topMargin = (int)(screen.x * 80.0/720.0);
+			help.setText("Cumulative results");
+			//Point screen = FragmentTabs.getSize();
+			//RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams)help.getLayoutParams();
+    		//helpParam.topMargin = (int)(screen.x * 80.0/720.0);
 		}
 		else
 			help.setText("依據您的酒測，整體戒酒表現" );

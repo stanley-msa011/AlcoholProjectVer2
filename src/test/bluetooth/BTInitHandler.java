@@ -1,28 +1,23 @@
 package test.bluetooth;
 
 import main.activities.TestFragment;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
-public class BTInitTask extends AsyncTask<Void, Void, Void> {
-
+public class BTInitHandler extends Handler {
 	private TestFragment testFragment;
 	private Bluetooth bt;
 	private boolean Init_success;
 	
-	public BTInitTask(TestFragment testFragment,Bluetooth bt){
+	public BTInitHandler(TestFragment testFragment,Bluetooth bt){
 		this.testFragment = testFragment;
 		this.bt = bt;
 	}
 	
-	
-	@Override
-	protected Void doInBackground(Void... params) {
-		Log.d("BT","BT INIT");
+	public void handleMessage(Message msg){
 		bt.enableAdapter();
-		Log.d("BT","BT ENABLE ADAPTER");
 		bt.pair();
-		Log.d("BT","BT PAIR");
 		int success = bt.connect();
 		if (success == 1){
 			Log.d("BT","BT CONNECT");
@@ -33,17 +28,12 @@ public class BTInitTask extends AsyncTask<Void, Void, Void> {
 			
 			Init_success = false;
 		}
-		return null;
-	}
-	
-	 protected void onPostExecute(Void result) {
-		 Log.d("BT","END INIT");
+		Log.d("BT","END INIT");
 		 if (Init_success)
 			 testFragment.updateInitState(TestFragment._BT);
 		 else{
 			 testFragment.stop();
 			 testFragment.failBT();
 		 }
-    }
-
+	}
 }

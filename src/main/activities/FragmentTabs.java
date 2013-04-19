@@ -3,16 +3,24 @@ package main.activities;
 import tabControl.CustomTab;
 import tabControl.TabManager;
 import test.data.Reuploader;
+import ui.LoadingPageHandler;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.widget.TabHost;
@@ -32,6 +40,8 @@ public class FragmentTabs extends FragmentActivity {
 	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_social,R.drawable.tab_history}; 
 	private static final String[] iconText ={"測試","紀錄","社交","歷程"}; 
 	private static final String[] iconTextEng ={"Test","Record","Social","History"}; 
+	
+	public static Bitmap loadingBmp;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -86,7 +96,7 @@ public class FragmentTabs extends FragmentActivity {
 		
 		tabManager.addTab(
 				tabs[2],
-				InteractionFragment.class,
+				SocialFragment.class,
 				null
 				);
 		
@@ -119,6 +129,13 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onResume(){
 		super.onResume();
+		
+		if (loadingBmp==null){
+			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
+			loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
+			tmp.recycle();
+		}
+		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){
@@ -129,10 +146,17 @@ public class FragmentTabs extends FragmentActivity {
 		Reuploader.reuploader(this);
 	}
 	
+	protected void onStop(){
+		Log.d("TABS","ONSTOP");
+		loadingBmp.recycle();
+		super.onStop();
+	}
+	
 	protected void onPause(){
 		Reuploader.cancel();
-		System.gc();
+		Log.d("tabs","onPause");
 		super.onPause();
+		Log.d("tabs","onPauseEnd");
 	}
 
 	protected void onDestory(){
@@ -140,7 +164,9 @@ public class FragmentTabs extends FragmentActivity {
 			for (int i=0; i<customTabs.length;++i)
 				customTabs[i].clear();
 		}
-		super.onDestroy();;
+		Log.d("tabs","onDestory");
+		super.onDestroy();
+		Log.d("tabs","onDestory end");
 	}
 	
 	
@@ -197,6 +223,5 @@ public class FragmentTabs extends FragmentActivity {
 			tabWidget.getChildAt(i).setEnabled(s);
 		}
 	}
-	
 	
 }

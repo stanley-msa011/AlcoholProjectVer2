@@ -25,6 +25,7 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 			boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 			if (!gps_enabled && !network_enabled){
 				newIntent = true;
+				testFragment.setKeepMsgBox(true);
 				Intent gpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				testFragment.startActivityForResult(gpsIntent, TestFragment._GPS);
 			}
@@ -36,7 +37,6 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 	 protected void onPostExecute(Boolean result) {
 		if (!result.booleanValue()){
 			Log.d("GPS","NO INTENT");
-			//testFragment.updateGPSInitState();
 			testFragment.runGPS();
 		}
      }

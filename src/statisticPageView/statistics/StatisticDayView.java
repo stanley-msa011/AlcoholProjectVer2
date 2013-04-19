@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 
 import database.HistoryDB;
 
+import main.activities.Lang;
 import main.activities.R;
 import main.activities.StatisticFragment;
 import statisticPageView.StatisticPageView;
@@ -17,7 +18,7 @@ import android.graphics.Typeface;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.ViewGroup;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
@@ -25,7 +26,7 @@ import android.widget.TextView;
 
 public class StatisticDayView extends StatisticPageView {
 	
-	private TextView bracValueTextView;
+	private TextView bracValueTextView,bracResult2,result3;
 	private HistoryDB db;
 	private Bitmap resultBitmap;
 	private Bitmap bgBmp;
@@ -60,9 +61,13 @@ public class StatisticDayView extends StatisticPageView {
 		
 		bracValueTextView = (TextView) view.findViewById(R.id.statistic_day_brac_value);
 		bracValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, text_height);
-		Typeface face=Typeface.createFromAsset(context.getAssets(), "fonts/helvetica-lt-std-ultra-compressed.otf");
+		Typeface face=Typeface.createFromAsset(context.getAssets(), "fonts/helvetica-lt-std-bold.otf");
 		bracValueTextView.setTypeface(face);
 		bracValueTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+		
+		bracResult2 = (TextView) view.findViewById(R.id.statistic_day_brac_result2);
+		int text_height2 = (int) (statistic_size.y * 42.0/467.0);
+		bracResult2.setTextSize(TypedValue.COMPLEX_UNIT_PX, text_height2);
 		
 		BracGameHistory history = db.getLatestBracGameHistory();
 
@@ -91,16 +96,17 @@ public class StatisticDayView extends StatisticPageView {
 		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg1);
 		
 		RelativeLayout.LayoutParams textParam = (RelativeLayout.LayoutParams)bracValueTextView.getLayoutParams();
-		textParam.width = text_width;
-		textParam.height =ViewGroup.LayoutParams.WRAP_CONTENT;
-		textParam.leftMargin = (int) ((statistic_size.x - text_width)/2+text_width*0.04);
-		textParam.topMargin = (int)(statistic_size.y*0.34);
+		textParam.leftMargin = (int) ((statistic_size.x - text_width)/2)-(int)(statistic_size.x*10.0/720.0);
+		textParam.topMargin = (int)(statistic_size.y*0.32);
 		
 		RelativeLayout.LayoutParams resultParam =(RelativeLayout.LayoutParams ) bracResult.getLayoutParams();
 		resultParam.width = (int)(statistic_size.x*130.0/720.0);
 		resultParam.height = (int)( statistic_size.y*51.0/467.0);
 		resultParam.leftMargin = (int) (statistic_size.x*529.0/720.0);
 		resultParam.topMargin = (int) (statistic_size.y*196.0/467.0);
+		
+		RelativeLayout.LayoutParams result2Param =(RelativeLayout.LayoutParams ) bracResult2.getLayoutParams();
+		result2Param.leftMargin = (int) (statistic_size.x*545.0/720.0);
 		
 		if (brac > BracDataHandler.THRESHOLD)
 			resultBitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_record_notpass);
@@ -111,12 +117,29 @@ public class StatisticDayView extends StatisticPageView {
 	@Override
 	public void onPostTask() {
 		bracValueTextView.setText(output);
-		if (brac > BracDataHandler.THRESHOLD)
+		if (brac > BracDataHandler.THRESHOLD){
 			bracValueTextView.setTextColor(0xFFFF8613);
-		else
+			if (brac > BracDataHandler.THRESHOLD2)
+				bracResult2.setText("大醉");
+			else
+				bracResult2.setText("小酌");
+		}
+		else{
 			bracValueTextView.setTextColor(0xFFFFFFFF);
+			bracResult2.setText("");
+		}
 		bracResult.setImageBitmap(resultBitmap);
 		bg.setImageBitmap(bgBmp);
+		if(Lang.eng){
+			Point statistic_size = StatisticFragment.getStatisticPx();
+			bracResult.setVisibility(View.INVISIBLE);
+			result3 = (TextView) view.findViewById(R.id.statistic_day_brac_result3);
+			result3.setText("PASS");
+			RelativeLayout.LayoutParams resultParam =(RelativeLayout.LayoutParams ) result3.getLayoutParams();
+			resultParam.leftMargin = (int) (statistic_size.x*529.0/720.0);
+			int text_height =(int) (statistic_size.y * 42.0/467.0);
+			result3.setTextSize(TypedValue.COMPLEX_UNIT_PX, text_height);
+		}
 		
 	}
 

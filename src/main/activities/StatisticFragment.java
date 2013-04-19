@@ -5,12 +5,14 @@ import statisticPageView.analysis.AnalysisDrunkView;
 import statisticPageView.analysis.AnalysisRatingView;
 import statisticPageView.analysis.AnalysisSuccessView;
 import statisticPageView.statistics.StatisticPagerAdapter;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -37,11 +39,12 @@ public class StatisticFragment extends Fragment {
 	private static Point statistic_px,analysis_px;
 	private ScrollView analysisView;
 	private Bitmap dot_on, dot_off;
-	private LoadingTask loadingTask;
+	private LoadingHandler loadHandler;
 	private StatisticFragment statisticFragment;
 	
 	private static final int[] DOT_ID={0xFF0,0xFF1,0xFF2};
 	
+	private ImageView load;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,11 +74,30 @@ public class StatisticFragment extends Fragment {
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
-    	loadingTask = new LoadingTask();
-    	loadingTask.execute();
+		RelativeLayout layout = (RelativeLayout) view;
+		load = new ImageView(view.getContext());
+		if (!FragmentTabs.loadingBmp.isRecycled())
+			load.setImageBitmap(FragmentTabs.loadingBmp);
+		else{
+			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
+			FragmentTabs.loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
+			tmp.recycle();
+			load.setImageBitmap(FragmentTabs.loadingBmp);
+		}
+		layout.addView(load);
+		RelativeLayout.LayoutParams loadParam = (RelativeLayout.LayoutParams) load.getLayoutParams();
+		loadParam.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+		loadParam.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+		load.setScaleType(ScaleType.FIT_XY);
+		
+		if (loadHandler==null)
+			loadHandler = new LoadingHandler();
+		loadHandler.sendEmptyMessage(0);
     }
     
     public void onPause(){
+    	if (loadHandler!=null)
+    		loadHandler.removeMessages(0);
     	clear();
     	super.onPause();
     }
@@ -93,7 +115,8 @@ public class StatisticFragment extends Fragment {
     	for (int i=0;i<analysisViews.length;++i){
     		analysisViews[i].clear();
     	}
-    	analysisLayout.removeAllViews();
+    	if (analysisLayout!=null)
+    		analysisLayout.removeAllViews();
     	System.gc();
     }
     
@@ -130,8 +153,10 @@ public class StatisticFragment extends Fragment {
     	
     }
     
-	private class LoadingTask extends AsyncTask<Void, Void, Void>{
-    	protected void onPreExecute(){
+	@SuppressLint("HandlerLeak")
+	private class LoadingHandler extends Handler{
+		public void handleMessage(Message msg){
+			
         	Point screen = FragmentTabs.getSize();
         	statistic_px = new Point(screen.x,(int) (screen.x*467.0/720.0));
         	
@@ -151,12 +176,7 @@ public class StatisticFragment extends Fragment {
     		statisticViewAdapter.onPreTask();
     		for (int i=0;i<analysisViews.length;++i)
     			analysisViews[i].onPreTask();
-    	}
-    	
-		@Override
-		protected Void doInBackground(Void... params) {
-			Point screen = FragmentTabs.getSize();
-			
+    		
 			LayoutParams statisticViewLayoutParam =  statisticLayout.getLayoutParams();
         	statisticViewLayoutParam.height = statistic_px.y;
 			
@@ -184,12 +204,7 @@ public class StatisticFragment extends Fragment {
 			statisticViewAdapter.onInBackground();
     		for (int i=0;i<analysisViews.length;++i)
     			analysisViews[i].onInBackground();
-			return null;
-		}
-		@Override
-		 protected void onPostExecute(Void result) {
 			
-			Point screen = FragmentTabs.getSize();
 			int dot_size = (int) (screen.x*12.0/720.0);
 	    	int dot_gap = (int) (dot_size*4/3);
 			
@@ -221,12 +236,10 @@ public class StatisticFragment extends Fragment {
 	    	for (int i=0;i<3;++i)
 				dots[i].setImageBitmap(dot_off);
 			dots[0].setImageBitmap(dot_on);
-		}
-		
-		protected void onCancelled(){
-			statisticViewAdapter.onCancel();
-    		for (int i=0;i<analysisViews.length;++i)
-    			analysisViews[i].onCancel();
+			
+			RelativeLayout layout = (RelativeLayout) view;
+			layout.removeView(load);
+			
 		}
 	}
     

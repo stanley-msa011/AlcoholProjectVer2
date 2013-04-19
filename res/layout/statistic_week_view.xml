@@ -33,6 +33,42 @@
         android:id ="@+id/statistic_week_help"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="#FFFFFFFF"
+        />
+    
+    <TextView
+        android:id ="@+id/statistic_week_label_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFFFF"
+        android:text="晚"
+        />
+    
+    <TextView
+        android:id ="@+id/statistic_week_label_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/statistic_week_label_1"
+        android:textColor="#FFFFFFFF"
+        android:text="下"
+        />
+    
+    <TextView
+        android:id ="@+id/statistic_week_label_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/statistic_week_label_2"
+        android:textColor="#FFFFFFFF"
+        android:text="中"
+        />
+    
+    <TextView
+        android:id ="@+id/statistic_week_label_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/statistic_week_label_3"
+        android:textColor="#FFFFFFFF"
+        android:text="早"
         />
     
 </RelativeLayout>

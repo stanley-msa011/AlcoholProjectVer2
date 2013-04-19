@@ -201,8 +201,8 @@ public class Bluetooth {
 				if (end == -1){
 					break;
 				}
-				if (socket.isConnected())
-					bytes =in.read(temp);
+				//if (socket.isConnected())
+				bytes =in.read(temp);
 			}
 			close();
 		} catch (Exception e) {
@@ -251,9 +251,6 @@ public class Bluetooth {
 							duration += (end_time-start_time);
 							start_time = end_time;
 							
-							if (diff >= 0)
-								change_speed(1);
-							
 							if (duration > MILLIS_5){
 								show_in_UI(5);
 							}else if (duration > MILLIS_4){
@@ -277,8 +274,8 @@ public class Bluetooth {
 							else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
-								
 								show_in_UI(6);
+								change_speed(-1);
 								return -1;
 							}
 							

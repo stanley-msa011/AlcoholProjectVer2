@@ -57,6 +57,7 @@ public class BracDataHandler {
 	public static final int ERROR = -1;
 	public static final int SUCCESS = 1;
 	public static final double THRESHOLD = 0.09;
+	public static final double THRESHOLD2 = 0.12;
 	
 	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload.php";
 	

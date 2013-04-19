@@ -3,17 +3,26 @@ package test.ui;
 import main.activities.FragmentTabs;
 import main.activities.R;
 import main.activities.TestFragment;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
@@ -41,14 +50,17 @@ public class UIMsgBox {
 	private BTOnClickListener btListener;
 	private BTSuccessOnClickListener btSuccessListener;
 	
+	private TimeUpHandler timeUpHandler;
+	
 	public UIMsgBox(TestFragment testFragment,RelativeLayout mainLayout){
+		Log.d("UIMSG","NEW");
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.r = context.getResources();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
 		screen = FragmentTabs.getSize();
-		
+		timeUpHandler = new TimeUpHandler();
 		setting();
 	}
 	
@@ -73,7 +85,7 @@ public class UIMsgBox {
 		
 		yes = (TextView) box.findViewById(R.id.test_msg_box_o);
 		no = (TextView) box.findViewById(R.id.test_msg_box_x);
-		Typeface face=Typeface.createFromAsset(context.getAssets(), "fonts/helvetica-lt-std-ultra-compressed.otf");
+		Typeface face=Typeface.createFromAsset(context.getAssets(), "fonts/helvetica-lt-std-bold.otf");
 		yes.setTypeface(face);
 		no.setTypeface(face);
 		yes.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize );
@@ -118,7 +130,7 @@ public class UIMsgBox {
 		noBgParam.leftMargin = buttonHorizonMargin;
 		noBgParam.topMargin = buttonTopMargin;
 		
-		int ansHorizonMargin =(int)(screen.x * 197.0/720.0);
+		int ansHorizonMargin =(int)(screen.x * 192.0/720.0);
 		int ansTopMargin =(int)(screen.x * 262.0/720.0);
 		
 		
@@ -127,7 +139,7 @@ public class UIMsgBox {
 		yesParam.topMargin = ansTopMargin;
 		
 		RelativeLayout.LayoutParams noParam = (LayoutParams) no.getLayoutParams();
-		noParam.leftMargin = ansHorizonMargin;
+		noParam.leftMargin = ansHorizonMargin - (int)(screen.x * 10.0/720.0);
 		noParam.topMargin = ansTopMargin;
 	}
 	
@@ -137,6 +149,11 @@ public class UIMsgBox {
 	}
 	
 	public void clear(){
+		Log.d("UIMSG","CLEAR");
+		if (timeUpHandler!=null){
+			timeUpHandler.removeMessages(0);
+			timeUpHandler.removeMessages(1);
+		}
 		mainLayout.removeView(box);
 		if (bgBmps!=null){
 			for (int i=0;i<bgBmps.length;++i){
@@ -185,7 +202,6 @@ public class UIMsgBox {
 	}
 	
 	public void generateBTCheckBox(){
-		
 		bg.setImageBitmap(bgBmps[0]);
 		help.setText("請啟用\n酒測裝置及藍芽功能");
 		yes.setVisibility(View.INVISIBLE);
@@ -196,12 +212,24 @@ public class UIMsgBox {
 		RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
 		helpParam.topMargin = (int)(screen.x * 140.0/720.0);
 		
-		box.setOnClickListener(btListener);
+		//box.setOnClickListener(btListener);
 		yesBg.setOnClickListener(null);
 		noBg.setOnClickListener(null);
 		
 		box.setVisibility(View.VISIBLE);
 		
+		Runnable r = new Runnable(){
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(2500);
+					timeUpHandler.sendEmptyMessage(0);
+				} catch (InterruptedException e) {
+				}
+			}
+		};
+		Thread t = new Thread(r);
+		t.start();
 	}
 	
 	private class BTOnClickListener implements View.OnClickListener{
@@ -224,11 +252,25 @@ public class UIMsgBox {
 		RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
 		helpParam.topMargin = (int)(screen.x * 140.0/720.0);
 		
-		box.setOnClickListener(btSuccessListener);
+		//box.setOnClickListener(btSuccessListener);
 		yesBg.setOnClickListener(null);
 		noBg.setOnClickListener(null);
 		
 		box.setVisibility(View.VISIBLE);
+		
+		timeUpHandler.removeMessages(0);
+		Runnable r = new Runnable(){
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(2000);
+					timeUpHandler.sendEmptyMessage(1);
+				} catch (InterruptedException e) {
+				}
+			}
+		};
+		Thread t = new Thread(r);
+		t.start();
 	}
 	
 	private class BTSuccessOnClickListener implements View.OnClickListener{
@@ -261,6 +303,18 @@ public class UIMsgBox {
 	public void closeInitializingBox(){
 			box.setVisibility(View.INVISIBLE);
 			return;
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class TimeUpHandler extends Handler{
+		public void handleMessage(Message msg){
+			int t = msg.what;
+			box.setVisibility(View.INVISIBLE);
+			if (t == 0)
+				testFragment.startBT();
+			else
+				testFragment.runBT();
+		}
 	}
 	
 }
