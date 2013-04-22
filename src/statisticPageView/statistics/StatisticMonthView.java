@@ -163,7 +163,7 @@ public class StatisticMonthView extends StatisticPageView {
 		blocks = new ImageView[28*4];
 		int leftMargin = (int) (screen.x * 70.0/720.0);
 		for (int i=0;i<28;++i){
-			int topMargin = blockTopMargin - blockHeight;
+			int topMargin = blockTopMargin - blockHeight - 3*blockHeight;
 			for (int j=0;j<4;++j){
 				int c = 4*i+j;
 				blocks[c] = new ImageView(context);
@@ -174,7 +174,12 @@ public class StatisticMonthView extends StatisticPageView {
 				param.height = blockHeight;
 				param.leftMargin = leftMargin;
 				param.topMargin = topMargin;
-				topMargin -= blockHeight;
+				topMargin += blockHeight;
+				if (i %7 ==6 && i != 27){
+					blocks[c].setPadding(0, 0, blockGap, 0);
+					blocks[c].setBackgroundColor(0xFFF97306);
+				}
+				
 			}
 			leftMargin+=blockWidth+blockGap;
 		}
@@ -192,7 +197,7 @@ public class StatisticMonthView extends StatisticPageView {
 		
 		days = new TextView[2];
 		leftMargin-=blockWidth+blockGap;
-		int textSize =(int) (screen.x * 18.0/720.0);
+		int textSize =(int) (screen.x * 24.0/720.0);
 		Calendar cal = Calendar.getInstance();
 		long monthMillis = 86400*1000L*27L;
 		for (int i=1;i>=0;--i){
@@ -204,7 +209,7 @@ public class StatisticMonthView extends StatisticPageView {
 			if (month<10)
 				date_str = "0"+date_str;
 			days[i].setText(date_str);
-			days[i].setLineSpacing(-textSize/2, 1.1F);
+			days[i].setLineSpacing(-textSize/2, 1.2F);
 			days[i].setTextColor(0xFFFFFFFF);
 			mainLayout.addView(days[i]);
 			RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) days[i].getLayoutParams();

@@ -32,7 +32,8 @@ public class BTInitHandler extends Handler {
 		 if (Init_success)
 			 testFragment.updateInitState(TestFragment._BT);
 		 else{
-			 testFragment.stop();
+			 //testFragment.stop();
+			 testFragment.stopDueToInit();
 			 testFragment.failBT();
 		 }
 	}

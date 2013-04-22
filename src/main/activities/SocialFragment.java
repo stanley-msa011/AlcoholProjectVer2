@@ -4,14 +4,17 @@ import database.HistoryDB;
 import interaction.UserLevelCollector;
 import history.InteractionHistory;
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -39,7 +42,8 @@ public class SocialFragment extends Fragment {
 	
 	private LayoutInflater inflater;
 	private LoadingHandler loadHandler;
-	private NetworkHandler netHandler;
+	//private NetworkHandler netHandler;
+	private NetworkTask netTask;
 	
 	
 	private InteractionHistory[] historys_all;
@@ -61,7 +65,7 @@ public class SocialFragment extends Fragment {
 		
 		RelativeLayout layout = (RelativeLayout) view;
 		load = new ImageView(view.getContext());
-		if (!FragmentTabs.loadingBmp.isRecycled())
+		if (FragmentTabs.loadingBmp != null && !FragmentTabs.loadingBmp.isRecycled())
 			load.setImageBitmap(FragmentTabs.loadingBmp);
 		else{
 			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
@@ -104,8 +108,11 @@ public class SocialFragment extends Fragment {
     	if (main_layout!=null)
     		main_layout.removeAllViews();
     	
-    	if (netHandler!=null)
-    		netHandler.removeMessages(1);
+    	//if (netHandler!=null)
+    	//	netHandler.removeMessages(1);
+    	
+    	if (netTask !=null)
+    		netTask.cancel(true);
     	
     	if (loadHandler!=null)
     		loadHandler.removeMessages(0);
@@ -212,6 +219,14 @@ public class SocialFragment extends Fragment {
     		iconViewParam.leftMargin = leftMargin + (bgWidth+horizontalGap)*h_pos ;
     		iconViewParam.topMargin = topMargin + (bgHeight+verticalGap)*v_pos ;
     		
+    		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(view.getContext());
+    		String uid = sp.getString("uid", "");
+    		
+    		if (historys[i].uid.equals(uid)){
+    			Log.d("social","match uid");
+    			iconBg.setBackgroundResource(R.drawable.square);
+    		}
+    		
     	}
     	
     }
@@ -243,17 +258,54 @@ public class SocialFragment extends Fragment {
 			 RelativeLayout layout = (RelativeLayout) view;
 			 layout.removeView(load);
 			 
-			 if (netHandler !=null)
-				 netHandler.sendEmptyMessage(1);
-			 
+			 //if (netHandler ==null)
+			//	 netHandler = new NetworkHandler();
+			//netHandler.sendEmptyMessage(1);
+			 netTask = new NetworkTask();
+			 netTask.execute();
 			 
     	}
     }
     
     
-    private InteractionHistory[] historys;
-	private UserLevelCollector levelCollector;
+    //private InteractionHistory[] historys;
+	//private UserLevelCollector levelCollector;
     
+	
+	public class NetworkTask extends AsyncTask<Void, Void, Void>{
+
+		private InteractionHistory[] historys;
+		private UserLevelCollector levelCollector;
+		
+		protected void onPreExecute(){
+			levelCollector = new UserLevelCollector(view.getContext());
+		}
+		
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			Log.d("NetworkLoadingTask","StartLoading");
+			historys = levelCollector.update();
+			Log.d("NetworkLoadingTask","endLoading");
+			return null;
+		}
+		
+		protected void onPostExecute(Void result){
+			Log.d("NetworkLoadingTask","postExecute");
+			if (historys == null)
+				return;
+			for (int i=0;i<historys.length;++i)
+				db.insertInteractionHistory(historys[i]);
+			historys_all = db.getAllUsersHistory();
+			setImages(historys_all);
+			return;
+		}
+		protected void onCancelled(){
+			Log.d("NetworkLoadingTask","cancel");
+		}
+		
+	}
+	
+	/*
     @SuppressLint("HandlerLeak")
 	private class NetworkHandler extends Handler{
     	public void handleMessage(Message msg){
@@ -267,6 +319,6 @@ public class SocialFragment extends Fragment {
 			historys_all = db.getAllUsersHistory();
 			setImages(historys_all);
     	}
-    }
+    }*/
     
 }

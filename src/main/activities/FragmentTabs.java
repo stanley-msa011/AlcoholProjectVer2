@@ -38,7 +38,7 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private static final String[] tabName ={"Test","Record","Social","History"}; 
 	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_social,R.drawable.tab_history}; 
-	private static final String[] iconText ={"測試","紀錄","社交","歷程"}; 
+	private static final String[] iconText ={"測試","紀錄","社交","人生新頁"}; 
 	private static final String[] iconTextEng ={"Test","Record","Social","History"}; 
 	
 	public static Bitmap loadingBmp;
@@ -129,13 +129,14 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onResume(){
 		super.onResume();
-		
+		/*
 		if (loadingBmp==null){
+			
 			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
 			loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
 			tmp.recycle();
 		}
-		
+		*/
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){

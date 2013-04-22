@@ -123,7 +123,7 @@ public class AnalysisDrunkView extends StatisticPageView {
 		if (Lang.eng)
 			help.setText("Your test results today");
 		else
-		help.setText("您今天的酒測次數與結果" );
+		help.setText("今天的酒測次數與結果" );
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
@@ -131,10 +131,10 @@ public class AnalysisDrunkView extends StatisticPageView {
 		int bgSize = (int)(screen.x * 106.0/720.0);
 		int bgGap = (int)(screen.x * 18.0/720.0);
 		int textWidth = (int)(screen.x * 64.0/720.0);
-		int textSize = (int)(screen.x * 48.0/720.0);
-		int textGap = (int)(screen.x * 60.0/720.0);
+		int textSize = (int)(screen.x * 46.0/720.0);
+		int textGap = (int)(screen.x * 61.0/720.0);
 
-		int labelGap = (int)(screen.x * 124.0/720.0);
+		int labelGap = (int)(screen.x * 125.0/720.0);
 		
 		texts = new TextView[4];
 		labels = new TextView[4];
@@ -153,11 +153,12 @@ public class AnalysisDrunkView extends StatisticPageView {
 			labels[i]  = new TextView(context);
 			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			labels[i].setTypeface(face);
+			labels[i].setTextColor(0xFF545454);
 			labels[i].setGravity(Gravity.CENTER);
 			content_layout.addView(labels[i]);
 			RelativeLayout.LayoutParams labelParam = (LayoutParams) labels[i].getLayoutParams();
 			labelParam.leftMargin = (int)(screen.x * 146.0/720.0) +labelGap*i;
-			labelParam.topMargin = (int)(screen.x * 215.0/720.0);
+			labelParam.topMargin = (int)(screen.x * 283.0/720.0);
 			
 			texts[i] = new TextView(context);
 			texts[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
@@ -187,6 +188,13 @@ public class AnalysisDrunkView extends StatisticPageView {
 				labels[i].setVisibility(View.INVISIBLE);
 			}
 		}
+		for (int i=3;i>=0;--i){
+			if (historys[i]!=null){
+				bgs[i].setBackgroundResource(R.drawable.ring);
+				break;
+			}
+		}
+		
 		if (Lang.eng){
 			labels[0].setText("am");
 			labels[0].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize/2);

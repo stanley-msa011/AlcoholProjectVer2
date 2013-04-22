@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFFFF"
-        android:text="晚"
+        android:text="早"
         />
     
     <TextView
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/statistic_month_label_1"
         android:textColor="#FFFFFFFF"
-        android:text="下"
+        android:text="中"
         />
     
     <TextView
@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/statistic_month_label_2"
         android:textColor="#FFFFFFFF"
-        android:text="中"
+        android:text="下"
         />
     
     <TextView
@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/statistic_month_label_3"
         android:textColor="#FFFFFFFF"
-        android:text="早"
+        android:text="晚"
         />
 
 </RelativeLayout>

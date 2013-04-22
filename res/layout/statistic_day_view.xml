@@ -39,4 +39,10 @@
         android:layout_above="@+id/statistic_day_brac_result2"
         android:textColor="#FFFFFFFF"
         />
+      <ImageView
+        android:id="@+id/statistic_day_brac_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        />
 </RelativeLayout>

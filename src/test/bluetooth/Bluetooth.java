@@ -139,7 +139,7 @@ public class Bluetooth {
 				socket = sensor.createInsecureRfcommSocketToServiceRecord(uuid);
 			socket.connect();
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO CONNECT THE SENSOR");
+			Log.e("BT","FAIL TO CONNECT TO THE SENSOR");
 			close();
 			return -1;
 		}
@@ -299,14 +299,14 @@ public class Bluetooth {
 		}
 		
 		try {
-				if (in != null)
-					in.close();
-			} catch (Exception e) {
-				Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
-			}
-			if (bracFileHandler!= null)
-				bracFileHandler.close();
-			}
+			if (in != null)
+				in.close();
+		} catch (Exception e) {
+			Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
+		}
+		if (bracFileHandler!= null)
+			bracFileHandler.close();
+	}
 	
 	private void write_to_file(String str){
 		Message msg = new Message();

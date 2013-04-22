@@ -76,7 +76,7 @@ public class StatisticFragment extends Fragment {
 		
 		RelativeLayout layout = (RelativeLayout) view;
 		load = new ImageView(view.getContext());
-		if (!FragmentTabs.loadingBmp.isRecycled())
+		if (FragmentTabs.loadingBmp != null && !FragmentTabs.loadingBmp.isRecycled())
 			load.setImageBitmap(FragmentTabs.loadingBmp);
 		else{
 			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);

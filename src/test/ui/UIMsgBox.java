@@ -99,6 +99,19 @@ public class UIMsgBox {
 	
 	public void settingInBackground(){
 		
+		if (bgBmps!=null){
+			for (int i=0;i<bgBmps.length;++i){
+				if(bgBmps[i]!=null && !bgBmps[i].isRecycled()){
+					bgBmps[i].recycle();
+					bgBmps[i]=null;
+				}
+			}
+			bgBmps = null;
+		}
+		if(buttonBmp!=null && !buttonBmp.isRecycled()){
+			buttonBmp.recycle();
+			buttonBmp=null;
+		}
 		bgBmps = new Bitmap[2];
 		bgBmps[0] = BitmapFactory.decodeResource(r, R.drawable.test_box_bg_1);
 		bgBmps[1] = BitmapFactory.decodeResource(r, R.drawable.test_box_bg_2);
@@ -158,6 +171,7 @@ public class UIMsgBox {
 		if (bgBmps!=null){
 			for (int i=0;i<bgBmps.length;++i){
 				if(bgBmps[i]!=null && !bgBmps[i].isRecycled()){
+					Log.d("UIMSG","recycle bgBmps");
 					bgBmps[i].recycle();
 					bgBmps[i]=null;
 				}
@@ -171,6 +185,11 @@ public class UIMsgBox {
 	}
 	
 	public void generateGPSCheckBox(){
+		if (bgBmps == null)
+			return;
+		if (bg==null || help == null || yes == null || no == null || yesBg ==null || noBg == null)
+			return;
+		
 		bg.setImageBitmap(bgBmps[0]);
 		help.setText("是否回報現在位置?");
 		yes.setVisibility(View.VISIBLE);
@@ -202,6 +221,11 @@ public class UIMsgBox {
 	}
 	
 	public void generateBTCheckBox(){
+		if (bgBmps == null)
+			return;
+		if (bg==null || help == null || yes == null || no == null || yesBg ==null || noBg == null)
+			return;
+		
 		bg.setImageBitmap(bgBmps[0]);
 		help.setText("請啟用\n酒測裝置及藍芽功能");
 		yes.setVisibility(View.INVISIBLE);
@@ -212,7 +236,7 @@ public class UIMsgBox {
 		RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
 		helpParam.topMargin = (int)(screen.x * 140.0/720.0);
 		
-		//box.setOnClickListener(btListener);
+		box.setOnClickListener(null);
 		yesBg.setOnClickListener(null);
 		noBg.setOnClickListener(null);
 		
@@ -242,6 +266,11 @@ public class UIMsgBox {
 	
 	
 	public void generateBTSuccessBox(){
+		if (bgBmps == null)
+			return;
+		if (bg==null || help == null || yes == null || no == null || yesBg ==null || noBg == null)
+			return;
+		
 		bg.setImageBitmap(bgBmps[1]);
 		help.setText("已啟用  \n酒測裝置及藍芽功能");
 		yes.setVisibility(View.INVISIBLE);
@@ -252,7 +281,7 @@ public class UIMsgBox {
 		RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
 		helpParam.topMargin = (int)(screen.x * 140.0/720.0);
 		
-		//box.setOnClickListener(btSuccessListener);
+		box.setOnClickListener(null); 
 		yesBg.setOnClickListener(null);
 		noBg.setOnClickListener(null);
 		
@@ -283,6 +312,10 @@ public class UIMsgBox {
 	
 	
 	public void generateInitializingBox(){
+		if (bgBmps == null)
+			return;
+		if (bg==null || help == null || yes == null || no == null || yesBg ==null || noBg == null)
+			return;
 		bg.setImageBitmap(bgBmps[0]);
 		help.setText("請稍待");
 		yes.setVisibility(View.INVISIBLE);
@@ -293,7 +326,7 @@ public class UIMsgBox {
 		RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
 		helpParam.topMargin = (int)(screen.x * 140.0/720.0);
 		
-		box.setOnClickListener(btListener);
+		box.setOnClickListener(null);
 		yesBg.setOnClickListener(null);
 		noBg.setOnClickListener(null);
 		

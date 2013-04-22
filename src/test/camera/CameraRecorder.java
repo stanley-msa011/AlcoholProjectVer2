@@ -82,11 +82,13 @@ public class CameraRecorder {
     public void setSurfaceCallback(){
     	previewFrame = null;
     	previewFrame =(FrameLayout) activity.findViewById(R.id.test_camera_preview_layout);
-    	preview = new PreviewWindow(activity,this);
-    	previewHolder = preview.getHolder();
-    	previewHolder.addCallback(preview);
-    	previewFrame.addView(preview);
-    	preview.setVisibility(View.INVISIBLE);
+    	if (previewFrame!=null){
+    		preview = new PreviewWindow(activity,this);
+    		previewHolder = preview.getHolder();
+    		previewHolder.addCallback(preview);
+    		previewFrame.addView(preview);
+    		preview.setVisibility(View.INVISIBLE);
+    	}
     }
     
     

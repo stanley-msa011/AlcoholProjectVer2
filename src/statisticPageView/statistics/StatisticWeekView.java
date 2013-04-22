@@ -36,6 +36,7 @@ public class StatisticWeekView extends StatisticPageView {
 	
 	private ImageView[] blocks;
 	
+	private static final String[] WEEK_LABEL = {"日","一","二","三","四","五","六"};
 	
 	public StatisticWeekView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_week_view, statisticFragment);
@@ -186,7 +187,7 @@ public class StatisticWeekView extends StatisticPageView {
 		blocks = new ImageView[28];
 		int leftMargin = (int) (screen.x * 204.0/720.0);
 		for (int i=0;i<7;++i){
-			int topMargin =blockTopMargin - blockHeight;
+			int topMargin =blockTopMargin - blockHeight - 3*blockGapVer;
 			for (int j=0;j<4;++j){
 				int c = 4*i+j;
 				blocks[c] = new ImageView(context);
@@ -198,7 +199,8 @@ public class StatisticWeekView extends StatisticPageView {
 				param.height = blockHeight;
 				param.leftMargin = leftMargin;
 				param.topMargin = topMargin;
-				topMargin -= blockGapVer;
+				//topMargin -= blockGapVer;
+				topMargin += blockGapVer;
 			}
 			leftMargin+=blockWidth+blockGap;
 		}
@@ -215,24 +217,20 @@ public class StatisticWeekView extends StatisticPageView {
 		}
 		
 		leftMargin-=blockWidth+blockGap;
-		int textSize =(int) (screen.x * 18.0/720.0);
+		int textSize =(int) (screen.x * 36.0/720.0);
 		Calendar cal = Calendar.getInstance();
 		long dateMillis = 86400*1000L;
 		for (int i=6;i>=0;--i){
 			days[i] = new TextView(context);
 			days[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-			int date = cal.get(Calendar.DATE);
-			int month = cal.get(Calendar.MONTH)+1;
-			String date_str= month+"\n   /"+date;
-			if (month<10)
-				date_str = "0"+date_str;
-			days[i].setText(date_str);
-			days[i].setLineSpacing(-textSize/2, 1.1F);
+			int day_of_week = cal.get(Calendar.DAY_OF_WEEK);
+			String week_str = WEEK_LABEL[day_of_week-1];
+			days[i].setText(week_str);
 			days[i].setTextColor(0xFFFFFFFF);
 			mainLayout.addView(days[i]);
 			RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) days[i].getLayoutParams();
 			param.leftMargin = leftMargin;
-			param.topMargin = (int)(screen.y*312.0/443.0);
+			param.topMargin = (int)(screen.y*308.0/443.0);
 			leftMargin-=blockWidth+blockGap;
 			cal.setTimeInMillis(cal.getTimeInMillis()-dateMillis);
 		}

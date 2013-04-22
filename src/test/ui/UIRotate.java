@@ -111,6 +111,14 @@ public class UIRotate {
 	
 	public void clear(){
 		mainLayout.removeView(view);
+		if (bgBmp!=null && !bgBmp.isRecycled()){
+			bgBmp.recycle();
+			bgBmp = null;
+		}
+		if (ringBmp!=null && !ringBmp.isRecycled()){
+			ringBmp.recycle();
+			ringBmp = null;
+		}
 	}
 	
 	public void setSpeed(int modify){

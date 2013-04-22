@@ -139,7 +139,7 @@ public class TestFragment extends Fragment {
 		if (!isKeepMsgBox()){
 			RelativeLayout layout = (RelativeLayout) view;
 			load = new ImageView(view.getContext());
-			if (!FragmentTabs.loadingBmp.isRecycled())
+			if (FragmentTabs.loadingBmp != null && !FragmentTabs.loadingBmp.isRecycled())
 				load.setImageBitmap(FragmentTabs.loadingBmp);
 			else{
 				Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
@@ -177,7 +177,8 @@ public class TestFragment extends Fragment {
 		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
 		failHelp = (TextView) view.findViewById(R.id.test_fail_help);
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 56.0/720.0));
-		msgBox = new UIMsgBox(testFragment,main_layout);
+		if (msgBox==null)
+			msgBox = new UIMsgBox(testFragment,main_layout);
 		rotate = new UIRotate(testFragment,main_layout);
 		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
 		
@@ -233,7 +234,8 @@ public class TestFragment extends Fragment {
 		else{
 			updateDoneState(_GPS);
 		}
-		msgBox.generateBTCheckBox();
+		if (msgBox!=null)
+			msgBox.generateBTCheckBox();
 	}
 	
 	public void startBT(){
@@ -252,7 +254,8 @@ public class TestFragment extends Fragment {
 	public void runBT(){
 		
 		cleanMsgBox();
-		testHandler.sendEmptyMessage(0);
+		if (testHandler!=null)
+			testHandler.sendEmptyMessage(0);
 
 	}
 	
@@ -264,7 +267,8 @@ public class TestFragment extends Fragment {
 		data.putString("msg","未啟用  \n酒測裝置及藍芽功能");
 		msg.setData(data);
 		msg.what = 0;
-		failBgHandler.sendMessage(msg);
+		if (failBgHandler!=null)
+			failBgHandler.sendMessage(msg);
 	}
 	
 	
@@ -276,7 +280,8 @@ public class TestFragment extends Fragment {
 			startCircle.setVisibility(View.INVISIBLE);
 			startText.setVisibility(View.INVISIBLE);
 			reset();
-			animationHandler.sendEmptyMessage(0);
+			if (animationHandler!=null)
+				animationHandler.sendEmptyMessage(0);
 		}
 	}
 	
@@ -284,8 +289,9 @@ public class TestFragment extends Fragment {
 		@Override
 		public void onClick(View v) {
 			failHelp.setVisibility(View.INVISIBLE);
-			stop();
-			loadingHandler.sendEmptyMessage(0);
+			stopDueToInit();
+			if (loadingHandler!=null)
+				loadingHandler.sendEmptyMessage(0);
 		}
 	}
 	
@@ -372,7 +378,33 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
+	public void stopDueToInit(){
+		if (cameraRecorder!=null)
+			cameraRecorder.close();
+		
+		if (bt!=null)
+			bt.close();
+		
+		if (gpsInitTask!=null)
+			gpsInitTask.cancel(true);
+		
+		if (btInitHandler!=null)
+			btInitHandler.removeMessages(0);
+		
+		if (cameraInitHandler!=null)
+			cameraInitHandler.removeMessages(0);
+		
+		if (btRunTask!=null)
+			btRunTask.cancel(true);
+
+		if (gpsRunTask!=null){
+			gpsRunTask.cancel(true);
+		}
+	}
+	
 	public void stop(){
+		Log.d("test","stop");
+		
 		if (cameraRecorder!=null)
 			cameraRecorder.close();
 		
@@ -395,17 +427,32 @@ public class TestFragment extends Fragment {
 			gpsRunTask.cancel(true);
 		}
 		
-		loadingHandler.removeMessages(0);
-		msgLoadingHandler.removeMessages(0);
-		testHandler.removeMessages(0);
-		failBgHandler.removeMessages(0);
-		animationHandler.removeMessages(0);
+		if (loadingHandler!=null){
+			loadingHandler.removeMessages(0);
+			loadingHandler = null;
+		}
+		if (msgLoadingHandler !=null){
+			msgLoadingHandler.removeMessages(0);
+			msgLoadingHandler = null;
+		}
+		if (testHandler!=null){
+			testHandler.removeMessages(0);
+			testHandler = null;
+		}
+		if (failBgHandler!=null){
+			failBgHandler.removeMessages(0);
+			failBgHandler = null;
+		}
+		if (animationHandler!=null){
+			animationHandler.removeMessages(0);
+			animationHandler = null;
+		}
 		if (animationTimerTask!=null)
 			animationTimerTask.cancel(true);
 	}
 	
 	private void clear(){
-
+		Log.d("test","clear");
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;
@@ -524,10 +571,12 @@ public class TestFragment extends Fragment {
 	private class MsgLoadingHandler extends Handler{
 		
 		public void handleMessage(Message msg){
-			msgBox.settingPreTask();
-			msgBox.settingInBackground();
-			msgBox.settingPostTask();
-			msgBox.generateGPSCheckBox();
+			if (msgBox!=null){
+				msgBox.settingPreTask();
+				msgBox.settingInBackground();
+				msgBox.settingPostTask();
+				msgBox.generateGPSCheckBox();
+			}
 		}
 	}
     
@@ -610,7 +659,8 @@ public class TestFragment extends Fragment {
 					}
 				}
 			}
-			msgLoadingHandler.sendEmptyMessage(0);
+			if (msgLoadingHandler!=null)
+				msgLoadingHandler.sendEmptyMessage(0);
 		}
 		
 		protected void onCancelled(){
@@ -626,6 +676,7 @@ public class TestFragment extends Fragment {
 			rotate.settingPreTask();
 			
 			if(bgBmp!=null && !bgBmp.isRecycled()){
+				
 				bgBmp.recycle();
 				bgBmp = null;
 			}
@@ -658,7 +709,8 @@ public class TestFragment extends Fragment {
 		data.putString("msg","測試失敗             \n可能因為測試超時\n或酒測器沒電了");
 		msg.setData(data);
 		msg.what = 0;
-		failBgHandler.sendMessage(msg);
+		if (failBgHandler!=null)
+			failBgHandler.sendMessage(msg);
 	}
 
 	public boolean isKeepMsgBox() {
