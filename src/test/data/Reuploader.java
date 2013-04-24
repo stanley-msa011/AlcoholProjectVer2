@@ -72,6 +72,7 @@ public class Reuploader {
 		
 		@Override
 		protected Void doInBackground(Void... arg0) {
+			Log.d("reuploader","start");
 			 if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 		        	mainStorageDir = new File(Environment.getExternalStorageDirectory(), "drunk_detection");
 		        else
@@ -79,8 +80,10 @@ public class Reuploader {
 			
 			
 			long ts[] = db.getAllNotUploadedTS();
-			if (ts == null)
+			if (ts == null){
+				Log.d("reuploader","null");
 				return null;
+			}
 			for (int i=0;i<ts.length;++i){
 				String _ts = String.valueOf(ts[i]);
 				File[]  imageFiles;

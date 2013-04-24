@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -39,6 +40,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -52,6 +54,7 @@ public class TestFragment extends Fragment {
 	private Activity context;
 	private TestFragment testFragment;
 	private View view;
+	private TextView messageView;
 	private String timestamp;
 	
 	private final boolean[] INIT_PROGRESS={false,false,false};
@@ -93,10 +96,12 @@ public class TestFragment extends Fragment {
 
 	private LoadingHandler loadingHandler;
 	private AnimationHandler animationHandler;
-	private AnimationTimerTask animationTimerTask;
 	private FailBgHandler failBgHandler;
 	private MsgLoadingHandler msgLoadingHandler;
 	private TestHandler testHandler;
+	private TimeUpHandler timeUpHandler;
+	private ChangeTabsHandler changeTabsHandler;
+	
 	
 	private ImageView bg, startLine, startCircle;
 	private Bitmap bgBmp, startLineBmp, startCircleBmp;
@@ -112,9 +117,7 @@ public class TestFragment extends Fragment {
 	private static Object done_lock  = new Object();
 	
 	private TextView failHelp;
-	
 	private ImageView load;
-	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -176,7 +179,11 @@ public class TestFragment extends Fragment {
 		animation.setVisibility(View.INVISIBLE);
 		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
 		failHelp = (TextView) view.findViewById(R.id.test_fail_help);
-		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 56.0/720.0));
+		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 49.0/720.0));
+		messageView = (TextView) view.findViewById(R.id.test_message);
+		messageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 42.0/720.0));
+		RelativeLayout.LayoutParams mParam = (LayoutParams) messageView.getLayoutParams();
+		mParam.topMargin = (int)(screen.x * 36.0/720.0);
 		if (msgBox==null)
 			msgBox = new UIMsgBox(testFragment,main_layout);
 		rotate = new UIRotate(testFragment,main_layout);
@@ -187,9 +194,9 @@ public class TestFragment extends Fragment {
 		failBgHandler = new FailBgHandler();
 		testHandler = new TestHandler();
 		animationHandler = new AnimationHandler();
+		timeUpHandler = new TimeUpHandler();
+		changeTabsHandler = new ChangeTabsHandler(); 
 	}
-	
-	
 	
 	public void reset(){
 		timestamp = setTimeStamp();
@@ -202,15 +209,14 @@ public class TestFragment extends Fragment {
 			INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
 	}
 	
-	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	view = inflater.inflate(R.layout.new_test_fragment, container,false);
     	return view;
     }
 	
-	
 	public void startGPS(boolean enable){
+		msgBox.generateInitializingBox();
 		if (enable){
 			Log.d("GPS","ENABLE GPS");
 			gps_state = true;
@@ -234,12 +240,11 @@ public class TestFragment extends Fragment {
 		else{
 			updateDoneState(_GPS);
 		}
-		if (msgBox!=null)
-			msgBox.generateBTCheckBox();
 	}
 	
 	public void startBT(){
-		msgBox.generateInitializingBox();
+		messageView.setTextColor(0xFFFFFFFF);
+		messageView.setText("請稍候");
 		//initialize bt task
 		btInitHandler = new BTInitHandler(testFragment,bt);
 		btInitHandler.sendEmptyMessage(0);
@@ -253,35 +258,48 @@ public class TestFragment extends Fragment {
 	
 	public void runBT(){
 		
-		cleanMsgBox();
 		if (testHandler!=null)
 			testHandler.sendEmptyMessage(0);
 
 	}
 	
 	public void failBT(){
-		msgBox.closeInitializingBox();
+		messageView.setText("");
 		cleanMsgBox();
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg","未啟用  \n酒測裝置及藍芽功能");
+		data.putString("msg","未啟用酒測裝置及藍芽功能");
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
 			failBgHandler.sendMessage(msg);
 	}
 	
-	
 	private class StartOnClickListener implements View.OnClickListener{
 
 		@Override
 		public void onClick(View v) {
+			messageView.setText("");
 			startLine.setVisibility(View.INVISIBLE);
 			startCircle.setVisibility(View.INVISIBLE);
 			startText.setVisibility(View.INVISIBLE);
 			reset();
-			if (animationHandler!=null)
-				animationHandler.sendEmptyMessage(0);
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(testFragment.getActivity());
+			boolean firstTime = sp.getBoolean("first", true);
+			if (firstTime){
+				SharedPreferences.Editor editor = sp.edit();
+				editor.putBoolean("first", false);
+				editor.commit();
+				if (animationHandler!=null)
+					animationHandler.sendEmptyMessage(0);
+			}
+			else{
+				messageView.setText("請啟用酒測裝置");
+				messageView.setTextColor(0xFFFFFFFF);
+				Thread t = new Thread(new TimeUpRunnable(0,1500));
+				t.start();
+			}
+			
 		}
 	}
 	
@@ -304,23 +322,17 @@ public class TestFragment extends Fragment {
 	private void setStorage(){
 		String state = Environment.getExternalStorageState();
 		File dir = null;
-		if (state.equals(Environment.MEDIA_MOUNTED)){
+		if (state.equals(Environment.MEDIA_MOUNTED))
 			dir = new File(Environment.getExternalStorageDirectory(),"drunk_detection");
-			Log.d("TEST_STORAGE","MEDIA");
-		} 
-		else{
+		else
 			dir = new File(this.getActivity().getFilesDir(),"drunk_detection");
-			Log.d("TEST_STORAGE","NO MEDIA");
-		}
-		if (!dir.exists()){
+		if (!dir.exists())
 			if (!dir.mkdirs())
 				Log.d("TEST_STORAGE","FAIL TO CREATE DIR");
-		}
 		
 		mainDirectory = new File(dir,timestamp);
 		if (!mainDirectory.exists())
 			if (!mainDirectory.mkdirs()){
-				Log.e("TEST_STORAGE", "CANNOT CREATE DIRECTORY");
 				return;
 			}
 		
@@ -329,20 +341,19 @@ public class TestFragment extends Fragment {
 		
 	}
 	
-	
 	public void updateInitState(int type){
 		synchronized(init_lock){
 			if (INIT_PROGRESS[type]==true)
 				return;
 			INIT_PROGRESS[type]=true;
-			
 			if (INIT_PROGRESS[_BT] && INIT_PROGRESS[_CAMERA]){
 				btInitHandler.removeMessages(0);
 				cameraInitHandler.removeMessages(0);
 				btRunTask = new BTRunTask(this,bt);
 				btRunTask.execute();
-				msgBox.closeInitializingBox();
-				msgBox.generateBTSuccessBox();
+				messageView.setText("已啟用酒測裝置");
+				Thread t = new Thread(new TimeUpRunnable(1,1500));
+				t.start();
 			}
 		}
 	}
@@ -352,22 +363,24 @@ public class TestFragment extends Fragment {
 			if (DONE_PROGRESS[type]==true)
 				return;
 			DONE_PROGRESS[type]=true;
-			String init_str=DONE_PROGRESS[0]+"/"+DONE_PROGRESS[1]+"/"+DONE_PROGRESS[2];
-			Log.d("DONE",init_str);
 			
-			if (DONE_PROGRESS[0]&&DONE_PROGRESS[1]&&DONE_PROGRESS[2]){
-				Log.d("NEW MAIN","ALL PROGRESS DONE");
+			if (!DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
 				stop();
+
+					if (msgLoadingHandler == null)
+						msgLoadingHandler = new MsgLoadingHandler();
+					if (msgLoadingHandler!=null){
+						msgLoadingHandler.sendEmptyMessage(0);
+					}
+				}
+			}
+			if (DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
 				BDH = new BracDataHandler(timestamp, testFragment);
 				int bdh_result = BDH.start();
-				if (bdh_result == BracDataHandler.ERROR){
-					//Show error message
-				}
-				else{
+				if (bdh_result != BracDataHandler.ERROR){
 					double result = BDH.getResult();
 					Log.d("TEST RESULT",String.valueOf(result));
-					FragmentTabs.changeTab(1);
-				}
+				changeTabsHandler.sendEmptyMessage(0);
 			}
 		}
 	}
@@ -447,8 +460,6 @@ public class TestFragment extends Fragment {
 			animationHandler.removeMessages(0);
 			animationHandler = null;
 		}
-		if (animationTimerTask!=null)
-			animationTimerTask.cancel(true);
 	}
 	
 	private void clear(){
@@ -530,8 +541,8 @@ public class TestFragment extends Fragment {
 			}
 			
 			RelativeLayout.LayoutParams startTextParam = (LayoutParams) startText.getLayoutParams();
-			startTextParam.topMargin = (int)(screen.x * 240.0/720.0);
-			startTextParam.leftMargin =(int)(screen.x * 480.0/720.0);
+			startTextParam.topMargin = (int)(screen.x * 246.0/720.0);
+			startTextParam.leftMargin =(int)(screen.x * 435.0/720.0);
 			
 			RelativeLayout.LayoutParams animationParam = (LayoutParams) animation.getLayoutParams();
 			animationParam.width = (int)(screen.x * 573.0/720.0);
@@ -546,16 +557,19 @@ public class TestFragment extends Fragment {
 			previewParam.leftMargin = (int)(screen.x * 62.0/720.0);
 			previewParam.topMargin = (int)(screen.x * 233.0/720.0);
 			
-			if(bgBmp!=null)
+			if(bgBmp!=null && !bgBmp.isRecycled())
 				bg.setImageBitmap(bgBmp);
-			if(startLineBmp!=null)
+			if(startLineBmp!=null && !startLineBmp.isRecycled())
 				startLine.setImageBitmap(startLineBmp);
 			startLine.setVisibility(View.VISIBLE);
-			if (startCircleBmp!=null)
+			if (startCircleBmp!=null && !startCircleBmp.isRecycled())
 				startCircle.setImageBitmap(startCircleBmp);
 			startCircle.setVisibility(View.VISIBLE);
-			startText.setText("開始");
+			startText.setText("點我開始");
 			startText.setVisibility(View.VISIBLE);
+			
+			messageView.setText("請點選'點我開始'以進行測試");
+			messageView.setTextColor(0xFFFFFFFF);
 			
 			startCircle.setOnClickListener(new StartOnClickListener());
 			bg.setOnClickListener(null);
@@ -566,7 +580,6 @@ public class TestFragment extends Fragment {
 		}
 	}
     
-    
 	@SuppressLint("HandlerLeak")
 	private class MsgLoadingHandler extends Handler{
 		
@@ -575,7 +588,20 @@ public class TestFragment extends Fragment {
 				msgBox.settingPreTask();
 				msgBox.settingInBackground();
 				msgBox.settingPostTask();
+			}
+			cleanRotate();
+			bg.setImageBitmap(null);
+			if (bgBmp!=null && !bgBmp.isRecycled()){
+				bgBmp.recycle();
+				bgBmp = null;
+			}
+			bgBmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_start_bg);
+			if(bgBmp!=null && !bgBmp.isRecycled())
+				bg.setImageBitmap(bgBmp);
+			if (msgBox!=null){
 				msgBox.generateGPSCheckBox();
+				messageView.setText("請依對話框指示進行操作");
+				messageView.setTextColor(0xFFFFFFFF);
 			}
 		}
 	}
@@ -584,34 +610,22 @@ public class TestFragment extends Fragment {
 	private class FailBgHandler extends Handler{
 		
 		private String msgStr;
-		private int topMargin;
 	
 		public void handleMessage(Message msg){
 			this.msgStr = msg.getData().getString("msg");
-			
 			cleanRotate();
-			
-			Point screen = FragmentTabs.getSize();
-			failHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 56.0/720.0));
-			topMargin = (int)(screen.x*240.0/720.0);
-			bg.setImageBitmap(null);
+			msgStr = msgStr.concat("\n請點選畫面以重新開始");
 			if(bgBmp!=null && !bgBmp.isRecycled()){
 				bgBmp.recycle();
 				bgBmp = null;
 			}
-			bgBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_notusing_bg);
-			
-			RelativeLayout.LayoutParams msgParam = (LayoutParams) failHelp.getLayoutParams();
-			msgParam.topMargin = topMargin;
-			
-			bg.setImageBitmap(bgBmp);
+			bgBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_start_bg);
+			messageView.setText(msgStr);
+			messageView.setTextColor(0xFFFF0000);
 			bg.setOnClickListener(new EndTestOnClickListener());
-			failHelp.setText(msgStr);
-			failHelp.setVisibility(View.VISIBLE);
+			
 		}
 	}
-	
-	
 	
 	@SuppressLint("HandlerLeak")
 	private class AnimationHandler extends Handler{
@@ -632,42 +646,10 @@ public class TestFragment extends Fragment {
 			}
 			animation.setVisibility(View.VISIBLE);
 			animationDrawable.start();
-			animationTimerTask = new AnimationTimerTask();
-			animationTimerTask.execute();
+			Thread t = new Thread(new TimeUpRunnable(2,2400));
+			t.start();
 		}
 	}
-	
-	private class AnimationTimerTask extends AsyncTask<Void, Void, Void>{
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			try {
-				Thread.sleep(2400);
-			} catch (InterruptedException e) {}
-			return null;
-		}
-		@Override
-		 protected void onPostExecute(Void result) {
-			animation.setVisibility(View.INVISIBLE);
-			animationDrawable.stop();
-			animation.setImageDrawable(null);
-			if (animationBmp!=null){
-				for (int i=0;i<animationBmp.length;++i){
-					if(animationBmp[i]!=null && !animationBmp[i].isRecycled()){
-						animationBmp[i].recycle();
-						animationBmp[i] = null;
-					}
-				}
-			}
-			if (msgLoadingHandler!=null)
-				msgLoadingHandler.sendEmptyMessage(0);
-		}
-		
-		protected void onCancelled(){
-			clear();
-		}
-	}
-	
 	
 	@SuppressLint("HandlerLeak")
 	private class TestHandler extends Handler{
@@ -687,6 +669,8 @@ public class TestFragment extends Fragment {
 			bg.setOnClickListener(null);
 			rotate.settingPostTask();
 			
+			messageView.setText("請依照圓圈內指示進行測試");
+			messageView.setTextColor(0xFFFFFFFF);
 			if (bt!=null && cameraRecorder!=null){
 				bt.start();
 				cameraRecorder.start();
@@ -706,7 +690,7 @@ public class TestFragment extends Fragment {
 		Log.d("test","stop by time out");
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg","測試失敗             \n可能因為測試超時\n或酒測器沒電了");
+		data.putString("msg","測試失敗,可能因為測試超時或酒測器沒電了");
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
@@ -719,6 +703,62 @@ public class TestFragment extends Fragment {
 
 	public void setKeepMsgBox(boolean keepMsgBox) {
 		this.keepMsgBox = keepMsgBox;
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class TimeUpHandler extends Handler{
+		public void handleMessage(Message msg){
+			int t = msg.what;
+			if (t == 0)
+				startBT();
+			else if (t == 1)
+				runBT();
+			else if (t == 2){
+				animation.setVisibility(View.INVISIBLE);
+				animationDrawable.stop();
+				animation.setImageDrawable(null);
+				if (animationBmp!=null){
+					for (int i=0;i<animationBmp.length;++i){
+						if(animationBmp[i]!=null && !animationBmp[i].isRecycled()){
+							animationBmp[i].recycle();
+							animationBmp[i] = null;
+						}
+					}
+				}
+				messageView.setText("請啟用酒測裝置");
+				messageView.setTextColor(0xFFFFFFFF);
+				Thread th = new Thread(new TimeUpRunnable(0,1500));
+				th.start();
+			}
+		}
+	}
+	
+	private class TimeUpRunnable implements Runnable{
+
+		int msg;
+		int time;
+		public TimeUpRunnable (int msg, int time){
+			this.msg = msg;
+			this.time = time;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(time);
+				timeUpHandler.sendEmptyMessage(msg);
+			} catch (InterruptedException e) {}
+		}
+		
+	}
+
+	@SuppressLint("HandlerLeak")
+	private class ChangeTabsHandler extends Handler{
+		public void handleMessage(Message msg){
+			if (msgBox!=null)
+				msgBox.closeInitializingBox();
+			FragmentTabs.changeTab(1);
+		}
 	}
 	
 }

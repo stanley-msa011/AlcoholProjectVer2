@@ -185,7 +185,6 @@ public class AnalysisDrunkView extends StatisticPageView {
 					bgs[i].setImageBitmap(bgBmps[1]);
 				else if (bgBmps!=null)
 					bgs[i].setImageBitmap(bgBmps[0]);
-				labels[i].setVisibility(View.INVISIBLE);
 			}
 		}
 		for (int i=3;i>=0;--i){

@@ -24,12 +24,12 @@ public class StatisticMonthView extends StatisticPageView {
 
 	private HistoryDB db;
 	private ImageView  lineImage1, lineImage2;
-	private Bitmap block_green, block_yellow, block_red;
 	private Bitmap textBmp, lineBmp1, lineBmp2; 
 	private RelativeLayout mainLayout;
 	private TextView help;
 	private TextView[] labels;
 	private TextView[] days;
+	private ImageView[] lines;
 	
 	private ImageView[] blocks;
 	
@@ -56,18 +56,6 @@ public class StatisticMonthView extends StatisticPageView {
 			lineBmp2.recycle();
 			lineBmp2 = null;
 		}
-		if (block_red!=null && !block_red.isRecycled()){
-			block_red.recycle();
-			block_red = null;
-		}
-		if (block_yellow!=null && !block_yellow.isRecycled()){
-			block_yellow.recycle();
-			block_yellow = null;
-		}
-		if (block_green!=null && !block_green.isRecycled()){
-			block_green.recycle();
-			block_green = null;
-		}
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;
@@ -88,6 +76,8 @@ public class StatisticMonthView extends StatisticPageView {
 		lineImage2.setImageBitmap(lineBmp2);
 		lineImage2.setScaleType(ScaleType.FIT_XY);
 		
+		lines = new ImageView[3];
+		
 		mainLayout = (RelativeLayout) view.findViewById(R.id.statistic_month_layout);
 		
 		bg = (ImageView) view.findViewById(R.id.statistic_month_bg);
@@ -106,6 +96,10 @@ public class StatisticMonthView extends StatisticPageView {
 		for (int i=0;i<4;++i){
 			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		}
+		for (int i=0;i<3;++i){
+			lines[i] = new ImageView(context);
+			mainLayout.addView(lines[i]);
 		}
 		
 	}
@@ -131,9 +125,6 @@ public class StatisticMonthView extends StatisticPageView {
 		lineParam2.leftMargin = (int) (screen.x * 34.0/720.0);
 		lineParam2.topMargin = (int)(screen.y*158.0/443.0);
 		
-		block_green = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_green);
-		block_yellow = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_yellow);
-		block_red = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_4week_red);
 		
 		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg2);
 		
@@ -176,22 +167,37 @@ public class StatisticMonthView extends StatisticPageView {
 				param.topMargin = topMargin;
 				topMargin += blockHeight;
 				if (i %7 ==6 && i != 27){
-					blocks[c].setPadding(0, 0, blockGap, 0);
-					blocks[c].setBackgroundColor(0xFFF97306);
+					blocks[c].setPadding(0, 0, 2*blockGap, 0);
 				}
 				
 			}
 			leftMargin+=blockWidth+blockGap;
 		}
 		
+		int leftMargin2 = (int) (screen.x * 70.0/720.0);
+		
+		int lineWidth3 = (int) (screen.x*2.0/720.0);
+		int lineHeight3 =blockHeight*4;
+		for (int i=0;i<3;++i){
+			leftMargin2+=7*(blockWidth+blockGap) - blockGap;
+			if (i>0)
+				leftMargin2 += blockGap;
+			lines[i].setBackgroundColor(0xFFFF0000);
+			RelativeLayout.LayoutParams lineParam3 = (RelativeLayout.LayoutParams) lines[i].getLayoutParams();
+			lineParam3.height = lineHeight3;
+			lineParam3.width = lineWidth3;
+			lineParam3.leftMargin = leftMargin2;;
+			lineParam3.topMargin = blockTopMargin - blockHeight - 3*blockHeight;
+		}
+		
 		BracGameHistory[] historys = db.getMultiDayInfo(28);
 		for (int i=0;i<historys.length;++i){
 			if (historys[i]==null)//MISS
-				blocks[i].setImageBitmap(block_yellow);
+				blocks[i].setBackgroundColor(0xFFe4c626);
 			else if (historys[i].brac>BracDataHandler.THRESHOLD)//FAIL
-				blocks[i].setImageBitmap(block_red);
+				blocks[i].setBackgroundColor(0xFFdd6325);
 			else//PASS
-				blocks[i].setImageBitmap(block_green);
+				blocks[i].setBackgroundColor(0xFF5cb52f);
 		}
 		
 		

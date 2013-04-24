@@ -33,13 +33,13 @@ public class FragmentTabs extends FragmentActivity {
 	private TabManager tabManager;
 	private static Point screen_px;
 	private static Point tab_px;
-	private TabSpec[] tabs;
-	private CustomTab[] customTabs;
+	static private TabSpec[] tabs;
+	static private CustomTab[] customTabs;
 	
-	private static final String[] tabName ={"Test","Record","Social","History"}; 
-	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_social,R.drawable.tab_history}; 
-	private static final String[] iconText ={"測試","紀錄","社交","人生新頁"}; 
-	private static final String[] iconTextEng ={"Test","Record","Social","History"}; 
+	private static final String[] tabName ={"Test","Record","History","Question"}; 
+	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_history,R.drawable.tab_social}; 
+	private static final String[] iconText ={"測試","紀錄","人生新頁","問卷"}; 
+	private static final String[] iconTextEng ={"Test","Record","History","Questionaire"}; 
 	
 	public static Bitmap loadingBmp;
 	
@@ -62,16 +62,16 @@ public class FragmentTabs extends FragmentActivity {
 
 		tab_px = new Point(screen_px.x,(int)(screen_px.y*(110.0/1280.0)));
 		
-		Log.d("SCREEN_PX",screen_px.toString());
-		
 		setContentView(R.layout.tab_layout);
 		tabHost = (TabHost) this.findViewById(android.R.id.tabhost);
 		tabHost.setup();
 		tabManager = new TabManager(this,tabHost,R.id.real_tabcontent);
 		
 
-		tabs = new TabSpec[4];
-		customTabs = new CustomTab[4];
+		if (tabs==null)
+			tabs = new TabSpec[4];
+		if (customTabs==null)
+			customTabs = new CustomTab[4];
 		
 		for (int i=0;i<4;++i){
 			if (Lang.eng)
@@ -96,13 +96,13 @@ public class FragmentTabs extends FragmentActivity {
 		
 		tabManager.addTab(
 				tabs[2],
-				SocialFragment.class,
+				HistoryFragment.class,
 				null
 				);
 		
 		tabManager.addTab(
 				tabs[3],
-				HistoryFragment.class,
+				SocialFragment.class,
 				null
 				);
 		
@@ -129,19 +129,12 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onResume(){
 		super.onResume();
-		/*
-		if (loadingBmp==null){
-			
-			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
-			loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
-			tmp.recycle();
-		}
-		*/
+		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){
 			Intent newIntent = new Intent(this, PreSettingActivity.class);
-			this.startActivity(newIntent);
+			this.startActivityForResult(newIntent, 1);
 			return;
 		}
 		Reuploader.reuploader(this);
@@ -149,7 +142,8 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onStop(){
 		Log.d("TABS","ONSTOP");
-		loadingBmp.recycle();
+		if (loadingBmp!=null && !loadingBmp.isRecycled())
+			loadingBmp.recycle();
 		super.onStop();
 	}
 	
@@ -161,10 +155,6 @@ public class FragmentTabs extends FragmentActivity {
 	}
 
 	protected void onDestory(){
-		if (customTabs!=null){
-			for (int i=0; i<customTabs.length;++i)
-				customTabs[i].clear();
-		}
 		Log.d("tabs","onDestory");
 		super.onDestroy();
 		Log.d("tabs","onDestory end");
@@ -222,6 +212,12 @@ public class FragmentTabs extends FragmentActivity {
 		int count  = tabWidget.getChildCount();
 		for (int i=0;i<count;++i){
 			tabWidget.getChildAt(i).setEnabled(s);
+		}
+	}
+	
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		if (requestCode==1){
+			finish();
 		}
 	}
 	

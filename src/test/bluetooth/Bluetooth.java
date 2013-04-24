@@ -59,6 +59,8 @@ public class Bluetooth {
 	
 	private boolean start;
 	
+	private boolean success;
+	
 	private final static int READ_NULL = 0;
 	private final static int READ_ALCOHOL = 1;
 	private final static int READ_PRESSURE = 2;
@@ -81,7 +83,7 @@ public class Bluetooth {
 			Log.e("BT","NOT SUPPORT BT");
 		prev_pressure = 0.f;
 		now_pressure = 0.f;
-		
+		success = false;
 		btUIHandler=new BTUIHandler(testFragment);
 		start = false;
 	}
@@ -158,6 +160,7 @@ public class Bluetooth {
 		int bytes;
 		String msg = "";
 		isPeak=false;
+		success = false;
 		now_pressure = 0;
 		prev_pressure = 0;
 		int read_type = READ_NULL;
@@ -180,7 +183,7 @@ public class Bluetooth {
 				else if (time - first_start_time > 10000){
 					Log.d("BT","TIME OUT");
 					end =-1; 
-					//cameraRunHandler.closeFail();
+					success = true;
 					cameraRunHandler.sendEmptyMessage(1);
 				}
 				for (int i=0;i<bytes;++i){
@@ -201,14 +204,14 @@ public class Bluetooth {
 				if (end == -1){
 					break;
 				}
-				//if (socket.isConnected())
 				bytes =in.read(temp);
 			}
 			close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
 			close();
-			cameraRunHandler.sendEmptyMessage(1);
+			//if(!success)
+				//cameraRunHandler.sendEmptyMessage(1);
 			
 		}
 	}
@@ -232,7 +235,6 @@ public class Bluetooth {
 				//Log.d("BT","READ-M");
 				if (prev_pressure == 0.f){
 					prev_pressure = Float.valueOf(msg.substring(1));
-					//first_pressure;
 				}
 				else {
 					prev_pressure = now_pressure;
@@ -245,7 +247,7 @@ public class Bluetooth {
 						isPeak = true;
 						change_speed(0);
 						start_time = time;
-					}else if ( diff < PRESSURE_DIFF_MIN && diff > -PRESSURE_DIFF_MIN/2){
+					}else if ( diff < PRESSURE_DIFF_MIN && diff > -PRESSURE_DIFF_MIN/3){
 						if (isPeak){
 							end_time = time;
 							duration += (end_time-start_time);
@@ -276,6 +278,7 @@ public class Bluetooth {
 								++image_count;
 								show_in_UI(6);
 								change_speed(-1);
+								success = true;
 								return -1;
 							}
 							

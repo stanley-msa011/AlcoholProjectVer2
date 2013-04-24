@@ -74,7 +74,7 @@ public class UIMsgBox {
 		box.setVisibility(View.INVISIBLE);
 		bg = (ImageView) box.findViewById(R.id.test_msg_box_bg);
 		
-		int textSize = (int)(screen.x * 56.0/720.0);
+		int textSize = (int)(screen.x * 49.0/720.0);
 		
 		help = (TextView) box.findViewById(R.id.test_msg_box_help);
 		
@@ -227,7 +227,7 @@ public class UIMsgBox {
 			return;
 		
 		bg.setImageBitmap(bgBmps[0]);
-		help.setText("請啟用\n酒測裝置及藍芽功能");
+		help.setText("請啟用\n酒測裝置");
 		yes.setVisibility(View.INVISIBLE);
 		no.setVisibility(View.INVISIBLE);
 		yesBg.setVisibility(View.INVISIBLE);

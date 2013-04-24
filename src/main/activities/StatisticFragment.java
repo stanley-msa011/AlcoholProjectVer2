@@ -3,6 +3,7 @@ package main.activities;
 import statisticPageView.StatisticPageView;
 import statisticPageView.analysis.AnalysisDrunkView;
 import statisticPageView.analysis.AnalysisRatingView;
+import statisticPageView.analysis.AnalysisRestView;
 import statisticPageView.analysis.AnalysisSuccessView;
 import statisticPageView.statistics.StatisticPagerAdapter;
 import android.annotation.SuppressLint;
@@ -67,10 +68,10 @@ public class StatisticFragment extends Fragment {
     	super.onResume();
     	statisticFragment = this;
     	
-    	analysisViews = new StatisticPageView[3];
+    	analysisViews = new StatisticPageView[2];
 		analysisViews[0] = new AnalysisDrunkView(activity,statisticFragment);
-		analysisViews[1] = new AnalysisSuccessView(activity,statisticFragment);
-		analysisViews[2] = new AnalysisRatingView(activity,statisticFragment);
+		//analysisViews[1] = new AnalysisRestView(activity,statisticFragment);
+		analysisViews[1] = new AnalysisRatingView(activity,statisticFragment);
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
@@ -190,11 +191,11 @@ public class StatisticFragment extends Fragment {
     		LayoutParams analysisViewParam1 =  analysisViews[1].getView().getLayoutParams();
     		analysisViewParam1.width = screen.x;
     		analysisViewParam1.height = (int) (screen.x*500.0/720.0);
-    		
+    		/*
     		LayoutParams analysisViewParam2 =  analysisViews[2].getView().getLayoutParams();
     		analysisViewParam2.width = screen.x;
     		analysisViewParam2.height = (int) (screen.x*424.0/720.0);
-        	
+        	*/
 	    	dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_on);
 	    	dot_off = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_off);
 			

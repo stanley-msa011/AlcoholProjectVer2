@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/statistic_day_layout"
+    >
+
+    <ImageView
+        android:id="@+id/statistic_day_brac_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+     />
+    
+    <TextView
+        android:id="@+id/statistic_day_brac_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        />
+    
+    <TextView
+        android:id="@+id/statistic_day_brac_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/statistic_day_brac_value"
+        android:textColor="#FFFFFFFF"
+        />
+    
+    <ImageView
+        android:id="@+id/statistic_day_brac_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+     />
+     <TextView
+        android:id="@+id/statistic_day_brac_result2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_below="@+id/statistic_day_brac_result"
+        />
+     <TextView
+        android:id="@+id/statistic_day_brac_result3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_above="@+id/statistic_day_brac_result2"
+        android:textColor="#FFFFFFFF"
+        />
+      <ImageView
+        android:id="@+id/statistic_day_brac_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        />
+</RelativeLayout>

@@ -24,7 +24,6 @@ public class StatisticWeekView extends StatisticPageView {
 
 	private HistoryDB db;
 	private ImageView textImage, lineImage1, lineImage2;
-	private Bitmap block_green, block_yellow, block_red;
 	private Bitmap textBmp, lineBmp1, lineBmp2; 
 	private RelativeLayout mainLayout;
 	private TextView help;
@@ -59,18 +58,6 @@ public class StatisticWeekView extends StatisticPageView {
 		if (lineBmp2!=null && !lineBmp2.isRecycled()){
 			lineBmp2.recycle();
 			lineBmp2 = null;
-		}
-		if (block_red!=null && !block_red.isRecycled()){
-			block_red.recycle();
-			block_red = null;
-		}
-		if (block_yellow!=null && !block_yellow.isRecycled()){
-			block_yellow.recycle();
-			block_yellow = null;
-		}
-		if (block_green!=null && !block_green.isRecycled()){
-			block_green.recycle();
-			block_green = null;
 		}
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
@@ -129,15 +116,15 @@ public class StatisticWeekView extends StatisticPageView {
 		textParam.leftMargin = (int) (screen.x * 560.0/720.0);
 		textParam.topMargin = (int)(screen.y*163.0/443.0);
 		
-		int lineWidth1 = (int) (screen.x*557.0/720.0);
+		int lineWidth1 = screen.x;
 		int lineHeight1 = (int) (screen.y*5.0/443.0);
-		lineBmp1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line);
+		lineBmp1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line3);
 		
 		RelativeLayout.LayoutParams lineParam1 = (RelativeLayout.LayoutParams) lineImage1.getLayoutParams();
 		lineParam1.height = lineHeight1;
 		lineParam1.width = lineWidth1;
 		lineParam1.leftMargin = (int) (screen.x * 90.0/720.0);
-		lineParam1.topMargin = blockTopMargin = (int)(screen.y*312.0/443.0);
+		lineParam1.topMargin = blockTopMargin = (int)(screen.y*310.0/443.0);
 		
 		int lineWidth2 = (int) (screen.x*10.0/720.0);
 		int lineHeight2 = (int) (screen.y*102.0/443.0);
@@ -146,22 +133,18 @@ public class StatisticWeekView extends StatisticPageView {
 		RelativeLayout.LayoutParams lineParam2 = (RelativeLayout.LayoutParams) lineImage2.getLayoutParams();
 		lineParam2.height = lineHeight2;
 		lineParam2.width = lineWidth2;
-		lineParam2.leftMargin = (int) (screen.x * 160.0/720.0);
+		lineParam2.leftMargin = (int) (screen.x * 34.0/720.0);
 		lineParam2.topMargin = (int)(screen.y*158.0/443.0);
-		
-		block_green = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_aweek_green);
-		block_yellow = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_aweek_yellow);
-		block_red = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_aweek_red);
 		
 		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg2);
 		
 		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
-		helpParam.leftMargin =  (int) (screen.x * 199.0/720.0);
+		helpParam.leftMargin =  (int) (screen.x * 60.0/720.0);
 		helpParam.topMargin = (int)(screen.y*61.0/443.0);
 		
 		for (int i=0;i<4;++i){
 			RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[i].getLayoutParams();
-			labelParam.leftMargin = (int) (screen.x * 147.0/720.0);
+			labelParam.leftMargin = (int) (screen.x * 22.0/720.0);
 		}
 		RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[0].getLayoutParams();
 		labelParam.topMargin = (int)(screen.y*115.0/443.0);
@@ -180,26 +163,23 @@ public class StatisticWeekView extends StatisticPageView {
 		int blockWidth =  (int) (screen.x * 44.0/720.0);
 		int blockHeight =  (int) (screen.y * 50.0/443.0);
 		int blockGapVer =  (int) (screen.y * 50.0/443.0);
-		int blockGap = (int)(screen.x * 3.0/720.0);
+		int blockGap = (int)(screen.x * 30.0/720.0);
 		if (blockGap < 1)
 			blockGap = 1;
 		
 		blocks = new ImageView[28];
-		int leftMargin = (int) (screen.x * 204.0/720.0);
+		int leftMargin = (int) (screen.x * 70.0/720.0);
 		for (int i=0;i<7;++i){
 			int topMargin =blockTopMargin - blockHeight - 3*blockGapVer;
 			for (int j=0;j<4;++j){
 				int c = 4*i+j;
 				blocks[c] = new ImageView(context);
-				blocks[c].setScaleType(ScaleType.FIT_XY);
-				blocks[c].setAdjustViewBounds(true);
 				mainLayout.addView(blocks[c]);
 				RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) blocks[c].getLayoutParams();
 				param.width = blockWidth;
 				param.height = blockHeight;
 				param.leftMargin = leftMargin;
 				param.topMargin = topMargin;
-				//topMargin -= blockGapVer;
 				topMargin += blockGapVer;
 			}
 			leftMargin+=blockWidth+blockGap;
@@ -209,11 +189,11 @@ public class StatisticWeekView extends StatisticPageView {
 		BracGameHistory[] historys = db.getMultiDayInfo(7);
 		for (int i=0;i<historys.length;++i){
 			if (historys[i]==null)//MISS
-				blocks[i].setImageBitmap(block_yellow);
+				blocks[i].setBackgroundColor(0xFFe4c626);
 			else if (historys[i].brac>BracDataHandler.THRESHOLD)//FAIL
-				blocks[i].setImageBitmap(block_red);
+				blocks[i].setBackgroundColor(0xFFdd6325);
 			else//PASS
-				blocks[i].setImageBitmap(block_green);
+				blocks[i].setBackgroundColor(0xFF5cb52f);
 		}
 		
 		leftMargin-=blockWidth+blockGap;

@@ -166,9 +166,6 @@ public class AnalysisSuccessView extends StatisticPageView {
 		text.setText(String.valueOf(score));
 		if (Lang.eng){
 			help.setText("Cumulative results");
-			//Point screen = FragmentTabs.getSize();
-			//RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams)help.getLayoutParams();
-    		//helpParam.topMargin = (int)(screen.x * 80.0/720.0);
 		}
 		else
 			help.setText("依據您的酒測，整體戒酒表現" );

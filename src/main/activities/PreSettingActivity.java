@@ -3,6 +3,7 @@ package main.activities;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.View;
@@ -40,6 +41,8 @@ public class PreSettingActivity extends Activity {
 				editor.putString("uid", text);
 				editor.commit();
 			}
+			Intent newIntent = new Intent(activity, FragmentTabs.class);
+			activity.startActivity(newIntent);
 			activity.finish();
 		}
 		

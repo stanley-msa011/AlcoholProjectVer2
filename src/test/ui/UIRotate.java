@@ -41,7 +41,7 @@ public class UIRotate {
 	
 	private RotateAnimation anim;  
 	
-	private static final String[] MSG = {"開始","加油\n1","加油\n2","加油\n3","加油\n4","加油\n5","完成"};
+	private static final String[] MSG = {"開始\n吹氣","加油\n1","加油\n2","加油\n3","加油\n4","加油\n5"," 完成"};
 	
 	
 	public UIRotate(TestFragment testFragment,RelativeLayout mainLayout){
@@ -127,7 +127,7 @@ public class UIRotate {
 			anim.setDuration(1000);
 		}
 		if (modify == -1){
-			anim.setDuration(99999);
+			anim.setDuration(Long.MAX_VALUE);
 		}
 	}
 	

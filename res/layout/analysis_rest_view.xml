@@ -5,34 +5,34 @@
     android:orientation="vertical" >
     
    <RelativeLayout
-       android:id ="@+id/analysis_rating_layout"
+       android:id ="@+id/analysis_rest_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
 
        
        <ImageView
-        android:id ="@+id/analysis_rating_title_bg"
+        android:id ="@+id/analysis_rest_title_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="fitXY"
         />
        
        <TextView
-        android:id ="@+id/analysis_rating_help"
+        android:id ="@+id/analysis_rest_help"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
         
         <TextView
-        android:id ="@+id/analysis_rating_title"
+        android:id ="@+id/analysis_rest_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="你的排名" />
+        android:text="完成狀況" />
        
        
         <ImageView
-            android:id="@+id/analysis_rating_bar"
+            android:id="@+id/analysis_rest_bar"
        		android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:scaleType="fitXY"
@@ -41,21 +41,21 @@
 
 
         <TextView
-            android:id="@+id/analysis_rating_low"
+            android:id="@+id/analysis_rest_from"
        		android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:layout_alignParentLeft="true"
         />
         
         <TextView
-            android:id="@+id/analysis_rating_high"
+            android:id="@+id/analysis_rest_to"
        		android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:layout_alignParentRight="true"
         />
         
         <ImageView
-            android:id="@+id/analysis_rating_pointer"
+            android:id="@+id/analysis_rest_progress"
        		android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:scaleType="fitXY"
