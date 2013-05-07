@@ -3,7 +3,7 @@ package main.activities;
 import tabControl.CustomTab;
 import tabControl.TabManager;
 import test.data.Reuploader;
-import ui.LoadingPageHandler;
+//import ui.LoadingPageHandler; // Eric
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
