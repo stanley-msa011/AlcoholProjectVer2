@@ -74,12 +74,11 @@ public class StatisticFragment extends Fragment {
     	statisticFragment = this;
     	
     	// Eric - add  
-    	analysisViews = new StatisticPageView[4];
+    	analysisViews = new StatisticPageView[3];
     	analysisViews[0] = new AnalysisProgressView(activity, statisticFragment);
     	analysisViews[1] = new AnalysisSavingView(activity, statisticFragment);
-		analysisViews[2] = new AnalysisDrunkView(activity,statisticFragment);
-		//analysisViews[1] = new AnalysisRestView(activity,statisticFragment);
-		analysisViews[3] = new AnalysisRatingView(activity,statisticFragment);
+		//analysisViews[2] = new AnalysisDrunkView(activity,statisticFragment);
+		analysisViews[2] = new AnalysisRatingView(activity,statisticFragment);
 		// Eric end
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
@@ -178,12 +177,6 @@ public class StatisticFragment extends Fragment {
 			
         	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
         	analysisViewLayoutParam.height = screen.y - statistic_px.y;
-        /*	
-        	// Eric
-    		LayoutParams analysisViewParam0 =  analysisViews[0].getView().getLayoutParams();
-    		analysisViewParam0.width = screen.x;
-    		analysisViewParam0.height = (int) (screen.x*345.0/720.0);
-    		*/
     		LayoutParams analysisViewParam0 =  analysisViews[0].getView().getLayoutParams();
     		analysisViewParam0.width = screen.x;
     		analysisViewParam0.height = (int) (screen.x*370.0/720.0);
@@ -192,20 +185,10 @@ public class StatisticFragment extends Fragment {
     		analysisViewParam1.width = screen.x;
     		analysisViewParam1.height = (int) (screen.x*500.0/720.0);
         	
-        	LayoutParams analysisViewParam2 =  analysisViews[2].getView().getLayoutParams();
-    		analysisViewParam2.width = screen.x;
-    		analysisViewParam2.height = (int) (screen.x*345.0/720.0);
-    		
-    		LayoutParams analysisViewParam3 =  analysisViews[3].getView().getLayoutParams();
-    		analysisViewParam3.width = screen.x;
-    		analysisViewParam3.height = (int) (screen.x*500.0/720.0);
-    		// Eric
-    		
-    		/*
     		LayoutParams analysisViewParam2 =  analysisViews[2].getView().getLayoutParams();
     		analysisViewParam2.width = screen.x;
-    		analysisViewParam2.height = (int) (screen.x*424.0/720.0);
-        	*/
+    		analysisViewParam2.height = (int) (screen.x*500.0/720.0);
+    		
 	    	dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_on);
 	    	dot_off = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_off);
 			
