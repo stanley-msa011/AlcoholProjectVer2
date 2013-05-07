@@ -40,6 +40,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -121,9 +122,8 @@ public class TestFragment extends Fragment {
 	private static Object done_lock  = new Object();
 	
 	private TextView failHelp;
-	private ImageView load;
 	
-	
+	private ProgressDialog loadDialog;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -146,21 +146,9 @@ public class TestFragment extends Fragment {
 	public void onResume(){
 		super.onResume();
 		if (!isKeepMsgBox()){
-			RelativeLayout layout = (RelativeLayout) view;
-			load = new ImageView(view.getContext());
-			if (FragmentTabs.loadingBmp != null && !FragmentTabs.loadingBmp.isRecycled())
-				load.setImageBitmap(FragmentTabs.loadingBmp);
-			else{
-				Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
-				FragmentTabs.loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
-				tmp.recycle();
-				load.setImageBitmap(FragmentTabs.loadingBmp);
-			}
-			layout.addView(load);
-			RelativeLayout.LayoutParams loadParam = (LayoutParams) load.getLayoutParams();
-			loadParam.width = RelativeLayout.LayoutParams.MATCH_PARENT;
-			loadParam.height = RelativeLayout.LayoutParams.MATCH_PARENT;
-			load.setScaleType(ScaleType.FIT_XY);
+
+			loadDialog = LoadingBox.loading(this.getActivity());
+			loadDialog.show();
 			
 			context = this.getActivity();
 			testFragment = this;
@@ -620,8 +608,8 @@ public class TestFragment extends Fragment {
 			startCircle.setOnClickListener(new StartOnClickListener());
 			bg.setOnClickListener(null);
 		
-			RelativeLayout layout = (RelativeLayout) view;
-			layout.removeView(load);
+			loadDialog.dismiss();
+
 			
 			sensor_button.setBackgroundColor(0xFF000000);
 			sensor_button.setVisibility(View.VISIBLE);

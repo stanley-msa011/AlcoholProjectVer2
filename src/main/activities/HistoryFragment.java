@@ -76,6 +76,7 @@ public class HistoryFragment extends Fragment {
 		System.gc();
 		
 		loadDialog = LoadingBox.loading(this.getActivity());
+		loadDialog.show();
 		if (loadHandler == null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);

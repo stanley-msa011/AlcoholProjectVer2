@@ -65,7 +65,7 @@ public class SocialFragment extends Fragment {
 		super.onResume();
 		
 		loadDialog = LoadingBox.loading(this.getActivity());
-		
+		loadDialog.show();
 		this.db = new HistoryDB(this.getActivity());
 		Point screen = FragmentTabs.getSize();
 		

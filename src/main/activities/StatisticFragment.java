@@ -45,6 +45,7 @@ public class StatisticFragment extends Fragment {
 	private StatisticFragment statisticFragment;
 	
 	
+	
 	private static final int[] DOT_ID={0xFF0,0xFF1,0xFF2};
 	
 	private ProgressDialog loadDialog;
@@ -77,7 +78,7 @@ public class StatisticFragment extends Fragment {
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
 		loadDialog = LoadingBox.loading(this.getActivity());
-		
+		loadDialog.show();
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);
