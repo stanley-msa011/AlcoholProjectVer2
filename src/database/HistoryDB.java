@@ -15,6 +15,8 @@ import android.util.Log;
 
 public class HistoryDB {
 
+	private static final  int nBlocks = 2;
+	
 	private SQLiteOpenHelper dbHelper = null;
     private SQLiteDatabase db = null;
 	
@@ -77,7 +79,9 @@ public class HistoryDB {
     
     public BracGameHistory[] getTodayBracGameHistory(){
 
-    	BracGameHistory[] historys = new BracGameHistory[4];
+    	
+    	
+    	BracGameHistory[] historys = new BracGameHistory[nBlocks];
     	
     	Calendar cal = Calendar.getInstance();
     	int year = cal.get(Calendar.YEAR);
@@ -86,7 +90,7 @@ public class HistoryDB {
     	
     	db = dbHelper.getReadableDatabase();
     	
-    	for (int i=0;i<4;++i){
+    	for (int i=0;i<nBlocks;++i){
     		String sql = "SELECT _BRAC FROM HistoryGame WHERE _YEAR="+year
     				+" AND _MONTH="+month
     				+" AND _DATE="+date
@@ -222,7 +226,7 @@ public class HistoryDB {
     	String cu = cursor.getCount()+"";
     	Log.d("DB",cu);
     	
-    	BracGameHistory[] historys = new BracGameHistory[n_days*4];
+    	BracGameHistory[] historys = new BracGameHistory[n_days*nBlocks];
     	
     	int brac_idx = cursor.getColumnIndex("_BRAC");
     	int ts_idx = cursor.getColumnIndex("_TS");
@@ -245,7 +249,7 @@ public class HistoryDB {
     			_ts = cursor.getLong(ts_idx);
     			if (_ts >= ts_from && _ts < ts_to){// match date
     				_tb = cursor.getInt(tb_idx);
-    				if (_tb ==i%4){
+    				if (_tb ==i%nBlocks){
     					_brac = cursor.getFloat(brac_idx);
     					historys[i] = new BracGameHistory(0,_ts,_brac);
     					++cursor_pointer;
@@ -256,7 +260,7 @@ public class HistoryDB {
     			++cursor_pointer;
     		}
     		
-    		if (i%4==3){
+    		if (i%nBlocks==nBlocks-1){
     			ts_from+=3600*24;
     			ts_to+=3600*24;
     		}
@@ -335,5 +339,20 @@ public class HistoryDB {
     		db.execSQL(sql);
     	}
     	db.close();
+    }
+    
+    public Calendar getFirstTestDate(){
+    	db = dbHelper.getReadableDatabase();
+    	String sql = "SELECT * FROM HistoryGame ORDER BY  _ID ASC";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	int count = cursor.getCount();
+    	if (count == 0)
+    		return null;
+    	cursor.moveToFirst();
+    	int ts_idx = cursor.getColumnIndex("_TS");
+    	long ts = cursor.getLong(ts_idx)*1000L;
+    	Calendar cal = Calendar.getInstance();
+    	cal.setTimeInMillis(ts);
+		return cal;
     }
 }

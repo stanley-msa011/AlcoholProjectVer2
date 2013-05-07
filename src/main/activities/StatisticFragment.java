@@ -8,6 +8,7 @@ import statisticPageView.analysis.AnalysisSuccessView;
 import statisticPageView.statistics.StatisticPagerAdapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -43,9 +44,10 @@ public class StatisticFragment extends Fragment {
 	private LoadingHandler loadHandler;
 	private StatisticFragment statisticFragment;
 	
+	
 	private static final int[] DOT_ID={0xFF0,0xFF1,0xFF2};
 	
-	private ImageView load;
+	private ProgressDialog loadDialog;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,27 +71,12 @@ public class StatisticFragment extends Fragment {
     	statisticFragment = this;
     	
     	analysisViews = new StatisticPageView[2];
-		analysisViews[0] = new AnalysisDrunkView(activity,statisticFragment);
-		//analysisViews[1] = new AnalysisRestView(activity,statisticFragment);
+		analysisViews[0] = new AnalysisRestView(activity,statisticFragment);
 		analysisViews[1] = new AnalysisRatingView(activity,statisticFragment);
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
-		RelativeLayout layout = (RelativeLayout) view;
-		load = new ImageView(view.getContext());
-		if (FragmentTabs.loadingBmp != null && !FragmentTabs.loadingBmp.isRecycled())
-			load.setImageBitmap(FragmentTabs.loadingBmp);
-		else{
-			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
-			FragmentTabs.loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
-			tmp.recycle();
-			load.setImageBitmap(FragmentTabs.loadingBmp);
-		}
-		layout.addView(load);
-		RelativeLayout.LayoutParams loadParam = (RelativeLayout.LayoutParams) load.getLayoutParams();
-		loadParam.width = RelativeLayout.LayoutParams.MATCH_PARENT;
-		loadParam.height = RelativeLayout.LayoutParams.MATCH_PARENT;
-		load.setScaleType(ScaleType.FIT_XY);
+		loadDialog = LoadingBox.loading(this.getActivity());
 		
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
@@ -183,20 +170,20 @@ public class StatisticFragment extends Fragment {
 			
         	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
         	analysisViewLayoutParam.height = screen.y - statistic_px.y;
-        	
+        /*	
         	LayoutParams analysisViewParam0 =  analysisViews[0].getView().getLayoutParams();
     		analysisViewParam0.width = screen.x;
     		analysisViewParam0.height = (int) (screen.x*345.0/720.0);
+    		*/
+    		LayoutParams analysisViewParam0 =  analysisViews[0].getView().getLayoutParams();
+    		analysisViewParam0.width = screen.x;
+    		analysisViewParam0.height = (int) (screen.x*370.0/720.0);
     		
     		LayoutParams analysisViewParam1 =  analysisViews[1].getView().getLayoutParams();
     		analysisViewParam1.width = screen.x;
-    		analysisViewParam1.height = (int) (screen.x*500.0/720.0);
-    		/*
-    		LayoutParams analysisViewParam2 =  analysisViews[2].getView().getLayoutParams();
-    		analysisViewParam2.width = screen.x;
-    		analysisViewParam2.height = (int) (screen.x*424.0/720.0);
-        	*/
-	    	dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_on);
+    		analysisViewParam1.height = (int) (screen.x*424.0/720.0);
+
+    		dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_on);
 	    	dot_off = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_off);
 			
 	    	RelativeLayout.LayoutParams dotsLayoutParam = (android.widget.RelativeLayout.LayoutParams) dots_layout.getLayoutParams();
@@ -238,8 +225,7 @@ public class StatisticFragment extends Fragment {
 				dots[i].setImageBitmap(dot_off);
 			dots[0].setImageBitmap(dot_on);
 			
-			RelativeLayout layout = (RelativeLayout) view;
-			layout.removeView(load);
+			loadDialog.dismiss();
 			
 		}
 	}

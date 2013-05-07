@@ -18,7 +18,6 @@ import test.gps.GPSRunTask;
 import test.ui.UIMsgBox;
 import test.ui.UIRotate;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -30,6 +29,9 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -101,7 +103,9 @@ public class TestFragment extends Fragment {
 	private TestHandler testHandler;
 	private TimeUpHandler timeUpHandler;
 	private ChangeTabsHandler changeTabsHandler;
-	
+	private ImageView sensor_button;
+	private ImageView[] sensor_lights;
+	private Animation blink_anim;
 	
 	private ImageView bg, startLine, startCircle;
 	private Bitmap bgBmp, startLineBmp, startCircleBmp;
@@ -118,6 +122,8 @@ public class TestFragment extends Fragment {
 	
 	private TextView failHelp;
 	private ImageView load;
+	
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -188,6 +194,36 @@ public class TestFragment extends Fragment {
 			msgBox = new UIMsgBox(testFragment,main_layout);
 		rotate = new UIRotate(testFragment,main_layout);
 		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
+		
+		sensor_button = (ImageView) view.findViewById(R.id.test_sensor_button);
+		RelativeLayout.LayoutParams sParam = (LayoutParams) sensor_button.getLayoutParams();
+		sParam.topMargin = (int)(screen.x * 800.0/720.0);
+		sParam.leftMargin = (int)(screen.x * 620.0/720.0);
+		sParam.width =  (int)(screen.x * 18.0/720.0);
+		sParam.height=  (int)(screen.x * 36.0/720.0);
+		
+		sensor_lights = new ImageView[2];
+		sensor_lights[0] = (ImageView) view.findViewById(R.id.test_sensor_light_red);
+		sensor_lights[1] = (ImageView) view.findViewById(R.id.test_sensor_light_yellow);
+
+		
+		RelativeLayout.LayoutParams l_redParam = (LayoutParams) sensor_lights[0].getLayoutParams();
+		l_redParam.topMargin = (int)(screen.x * 470.0/720.0);
+		l_redParam.leftMargin = (int)(screen.x * 290.0/720.0);
+		l_redParam.width =  (int)(screen.x * 32.0/720.0);
+		l_redParam.height=  (int)(screen.x * 32.0/720.0);
+		
+		RelativeLayout.LayoutParams l_yellowParam = (LayoutParams) sensor_lights[1].getLayoutParams();
+		l_yellowParam.topMargin = (int)(screen.x * 470.0/720.0);
+		l_yellowParam.leftMargin = (int)(screen.x * 346.0/720.0);
+		l_yellowParam.width =  (int)(screen.x * 32.0/720.0);
+		l_yellowParam.height=  (int)(screen.x * 32.0/720.0);
+		
+		
+		blink_anim = new AlphaAnimation(1.0f,0.1f);
+		blink_anim.setRepeatCount(1000);
+		blink_anim.setRepeatMode(Animation.REVERSE);
+		blink_anim.setDuration(100);
 		
 		loadingHandler = new LoadingHandler();
 		msgLoadingHandler = new MsgLoadingHandler();
@@ -268,7 +304,7 @@ public class TestFragment extends Fragment {
 		cleanMsgBox();
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg","未啟用酒測裝置及藍芽功能");
+		data.putString("msg","未啟用酒測裝置");
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
@@ -296,8 +332,12 @@ public class TestFragment extends Fragment {
 			else{
 				messageView.setText("請啟用酒測裝置");
 				messageView.setTextColor(0xFFFFFFFF);
+				sensor_button.setBackgroundColor(0xFF00CCAA);
+				sensor_lights[0].setVisibility(View.VISIBLE);
+				sensor_lights[1].setVisibility(View.INVISIBLE);
 				Thread t = new Thread(new TimeUpRunnable(0,1500));
 				t.start();
+				
 			}
 			
 		}
@@ -310,6 +350,11 @@ public class TestFragment extends Fragment {
 			stopDueToInit();
 			if (loadingHandler!=null)
 				loadingHandler.sendEmptyMessage(0);
+			blink_anim.cancel();
+			sensor_lights[1].setAnimation(null);
+			sensor_lights[0].setVisibility(View.INVISIBLE);
+			sensor_lights[1].setVisibility(View.INVISIBLE);
+			
 		}
 	}
 	
@@ -352,6 +397,7 @@ public class TestFragment extends Fragment {
 				btRunTask = new BTRunTask(this,bt);
 				btRunTask.execute();
 				messageView.setText("已啟用酒測裝置");
+				sensor_button.setBackgroundColor(0xFF000000);
 				Thread t = new Thread(new TimeUpRunnable(1,1500));
 				t.start();
 			}
@@ -522,7 +568,7 @@ public class TestFragment extends Fragment {
 				bgBmp.recycle();
 				bgBmp = null;
 			}
-			bgBmp = BitmapFactory.decodeResource(r, R.drawable.test_start_bg);
+			bgBmp = BitmapFactory.decodeResource(r,  R.drawable.test_start_bg_2);
 			
 			if (startLineBmp==null ||startLineBmp.isRecycled()){
 				startLineBmp = BitmapFactory.decodeResource(r, R.drawable.test_start_line);
@@ -577,6 +623,10 @@ public class TestFragment extends Fragment {
 			RelativeLayout layout = (RelativeLayout) view;
 			layout.removeView(load);
 			
+			sensor_button.setBackgroundColor(0xFF000000);
+			sensor_button.setVisibility(View.VISIBLE);
+			sensor_lights[0].setVisibility(View.INVISIBLE);
+			sensor_lights[1].setVisibility(View.INVISIBLE);
 		}
 	}
     
@@ -595,7 +645,7 @@ public class TestFragment extends Fragment {
 				bgBmp.recycle();
 				bgBmp = null;
 			}
-			bgBmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_start_bg);
+			bgBmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_start_bg_2);
 			if(bgBmp!=null && !bgBmp.isRecycled())
 				bg.setImageBitmap(bgBmp);
 			if (msgBox!=null){
@@ -603,6 +653,8 @@ public class TestFragment extends Fragment {
 				messageView.setText("請依對話框指示進行操作");
 				messageView.setTextColor(0xFFFFFFFF);
 			}
+			sensor_lights[0].setVisibility(View.INVISIBLE);
+			sensor_lights[1].setVisibility(View.INVISIBLE);
 		}
 	}
     
@@ -612,18 +664,36 @@ public class TestFragment extends Fragment {
 		private String msgStr;
 	
 		public void handleMessage(Message msg){
+			if (msgLoadingHandler !=null){
+				msgLoadingHandler.removeMessages(0);
+				msgLoadingHandler = null;
+			}
+			if (testHandler!=null){
+				testHandler.removeMessages(0);
+				testHandler = null;
+			}
+			
 			this.msgStr = msg.getData().getString("msg");
 			cleanRotate();
 			msgStr = msgStr.concat("\n請點選畫面以重新開始");
+			bg.setImageBitmap(null);
 			if(bgBmp!=null && !bgBmp.isRecycled()){
 				bgBmp.recycle();
 				bgBmp = null;
 			}
-			bgBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_start_bg);
+			bgBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_start_bg_2);
+			bg.setImageBitmap(bgBmp);
+			sensor_button.setBackgroundColor(0xFF000000);
 			messageView.setText(msgStr);
 			messageView.setTextColor(0xFFFF0000);
 			bg.setOnClickListener(new EndTestOnClickListener());
 			
+			sensor_button.setVisibility(View.VISIBLE);
+			sensor_lights[0].setVisibility(View.INVISIBLE);
+			sensor_lights[1].setVisibility(View.VISIBLE);
+			
+			sensor_lights[1].setAnimation(blink_anim);
+			blink_anim.start();
 		}
 	}
 	
@@ -675,6 +745,9 @@ public class TestFragment extends Fragment {
 				bt.start();
 				cameraRecorder.start();
 			}
+			sensor_button.setVisibility(View.INVISIBLE);
+			sensor_lights[0].setVisibility(View.INVISIBLE);
+			sensor_lights[1].setVisibility(View.INVISIBLE);
 		}
 	}
 	
@@ -727,6 +800,9 @@ public class TestFragment extends Fragment {
 				}
 				messageView.setText("請啟用酒測裝置");
 				messageView.setTextColor(0xFFFFFFFF);
+				sensor_button.setBackgroundColor(0xFF00CCAA);
+				sensor_lights[0].setVisibility(View.VISIBLE);
+				sensor_lights[1].setVisibility(View.INVISIBLE);
 				Thread th = new Thread(new TimeUpRunnable(0,1500));
 				th.start();
 			}

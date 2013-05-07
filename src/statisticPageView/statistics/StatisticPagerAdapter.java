@@ -23,8 +23,8 @@ public class StatisticPagerAdapter extends PagerAdapter {
 		statisticViews = new StatisticPageView[3];
 		//statisticViews[0] = new StatisticDayView(context,statisticFragment);
 		statisticViews[0] = new StatisticDayView2(context,statisticFragment);
-		statisticViews[1] = new StatisticWeekView(context,statisticFragment);
-		statisticViews[2] = new StatisticMonthView(context,statisticFragment);
+		statisticViews[1] = new StatisticWeekView2(context,statisticFragment);
+		statisticViews[2] = new StatisticMonthView2(context,statisticFragment);
 		
 		viewsList.add(statisticViews[0].getView());
 		viewsList.add(statisticViews[1].getView());

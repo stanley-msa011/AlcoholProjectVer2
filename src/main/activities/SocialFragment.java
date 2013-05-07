@@ -4,6 +4,7 @@ import database.HistoryDB;
 import interaction.UserLevelCollector;
 import history.InteractionHistory;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -48,9 +49,9 @@ public class SocialFragment extends Fragment {
 	
 	private InteractionHistory[] historys_all;
 	
-	private ImageView load;
-	
 	private HistoryDB db;
+	
+	private ProgressDialog loadDialog;
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,21 +64,7 @@ public class SocialFragment extends Fragment {
     public void onResume(){
 		super.onResume();
 		
-		RelativeLayout layout = (RelativeLayout) view;
-		load = new ImageView(view.getContext());
-		if (FragmentTabs.loadingBmp != null && !FragmentTabs.loadingBmp.isRecycled())
-			load.setImageBitmap(FragmentTabs.loadingBmp);
-		else{
-			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
-			FragmentTabs.loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
-			tmp.recycle();
-			load.setImageBitmap(FragmentTabs.loadingBmp);
-		}
-		layout.addView(load);
-		RelativeLayout.LayoutParams loadParam = (LayoutParams) load.getLayoutParams();
-		loadParam.width = RelativeLayout.LayoutParams.MATCH_PARENT;
-		loadParam.height = RelativeLayout.LayoutParams.MATCH_PARENT;
-		load.setScaleType(ScaleType.FIT_XY);
+		loadDialog = LoadingBox.loading(this.getActivity());
 		
 		this.db = new HistoryDB(this.getActivity());
 		Point screen = FragmentTabs.getSize();
@@ -255,8 +242,7 @@ public class SocialFragment extends Fragment {
 			 historys_all = historys;
 			 setImages(historys_all);
 			 
-			 RelativeLayout layout = (RelativeLayout) view;
-			 layout.removeView(load);
+			 loadDialog.dismiss();
 			 
 			 //if (netHandler ==null)
 			//	 netHandler = new NetworkHandler();

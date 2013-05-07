@@ -6,7 +6,7 @@ public class TimeBlock {
 	
 	
 	public static int getTimeBlock(int hour_24){
-		if (hour_24 >= 6 && hour_24 <11)
+		/*if (hour_24 >= 6 && hour_24 <11)
 			return 0;
 		else if (hour_24 >=11 && hour_24 < 14)
 			return 1;
@@ -14,6 +14,12 @@ public class TimeBlock {
 			return 2;
 		else if (hour_24 >= 19 && hour_24 <24)
 			return 3;
+		return -1;
+		*/
+		if (hour_24 >= 6 && hour_24 <12)
+			return 0;
+		else if (hour_24 >=18 && hour_24 < 24)
+			return 1;
 		return -1;
 	}
 }

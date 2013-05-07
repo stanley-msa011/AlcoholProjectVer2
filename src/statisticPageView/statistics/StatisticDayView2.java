@@ -34,7 +34,11 @@ public class StatisticDayView2 extends StatisticPageView {
 	private Bitmap bgBmp,logoBmp;
 	private ImageView bg,bracResult;
 	private ImageView bracLogo;
-	
+	private Bitmap[] circleBmps;
+	private ImageView[] circleImages;
+	private TextView[] circleHelps;
+	private TextView[] circleValues;
+	private DecimalFormat format;
 	public StatisticDayView2(Context context,StatisticFragment statisticFragment){
 		super(context,R.layout.statistic_day_view2,statisticFragment);
 		db = new HistoryDB(context);
@@ -54,6 +58,15 @@ public class StatisticDayView2 extends StatisticPageView {
 		if ( logoBmp!=null && ! logoBmp.isRecycled()){
 			logoBmp.recycle();
 			logoBmp = null;
+		}
+		if (circleBmps!=null){
+			for (int i=0;i<circleBmps.length;++i){
+				if (circleBmps[i]!=null && !circleBmps[i].isRecycled()){
+					circleBmps[i].recycle();
+					circleBmps[i] = null;
+				}
+			}
+			circleBmps = null;
 		}
 	}
 
@@ -91,11 +104,27 @@ public class StatisticDayView2 extends StatisticPageView {
 		bracTime.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) (statistic_size.y * 30.0/467.0));
 		bg = (ImageView) view.findViewById(R.id.statistic_day_brac_bg);
 		
+		circleImages = new ImageView[2];
+		circleImages[0] = (ImageView) view.findViewById(R.id.statistic_day_brac_circle_morning);
+		circleImages[1] = (ImageView) view.findViewById(R.id.statistic_day_brac_circle_night);
+		
+		int textSize = (int)(statistic_size.x * 46.0/720.0);
+		
+		circleHelps =new TextView[2];
+		circleHelps[0] = (TextView) view.findViewById(R.id.statistic_day_brac_morning);
+		circleHelps[0].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		circleHelps[1] = (TextView) view.findViewById(R.id.statistic_day_brac_night);
+		circleHelps[1].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		circleValues = new TextView[2];
+		circleValues[0] = (TextView) view.findViewById(R.id.statistic_day_brac_value_morning);
+		circleValues[0].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		circleValues[1] = (TextView) view.findViewById(R.id.statistic_day_brac_value_night);
+		circleValues[1].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 	}
 
 	@Override
 	public void onInBackground() {
-		DecimalFormat format = new DecimalFormat();
+		format = new DecimalFormat();
 		format.setMaximumIntegerDigits(1);
 		format.setMinimumIntegerDigits(1);
 		format.setMinimumFractionDigits(2);
@@ -140,6 +169,39 @@ public class StatisticDayView2 extends StatisticPageView {
 		else
 			logoBmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.brac_success);
 		
+		
+		
+		circleBmps = new Bitmap[3];
+		circleBmps[0] = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_record_today_notyet);
+		circleBmps[1] = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_record_today_notpass);
+		circleBmps[2] = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_record_today_pass);
+	
+		int circleSize = (int)(statistic_size.x * 130.0/720.0);
+		
+		RelativeLayout.LayoutParams Help0Param =(RelativeLayout.LayoutParams ) circleHelps[0].getLayoutParams();
+		Help0Param.leftMargin = (int) (statistic_size.x*480.0/720.0);
+		Help0Param.topMargin =  (int)(statistic_size.x*100.0/720.0);
+		RelativeLayout.LayoutParams Help1Param =(RelativeLayout.LayoutParams ) circleHelps[1].getLayoutParams();
+		Help1Param.leftMargin = (int) (statistic_size.x*480.0/720.0);
+		Help1Param.topMargin =  (int)(statistic_size.x*105.0/720.0);
+		
+		RelativeLayout.LayoutParams circle0Param =(RelativeLayout.LayoutParams ) circleImages[0].getLayoutParams();
+		circle0Param.leftMargin = (int) (statistic_size.x*20.0/720.0);
+		circle0Param.topMargin =(int)(statistic_size.x*60.0/720.0);
+		circle0Param.width =circleSize;
+		circle0Param.height =circleSize;
+		RelativeLayout.LayoutParams circle1Param =(RelativeLayout.LayoutParams ) circleImages[1].getLayoutParams();
+		circle1Param.leftMargin = (int) (statistic_size.x*20.0/720.0);
+		circle1Param.topMargin =(int)(statistic_size.x*50.0/720.0);
+		circle1Param.width =circleSize;
+		circle1Param.height =circleSize;
+		
+		RelativeLayout.LayoutParams value0Param =(RelativeLayout.LayoutParams ) circleValues[0].getLayoutParams();
+		value0Param.leftMargin = (int) (statistic_size.x*40.0/720.0);
+		value0Param.topMargin =  (int)(statistic_size.x*90.0/720.0);
+		RelativeLayout.LayoutParams value1Param =(RelativeLayout.LayoutParams ) circleValues[1].getLayoutParams();
+		value1Param.leftMargin = (int) (statistic_size.x*40.0/720.0);
+		value1Param.topMargin =(int)(statistic_size.x*85.0/720.0);
 	}
 
 	@Override
@@ -183,6 +245,23 @@ public class StatisticDayView2 extends StatisticPageView {
 		}
 		bg.setImageBitmap(bgBmp);
 		
+		BracGameHistory[] historys = db.getTodayBracGameHistory();
+		for (int i =0; i<2; ++i){
+			if (historys[i] == null){
+				circleImages[i].setImageBitmap(circleBmps[0]);
+				circleValues[i].setText("");
+			}
+			else if (historys[i].brac < BracDataHandler.THRESHOLD){
+				circleImages[i].setImageBitmap(circleBmps[2]);
+				String value = format.format(historys[i].brac);
+				circleValues[i].setText(value);
+			}
+			else{
+				circleImages[i].setImageBitmap(circleBmps[1]);
+				String value = format.format(historys[i].brac);
+				circleValues[i].setText(value);
+			}
+		}
 	}
 
 	@Override

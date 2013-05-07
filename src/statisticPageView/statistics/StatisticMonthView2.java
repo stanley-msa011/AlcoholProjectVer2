@@ -20,11 +20,11 @@ import android.widget.ImageView.ScaleType;
 import statisticPageView.StatisticPageView;
 import test.data.BracDataHandler;
 
-public class StatisticMonthView extends StatisticPageView {
+public class StatisticMonthView2 extends StatisticPageView {
 
 	private HistoryDB db;
-	private ImageView  lineImage1, lineImage2;
-	private Bitmap textBmp, lineBmp1, lineBmp2; 
+	private ImageView  lineImage1;
+	private Bitmap textBmp, lineBmp1; 
 	private RelativeLayout mainLayout;
 	private TextView help;
 	private TextView[] labels;
@@ -36,8 +36,8 @@ public class StatisticMonthView extends StatisticPageView {
 	private ImageView bg;
 	private Bitmap bgBmp;
 	
-	public StatisticMonthView(Context context,StatisticFragment statisticFragment) {
-		super(context, R.layout.statistic_month_view,statisticFragment);
+	public StatisticMonthView2(Context context,StatisticFragment statisticFragment) {
+		super(context, R.layout.statistic_month_view2,statisticFragment);
 		db = new HistoryDB(context);
 	}
 
@@ -51,10 +51,6 @@ public class StatisticMonthView extends StatisticPageView {
 		if (lineBmp1!=null && !lineBmp1.isRecycled()){
 			lineBmp1.recycle();
 			lineBmp1 = null;
-		}
-		if (lineBmp2!=null && !lineBmp2.isRecycled()){
-			lineBmp2.recycle();
-			lineBmp2 = null;
 		}
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
@@ -71,10 +67,6 @@ public class StatisticMonthView extends StatisticPageView {
 		lineImage1.setImageBitmap(lineBmp1);
 		lineImage1.setScaleType(ScaleType.FIT_XY);
 		
-		lineBmp2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line2);
-		lineImage2 = (ImageView) view.findViewById(R.id.statistic_month_line2);
-		lineImage2.setImageBitmap(lineBmp2);
-		lineImage2.setScaleType(ScaleType.FIT_XY);
 		
 		lines = new ImageView[3];
 		
@@ -87,14 +79,11 @@ public class StatisticMonthView extends StatisticPageView {
 		help.setTextColor(0xFFFFFFFF);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		
-		labels = new TextView[4];
+		labels = new TextView[2];
 		labels[0] =  (TextView) view.findViewById(R.id.statistic_month_label_1);
 		labels[1] =  (TextView) view.findViewById(R.id.statistic_month_label_2);
-		labels[2] =  (TextView) view.findViewById(R.id.statistic_month_label_3);
-		labels[3] =  (TextView) view.findViewById(R.id.statistic_month_label_4);
 		
-		for (int i=0;i<4;++i){
-			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		for (int i=0;i<2;++i){
 			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		}
 		for (int i=0;i<3;++i){
@@ -117,27 +106,20 @@ public class StatisticMonthView extends StatisticPageView {
 		lineParam1.leftMargin = 0;
 		lineParam1.topMargin = blockTopMargin = (int)(screen.y*310.0/443.0);
 		
-		int lineWidth2 = (int) (screen.x*10.0/720.0);
-		int lineHeight2 = (int) (screen.y*102.0/443.0);
-		RelativeLayout.LayoutParams lineParam2 = (RelativeLayout.LayoutParams) lineImage2.getLayoutParams();
-		lineParam2.height = lineHeight2;
-		lineParam2.width = lineWidth2;
-		lineParam2.leftMargin = (int) (screen.x * 34.0/720.0);
-		lineParam2.topMargin = (int)(screen.y*158.0/443.0);
-		
-		
 		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg2);
 		
 		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
 		helpParam.leftMargin =  (int) (screen.x * 60.0/720.0);
 		helpParam.topMargin = (int)(screen.y*61.0/443.0);
 		
-		for (int i=0;i<4;++i){
+		for (int i=0;i<2;++i){
 			RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[i].getLayoutParams();
 			labelParam.leftMargin = (int) (screen.x *22.0/720.0);
 		}
 		RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[0].getLayoutParams();
-		labelParam.topMargin = (int)(screen.y*115.0/443.0);
+		labelParam.topMargin = (int)(screen.y*150.0/443.0);
+		labelParam = (RelativeLayout.LayoutParams) labels[1].getLayoutParams();
+		labelParam.topMargin = (int)(screen.y*40.0/443.0);
 		
 	}
 
@@ -146,17 +128,18 @@ public class StatisticMonthView extends StatisticPageView {
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		int blockWidth =  (int) (screen.x * 20.0/720.0);
-		int blockHeight =  (int) (screen.y * 50.0/443.0);
+		int blockHeight =  (int) (screen.y * 90.0/443.0);
+		int blockGapVer =   (int) (screen.y * 100.0/443.0);
 		int blockGap = (int)(screen.x * 2.0/720.0);
 		if (blockGap < 1)
 			blockGap = 1;
 		
-		blocks = new ImageView[28*4];
+		blocks = new ImageView[28*2];
 		int leftMargin = (int) (screen.x * 70.0/720.0);
 		for (int i=0;i<28;++i){
-			int topMargin = blockTopMargin - blockHeight - 3*blockHeight;
-			for (int j=0;j<4;++j){
-				int c = 4*i+j;
+			int topMargin = blockTopMargin - blockHeight - blockGapVer;
+			for (int j=0;j<2;++j){
+				int c = 2*i+j;
 				blocks[c] = new ImageView(context);
 				blocks[c].setScaleType(ScaleType.FIT_XY);
 				mainLayout.addView(blocks[c]);
@@ -165,7 +148,7 @@ public class StatisticMonthView extends StatisticPageView {
 				param.height = blockHeight;
 				param.leftMargin = leftMargin;
 				param.topMargin = topMargin;
-				topMargin += blockHeight;
+				topMargin += blockGapVer;
 				if (i %7 ==6 && i != 27){
 					blocks[c].setPadding(0, 0, 2*blockGap, 0);
 				}
@@ -177,7 +160,7 @@ public class StatisticMonthView extends StatisticPageView {
 		int leftMargin2 = (int) (screen.x * 70.0/720.0);
 		
 		int lineWidth3 = (int) (screen.x*5.0/720.0);
-		int lineHeight3 =blockHeight*4;
+		int lineHeight3 =blockGapVer*2;
 		for (int i=0;i<3;++i){
 			leftMargin2+=7*(blockWidth+blockGap) - 2*blockGap;
 			if (i>0)
@@ -187,7 +170,7 @@ public class StatisticMonthView extends StatisticPageView {
 			lineParam3.height = lineHeight3;
 			lineParam3.width = lineWidth3;
 			lineParam3.leftMargin = leftMargin2;;
-			lineParam3.topMargin = blockTopMargin - blockHeight - 3*blockHeight;
+			lineParam3.topMargin = blockTopMargin - 2*blockGapVer;
 		}
 		
 		BracGameHistory[] historys = db.getMultiDayInfo(28);

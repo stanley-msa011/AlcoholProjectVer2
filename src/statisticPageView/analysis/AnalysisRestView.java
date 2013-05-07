@@ -1,5 +1,7 @@
 package statisticPageView.analysis;
 
+import java.util.Calendar;
+
 import database.HistoryDB;
 import main.activities.R;
 import main.activities.StatisticFragment;
@@ -12,8 +14,10 @@ import android.graphics.Point;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import statisticPageView.StatisticPageView;
 
@@ -25,12 +29,9 @@ public class AnalysisRestView extends StatisticPageView {
 	
 	private TextView help;
 	private HistoryDB db;
-	private TextView high,low;
+	private TextView from,to;
 	
-	private ImageView bar, pointer;
-	private Bitmap barBmp, pointerBmp;
-	
-	private int minLeftPointer, maxLeftPointer;
+	private ImageView[] circles;
 	
 	public AnalysisRestView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rest_view,statisticFragment);
@@ -43,58 +44,40 @@ public class AnalysisRestView extends StatisticPageView {
 			titleBmp.recycle();
 			titleBmp = null;
 		}
-		if (barBmp!=null && !barBmp.isRecycled()){
-			barBmp.recycle();
-			barBmp = null;
-		}
-		if (pointerBmp!=null && !pointerBmp.isRecycled()){
-			pointerBmp.recycle();
-			pointerBmp = null;
-		}
 		
 	}
 
 	private void setPointer(){
+
+		Calendar from_cal = db.getFirstTestDate();
 		
-		int nPeople ,rank;
-		
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		String uid = sp.getString("uid", "");
-		
-		InteractionHistory[] historys = db.getAllUsersHistory();
-		if (historys == null){
-			nPeople =0;
-			rank = 0;
+		if (from_cal == null){
+			help.setText("請完成第一次測試才能計算完成度" );
+			from.setText("?" );
+			to.setText("?" );
+			return;
 		}
-		else{
-			rank = historys.length-1;
-			nPeople = historys.length-1;
-			int tmp_rank = 0, count = 0;
-			int prev_level = historys[0].level;
-			
-			for (int i=0;i<historys.length;++i){
-				if (historys[i].level < prev_level){
-					tmp_rank = count;
-				}
-				if (historys[i].uid.equals(uid)){
-					rank = tmp_rank;
-					break;
-				}
-				++count;
-				prev_level = historys[i].level;
-			}
-		}
-		Log.d("rating",String.valueOf(rank)+"/"+String.valueOf(nPeople));
+		Calendar to_cal = Calendar.getInstance();
+		long ts_from = from_cal.getTimeInMillis();
+		long ts_to = ts_from + 86400*7*12*1000L;
+		to_cal.setTimeInMillis(ts_to);
 		
-		int margin = minLeftPointer;
+		Calendar cal = Calendar.getInstance();
+		long ts = cal.getTimeInMillis();
+		int done = (int)((ts - ts_from)/(86400*7*1000L));
+		int rest = 12 - done;
 		
-		if (nPeople == 0)
-			margin = minLeftPointer + maxLeftPointer/2;
-		else
-			margin = (int)((maxLeftPointer - minLeftPointer)*(double)(nPeople - rank)/(double)nPeople ) + minLeftPointer;
+		for (int i=0;i<done;++i)
+			circles[i].setImageResource(R.drawable.complete_circle);
+		for (int i=done; i<circles.length;++i)
+			circles[i].setImageResource(R.drawable.complete_ring);
 		
-		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
-		pointerParam.leftMargin = margin;
+		String readme = "已戒酒 "  + done + " 周,療程尚餘 "+ rest +" 周"; 
+		help.setText(readme);
+		String from_str = (from_cal.get(Calendar.MONTH)+1) + "/" + from_cal.get(Calendar.DATE);
+		String to_str = (to_cal.get(Calendar.MONTH)+1) + "/" + to_cal.get(Calendar.DATE);
+		from.setText(from_str );
+		to.setText(to_str);
 	}
 	
 	
@@ -112,15 +95,18 @@ public class AnalysisRestView extends StatisticPageView {
 		help.setTextColor(0xFF545454);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 46.0/720.0));
 
-		bar = (ImageView) view.findViewById(R.id.analysis_rest_bar);
-		pointer  = (ImageView) view.findViewById(R.id.analysis_rest_progress);
-		
-		high = (TextView) view.findViewById(R.id.analysis_rest_from);
-		high.setTextColor(0xFF545454);
-		high.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
-		low = (TextView) view.findViewById(R.id.analysis_rest_to);
-		low.setTextColor(0xFF545454);
-		low.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
+		circles = new ImageView[12];
+		for (int i=0;i<circles.length;++i){
+			circles[i] = new ImageView(context);
+			RelativeLayout v = (RelativeLayout) view.findViewById(R.id.analysis_rest_layout);
+			v.addView(circles[i]);
+		}
+		from = (TextView) view.findViewById(R.id.analysis_rest_from);
+		from.setTextColor(0xFF545454);
+		from.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
+		to = (TextView) view.findViewById(R.id.analysis_rest_to);
+		to.setTextColor(0xFF545454);
+		to.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
 		
 	}
 
@@ -139,44 +125,36 @@ public class AnalysisRestView extends StatisticPageView {
 		titleBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_titlebg);
 		
 		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams)help.getLayoutParams();
-		helpParam.leftMargin = (int)(screen.x * 120.0/720.0);
 		helpParam.topMargin = (int)(screen.x * 100.0/720.0);
 		
+		RelativeLayout.LayoutParams highParam = (RelativeLayout.LayoutParams)from.getLayoutParams();
+		highParam.topMargin = (int)(screen.x * 250.0/720.0);
+		highParam.leftMargin = (int)(screen.x * 30.0/720.0);
+		RelativeLayout.LayoutParams lowParam = (RelativeLayout.LayoutParams)to.getLayoutParams();
+		lowParam.topMargin = (int)(screen.x * 250.0/720.0);
+		lowParam.rightMargin = (int)(screen.x * 30.0/720.0);
 		
-		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)bar.getLayoutParams();
-		barParam.width = (int)(screen.x * 480.0/720.0);
-		barParam.height = (int)(screen.x * 58.0/720.0);
-		barParam.leftMargin = minLeftPointer = (int)(screen.x * 121.0/720.0);
-		barParam.topMargin = (int)(screen.x * 231.0/720.0);
-		barBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_group_bg);
-		maxLeftPointer = minLeftPointer +  (int)(screen.x * 420.0/720.0);
+		int topMargin =  (int)(screen.x * 200.0/720.0);
+		int leftMargin =  (int)(screen.x * 38.0/720.0);
+		int width = (int)(screen.x * 40.0/720.0);
+		int gap = (int)(screen.x * 55.0/720.0);
 		
-		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
-		pointerParam.width = (int)(screen.x * 75.0/720.0);
-		pointerParam.height = (int)(screen.x * 120.0/720.0);
-		
-		pointerParam.topMargin = (int)(screen.x * 233.0/720.0);
-		pointerBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_group);
-		
-		
-		RelativeLayout.LayoutParams highParam = (RelativeLayout.LayoutParams)high.getLayoutParams();
-		highParam.topMargin = (int)(screen.x * 291.0/720.0);
-		highParam.rightMargin = (int)(screen.x * 120.0/720.0);
-		RelativeLayout.LayoutParams lowParam = (RelativeLayout.LayoutParams)low.getLayoutParams();
-		lowParam.topMargin = (int)(screen.x * 291.0/720.0);
-		lowParam.leftMargin = (int)(screen.x * 120.0/720.0);
+		for (int i=0;i<circles.length;++i){
+			RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) circles[i].getLayoutParams();
+			cParam.topMargin = topMargin;
+			cParam.leftMargin = leftMargin;
+			cParam.width = width;
+			cParam.height = width;
+			leftMargin += gap;
+		}
 		
 	}
 
 	@Override
 	public void onPostTask() {
 		title_bg.setImageBitmap(titleBmp);
-		bar.setImageBitmap(barBmp);
-		pointer.setImageBitmap(pointerBmp);
 		
-		help.setText("已戒酒 X 周，完成此療程尚餘 Y 周" );
-		high.setText("高" );
-		low.setText("低" );
+		
 		setPointer();
 		
 	}

@@ -5,6 +5,7 @@ import history.GameHistory;
 import history.pageEffect.PageAnimationTask;
 import history.pageEffect.PageWidget;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -58,7 +59,8 @@ public class HistoryFragment extends Fragment {
 	private LoadingHandler loadHandler;
 	
 	private boolean runAnimation;
-	private ImageView load;
+	
+	private ProgressDialog loadDialog;
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,22 +75,7 @@ public class HistoryFragment extends Fragment {
 		super.onResume();
 		System.gc();
 		
-		RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.history_main_layout);
-		load = new ImageView(view.getContext());
-		if (FragmentTabs.loadingBmp != null && !FragmentTabs.loadingBmp.isRecycled())
-			load.setImageBitmap(FragmentTabs.loadingBmp);
-		else{
-			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.loading_page);
-			FragmentTabs.loadingBmp = Bitmap.createScaledBitmap(tmp, (int)(tmp.getWidth()*0.4), (int)(tmp.getHeight()*0.4), true);
-			tmp.recycle();
-			load.setImageBitmap(FragmentTabs.loadingBmp);
-		}
-		layout.addView(load);
-		RelativeLayout.LayoutParams loadParam = (LayoutParams) load.getLayoutParams();
-		loadParam.width = RelativeLayout.LayoutParams.MATCH_PARENT;
-		loadParam.height = RelativeLayout.LayoutParams.MATCH_PARENT;
-		load.setScaleType(ScaleType.FIT_XY);
-		
+		loadDialog = LoadingBox.loading(this.getActivity());
 		if (loadHandler == null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);
@@ -296,8 +283,7 @@ public class HistoryFragment extends Fragment {
 			initView_step2();
 			endAnimation();
 	    	
-			RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.history_main_layout);
-			layout.removeView(load);
+			loadDialog.dismiss();
 		}
 	}
 

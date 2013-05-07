@@ -20,11 +20,11 @@ import android.widget.TextView;
 import statisticPageView.StatisticPageView;
 import test.data.BracDataHandler;
 
-public class StatisticWeekView extends StatisticPageView {
+public class StatisticWeekView2 extends StatisticPageView {
 
 	private HistoryDB db;
-	private ImageView textImage, lineImage1, lineImage2;
-	private Bitmap textBmp, lineBmp1, lineBmp2; 
+	private ImageView textImage, lineImage1;
+	private Bitmap textBmp, lineBmp1; 
 	private RelativeLayout mainLayout;
 	private TextView help;
 	private TextView[] labels;
@@ -37,8 +37,8 @@ public class StatisticWeekView extends StatisticPageView {
 	
 	private static final String[] WEEK_LABEL = {"日","一","二","三","四","五","六"};
 	
-	public StatisticWeekView(Context context,StatisticFragment statisticFragment) {
-		super(context, R.layout.statistic_week_view, statisticFragment);
+	public StatisticWeekView2(Context context,StatisticFragment statisticFragment) {
+		super(context, R.layout.statistic_week_view2, statisticFragment);
 		db = new HistoryDB(context);
 	}
 
@@ -54,10 +54,6 @@ public class StatisticWeekView extends StatisticPageView {
 		if (lineBmp1!=null && !lineBmp1.isRecycled()){
 			lineBmp1.recycle();
 			lineBmp1 = null;
-		}
-		if (lineBmp2!=null && !lineBmp2.isRecycled()){
-			lineBmp2.recycle();
-			lineBmp2 = null;
 		}
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
@@ -75,23 +71,17 @@ public class StatisticWeekView extends StatisticPageView {
 		lineImage1 = (ImageView) view.findViewById(R.id.statistic_week_line1);
 		lineImage1.setScaleType(ScaleType.FIT_XY);
 		
-		lineImage2 = (ImageView) view.findViewById(R.id.statistic_week_line2);
-		lineImage2.setScaleType(ScaleType.FIT_XY);
-		
 		mainLayout = (RelativeLayout) view.findViewById(R.id.statistic_week_layout);
 		
 		int textSize = (int)(screen.x * 36.0/720.0);
 		help = (TextView) view.findViewById(R.id.statistic_week_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		
-		labels = new TextView[4];
+		labels = new TextView[2];
 		labels[0] =  (TextView) view.findViewById(R.id.statistic_week_label_1);
 		labels[1] =  (TextView) view.findViewById(R.id.statistic_week_label_2);
-		labels[2] =  (TextView) view.findViewById(R.id.statistic_week_label_3);
-		labels[3] =  (TextView) view.findViewById(R.id.statistic_week_label_4);
 		
-		for (int i=0;i<4;++i){
-			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		for (int i=0;i<2;++i){
 			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		}
 			
@@ -125,29 +115,20 @@ public class StatisticWeekView extends StatisticPageView {
 		lineParam1.width = lineWidth1;
 		lineParam1.topMargin = blockTopMargin = (int)(screen.y*310.0/443.0);
 		
-		int lineWidth2 = (int) (screen.x*10.0/720.0);
-		int lineHeight2 = (int) (screen.y*102.0/443.0);
-		lineBmp2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line2);
-		
-		RelativeLayout.LayoutParams lineParam2 = (RelativeLayout.LayoutParams) lineImage2.getLayoutParams();
-		lineParam2.height = lineHeight2;
-		lineParam2.width = lineWidth2;
-		lineParam2.leftMargin = (int) (screen.x * 34.0/720.0);
-		lineParam2.topMargin = (int)(screen.y*158.0/443.0);
-		
 		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg2);
 		
 		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
 		helpParam.leftMargin =  (int) (screen.x * 60.0/720.0);
 		helpParam.topMargin = (int)(screen.y*61.0/443.0);
 		
-		for (int i=0;i<4;++i){
+		for (int i=0;i<2;++i){
 			RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[i].getLayoutParams();
 			labelParam.leftMargin = (int) (screen.x * 22.0/720.0);
 		}
 		RelativeLayout.LayoutParams labelParam = (RelativeLayout.LayoutParams) labels[0].getLayoutParams();
-		labelParam.topMargin = (int)(screen.y*115.0/443.0);
-		
+		labelParam.topMargin = (int)(screen.y*150.0/443.0);
+		labelParam = (RelativeLayout.LayoutParams) labels[1].getLayoutParams();
+		labelParam.topMargin = (int)(screen.y*40.0/443.0);
 	}
 
 
@@ -155,23 +136,22 @@ public class StatisticWeekView extends StatisticPageView {
 	public void onPostTask() {
 		textImage.setImageBitmap(textBmp);
 		lineImage1.setImageBitmap(lineBmp1);
-		lineImage2.setImageBitmap(lineBmp2);
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		int blockWidth =  (int) (screen.x * 44.0/720.0);
-		int blockHeight =  (int) (screen.y * 50.0/443.0);
-		int blockGapVer =  (int) (screen.y * 50.0/443.0);
+		int blockHeight =  (int) (screen.y * 90.0/443.0);
+		int blockGapVer =  (int) (screen.y * 100.0/443.0);
 		int blockGap = (int)(screen.x * 30.0/720.0);
 		if (blockGap < 1)
 			blockGap = 1;
 		
-		blocks = new ImageView[28];
+		blocks = new ImageView[14];
 		int leftMargin = (int) (screen.x * 70.0/720.0);
 		for (int i=0;i<7;++i){
-			int topMargin =blockTopMargin - blockHeight - 3*blockGapVer;
-			for (int j=0;j<4;++j){
-				int c = 4*i+j;
+			int topMargin =blockTopMargin - blockHeight - blockGapVer;
+			for (int j=0;j<2;++j){
+				int c = 2*i+j;
 				blocks[c] = new ImageView(context);
 				mainLayout.addView(blocks[c]);
 				RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) blocks[c].getLayoutParams();

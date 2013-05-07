@@ -3,7 +3,6 @@ package main.activities;
 import tabControl.CustomTab;
 import tabControl.TabManager;
 import test.data.Reuploader;
-import ui.LoadingPageHandler;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -37,11 +36,9 @@ public class FragmentTabs extends FragmentActivity {
 	static private CustomTab[] customTabs;
 	
 	private static final String[] tabName ={"Test","Record","History","Question"}; 
-	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_history,R.drawable.tab_social}; 
+	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_history,R.drawable.tab_question}; 
 	private static final String[] iconText ={"測試","紀錄","人生新頁","問卷"}; 
 	private static final String[] iconTextEng ={"Test","Record","History","Questionaire"}; 
-	
-	public static Bitmap loadingBmp;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -142,8 +139,6 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onStop(){
 		Log.d("TABS","ONSTOP");
-		if (loadingBmp!=null && !loadingBmp.isRecycled())
-			loadingBmp.recycle();
 		super.onStop();
 	}
 	

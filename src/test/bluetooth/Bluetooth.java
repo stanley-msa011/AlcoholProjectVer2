@@ -210,8 +210,8 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
 			close();
-			//if(!success)
-				//cameraRunHandler.sendEmptyMessage(1);
+			if(!success)
+				cameraRunHandler.sendEmptyMessage(1);
 			
 		}
 	}
