@@ -34,6 +34,7 @@ public class HistoryDB {
     	cursor = db.rawQuery("SELECT * FROM HistoryGame WHERE _ID="+String.valueOf(max_id),null);
 
     	if (cursor.getCount()==0){
+    		cursor.close();
     		db.close();
     		return new DateBracGameHistory(0,0,0);
     	}
@@ -45,13 +46,14 @@ public class HistoryDB {
     	
     	if (level_idx==-1||ts_idx==-1||brac_idx==-1){
     		Log.d("DATABASE","CANNOT FIND IDXs");
+    		cursor.close();
     		db.close();
     		return new DateBracGameHistory(0,0,0);
     	}
     	int level = cursor.getInt(level_idx);
     	long ts = cursor.getLong(ts_idx);
     	float brac = cursor.getFloat(brac_idx);
-    	
+    	cursor.close();
     	db.close();
     	return new DateBracGameHistory(level,ts,brac);
     }
@@ -105,6 +107,7 @@ public class HistoryDB {
     		cursor.moveToFirst();
     		float brac = cursor.getFloat(0);
     		historys[i] = new BracGameHistory(0,0,brac);
+    		cursor.close();
     	}
     	db.close();
     	return historys;
@@ -125,6 +128,7 @@ public class HistoryDB {
     	Cursor cursor = db.rawQuery(sql, null);
     	
     	if (cursor.getCount()==0){
+    		cursor.close();
     		db.close();
     		return score;
     	}
@@ -201,6 +205,7 @@ public class HistoryDB {
         	cur = next;
     		tb = _tb;
     	}
+    	cursor.close();
     	db.close();
 		return score;
     }
@@ -265,7 +270,8 @@ public class HistoryDB {
     			ts_to+=3600*24;
     		}
     	}
-    	
+    	cursor.close();
+    	db.close();
     	return historys;
     }
     
@@ -277,6 +283,7 @@ public class HistoryDB {
     		sql = "INSERT INTO NotUploadedTS (_TS) VALUES ("+ts+")";
     		db.execSQL(sql);
     	}
+    	cursor.close();
     	db.close();
     }
     
@@ -292,14 +299,18 @@ public class HistoryDB {
     	String sql = "SELECT * FROM NotUploadedTS ORDER BY _ID ASC";
     	Cursor cursor = db.rawQuery(sql, null);
     	int count = cursor.getCount();
-    	if (count == 0)
+    	if (count == 0){
+    		cursor.close();
+    		db.close();
     		return null;
+    	}
     	long[] ts = new long[count];
     	int ts_idx = cursor.getColumnIndex("_TS");
     	for (int i=0;i<count;++i){
     		cursor.moveToPosition(i);
     		ts[i] =cursor.getLong(ts_idx); 
     	}
+    	cursor.close();
     	db.close();
     	return ts;
     }
@@ -310,8 +321,11 @@ public class HistoryDB {
     	String sql = "SELECT * FROM InteractionGame ORDER BY _LEVEL DESC,  _UID ASC";
     	Cursor cursor = db.rawQuery(sql, null);
     	int count = cursor.getCount();
-    	if (count == 0)
+    	if (count == 0){
+    		cursor.close();
+    		db.close();
     		return null;
+    	}
     	historys = new InteractionHistory[count];
     	int uid_idx = cursor.getColumnIndex("_UID");
     	int level_idx = cursor.getColumnIndex("_LEVEL");
@@ -321,6 +335,7 @@ public class HistoryDB {
     		int level = cursor.getInt(level_idx);
     		historys[i] = new InteractionHistory(level,uid);
     	}
+    	cursor.close();
     	db.close();
     	return historys;
     }
@@ -338,6 +353,7 @@ public class HistoryDB {
     		Log.d("update",sql);
     		db.execSQL(sql);
     	}
+    	cursor.close();
     	db.close();
     }
     
@@ -346,13 +362,45 @@ public class HistoryDB {
     	String sql = "SELECT * FROM HistoryGame ORDER BY  _ID ASC";
     	Cursor cursor = db.rawQuery(sql, null);
     	int count = cursor.getCount();
-    	if (count == 0)
+    	if (count == 0){
+    		cursor.close();
+    		db.close();
     		return null;
+    	}
     	cursor.moveToFirst();
     	int ts_idx = cursor.getColumnIndex("_TS");
     	long ts = cursor.getLong(ts_idx)*1000L;
     	Calendar cal = Calendar.getInstance();
     	cal.setTimeInMillis(ts);
+    	cursor.close();
+    	db.close();
 		return cal;
     }
+    
+    public boolean getIsDone(Calendar curCal){
+    	db = dbHelper.getReadableDatabase();
+    	
+    	int year = curCal.get(Calendar.YEAR);
+    	int month = curCal.get(Calendar.MONTH)+1;
+    	int date = curCal.get(Calendar.DATE);
+    	int hour = curCal.get(Calendar.HOUR_OF_DAY);
+    	int time_block = TimeBlock.getTimeBlock(hour);
+    	
+    	String sql = "SELECT * FROM HistoryGame WHERE _YEAR ="+year
+    							+" AND _MONTH = "+month
+    							+" AND _DATE= "+date
+    							+" AND _TIMEBLOCK= "+time_block;
+    	Cursor cursor = db.rawQuery(sql , null);
+    	int len = cursor.getCount();
+    	
+    	boolean result = false;
+    	Log.d("isDone", String.valueOf(len));
+    	if (len > 0){
+    		result = true;
+    	}
+    	cursor.close();
+    	db.close();
+		return result;
+    }
+    
 }

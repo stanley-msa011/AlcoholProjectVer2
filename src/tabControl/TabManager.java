@@ -44,8 +44,6 @@ public class TabManager implements TabHost .OnTabChangeListener{
 		@Override
 		public View createTabContent(String tag) {
 			View v = new View(context);
-			v.setMinimumWidth(0);
-			v.setMinimumHeight(0);
 			return v;
 		}
 		
@@ -103,7 +101,7 @@ public class TabManager implements TabHost .OnTabChangeListener{
 	            ft.commit();
 	            fragmentTabs.getSupportFragmentManager().executePendingTransactions();
 	        }
-	     fragmentTabs.setTabState(tabId);
+	     //fragmentTabs.setTabState(tabId);
 	}
 
 }

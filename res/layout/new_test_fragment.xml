@@ -60,7 +60,8 @@
 	    android:id="@+id/test_camera_preview_layout"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    />
+	    >
+	    </FrameLayout>
 		
 	<TextView
         android:id = "@+id/test_message"
@@ -96,5 +97,30 @@
 	     android:scaleType="fitXY"
 	     android:visibility="invisible"
 	    />
+
+	<ScrollView
+	    android:id="@+id/debugView"
+	    android:layout_width="match_parent"
+	    android:layout_height="150dp"
+	    android:layout_alignParentBottom="true"
+	    android:visibility="invisible"
+	    android:layout_marginBottom="50dp"
+	  >
+
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" >
+
+	        <EditText
+	            android:visibility="invisible"
+	            android:id="@+id/debug_msg"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:freezesText="true"
+	            android:inputType="textMultiLine"
+	            android:textColor="#FFFFFFFF" />
+
+	    </LinearLayout>
+	</ScrollView>
 	
 </RelativeLayout>

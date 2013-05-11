@@ -50,8 +50,6 @@ public class StatisticFragment extends Fragment {
 	
 	private static final int[] DOT_ID={0xFF0,0xFF1,0xFF2};
 	
-	private ProgressDialog loadDialog;
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,8 +81,7 @@ public class StatisticFragment extends Fragment {
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
-		loadDialog = LoadingBox.loading(this.getActivity());
-		loadDialog.show();
+		LoadingBox.show(this.getActivity());
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);
@@ -151,7 +148,6 @@ public class StatisticFragment extends Fragment {
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
 		public void handleMessage(Message msg){
-			
         	Point screen = FragmentTabs.getSize();
         	statistic_px = new Point(screen.x,(int) (screen.x*467.0/720.0));
         	
@@ -188,6 +184,7 @@ public class StatisticFragment extends Fragment {
     		LayoutParams analysisViewParam2 =  analysisViews[2].getView().getLayoutParams();
     		analysisViewParam2.width = screen.x;
     		analysisViewParam2.height = (int) (screen.x*500.0/720.0);
+    		
     		
 	    	dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_on);
 	    	dot_off = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_off);
@@ -227,12 +224,13 @@ public class StatisticFragment extends Fragment {
     			analysisViews[i].onPostTask();
     		
 	    	statisticView.setCurrentItem(0);
+	    	
+	    	//Bugs happened here
 	    	for (int i=0;i<3;++i)
 				dots[i].setImageBitmap(dot_off);
 			dots[0].setImageBitmap(dot_on);
 			
-			loadDialog.dismiss();
-			
+			LoadingBox.dismiss();
 		}
 	}
     

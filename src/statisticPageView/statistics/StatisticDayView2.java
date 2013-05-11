@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 import database.HistoryDB;
 
+import main.activities.FragmentTabs;
 import main.activities.Lang;
 import main.activities.R;
 import main.activities.StatisticFragment;
@@ -132,6 +133,7 @@ public class StatisticDayView2 extends StatisticPageView {
 		output =format.format(brac); 
 		
 		Point statistic_size = StatisticFragment.getStatisticPx();
+		
 		
 		bgBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_bg2);
 		

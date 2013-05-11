@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/question_ask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:textSize="18sp"
+        />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/question_ask"
+        >
+        
+        <EditText
+        android:id="@+id/question_reply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="20" 
+        android:layout_weight="1.0"
+        android:textSize="18sp"
+        >
+
+        <requestFocus />
+    </EditText>
+
+     <Button
+        android:id="@+id/question_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.2"
+        android:text="OK" />
+            
+    </LinearLayout>
+
+</RelativeLayout>

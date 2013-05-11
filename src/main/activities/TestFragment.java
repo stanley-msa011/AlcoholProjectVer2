@@ -32,11 +32,13 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -47,6 +49,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.graphics.Point;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
@@ -98,7 +101,6 @@ public class TestFragment extends Fragment {
 	private UIRotate rotate;
 
 	private LoadingHandler loadingHandler;
-	private AnimationHandler animationHandler;
 	private FailBgHandler failBgHandler;
 	private MsgLoadingHandler msgLoadingHandler;
 	private TestHandler testHandler;
@@ -123,8 +125,9 @@ public class TestFragment extends Fragment {
 	
 	private TextView failHelp;
 	
-	private ProgressDialog loadDialog;
 	
+	private EditText debugMsg;
+	private ChangeMsgHandler msgHandler;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -145,14 +148,11 @@ public class TestFragment extends Fragment {
 	
 	public void onResume(){
 		super.onResume();
+		Log.d("test","onresume");
 		if (!isKeepMsgBox()){
-
-			loadDialog = LoadingBox.loading(this.getActivity());
-			loadDialog.show();
-			
+			LoadingBox.show(this.getActivity());
 			context = this.getActivity();
 			testFragment = this;
-			FragmentTabs.enableTab(true);
 			setting();
 			loadingHandler.sendEmptyMessage(0);
 		}
@@ -194,6 +194,8 @@ public class TestFragment extends Fragment {
 		sensor_lights[0] = (ImageView) view.findViewById(R.id.test_sensor_light_red);
 		sensor_lights[1] = (ImageView) view.findViewById(R.id.test_sensor_light_yellow);
 
+		debugMsg = (EditText) view.findViewById(R.id.debug_msg);
+		
 		
 		RelativeLayout.LayoutParams l_redParam = (LayoutParams) sensor_lights[0].getLayoutParams();
 		l_redParam.topMargin = (int)(screen.x * 470.0/720.0);
@@ -217,12 +219,12 @@ public class TestFragment extends Fragment {
 		msgLoadingHandler = new MsgLoadingHandler();
 		failBgHandler = new FailBgHandler();
 		testHandler = new TestHandler();
-		animationHandler = new AnimationHandler();
 		timeUpHandler = new TimeUpHandler();
 		changeTabsHandler = new ChangeTabsHandler(); 
 	}
 	
 	public void reset(){
+		checkDebug();
 		timestamp = setTimeStamp();
 		setStorage();
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -281,8 +283,9 @@ public class TestFragment extends Fragment {
 	}
 	
 	public void runBT(){
+		if (testHandler==null)
+			testHandler = new TestHandler();
 		
-		if (testHandler!=null)
 			testHandler.sendEmptyMessage(0);
 
 	}
@@ -314,19 +317,14 @@ public class TestFragment extends Fragment {
 				SharedPreferences.Editor editor = sp.edit();
 				editor.putBoolean("first", false);
 				editor.commit();
-				if (animationHandler!=null)
-					animationHandler.sendEmptyMessage(0);
 			}
-			else{
-				messageView.setText("請啟用酒測裝置");
+				messageView.setText("請按酒測裝置黑色按鈕\n以啟用酒測裝置");
 				messageView.setTextColor(0xFFFFFFFF);
 				sensor_button.setBackgroundColor(0xFF00CCAA);
 				sensor_lights[0].setVisibility(View.VISIBLE);
 				sensor_lights[1].setVisibility(View.INVISIBLE);
 				Thread t = new Thread(new TimeUpRunnable(0,1500));
 				t.start();
-				
-			}
 			
 		}
 	}
@@ -386,6 +384,7 @@ public class TestFragment extends Fragment {
 				btRunTask.execute();
 				messageView.setText("已啟用酒測裝置");
 				sensor_button.setBackgroundColor(0xFF000000);
+				showDebug("Device launched");
 				Thread t = new Thread(new TimeUpRunnable(1,1500));
 				t.start();
 			}
@@ -490,15 +489,16 @@ public class TestFragment extends Fragment {
 			failBgHandler.removeMessages(0);
 			failBgHandler = null;
 		}
-		if (animationHandler!=null){
-			animationHandler.removeMessages(0);
-			animationHandler = null;
+		
+		if (msgHandler!=null){
+			msgHandler.removeMessages(0);
+			msgHandler = null;
 		}
 	}
 	
 	private void clear(){
 		Log.d("test","clear");
-		if (bgBmp!=null && !bgBmp.isRecycled()){
+		/*if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;
 		}
@@ -509,7 +509,7 @@ public class TestFragment extends Fragment {
 		if (startCircleBmp!=null && !startCircleBmp.isRecycled()){
 			startCircleBmp.recycle();
 			startCircleBmp = null;
-		}
+		}*/
 		if (animation!=null){
 			animation.setImageDrawable(null);
 		}
@@ -556,23 +556,35 @@ public class TestFragment extends Fragment {
 				bgBmp.recycle();
 				bgBmp = null;
 			}
-			bgBmp = BitmapFactory.decodeResource(r,  R.drawable.test_start_bg_2);
+			
+			
+			Bitmap tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_bg_2);
+			bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.y, true);
+			tmp.recycle();
+			String bgBmp_size = bgBmp.getWidth() + "/"+bgBmp.getHeight();
+			Log.d("bgBMP",bgBmp_size);
+			
+			
 			
 			if (startLineBmp==null ||startLineBmp.isRecycled()){
-				startLineBmp = BitmapFactory.decodeResource(r, R.drawable.test_start_line);
-				RelativeLayout.LayoutParams startLineParam = (LayoutParams) startLine.getLayoutParams();
-				startLineParam.height = (int)(screen.x * 146.0/720.0);
-				startLineParam.topMargin = (int)(screen.x * 223.0/720.0);
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_line);
+				startLineBmp = Bitmap.createScaledBitmap(tmp, screen.x, (int)(screen.x * 146.0/720.0), true);
+				tmp.recycle();
 			}
+			RelativeLayout.LayoutParams startLineParam = (LayoutParams) startLine.getLayoutParams();
+			startLineParam.height = (int)(screen.x * 146.0/720.0);
+			startLineParam.topMargin = (int)(screen.x * 223.0/720.0);
 			
 			if (startCircleBmp==null ||startCircleBmp.isRecycled()){
-				startCircleBmp = BitmapFactory.decodeResource(r, R.drawable.test_start_start);
-				RelativeLayout.LayoutParams startCircleParam = (LayoutParams) startCircle.getLayoutParams();
-				startCircleParam.width = (int)(screen.x * 358.0/720.0);
-				startCircleParam.height = (int)(screen.x * 356.0/720.0);
-				startCircleParam.leftMargin = (int)(screen.x * 357.0/720.0);
-				startCircleParam.topMargin = (int)(screen.x * 112.0/720.0);
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_start);
+				startCircleBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 358.0/720.0), (int)(screen.x * 356.0/720.0), true);
+				tmp.recycle();
 			}
+			RelativeLayout.LayoutParams startCircleParam = (LayoutParams) startCircle.getLayoutParams();
+			startCircleParam.width = (int)(screen.x * 358.0/720.0);
+			startCircleParam.height = (int)(screen.x * 356.0/720.0);
+			startCircleParam.leftMargin = (int)(screen.x * 357.0/720.0);
+			startCircleParam.topMargin = (int)(screen.x * 112.0/720.0);
 			
 			RelativeLayout.LayoutParams startTextParam = (LayoutParams) startText.getLayoutParams();
 			startTextParam.topMargin = (int)(screen.x * 246.0/720.0);
@@ -591,13 +603,17 @@ public class TestFragment extends Fragment {
 			previewParam.leftMargin = (int)(screen.x * 62.0/720.0);
 			previewParam.topMargin = (int)(screen.x * 233.0/720.0);
 			
+			//Bugs Here
 			if(bgBmp!=null && !bgBmp.isRecycled())
 				bg.setImageBitmap(bgBmp);
+			
 			if(startLineBmp!=null && !startLineBmp.isRecycled())
 				startLine.setImageBitmap(startLineBmp);
 			startLine.setVisibility(View.VISIBLE);
+			
 			if (startCircleBmp!=null && !startCircleBmp.isRecycled())
 				startCircle.setImageBitmap(startCircleBmp);
+			//End
 			startCircle.setVisibility(View.VISIBLE);
 			startText.setText("點我開始");
 			startText.setVisibility(View.VISIBLE);
@@ -608,13 +624,11 @@ public class TestFragment extends Fragment {
 			startCircle.setOnClickListener(new StartOnClickListener());
 			bg.setOnClickListener(null);
 		
-			loadDialog.dismiss();
-
-			
 			sensor_button.setBackgroundColor(0xFF000000);
 			sensor_button.setVisibility(View.VISIBLE);
 			sensor_lights[0].setVisibility(View.INVISIBLE);
 			sensor_lights[1].setVisibility(View.INVISIBLE);
+			LoadingBox.dismiss();
 		}
 	}
     
@@ -633,7 +647,10 @@ public class TestFragment extends Fragment {
 				bgBmp.recycle();
 				bgBmp = null;
 			}
-			bgBmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_start_bg_2);
+			Point screen = FragmentTabs.getSize();
+			Bitmap tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_start_bg_2);
+			bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.y, true);
+			tmp.recycle();
 			if(bgBmp!=null && !bgBmp.isRecycled())
 				bg.setImageBitmap(bgBmp);
 			if (msgBox!=null){
@@ -669,7 +686,12 @@ public class TestFragment extends Fragment {
 				bgBmp.recycle();
 				bgBmp = null;
 			}
-			bgBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_start_bg_2);
+			
+			Point screen = FragmentTabs.getSize();
+			Bitmap tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_start_bg_2);
+			bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.y, true);
+			tmp.recycle();
+			
 			bg.setImageBitmap(bgBmp);
 			sensor_button.setBackgroundColor(0xFF000000);
 			messageView.setText(msgStr);
@@ -684,31 +706,6 @@ public class TestFragment extends Fragment {
 			blink_anim.start();
 		}
 	}
-	
-	@SuppressLint("HandlerLeak")
-	private class AnimationHandler extends Handler{
-		
-		@SuppressWarnings("deprecation")
-		public void handleMessage(Message msg){
-			animationBmp = new Bitmap[4];
-			animationBmp[0] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_0);
-			animationBmp[1] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_1);
-			animationBmp[2] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_2);
-			animationBmp[3] = BitmapFactory.decodeResource(getResources(), R.drawable.test_animation_3);
-			
-			animationDrawable = new AnimationDrawable();
-			animation.setImageDrawable(animationDrawable);
-			for (int i=0;i<8;++i){
-				Drawable d = new BitmapDrawable(animationBmp[i%4]);
-				animationDrawable.addFrame(d,300);
-			}
-			animation.setVisibility(View.VISIBLE);
-			animationDrawable.start();
-			Thread t = new Thread(new TimeUpRunnable(2,2400));
-			t.start();
-		}
-	}
-	
 	@SuppressLint("HandlerLeak")
 	private class TestHandler extends Handler{
 		public void handleMessage(Message msg){
@@ -720,14 +717,19 @@ public class TestFragment extends Fragment {
 				bgBmp.recycle();
 				bgBmp = null;
 			}
-			bgBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_camera_bg);
+			
+			Point screen = FragmentTabs.getSize();   
+			Bitmap tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_camera_bg);
+			bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.y, true);
+			tmp.recycle();
+			
 			rotate.settingInBackground();
 			
 			bg.setImageBitmap(bgBmp);
 			bg.setOnClickListener(null);
 			rotate.settingPostTask();
 			
-			messageView.setText("請依照圓圈內指示進行測試");
+			messageView.setText("請依照圓圈內指示進行測試,\n並將臉對於螢幕中央");
 			messageView.setTextColor(0xFFFFFFFF);
 			if (bt!=null && cameraRecorder!=null){
 				bt.start();
@@ -770,11 +772,16 @@ public class TestFragment extends Fragment {
 	private class TimeUpHandler extends Handler{
 		public void handleMessage(Message msg){
 			int t = msg.what;
-			if (t == 0)
+			if (t == 0){
+				showDebug(">Try to start the device");
 				startBT();
-			else if (t == 1)
+			}
+			else if (t == 1){
+				showDebug(">Start to run the  device");
 				runBT();
+		}
 			else if (t == 2){
+				showDebug(">Fail to start the device");
 				animation.setVisibility(View.INVISIBLE);
 				animationDrawable.stop();
 				animation.setImageDrawable(null);
@@ -822,6 +829,48 @@ public class TestFragment extends Fragment {
 			if (msgBox!=null)
 				msgBox.closeInitializingBox();
 			FragmentTabs.changeTab(1);
+		}
+	}
+	
+	private void checkDebug(){
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+		Boolean debug = sp.getBoolean("debug", false);
+		ScrollView sv = (ScrollView) view.findViewById(R.id.debugView);
+		if (debug){
+			sv.setVisibility(View.VISIBLE);
+			msgHandler = new ChangeMsgHandler();
+			debugMsg.setText("");
+			debugMsg.setVisibility(View.VISIBLE);
+			debugMsg.setClickable(false);
+			debugMsg.setOnKeyListener(null);
+			debugMsg.setEnabled(false);
+		}else{
+			sv.setVisibility(View.INVISIBLE);
+			debugMsg.setVisibility(View.INVISIBLE);
+		}
+			
+	}
+	
+	
+	public void showDebug(String message){
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+		Boolean debug = sp.getBoolean("debug", false);
+		if (msgHandler!=null && debug){
+			Message msg = new Message();
+			Bundle data = new Bundle();
+			data.putString("message", message);
+			msg.setData(data);
+			msg.what = 0;
+			msgHandler.sendMessage(msg);
+		}
+		
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class ChangeMsgHandler extends Handler{
+		public void handleMessage(Message msg){
+			debugMsg.append("\n"+msg.getData().getString("message"));
+			debugMsg.setSelection(debugMsg.getText().length());
 		}
 	}
 	

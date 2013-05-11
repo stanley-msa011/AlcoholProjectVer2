@@ -33,7 +33,7 @@ public class UIMsgBox {
 	private LayoutInflater inflater;
 	private RelativeLayout box = null;
 	
-	private Bitmap[] bgBmps;
+	private Bitmap bgBmp;
 	private Bitmap buttonBmp;
 	
 	private TextView help,yes,no;
@@ -47,8 +47,6 @@ public class UIMsgBox {
 	private Point screen;
 	
 	private GPSOnClickListener gpsListener;
-	private BTOnClickListener btListener;
-	private BTSuccessOnClickListener btSuccessListener;
 	
 	private TimeUpHandler timeUpHandler;
 	
@@ -66,8 +64,6 @@ public class UIMsgBox {
 	
 	private void setting(){
 		gpsListener  = new GPSOnClickListener();
-		btListener = new BTOnClickListener();
-		btSuccessListener = new BTSuccessOnClickListener();
 		
 		box = (RelativeLayout) inflater.inflate(R.layout.test_msg_box,null);
 		
@@ -99,23 +95,26 @@ public class UIMsgBox {
 	
 	public void settingInBackground(){
 		
-		if (bgBmps!=null){
-			for (int i=0;i<bgBmps.length;++i){
-				if(bgBmps[i]!=null && !bgBmps[i].isRecycled()){
-					bgBmps[i].recycle();
-					bgBmps[i]=null;
-				}
-			}
-			bgBmps = null;
+		if(bgBmp!=null && !bgBmp.isRecycled()){
+			bgBmp.recycle();
+			bgBmp=null;
 		}
 		if(buttonBmp!=null && !buttonBmp.isRecycled()){
 			buttonBmp.recycle();
 			buttonBmp=null;
 		}
-		bgBmps = new Bitmap[2];
-		bgBmps[0] = BitmapFactory.decodeResource(r, R.drawable.test_box_bg_1);
-		bgBmps[1] = BitmapFactory.decodeResource(r, R.drawable.test_box_bg_2);
+		
+		Point screen = FragmentTabs.getSize();
+		
+		Bitmap tmp;
+		tmp = BitmapFactory.decodeResource(r, R.drawable.test_box_bg_1);
+		bgBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 666.0/720.0),  (int)(screen.x * 440.0/720.0), true);
+		tmp.recycle();
+		tmp = buttonBmp = BitmapFactory.decodeResource(r, R.drawable.test_box_button);
 		buttonBmp = BitmapFactory.decodeResource(r, R.drawable.test_box_button);
+		tmp.recycle();
+		//bgBmp = BitmapFactory.decodeResource(r, R.drawable.test_box_bg_1,opts);
+		//buttonBmp = BitmapFactory.decodeResource(r, R.drawable.test_box_button,opts);
 		
 		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) box.getLayoutParams();
@@ -168,15 +167,9 @@ public class UIMsgBox {
 			timeUpHandler.removeMessages(1);
 		}
 		mainLayout.removeView(box);
-		if (bgBmps!=null){
-			for (int i=0;i<bgBmps.length;++i){
-				if(bgBmps[i]!=null && !bgBmps[i].isRecycled()){
-					Log.d("UIMSG","recycle bgBmps");
-					bgBmps[i].recycle();
-					bgBmps[i]=null;
-				}
-			}
-			bgBmps = null;
+		if(bgBmp!=null && !bgBmp.isRecycled()){
+			bgBmp.recycle();
+			bgBmp=null;
 		}
 		if(buttonBmp!=null && !buttonBmp.isRecycled()){
 			buttonBmp.recycle();
@@ -185,12 +178,12 @@ public class UIMsgBox {
 	}
 	
 	public void generateGPSCheckBox(){
-		if (bgBmps == null)
+		if (bgBmp == null || bgBmp.isRecycled())
 			return;
 		if (bg==null || help == null || yes == null || no == null || yesBg ==null || noBg == null)
 			return;
 		
-		bg.setImageBitmap(bgBmps[0]);
+		bg.setImageBitmap(bgBmp);
 		help.setText("是否回報現在位置?");
 		yes.setVisibility(View.VISIBLE);
 		no.setVisibility(View.VISIBLE);
@@ -221,12 +214,12 @@ public class UIMsgBox {
 	}
 	
 	public void generateBTCheckBox(){
-		if (bgBmps == null)
+		if (bgBmp == null || bgBmp.isRecycled())
 			return;
 		if (bg==null || help == null || yes == null || no == null || yesBg ==null || noBg == null)
 			return;
 		
-		bg.setImageBitmap(bgBmps[0]);
+		bg.setImageBitmap(bgBmp);
 		help.setText("請啟用\n酒測裝置");
 		yes.setVisibility(View.INVISIBLE);
 		no.setVisibility(View.INVISIBLE);
@@ -256,67 +249,12 @@ public class UIMsgBox {
 		t.start();
 	}
 	
-	private class BTOnClickListener implements View.OnClickListener{
-		@Override
-		public void onClick(View v) {
-			box.setVisibility(View.INVISIBLE);
-			testFragment.startBT();
-		}
-	}
-	
-	
-	public void generateBTSuccessBox(){
-		if (bgBmps == null)
-			return;
-		if (bg==null || help == null || yes == null || no == null || yesBg ==null || noBg == null)
-			return;
-		
-		bg.setImageBitmap(bgBmps[1]);
-		help.setText("已啟用  \n酒測裝置及藍芽功能");
-		yes.setVisibility(View.INVISIBLE);
-		no.setVisibility(View.INVISIBLE);
-		yesBg.setVisibility(View.INVISIBLE);
-		noBg.setVisibility(View.INVISIBLE);
-		
-		RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
-		helpParam.topMargin = (int)(screen.x * 140.0/720.0);
-		
-		box.setOnClickListener(null); 
-		yesBg.setOnClickListener(null);
-		noBg.setOnClickListener(null);
-		
-		box.setVisibility(View.VISIBLE);
-		
-		timeUpHandler.removeMessages(0);
-		Runnable r = new Runnable(){
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(2000);
-					timeUpHandler.sendEmptyMessage(1);
-				} catch (InterruptedException e) {
-				}
-			}
-		};
-		Thread t = new Thread(r);
-		t.start();
-	}
-	
-	private class BTSuccessOnClickListener implements View.OnClickListener{
-		@Override
-		public void onClick(View v) {
-			box.setVisibility(View.INVISIBLE);
-			testFragment.runBT();
-		}
-	}
-	
-	
 	public void generateInitializingBox(){
-		if (bgBmps == null)
+		if (bgBmp == null || bgBmp.isRecycled())
 			return;
 		if (bg==null || help == null || yes == null || no == null || yesBg ==null || noBg == null)
 			return;
-		bg.setImageBitmap(bgBmps[0]);
+		bg.setImageBitmap(bgBmp);
 		help.setText("請稍待");
 		yes.setVisibility(View.INVISIBLE);
 		no.setVisibility(View.INVISIBLE);

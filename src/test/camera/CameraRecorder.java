@@ -10,6 +10,7 @@ import test.file.ImageFileHandler;
 
 import android.app.Activity;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
@@ -19,6 +20,9 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 public class CameraRecorder {
     
@@ -30,7 +34,10 @@ public class CameraRecorder {
     
     private PreviewWindow preview;
     private FrameLayout previewFrame = null;
+    private RelativeLayout previewCircleLayout = null;
     SurfaceHolder previewHolder;
+    private ImageView circle;
+    private RelativeLayout.LayoutParams pParam;
     
     public int picture_count=0;
     
@@ -81,7 +88,11 @@ public class CameraRecorder {
     
     public void setSurfaceCallback(){
     	previewFrame = null;
+    	circle = new ImageView(activity);
+    	circle.setBackgroundColor(0xAAAACCFF);
     	previewFrame =(FrameLayout) activity.findViewById(R.id.test_camera_preview_layout);
+    	previewCircleLayout = new RelativeLayout(activity);
+    	pParam = (RelativeLayout.LayoutParams) previewFrame.getLayoutParams();
     	if (previewFrame!=null){
     		preview = new PreviewWindow(activity,this);
     		previewHolder = preview.getHolder();
@@ -89,6 +100,9 @@ public class CameraRecorder {
     		previewFrame.addView(preview);
     		preview.setVisibility(View.INVISIBLE);
     	}
+    	previewFrame.addView(previewCircleLayout);
+    	previewCircleLayout.addView(circle);
+    	circle.setVisibility(View.INVISIBLE);
     }
     
     
@@ -107,6 +121,7 @@ public class CameraRecorder {
     	if (camera!=null){
     		Camera tmp = camera;
     		camera = null;
+    		tmp.stopFaceDetection();
     		tmp.stopPreview();
     		tmp.release();
     		tmp = null;
@@ -133,12 +148,25 @@ public class CameraRecorder {
     
     public void CloseSuccess(){
     	close();
+    	circle.setVisibility(View.INVISIBLE);
 		testFragment.updateDoneState(TestFragment._CAMERA);
     }
     
     public void CloseFail(){
     	close();
+    	circle.setVisibility(View.INVISIBLE);
     	testFragment.stopByFail();
     }
     
+    public void drawFace(Rect rect){
+    	
+    	RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) circle.getLayoutParams();
+    	
+    	cParam.width = Math.abs(rect.width());
+    	cParam.height =Math.abs(rect.height());
+    	
+    	String rect_str = rect.left+"/"+rect.right+"/"+rect.top+"/"+rect.bottom;
+    	Log.d("preview",rect_str);
+    	circle.setVisibility(View.VISIBLE);
+    }
 }

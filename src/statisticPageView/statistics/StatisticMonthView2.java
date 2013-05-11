@@ -3,6 +3,7 @@ package statisticPageView.statistics;
 import java.util.Calendar;
 
 import database.HistoryDB;
+import main.activities.FragmentTabs;
 import main.activities.Lang;
 import main.activities.R;
 import main.activities.StatisticFragment;
@@ -62,11 +63,8 @@ public class StatisticMonthView2 extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		Point screen = StatisticFragment.getStatisticPx();
-		lineBmp1 =BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line3);
-		lineImage1 = (ImageView) view.findViewById(R.id.statistic_month_line1);
-		lineImage1.setImageBitmap(lineBmp1);
-		lineImage1.setScaleType(ScaleType.FIT_XY);
 		
+		lineImage1 = (ImageView) view.findViewById(R.id.statistic_month_line1);
 		
 		lines = new ImageView[3];
 		
@@ -95,6 +93,9 @@ public class StatisticMonthView2 extends StatisticPageView {
 
 	@Override
 	public void onInBackground() {
+
+		lineBmp1 =BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_line3);
+		
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		int lineWidth1 =screen.x;
@@ -126,6 +127,9 @@ public class StatisticMonthView2 extends StatisticPageView {
 	@Override
 	public void onPostTask() {
 		Point screen = StatisticFragment.getStatisticPx();
+		
+		lineImage1.setImageBitmap(lineBmp1);
+		lineImage1.setScaleType(ScaleType.FIT_XY);
 		
 		int blockWidth =  (int) (screen.x * 20.0/720.0);
 		int blockHeight =  (int) (screen.y * 90.0/443.0);

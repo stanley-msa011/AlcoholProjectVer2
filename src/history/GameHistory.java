@@ -4,7 +4,7 @@ public class GameHistory {
 
 	public int level;
 	public static final int MIN_LEVEL = 0;
-	public static final int MAX_LEVEL = 16;
+	public static final int MAX_LEVEL = 29;
 	
 	public GameHistory(int level){
 		if (level > MAX_LEVEL)

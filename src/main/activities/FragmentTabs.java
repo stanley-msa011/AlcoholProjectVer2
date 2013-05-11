@@ -1,24 +1,21 @@
 package main.activities;
 
 import tabControl.CustomTab;
-import tabControl.TabManager;
 import test.data.Reuploader;
+import android.content.Context;
 import android.content.Intent;import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
-import android.view.ViewGroup;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.widget.TabHost;
@@ -28,7 +25,7 @@ import android.widget.TabWidget;
 public class FragmentTabs extends FragmentActivity {
 
 	static private TabHost tabHost;
-	private TabManager tabManager;
+	//private TabManager tabManager;
 	private static Point screen_px;
 	private static Point tab_px;
 	static private TabSpec[] tabs;
@@ -37,7 +34,11 @@ public class FragmentTabs extends FragmentActivity {
 	private static final String[] tabName ={"Test","Record","History","Question"}; 
 	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_history,R.drawable.tab_question}; 
 	private static final String[] iconText ={"測試","紀錄","人生新頁","問卷"}; 
-	private static final String[] iconTextEng ={"Test","Record","History","Questionaire"}; 
+	
+	private Fragment[] fragments;
+	private android.support.v4.app.FragmentTransaction ft;
+	private android.support.v4.app.FragmentManager fm;
+	TabChangeListener tabChangeListener;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -61,48 +62,27 @@ public class FragmentTabs extends FragmentActivity {
 		setContentView(R.layout.tab_layout);
 		tabHost = (TabHost) this.findViewById(android.R.id.tabhost);
 		tabHost.setup();
-		tabManager = new TabManager(this,tabHost,R.id.real_tabcontent);
 		
-
 		if (tabs==null)
 			tabs = new TabSpec[4];
 		if (customTabs==null)
 			customTabs = new CustomTab[4];
 		
+		
+		
 		for (int i=0;i<4;++i){
-			if (Lang.eng)
-				customTabs[i] = new CustomTab(this,iconId[i],iconTextEng[i]);
-			else
 			customTabs[i] = new CustomTab(this,iconId[i],iconText[i]);
 			tabs[i] = tabHost.newTabSpec(tabName[i]).setIndicator(customTabs[i].getTab());
-			
+			tabs[i].setContent(new DummyTabFactory(this));
+			tabHost.addTab(tabs[i]);
 		}
-		
-		tabManager.addTab(
-				tabs[0],
-				TestFragment.class,
-				null
-				);
-		
-		tabManager.addTab(
-				tabs[1],
-				StatisticFragment.class,
-				null
-				);
-		
-		tabManager.addTab(
-				tabs[2],
-				HistoryFragment.class,
-				null
-				);
-		
-		tabManager.addTab(
-				tabs[3],
-				SocialFragment.class,
-				null
-				);
-		
+		fm =  getSupportFragmentManager();
+		fragments = new Fragment[4];
+		tabHost.setOnTabChangedListener(new TabChangeListener());
+		//LoadingBox.show(this);
+		tabHost.setCurrentTab(3);
 		tabHost.setCurrentTab(0);
+		//tabHost.setCurrentTab(0);
 		
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -147,24 +127,21 @@ public class FragmentTabs extends FragmentActivity {
 		super.onPause();
 		Log.d("tabs","onPauseEnd");
 	}
-
-	protected void onDestory(){
-		Log.d("tabs","onDestory");
-		super.onDestroy();
-		Log.d("tabs","onDestory end");
-	}
-	
 	
 	public void setTabState(String tabId){
 		for (int i=0;i<4;++i){
-			if (tabId.equals(tabName[i]))
+			if (tabId.equals(tabName[i])){
 				customTabs[i].changeState(true);
-			else
+			}
+			else{
 				customTabs[i].changeState(false);
+			}
 		}
 	}
 	
-	
+	static public int getScreenWidth(){
+		return screen_px.x;
+	}
 	
 	static public Point getSize(){
 		if (screen_px == null){
@@ -183,14 +160,9 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	
 	static public Point getTabSize(){
-		if (tab_px == null){
-			Log.d("TAB_SIZE","NULL");
-		}
-		else{
-			String str = tab_px.toString();
-			Log.d("TAB_SIZE",str);
-		}
-		return tab_px;
+		if (tab_px != null)
+			return tab_px;
+		return null;
 	}
 	
 	static public void changeTab(int pos){
@@ -201,18 +173,87 @@ public class FragmentTabs extends FragmentActivity {
 		}
 	}
 	
-	static public void enableTab(boolean s){
-		TabWidget tabWidget = tabHost.getTabWidget();
-		int count  = tabWidget.getChildCount();
-		for (int i=0;i<count;++i){
-			tabWidget.getChildAt(i).setEnabled(s);
-		}
-	}
-	
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (requestCode==1){
 			finish();
 		}
 	}
 	
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	menu.add(0, 0, 0, "Debug");
+    	menu.add(1, 1, 1, "Normal");
+    	return super.onCreateOptionsMenu(menu);
+    }
+	
+    public boolean onOptionsItemSelected(MenuItem item){
+    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+    	SharedPreferences.Editor editor = sp.edit();
+		int id = item.getItemId();
+		if (id == 0){
+			editor.putBoolean("debug", true);
+			editor.commit();
+		}else if (id == 1){
+			editor.putBoolean("debug", false);
+			editor.commit();
+		}
+		
+		return false;
+    }
+    
+    public class TabChangeListener implements TabHost .OnTabChangeListener{
+
+    	private String lastTabId;
+    	
+    	public TabChangeListener(){
+    		 lastTabId = "null";
+    	}
+    	
+		@Override
+		public void onTabChanged(String tabId) {
+			if (lastTabId.equals(tabId))
+				return;
+			
+			ft = fm.beginTransaction();
+			for (int i=0;i<fragments.length;++i){
+					if (fragments[i]!=null)
+						ft.detach(fragments[i]);
+			}
+			for (int i=0;i<tabName.length;++i){
+				if (tabId.equals(tabName[i])){
+					if (fragments[i]== null){
+						if (i==0)
+							fragments[i] = new TestFragment();
+						else if (i==1)
+							fragments[i] = new StatisticFragment();
+						else if (i==2)
+							fragments[i] = new HistoryFragment();
+						else
+							fragments[i] = new QuestionFragment();
+						ft.add(R.id.real_tabcontent,fragments[i],tabName[i] );
+					}else{
+						ft.attach(fragments[i]);
+					}
+					break;
+				}
+			}
+			lastTabId = tabId;
+			setTabState(tabId);
+			ft.commit();
+		}
+    	
+    }
+	static class DummyTabFactory implements TabHost.TabContentFactory{
+		private final Context context;
+
+		public DummyTabFactory(Context context){
+			this.context = context;
+		}
+		@Override
+		public View createTabContent(String tag) {
+			View v = new View(context);
+			return v;
+		}
+		
+	}
 }

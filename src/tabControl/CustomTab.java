@@ -42,6 +42,7 @@ public class CustomTab {
 		icon = (ImageView) view.findViewById(R.id.tab_icon_icon);
 		textView = (TextView) view.findViewById(R.id.tab_icon_text);
 		
+		
 		if (onBmp == null || onBmp.isRecycled())
 			onBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.tab_on);
 		

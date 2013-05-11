@@ -77,7 +77,12 @@ public class PageWidget extends View {
 		matrix = new Matrix();
 		
 	}
-	
+	public int getWidth2(){
+		return width;
+	}
+	public int getHeight2(){
+		return height;
+	}
 	public void setTouchPosition(PointF p){
 		touch.x = p.x;
 		touch.y = p.y;
@@ -134,6 +139,8 @@ public class PageWidget extends View {
 		path0.lineTo(cornerX, cornerY);
 		path0.close();
 
+		if (canvas==null)
+			return;
 		canvas.save();
 		canvas.clipPath(path, Region.Op.XOR);
 		canvas.drawBitmap(bitmap, 0, 0, null);
@@ -160,8 +167,9 @@ public class PageWidget extends View {
 		path1.lineTo(BezierStart1.x, BezierStart1.y);
 		path1.close();
 		float rotateDegrees;
+		if (canvas==null)
+			return;
 		canvas.save();
-
 		canvas.clipPath(path0, Region.Op.XOR);
 		canvas.clipPath(path1, Region.Op.INTERSECT);
 		int leftx;
@@ -229,6 +237,8 @@ public class PageWidget extends View {
 		rightx = (int) BezierStart1.x;
 		backShadowDrawable = backShadowDrawableRL;
 		
+		if (canvas==null)
+			return;
 		canvas.save();
 		canvas.clipPath(path0);
 		canvas.clipPath(path1, Region.Op.INTERSECT);
@@ -295,6 +305,8 @@ public class PageWidget extends View {
 		right= (int) (BezierStart1.x + 1);
 		folderShadowDrawable = folderShadowDrawableRL;
 		
+		if (canvas==null)
+			return;
 		canvas.save();
 		canvas.clipPath(path0);
 		canvas.clipPath(path1, Region.Op.INTERSECT);
@@ -330,8 +342,8 @@ public class PageWidget extends View {
 		drawNextPageAreaAndShadow(_canvas, nextPageBmp);
 		drawCurrentPageShadow(_canvas);
 		drawCurrentBackArea(_canvas);
-		
-		canvas.drawBitmap(_bitmap, 0, 0, _bitmapPaint);
+		if (_bitmap!=null && !_bitmap.isRecycled())
+			canvas.drawBitmap(_bitmap, 0, 0, _bitmapPaint);
 	}
 	
 	public void clear(){

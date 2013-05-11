@@ -73,8 +73,10 @@ public class Bluetooth {
 	private CameraRunHandler cameraRunHandler;
 	private BracValueFileHandler bracFileHandler;
 	
+	private TestFragment testFragment;
 	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler){
+		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.cameraRunHandler = cameraRunHandler;
 		this.bracFileHandler = bracFileHandler;
@@ -183,8 +185,7 @@ public class Bluetooth {
 				else if (time - first_start_time > 10000){
 					Log.d("BT","TIME OUT");
 					end =-1; 
-					success = true;
-					cameraRunHandler.sendEmptyMessage(1);
+					throw new Exception("time out");
 				}
 				for (int i=0;i<bytes;++i){
 					if ((char)temp[i]=='a'){
@@ -210,9 +211,9 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
 			close();
+			testFragment.showDebug("Close by exception or timeout" );
 			if(!success)
 				cameraRunHandler.sendEmptyMessage(1);
-			
 		}
 	}
 	
@@ -226,6 +227,8 @@ public class Bluetooth {
 					
 					float alcohol = Float.valueOf(msg.substring(1));
 					String output = timeStamp+"\t"+alcohol+"\n";
+					testFragment.showDebug("time: "+timeStamp);
+					testFragment.showDebug("alcohol: "+alcohol);
 					/*write to the file*/
 					write_to_file(output);
 				}
@@ -235,25 +238,30 @@ public class Bluetooth {
 				//Log.d("BT","READ-M");
 				if (prev_pressure == 0.f){
 					prev_pressure = Float.valueOf(msg.substring(1));
+					testFragment.showDebug("set_pressure: "+ prev_pressure);
 				}
 				else {
 					prev_pressure = now_pressure;
 					now_pressure = Float.valueOf(msg.substring(1));
+					testFragment.showDebug("set_pressure: "+ now_pressure);
 					float diff = now_pressure - prev_pressure;
 					
 					long time = System.currentTimeMillis();
-					
+					testFragment.showDebug("P_diff: "+diff );
 					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
+						testFragment.showDebug("P_PeakStart" );
 						isPeak = true;
 						change_speed(0);
 						start_time = time;
 					}else if ( diff < PRESSURE_DIFF_MIN && diff > -PRESSURE_DIFF_MIN/3){
 						if (isPeak){
+							testFragment.showDebug("P_Peak" );
 							end_time = time;
 							duration += (end_time-start_time);
 							start_time = end_time;
 							
 							if (duration > MILLIS_5){
+								testFragment.showDebug("End of Blowing" );
 								show_in_UI(5);
 							}else if (duration > MILLIS_4){
 								show_in_UI(4);
@@ -284,6 +292,7 @@ public class Bluetooth {
 							
 						}
 					}else if (diff <-PRESSURE_DIFF_MIN/2 ){
+						testFragment.showDebug("P_PeakEnd" );
 						isPeak = false;
 						start_time = end_time = 0;
 						change_speed(-1);

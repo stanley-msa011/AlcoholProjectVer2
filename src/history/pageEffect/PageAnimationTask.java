@@ -20,12 +20,14 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 	private HistoryFragment historyFragment;
 	
 	private PointF endTouch;
+	private int startImageIdx;
 	private int endImageIdx;
 	
-	public PageAnimationTask(PageWidget pageWidget, PointF from, PointF to, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int endImageIdx){
+	public PageAnimationTask(PageWidget pageWidget, PointF from, PointF to, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx){
 		this.pageWidget = pageWidget;
 		this.from = from;
 		this.endTouch = endTouch;
+		this.startImageIdx = startImageIdx;
 		this.endImageIdx = endImageIdx;
 		
 		this.historyFragment = historyFragment;
@@ -37,8 +39,9 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 	@Override
 	protected Void doInBackground(Void... arg0) {
 		Log.d("PageAnimation","Start animation");
-		int width = pageWidget.getWidth();
-		int height = pageWidget.getHeight();
+		int width = pageWidget.getWidth2();
+		int height = pageWidget.getHeight2();
+		
 		
 		Bitmap cur=null,next=null,tmp=null;
 		Bitmap prev_cur=null,prev_next=null;

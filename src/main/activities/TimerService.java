@@ -3,7 +3,11 @@ package main.activities;
 
 import java.util.Calendar;
 
+import database.HistoryDB;
+
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -13,85 +17,69 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class TimerService extends Service {
-	private Handler handler = new Handler();
-	MediaPlayer mp;
-	private long startTime;
+	private Handler handler;
+	private HistoryDB db;
+	private Service service;
 	
 	@Override
 	public void onCreate(){
-		Log.i("...","onCreate");
-		Log.i("startTime = ",String.valueOf(startTime) );
-		mp = MediaPlayer.create(this, R.raw.alcohol_test);
+		db = new HistoryDB(this);
+		handler = new Handler();
+		this.service = this;
 	}
 
 	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public int onStartCommand(Intent intent, int flags,int startId){
+		super.onStartCommand(intent, flags, startId);
+		handler.post(showTime);
+		return Service.START_REDELIVER_INTENT;
 	}
 
-	@Override
-	public void onStart(Intent intent, int startId){
-		startTime = System.currentTimeMillis();
-		handler.postDelayed(showTime, 1000);
-		super.onStart(intent, startId);
-		
-	}
-	
 	@Override
 	public void onDestroy(){
 		handler.removeCallbacks(showTime);
-		Log.i("...","onDestroy");
-		Log.i("startTime = ",String.valueOf(startTime) );
 		super.onDestroy();
 	}
 	
 	private Runnable showTime = new Runnable(){
-		@SuppressWarnings("deprecation")
 		public void run(){
-			handler.postDelayed(this, 1000);
-			
-			//Long spentTime = System.currentTimeMillis() - startTime;
-
-			//Long minutes = (spentTime/1000)/60;
-			//Long seconds = (spentTime/1000)%60;
 			
 			Calendar calendar = Calendar.getInstance();
 			int minute = calendar.get(Calendar.MINUTE);
 			int second = calendar.get(Calendar.SECOND);
 			int hour = calendar.get(Calendar.HOUR_OF_DAY);
 			
-			if (false){
-			//if( minute % 1 == 0 && second == 0){
-			//if (hour == 17 &&minute == 0 && second ==0){
-				//mp.start();
-				//get a reference to notificationManager
-				String ns = Context.NOTIFICATION_SERVICE;
-				NotificationManager notificationManager = (NotificationManager)getSystemService(ns);
+			Log.d("service mins",String.valueOf(minute));
+			
+			//if( second == 0){
+				if ((hour >=6 && hour <12)||(hour>=18 || hour < 24)){
 				
-				//Instantiate the notification
-				//int icon = R.drawable.ioio_icon_status;
-				CharSequence tickerText = "Alc test!";
-				long when = System.currentTimeMillis();
+				if (!db.getIsDone(calendar)){
+					Intent intent = new Intent(service, FragmentTabs.class);
+					PendingIntent pIntent = PendingIntent.getActivity(service, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				
-				//long[] tVibrate = {0,100,200,300};
-
-				//Notification notification = new Notification(icon,tickerText,when);
-				//notification.vibrate = tVibrate;
-				//notification.defaults = Notification.DEFAULT_ALL;
-				//notification.flags = Notification.FLAG_AUTO_CANCEL;
 				
-				Context context = getApplicationContext();
-				CharSequence contentTitle = "Alcohol test";
-				CharSequence contentText = "該吹氣摟！！";
-				//Intent notificationIntent = new Intent(context, GameActivity.class);
-				//notificationIntent.putExtra("notify", true);
-				//PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-				//notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-				//notificationManager.notify(0, notification); //前面的只是一個tag而已 ＝ ＝
+					Notification.Builder notificationBuilder = new Notification.Builder(getBaseContext());
+					notificationBuilder.setContentTitle("戒酒小幫手");
+					notificationBuilder.setContentText("該吹氣了!");
+					notificationBuilder.setSmallIcon(R.drawable.icon);
+					notificationBuilder.setContentIntent(pIntent);
 				
-			}
+					Notification notification = notificationBuilder.build();
+					notification.defaults = Notification.DEFAULT_ALL;
+					notification.flags |= Notification.FLAG_AUTO_CANCEL;
+				
+					NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+					notificationManager.notify(0,notification);
+				}
+				}
+			//}
 		}
 	};
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
 	
 }

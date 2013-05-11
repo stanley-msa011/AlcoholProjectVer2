@@ -4,6 +4,7 @@ package statisticPageView.statistics;
 import java.util.Calendar;
 
 import database.HistoryDB;
+import main.activities.FragmentTabs;
 import main.activities.R;
 import main.activities.StatisticFragment;
 import history.BracGameHistory;
@@ -95,6 +96,7 @@ public class StatisticWeekView2 extends StatisticPageView {
 	public void onInBackground() {
 		
 		Point screen = StatisticFragment.getStatisticPx();
+		
 		
 		int textWidth = (int) (screen.x*120.0/720.0);
 		int textHeight = (int) (textWidth*106.0/120.0);
