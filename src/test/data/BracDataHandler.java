@@ -99,7 +99,7 @@ public class BracDataHandler {
     	timeblock = TimeBlock.getTimeBlock(hour);
     
     	//check time block
-    	boolean check_time_block = true;
+    	boolean check_time_block =true;
     	if (check_time_block){
     		if (timeblock==-1);
     		else if (year == prevHistory.year && month == prevHistory.month && date == prevHistory.date && timeblock == prevHistory.timeblock);

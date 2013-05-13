@@ -23,6 +23,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
@@ -35,6 +36,7 @@ public class HistoryFragment extends Fragment {
 	
 	private ImageView bgView;
 	private ImageView playButton;
+	private ImageView prevImage;
 	private TextView playText;
 	private TextView uidText;
 	private RelativeLayout buttonLayout;
@@ -43,6 +45,9 @@ public class HistoryFragment extends Fragment {
 	
 	private PageWidget pageWidget;
 	private PageAnimationTask pageAnimationTask;
+	
+	private AlphaAnimation prevAnimation;
+	private AlphaAnimationEndHandler aaEndHandler;
 	
 	private int width, height,top_margin,bg_x,bg_y,playWidth,playHeight;
 	private static final int[] bgs= 
@@ -65,6 +70,8 @@ public class HistoryFragment extends Fragment {
 	private Bitmap background;
 	private Bitmap cur_bg_bmp,next_bg_bmp;
 	private Bitmap play_button_bmp;
+	private Bitmap prev_bg_bmp;
+	
 	
 	private PointF[] touchPoints;
 	private PointF from,to;
@@ -73,6 +80,8 @@ public class HistoryFragment extends Fragment {
 	private int curPageIdx;
 	private PointF curPageTouch;
 	private LoadingHandler loadHandler;
+	
+	private int level;
 	
 	private boolean runAnimation;
 	
@@ -89,6 +98,8 @@ public class HistoryFragment extends Fragment {
    
 	public void onResume(){
 		super.onResume();
+		
+		level = db.getLatestBracGameHistory().level;
 		
 		LoadingBox.show(this.getActivity());
 		if (loadHandler == null)
@@ -110,6 +121,11 @@ public class HistoryFragment extends Fragment {
     		pageAnimationTask.cancel(true);
     		pageAnimationTask = null;
     	}
+    	if (aaEndHandler!=null){
+    		aaEndHandler.removeMessages(0);
+    		aaEndHandler = null;
+    	}
+    	
     	if (cur_bg_bmp!=null && !cur_bg_bmp.isRecycled()){
     		cur_bg_bmp.recycle();
     		cur_bg_bmp=null;
@@ -117,6 +133,10 @@ public class HistoryFragment extends Fragment {
     	if (next_bg_bmp!=null && !next_bg_bmp.isRecycled()){
     		next_bg_bmp.recycle();
     		next_bg_bmp=null;
+    	}
+    	if (prev_bg_bmp!=null && !prev_bg_bmp.isRecycled()){
+    		prev_bg_bmp.recycle();
+    		prev_bg_bmp=null;
     	}
     	if (background!=null && !background.isRecycled()){
     		background.recycle();
@@ -161,9 +181,6 @@ public class HistoryFragment extends Fragment {
     	
     	pageWidget= new PageWidget(main_layout.getContext(),width,height);
     	
-    	GameHistory history = db.getLatestBracGameHistory();
-    	int level = history.level;
-    	
     	curPageIdx = level;
     	curPageTouch = touchPoints[0];
     	Log.d("History","step1 end");
@@ -184,13 +201,20 @@ public class HistoryFragment extends Fragment {
 		tmp = BitmapFactory.decodeResource(historyFragment.getResources(), bgs[curPageIdx]);
 		cur_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
 		tmp.recycle();
-		if (curPageIdx == bgs.length-1)
-			next_bg_bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		else{
-			tmp = BitmapFactory.decodeResource(historyFragment.getResources(), bgs[curPageIdx+1]);
-			next_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
+		//if (curPageIdx == bgs.length-1)
+		next_bg_bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+		//else{
+		//	tmp = BitmapFactory.decodeResource(historyFragment.getResources(), bgs[curPageIdx+1]);
+		//	next_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
+		//	tmp.recycle();
+		//}
+		if (curPageIdx > 0){
+			tmp = BitmapFactory.decodeResource(historyFragment.getResources(), bgs[curPageIdx-1]);
+			prev_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
 			tmp.recycle();
-		}
+		}	
+		
+		
     	playWidth = (int) (bg_x*220.0/720.0);
     	playHeight = (int) (bg_y*220.0/1280.0);
     	if (playWidth > playHeight)
@@ -214,7 +238,21 @@ public class HistoryFragment extends Fragment {
     	param.height = height;
     	param.topMargin = top_margin;
     	param.leftMargin = 0;
-    	
+
+    	prevImage = new ImageView(main_layout.getContext());
+    	main_layout.addView(prevImage);
+    	LayoutParams pParam = (LayoutParams) prevImage.getLayoutParams();
+    	pParam.width = width;
+    	pParam.height = height;
+    	pParam.topMargin = top_margin;
+    	pParam.leftMargin = 0;
+    	if (prev_bg_bmp!=null && !isChangePage()){
+    		prevImage.setImageBitmap(prev_bg_bmp);
+    		prevAnimation = new AlphaAnimation(1.0F,0.0F);
+    		prevAnimation.setDuration(2000);
+    		prevImage.setAnimation(prevAnimation);
+    		aaEndHandler = new AlphaAnimationEndHandler(); 
+    	}
     	buttonLayout = new RelativeLayout(main_layout.getContext());
     	main_layout.addView(buttonLayout);
     	LayoutParams playLayoutParam = (LayoutParams) buttonLayout.getLayoutParams();
@@ -222,7 +260,6 @@ public class HistoryFragment extends Fragment {
     	playLayoutParam.height=playHeight;
     	playLayoutParam.leftMargin = (int) (bg_x*470.0/720.0);
     	playLayoutParam.topMargin = (int) (bg_y*940.0/1280.0);
-    	
     	
     	playButton = new ImageView(buttonLayout.getContext());
     	
@@ -290,6 +327,7 @@ public class HistoryFragment extends Fragment {
 				int pageIdx = getMaxPageNum();
 				pageAnimationTask = new PageAnimationTask(pageWidget,from,to,aBgs,historyFragment,curPageTouch,0,pageIdx);
 				pageAnimationTask.execute();
+				FragmentTabs.enableTab(false);
 			}
 		}
     }
@@ -298,6 +336,7 @@ public class HistoryFragment extends Fragment {
     public void endAnimation(){
     	runAnimation = false;
     	buttonLayout.setVisibility(View.VISIBLE);
+    	FragmentTabs.enableTab(true);
     }
     
     public void setPage(){
@@ -325,8 +364,6 @@ public class HistoryFragment extends Fragment {
 	}
 
 	private int[] generateAnimationBgs(){
-		GameHistory history = db.getLatestBracGameHistory();
-    	int level = history.level;
     	int[] aBgs = new int[bgs_full.length];
     	for (int i=0;i<aBgs.length;++i){
     		aBgs[i] = bgs_full[i];
@@ -346,8 +383,6 @@ public class HistoryFragment extends Fragment {
 	}
 	
 	private int getMaxPageNum(){
-		GameHistory history = db.getLatestBracGameHistory();
-    	int level = history.level;
     	if (level < 6)
     		return 0;
     	else if (level < 12)
@@ -360,8 +395,6 @@ public class HistoryFragment extends Fragment {
 	}
 
 	private boolean isChangePage(){
-		GameHistory history = db.getLatestBracGameHistory();
-    	int level = history.level;
     	if (level == 0)
     		return true;
     	if (level == 6)
@@ -378,7 +411,6 @@ public class HistoryFragment extends Fragment {
 	private void startAnim(){
 		
 		boolean isChange = isChangePage();
-		//isChange = true;
 		if (isChange){
 			buttonLayout.setVisibility(View.INVISIBLE);
 			runAnimation = true;
@@ -387,16 +419,40 @@ public class HistoryFragment extends Fragment {
 			int startIdx = pageIdx-1;
 			if (startIdx <0)
 				startIdx =0;
+			prevImage.setVisibility(View.INVISIBLE);
 			pageAnimationTask = new PageAnimationTask(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx);
 			pageAnimationTask.execute();
+			FragmentTabs.enableTab(false);
+			
+		}else{
+			if (prevAnimation!=null){
+				prevImage.setVisibility(View.VISIBLE);
+				Runnable r = new alphaAnimationTimer();
+				Thread t = new Thread(r);
+				prevAnimation.start();
+				t.start();
+			}
 		}
-		else{
-			int[] aBgs = new int[2];
-			GameHistory history = db.getLatestBracGameHistory();
-	    	int level = history.level;
-			aBgs[0] = bgs[level-1];
-			aBgs[1] = bgs[level];
-			//new NewPageAlphaAnimationTask(pageWidget,aBgs,historyFragment).execute();
+	}
+	
+	private class alphaAnimationTimer implements Runnable{
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(2000);
+				if (aaEndHandler!=null)
+					aaEndHandler.sendEmptyMessage(0);
+			} catch (InterruptedException e) {}
+		}
+	}
+	@SuppressLint("HandlerLeak")
+	private class AlphaAnimationEndHandler extends Handler{
+		public void handleMessage(Message msg){
+			if (prevAnimation!=null)
+				prevAnimation.cancel();
+			prevImage.setAnimation(null);
+			prevImage.setImageBitmap(null);
+			prevImage.setVisibility(View.INVISIBLE);
 		}
 	}
 	

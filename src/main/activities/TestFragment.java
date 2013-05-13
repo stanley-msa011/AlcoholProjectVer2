@@ -113,11 +113,11 @@ public class TestFragment extends Fragment {
 	private ImageView bg, startLine, startCircle;
 	private Bitmap bgBmp, startLineBmp, startCircleBmp;
 	private TextView startText;
-	
+	/*
 	private ImageView animation;
 	private Bitmap[] animationBmp;
 	private AnimationDrawable animationDrawable;
-	
+	*/
 	private FrameLayout preview_layout;
 	
 	private static Object init_lock  = new Object();
@@ -143,6 +143,12 @@ public class TestFragment extends Fragment {
 		else{
 			Log.d("onpause","skip");
 		}
+		if (blink_anim!=null)
+			blink_anim.cancel();
+		if (sensor_lights!=null){
+			sensor_lights[0].setVisibility(View.INVISIBLE);
+			sensor_lights[1].setVisibility(View.INVISIBLE);
+		}
 		super.onPause();
 	}
 	
@@ -159,6 +165,7 @@ public class TestFragment extends Fragment {
 		else{
 			setKeepMsgBox(false);
 		}
+		
 		Log.d("test","onresume end");
 	}
 	
@@ -169,8 +176,8 @@ public class TestFragment extends Fragment {
 		startText =(TextView) view.findViewById(R.id.test_start_text);
 		Point screen = FragmentTabs.getSize();
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 74.0/720.0));
-		animation = (ImageView) view.findViewById(R.id.test_animation);
-		animation.setVisibility(View.INVISIBLE);
+		//animation = (ImageView) view.findViewById(R.id.test_animation);
+		//animation.setVisibility(View.INVISIBLE);
 		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
 		failHelp = (TextView) view.findViewById(R.id.test_fail_help);
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 49.0/720.0));
@@ -399,12 +406,11 @@ public class TestFragment extends Fragment {
 			
 			if (!DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
 				stop();
-
+					if (msgBox == null)
+						msgBox = new UIMsgBox(testFragment,main_layout);
 					if (msgLoadingHandler == null)
 						msgLoadingHandler = new MsgLoadingHandler();
-					if (msgLoadingHandler!=null){
-						msgLoadingHandler.sendEmptyMessage(0);
-					}
+					msgLoadingHandler.sendEmptyMessage(0);
 				}
 			}
 			if (DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
@@ -498,29 +504,6 @@ public class TestFragment extends Fragment {
 	
 	private void clear(){
 		Log.d("test","clear");
-		/*if (bgBmp!=null && !bgBmp.isRecycled()){
-			bgBmp.recycle();
-			bgBmp = null;
-		}
-		if (startLineBmp!=null && !startLineBmp.isRecycled()){
-			startLineBmp.recycle();
-			startLineBmp = null;
-		}
-		if (startCircleBmp!=null && !startCircleBmp.isRecycled()){
-			startCircleBmp.recycle();
-			startCircleBmp = null;
-		}*/
-		if (animation!=null){
-			animation.setImageDrawable(null);
-		}
-		if (animationBmp!=null){
-			for (int i=0;i<animationBmp.length;++i){
-				if(animationBmp[i]!=null && !animationBmp[i].isRecycled()){
-					animationBmp[i].recycle();
-					animationBmp[i] = null;
-				}
-			}
-		}
 		cleanMsgBox();
 		cleanRotate();
 	}
@@ -528,12 +511,14 @@ public class TestFragment extends Fragment {
     private void cleanMsgBox(){
     	if (msgBox!=null){
     		msgBox.clear();
+    		msgBox = null;
     	}
     }
 	
     private void cleanRotate(){
     	if (rotate!=null){
     		rotate.clear();
+    		rotate = null;
     	}
     }
     
@@ -590,13 +575,6 @@ public class TestFragment extends Fragment {
 			startTextParam.topMargin = (int)(screen.x * 246.0/720.0);
 			startTextParam.leftMargin =(int)(screen.x * 435.0/720.0);
 			
-			RelativeLayout.LayoutParams animationParam = (LayoutParams) animation.getLayoutParams();
-			animationParam.width = (int)(screen.x * 573.0/720.0);
-			animationParam.height = (int)(screen.x * 631.0/720.0);
-			animationParam.leftMargin = 0;
-			animationParam.topMargin = (int)(screen.x * 44.0/720.0);
-			
-			
 			RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
 			previewParam.width = (int)(screen.x * 588.0/720.0);
 			previewParam.height = (int)(screen.x * 750.0/720.0);
@@ -626,6 +604,8 @@ public class TestFragment extends Fragment {
 		
 			sensor_button.setBackgroundColor(0xFF000000);
 			sensor_button.setVisibility(View.VISIBLE);
+			if (blink_anim!=null)
+				blink_anim.cancel();
 			sensor_lights[0].setVisibility(View.INVISIBLE);
 			sensor_lights[1].setVisibility(View.INVISIBLE);
 			LoadingBox.dismiss();
@@ -656,6 +636,9 @@ public class TestFragment extends Fragment {
 			if (msgBox!=null){
 				msgBox.generateGPSCheckBox();
 				messageView.setText("請依對話框指示進行操作");
+				messageView.setTextColor(0xFFFFFFFF);
+			}else{
+				messageView.setText("請依對話框指示進行操作XXXX");
 				messageView.setTextColor(0xFFFFFFFF);
 			}
 			sensor_lights[0].setVisibility(View.INVISIBLE);
@@ -710,6 +693,8 @@ public class TestFragment extends Fragment {
 	private class TestHandler extends Handler{
 		public void handleMessage(Message msg){
 			bg.setImageBitmap(null);
+			if (rotate == null)
+				rotate = new UIRotate(testFragment,main_layout);
 			rotate.settingPreTask();
 			
 			if(bgBmp!=null && !bgBmp.isRecycled()){
@@ -779,27 +764,6 @@ public class TestFragment extends Fragment {
 			else if (t == 1){
 				showDebug(">Start to run the  device");
 				runBT();
-		}
-			else if (t == 2){
-				showDebug(">Fail to start the device");
-				animation.setVisibility(View.INVISIBLE);
-				animationDrawable.stop();
-				animation.setImageDrawable(null);
-				if (animationBmp!=null){
-					for (int i=0;i<animationBmp.length;++i){
-						if(animationBmp[i]!=null && !animationBmp[i].isRecycled()){
-							animationBmp[i].recycle();
-							animationBmp[i] = null;
-						}
-					}
-				}
-				messageView.setText("請啟用酒測裝置");
-				messageView.setTextColor(0xFFFFFFFF);
-				sensor_button.setBackgroundColor(0xFF00CCAA);
-				sensor_lights[0].setVisibility(View.VISIBLE);
-				sensor_lights[1].setVisibility(View.INVISIBLE);
-				Thread th = new Thread(new TimeUpRunnable(0,1500));
-				th.start();
 			}
 		}
 	}

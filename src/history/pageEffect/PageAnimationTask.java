@@ -1,5 +1,6 @@
 package history.pageEffect;
 
+import main.activities.FragmentTabs;
 import main.activities.HistoryFragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,6 +24,9 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 	private int startImageIdx;
 	private int endImageIdx;
 	
+	private Bitmap cur=null,next=null,tmp=null;
+	private Bitmap prev_cur=null,prev_next=null;
+	
 	public PageAnimationTask(PageWidget pageWidget, PointF from, PointF to, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx){
 		this.pageWidget = pageWidget;
 		this.from = from;
@@ -43,8 +47,9 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 		int height = pageWidget.getHeight2();
 		
 		
-		Bitmap cur=null,next=null,tmp=null;
-		Bitmap prev_cur=null,prev_next=null;
+		cur=null;next=null;tmp=null;
+		prev_cur=null;prev_next=null;
+		
 		for (int c=0;c<bgs.length-1;++c){
 			if (c > endImageIdx)
 				break;
@@ -102,5 +107,30 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 		//
 		historyFragment.endAnimation();
     }
+	@Override
+	protected void onCancelled(){
+		FragmentTabs.enableTab(true);
+		if (cur!=null && !cur.isRecycled()){
+			cur.recycle();
+			cur = null;
+		}
+		
+		if (next!=null && !next.isRecycled()){
+			next.recycle();
+			next = null;
+		}
+		if (tmp!=null && !tmp.isRecycled()){
+			tmp.recycle();
+			tmp = null;
+		}
+		if (prev_cur!=null && !prev_cur.isRecycled()){
+			prev_cur.recycle();
+			prev_cur = null;
+		}
+		if (prev_next!=null && !prev_next.isRecycled()){
+			prev_next.recycle();
+			prev_next = null;
+		}
+	}
 	
 }

@@ -25,7 +25,8 @@ import android.widget.TabWidget;
 public class FragmentTabs extends FragmentActivity {
 
 	static private TabHost tabHost;
-	//private TabManager tabManager;
+
+	private static boolean enableTabs;
 	private static Point screen_px;
 	private static Point tab_px;
 	static private TabSpec[] tabs;
@@ -79,6 +80,7 @@ public class FragmentTabs extends FragmentActivity {
 		fm =  getSupportFragmentManager();
 		fragments = new Fragment[4];
 		tabHost.setOnTabChangedListener(new TabChangeListener());
+		enableTabs = true;
 		//LoadingBox.show(this);
 		tabHost.setCurrentTab(3);
 		tabHost.setCurrentTab(0);
@@ -106,6 +108,7 @@ public class FragmentTabs extends FragmentActivity {
 	protected void onResume(){
 		super.onResume();
 		
+		enableTabs = true;
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){
@@ -211,6 +214,8 @@ public class FragmentTabs extends FragmentActivity {
     	
 		@Override
 		public void onTabChanged(String tabId) {
+			if (!enableTabs)
+				return;
 			if (lastTabId.equals(tabId))
 				return;
 			
@@ -255,5 +260,8 @@ public class FragmentTabs extends FragmentActivity {
 			return v;
 		}
 		
+	}
+	static public void enableTab(boolean enable){
+		enableTabs = enable;
 	}
 }
