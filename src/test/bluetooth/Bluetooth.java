@@ -253,7 +253,7 @@ public class Bluetooth {
 						isPeak = true;
 						change_speed(0);
 						start_time = time;
-					}else if ( diff < PRESSURE_DIFF_MIN && diff > -PRESSURE_DIFF_MIN/3){
+					}else if (diff > -PRESSURE_DIFF_MIN/2){
 						if (isPeak){
 							testFragment.showDebug("P_Peak" );
 							end_time = time;
