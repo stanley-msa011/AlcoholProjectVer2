@@ -1,6 +1,6 @@
 package statisticPageView.analysis;
 
-import java.text.DecimalFormat;
+import java.util.Calendar;
 
 import main.activities.Lang;
 import main.activities.R;
@@ -54,7 +54,7 @@ public class AnalysisProgressView extends StatisticPageView {
 	}
 	
 	private RelativeLayout content_layout;
-	private int totalWeek = 7;
+	private int totalWeek = 12;
 	private int currentWeek = 1;
 	
 	@Override
@@ -78,7 +78,15 @@ public class AnalysisProgressView extends StatisticPageView {
 
 	@Override
 	public void onInBackground() {
-		currentWeek = 5; // TODO get actual progress from DB
+		
+		Calendar now = Calendar.getInstance();
+		Calendar firstDate = db.getFirstTestDate();
+		if(firstDate == null){
+			firstDate = now;
+		}
+		long diff_millis = now.getTimeInMillis() - firstDate.getTimeInMillis();
+		currentWeek = (int)(diff_millis / (1000 * 60 * 60 * 24 * 7));
+		
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
@@ -115,7 +123,7 @@ public class AnalysisProgressView extends StatisticPageView {
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		int bgMargin = (int)(screen.x * 100.0/720.0);
-		int bgGap = (int)(screen.x * 18.0/720.0);
+		int bgGap = (int)(screen.x * 10.0/720.0);
 		int bgSize = (int)((screen.x - 2 * bgMargin - (totalWeek - 1) * bgGap) / totalWeek);
 
 		bgs = new ImageView[totalWeek];
