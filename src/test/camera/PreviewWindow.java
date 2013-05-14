@@ -85,10 +85,10 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 		@Override
 		public void onFaceDetection(Face[] faces, Camera camera) {
 			if (faces.length>0){
-				for (int i=faces.length-1;i<faces.length;++i){
-					Rect rect = faces[i].rect;
-					cameraRecorder.drawFace(rect);
-				}
+				cameraRecorder.drawFace(true);
+			}
+			else{
+				cameraRecorder.drawFace(false);
 			}
 		}
 	}

@@ -32,9 +32,9 @@ public class FragmentTabs extends FragmentActivity {
 	static private TabSpec[] tabs;
 	static private CustomTab[] customTabs;
 	
-	private static final String[] tabName ={"Test","Record","History","Question"}; 
-	private static final int[] iconId ={R.drawable.tab_test,R.drawable.tab_record,R.drawable.tab_history,R.drawable.tab_question}; 
-	private static final String[] iconText ={"測試","紀錄","人生新頁","問卷"}; 
+	private static final String[] tabName ={"Test","Record","History"}; 
+	private static final int[] iconId ={R.drawable.tabs_test,R.drawable.tabs_statistic,R.drawable.tabs_history}; 
+	private static final String[] iconText ={"測試","紀錄","人生新頁"}; 
 	
 	private Fragment[] fragments;
 	private android.support.v4.app.FragmentTransaction ft;
@@ -58,33 +58,31 @@ public class FragmentTabs extends FragmentActivity {
 			display.getSize(screen_px);
 		}
 
-		tab_px = new Point(screen_px.x,(int)(screen_px.y*(110.0/1280.0)));
+		tab_px = new Point(screen_px.x,(int)(screen_px.y*(104.0/1280.0)));
 		
 		setContentView(R.layout.tab_layout);
 		tabHost = (TabHost) this.findViewById(android.R.id.tabhost);
 		tabHost.setup();
 		
 		if (tabs==null)
-			tabs = new TabSpec[4];
+			tabs = new TabSpec[3];
 		if (customTabs==null)
-			customTabs = new CustomTab[4];
+			customTabs = new CustomTab[3];
 		
 		
-		
-		for (int i=0;i<4;++i){
+		for (int i=0;i<3;++i){
 			customTabs[i] = new CustomTab(this,iconId[i],iconText[i]);
 			tabs[i] = tabHost.newTabSpec(tabName[i]).setIndicator(customTabs[i].getTab());
 			tabs[i].setContent(new DummyTabFactory(this));
 			tabHost.addTab(tabs[i]);
 		}
 		fm =  getSupportFragmentManager();
-		fragments = new Fragment[4];
+		fragments = new Fragment[3];
 		tabHost.setOnTabChangedListener(new TabChangeListener());
 		enableTabs = true;
-		//LoadingBox.show(this);
-		tabHost.setCurrentTab(3);
+		
+		tabHost.setCurrentTab(2);
 		tabHost.setCurrentTab(0);
-		//tabHost.setCurrentTab(0);
 		
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -92,7 +90,7 @@ public class FragmentTabs extends FragmentActivity {
 		
 		
 		TabWidget tabWidget = tabHost.getTabWidget();
-		
+		tabWidget.setBackgroundResource(R.drawable.tabs_background);
 		
 		int count  = tabWidget.getChildCount();
 		for (int i=0;i<count;++i)
@@ -132,7 +130,7 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	
 	public void setTabState(String tabId){
-		for (int i=0;i<4;++i){
+		for (int i=0;i<3;++i){
 			if (tabId.equals(tabName[i])){
 				customTabs[i].changeState(true);
 			}
@@ -233,8 +231,6 @@ public class FragmentTabs extends FragmentActivity {
 							fragments[i] = new StatisticFragment();
 						else if (i==2)
 							fragments[i] = new HistoryFragment();
-						else
-							fragments[i] = new QuestionFragment();
 						ft.add(R.id.real_tabcontent,fragments[i],tabName[i] );
 					}else{
 						ft.attach(fragments[i]);

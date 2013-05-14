@@ -15,6 +15,7 @@ import test.file.BracValueFileHandler;
 import test.file.ImageFileHandler;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
+import test.ui.Tutorial;
 import test.ui.UIMsgBox;
 import test.ui.UIRotate;
 import android.location.LocationManager;
@@ -98,7 +99,7 @@ public class TestFragment extends Fragment {
 	
 	private RelativeLayout main_layout;
 	private UIMsgBox msgBox;
-	private UIRotate rotate;
+	//private UIRotate rotate;
 
 	private LoadingHandler loadingHandler;
 	private FailBgHandler failBgHandler;
@@ -106,28 +107,37 @@ public class TestFragment extends Fragment {
 	private TestHandler testHandler;
 	private TimeUpHandler timeUpHandler;
 	private ChangeTabsHandler changeTabsHandler;
-	private ImageView sensor_button;
-	private ImageView[] sensor_lights;
-	private Animation blink_anim;
 	
-	private ImageView bg, startLine, startCircle;
-	private Bitmap bgBmp, startLineBmp, startCircleBmp;
+	private RelativeLayout startLayout;
+	private ImageView bg, startButton, startStroke;
+	private Bitmap bgBmp, startButtonBmp, startStrokeBmp;
 	private TextView startText;
-	/*
-	private ImageView animation;
-	private Bitmap[] animationBmp;
-	private AnimationDrawable animationDrawable;
-	*/
+
 	private FrameLayout preview_layout;
+	
+	private ImageView pictureStroke;
+	private Bitmap pictureStrokeBmp;
+	
+	private RelativeLayout helpLayout;
+	private ImageView helpButton;
+	private Bitmap helpButtonBmp;
+	
+	private ImageView testCircle;
 	
 	private static Object init_lock  = new Object();
 	private static Object done_lock  = new Object();
 	
-	private TextView failHelp;
-	
-	
 	private EditText debugMsg;
 	private ChangeMsgHandler msgHandler;
+	
+	private static final String[] BLOW_MSG = {"開始\n吹氣","加油\n1","加油\n2","加油\n3","加油\n4","加油\n5"," 完成"};
+	private static final int[] BLOW_RESOURCE = {0,R.drawable.test_circle1,R.drawable.test_circle2,R.drawable.test_circle3,R.drawable.test_circle4,R.drawable.test_circle5};
+	private Bitmap[] blowBmp;
+	
+	private Tutorial tutorial;
+	private RelativeLayout tutorialLayout;
+	private TutorialHandler tutorialHandler;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -142,12 +152,6 @@ public class TestFragment extends Fragment {
 		}
 		else{
 			Log.d("onpause","skip");
-		}
-		if (blink_anim!=null)
-			blink_anim.cancel();
-		if (sensor_lights!=null){
-			sensor_lights[0].setVisibility(View.INVISIBLE);
-			sensor_lights[1].setVisibility(View.INVISIBLE);
 		}
 		super.onPause();
 	}
@@ -172,15 +176,22 @@ public class TestFragment extends Fragment {
 	
 	private void setting(){
 		bg = (ImageView) view.findViewById(R.id.test_background);
-		startLine = (ImageView) view.findViewById(R.id.test_background_line);
-		startCircle = (ImageView) view.findViewById(R.id.test_start_button);
+		startLayout = (RelativeLayout) view.findViewById(R.id.test_start_layout);
+		startButton = (ImageView) view.findViewById(R.id.test_start_button);
+		startStroke = (ImageView) view.findViewById(R.id.test_start_stroke);
 		startText =(TextView) view.findViewById(R.id.test_start_text);
+		
+		pictureStroke = (ImageView) view.findViewById(R.id.test_picture_stroke);
+		
+		helpLayout = (RelativeLayout) view.findViewById(R.id.help_layout);
+		helpButton = (ImageView) view.findViewById(R.id.help_background);
+		
+		testCircle = (ImageView) view.findViewById(R.id.test_start_circle);
+		
 		Point screen = FragmentTabs.getSize();
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 74.0/720.0));
-		//animation = (ImageView) view.findViewById(R.id.test_animation);
-		//animation.setVisibility(View.INVISIBLE);
+
 		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
-		failHelp = (TextView) view.findViewById(R.id.test_fail_help);
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 49.0/720.0));
 		messageView = (TextView) view.findViewById(R.id.test_message);
 		messageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 42.0/720.0));
@@ -188,40 +199,13 @@ public class TestFragment extends Fragment {
 		mParam.topMargin = (int)(screen.x * 36.0/720.0);
 		if (msgBox==null)
 			msgBox = new UIMsgBox(testFragment,main_layout);
-		rotate = new UIRotate(testFragment,main_layout);
 		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
-		
-		sensor_button = (ImageView) view.findViewById(R.id.test_sensor_button);
-		RelativeLayout.LayoutParams sParam = (LayoutParams) sensor_button.getLayoutParams();
-		sParam.topMargin = (int)(screen.x * 800.0/720.0);
-		sParam.leftMargin = (int)(screen.x * 620.0/720.0);
-		sParam.width =  (int)(screen.x * 18.0/720.0);
-		sParam.height=  (int)(screen.x * 36.0/720.0);
-		
-		sensor_lights = new ImageView[2];
-		sensor_lights[0] = (ImageView) view.findViewById(R.id.test_sensor_light_red);
-		sensor_lights[1] = (ImageView) view.findViewById(R.id.test_sensor_light_yellow);
 
+		tutorial = new Tutorial(this);
+		tutorialLayout = (RelativeLayout) tutorial.getView();
+		main_layout.addView(tutorialLayout);
+		
 		debugMsg = (EditText) view.findViewById(R.id.debug_msg);
-		
-		
-		RelativeLayout.LayoutParams l_redParam = (LayoutParams) sensor_lights[0].getLayoutParams();
-		l_redParam.topMargin = (int)(screen.x * 470.0/720.0);
-		l_redParam.leftMargin = (int)(screen.x * 290.0/720.0);
-		l_redParam.width =  (int)(screen.x * 32.0/720.0);
-		l_redParam.height=  (int)(screen.x * 32.0/720.0);
-		
-		RelativeLayout.LayoutParams l_yellowParam = (LayoutParams) sensor_lights[1].getLayoutParams();
-		l_yellowParam.topMargin = (int)(screen.x * 470.0/720.0);
-		l_yellowParam.leftMargin = (int)(screen.x * 346.0/720.0);
-		l_yellowParam.width =  (int)(screen.x * 32.0/720.0);
-		l_yellowParam.height=  (int)(screen.x * 32.0/720.0);
-		
-		
-		blink_anim = new AlphaAnimation(1.0f,0.1f);
-		blink_anim.setRepeatCount(1000);
-		blink_anim.setRepeatMode(Animation.REVERSE);
-		blink_anim.setDuration(100);
 		
 		loadingHandler = new LoadingHandler();
 		msgLoadingHandler = new MsgLoadingHandler();
@@ -229,6 +213,7 @@ public class TestFragment extends Fragment {
 		testHandler = new TestHandler();
 		timeUpHandler = new TimeUpHandler();
 		changeTabsHandler = new ChangeTabsHandler(); 
+		tutorialHandler = new TutorialHandler();
 	}
 	
 	public void reset(){
@@ -245,7 +230,7 @@ public class TestFragment extends Fragment {
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    	view = inflater.inflate(R.layout.new_test_fragment, container,false);
+    	view = inflater.inflate(R.layout.test_fragment, container,false);
     	return view;
     }
 	
@@ -314,41 +299,34 @@ public class TestFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-			messageView.setText("");
-			startLine.setVisibility(View.INVISIBLE);
-			startCircle.setVisibility(View.INVISIBLE);
-			startText.setVisibility(View.INVISIBLE);
-			reset();
+
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(testFragment.getActivity());
 			boolean firstTime = sp.getBoolean("first", true);
+			helpButton.setOnClickListener(null);
 			if (firstTime){
+				messageView.setText("");
 				SharedPreferences.Editor editor = sp.edit();
 				editor.putBoolean("first", false);
 				editor.commit();
+				showTutorial();
 			}
+			else{
+				startText.setText("");
+				reset();
 				messageView.setText("請按酒測裝置黑色按鈕\n以啟用酒測裝置");
 				messageView.setTextColor(0xFFFFFFFF);
-				sensor_button.setBackgroundColor(0xFF00CCAA);
-				sensor_lights[0].setVisibility(View.VISIBLE);
-				sensor_lights[1].setVisibility(View.INVISIBLE);
 				Thread t = new Thread(new TimeUpRunnable(0,1500));
 				t.start();
-			
+			}
 		}
 	}
 	
 	private class EndTestOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			failHelp.setVisibility(View.INVISIBLE);
 			stopDueToInit();
 			if (loadingHandler!=null)
 				loadingHandler.sendEmptyMessage(0);
-			blink_anim.cancel();
-			sensor_lights[1].setAnimation(null);
-			sensor_lights[0].setVisibility(View.INVISIBLE);
-			sensor_lights[1].setVisibility(View.INVISIBLE);
-			
 		}
 	}
 	
@@ -391,7 +369,6 @@ public class TestFragment extends Fragment {
 				btRunTask = new BTRunTask(this,bt);
 				btRunTask.execute();
 				messageView.setText("已啟用酒測裝置");
-				sensor_button.setBackgroundColor(0xFF000000);
 				showDebug("Device launched");
 				Thread t = new Thread(new TimeUpRunnable(1,1500));
 				t.start();
@@ -453,6 +430,10 @@ public class TestFragment extends Fragment {
 		if (gpsRunTask!=null){
 			gpsRunTask.cancel(true);
 		}
+		
+		if (tutorialHandler != null){
+			tutorialHandler .removeMessages(0);
+		}
 	}
 	
 	public void stop(){
@@ -501,12 +482,16 @@ public class TestFragment extends Fragment {
 			msgHandler.removeMessages(0);
 			msgHandler = null;
 		}
+		if (tutorialHandler != null){
+			tutorialHandler .removeMessages(0);
+		}
 	}
 	
 	private void clear(){
 		Log.d("test","clear");
 		cleanMsgBox();
-		cleanRotate();
+		cleanBlowBmp();
+		cleanTutorial();
 	}
 	
     private void cleanMsgBox(){
@@ -515,14 +500,24 @@ public class TestFragment extends Fragment {
     		msgBox = null;
     	}
     }
-	
-    private void cleanRotate(){
-    	if (rotate!=null){
-    		rotate.clear();
-    		rotate = null;
+    
+    private void cleanTutorial(){
+    	if (tutorial!=null){
+    		tutorial.clear();
     	}
     }
     
+    private void cleanBlowBmp(){
+    	if (blowBmp == null)
+    		return;
+    	for (int i=1;i<blowBmp.length;++i){
+    		if (blowBmp[i]!=null && !blowBmp[i].isRecycled()){
+    			blowBmp[i].recycle();
+    			blowBmp[i] = null;
+    		}
+    	}
+    	blowBmp = null;
+    }
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
 		
@@ -534,81 +529,105 @@ public class TestFragment extends Fragment {
 			r = getResources();
     		bg.setImageBitmap(null);
     		
-    		failHelp.setVisibility(View.INVISIBLE);
-    		
     		Point screen = FragmentTabs.getSize();
 			
-			if (bgBmp!=null && !bgBmp.isRecycled()){
-				bgBmp.recycle();
-				bgBmp = null;
+			Bitmap tmp;
+			if (bgBmp==null || bgBmp.isRecycled()){
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_background);
+				bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, (int)(screen.x/355.0*555.0), true);
+				tmp.recycle();
+				String bgBmp_size = bgBmp.getWidth() + "/"+bgBmp.getHeight();
+				Log.d("bgBMP",bgBmp_size);
+				RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams)bg.getLayoutParams();
+				bParam.width = screen.x;
+				bParam.height = bParam.width*555/355;
 			}
 			
 			
-			Bitmap tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_bg_2);
-			bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.y, true);
-			tmp.recycle();
-			String bgBmp_size = bgBmp.getWidth() + "/"+bgBmp.getHeight();
-			Log.d("bgBMP",bgBmp_size);
-			
-			
-			
-			if (startLineBmp==null ||startLineBmp.isRecycled()){
-				tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_line);
-				startLineBmp = Bitmap.createScaledBitmap(tmp, screen.x, (int)(screen.x * 146.0/720.0), true);
+			if (startButtonBmp==null ||startButtonBmp.isRecycled()){
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_button);
+				startButtonBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 320.0/720.0), (int)(screen.x * 320.0/720.0), true);
 				tmp.recycle();
 			}
-			RelativeLayout.LayoutParams startLineParam = (LayoutParams) startLine.getLayoutParams();
-			startLineParam.height = (int)(screen.x * 146.0/720.0);
-			startLineParam.topMargin = (int)(screen.x * 223.0/720.0);
 			
-			if (startCircleBmp==null ||startCircleBmp.isRecycled()){
-				tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_start);
-				startCircleBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 358.0/720.0), (int)(screen.x * 356.0/720.0), true);
+			if (startStrokeBmp==null ||startStrokeBmp.isRecycled()){
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_button);
+				startStrokeBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 372.0/720.0), (int)(screen.x * 372.0/720.0), true);
 				tmp.recycle();
 			}
-			RelativeLayout.LayoutParams startCircleParam = (LayoutParams) startCircle.getLayoutParams();
-			startCircleParam.width = (int)(screen.x * 358.0/720.0);
-			startCircleParam.height = (int)(screen.x * 356.0/720.0);
-			startCircleParam.leftMargin = (int)(screen.x * 357.0/720.0);
-			startCircleParam.topMargin = (int)(screen.x * 112.0/720.0);
 			
-			RelativeLayout.LayoutParams startTextParam = (LayoutParams) startText.getLayoutParams();
-			startTextParam.topMargin = (int)(screen.x * 246.0/720.0);
-			startTextParam.leftMargin =(int)(screen.x * 435.0/720.0);
+			if (pictureStrokeBmp==null ||pictureStrokeBmp.isRecycled()){
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_picture_stroke);
+				pictureStrokeBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 322.0/720.0), (int)(screen.x * 322.0/720.0), true);
+				tmp.recycle();
+			}
+			
+			if (helpButtonBmp==null ||helpButtonBmp.isRecycled()){
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_tutorial_button);
+				helpButtonBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 62.0/720.0), (int)(screen.x * 62.0/720.0), true);
+				tmp.recycle();
+			}
+			
+			RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
+			startLayoutParam.width= (int)(screen.x * 372.0/720.0);
+			startLayoutParam.height= (int)(screen.x * 372.0/720.0);
+			startLayoutParam.topMargin =  (int)(screen.x * 620.0/720.0);
+			
+			RelativeLayout.LayoutParams startButtonParam = (LayoutParams) startButton.getLayoutParams();
+			startButtonParam.width = (int)(screen.x * 320.0/720.0);
+			startButtonParam.height = (int)(screen.x * 320.0/720.0);
+			
+			RelativeLayout.LayoutParams startStrokeParam = (LayoutParams) startStroke.getLayoutParams();
+			startStrokeParam.width = (int)(screen.x * 372.0/720.0);
+			startStrokeParam.height = (int)(screen.x * 372.0/720.0);
 			
 			RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
-			previewParam.width = (int)(screen.x * 588.0/720.0);
-			previewParam.height = (int)(screen.x * 750.0/720.0);
-			previewParam.leftMargin = (int)(screen.x * 62.0/720.0);
-			previewParam.topMargin = (int)(screen.x * 233.0/720.0);
+			previewParam.width = (int)(screen.x * 320.0/720.0);
+			previewParam.height = (int)(screen.x * 320.0/720.0);
+			previewParam.topMargin = (int)(screen.x * 174.0/720.0);
 			
-			//Bugs Here
+			RelativeLayout.LayoutParams pictureParam = (LayoutParams) pictureStroke.getLayoutParams();
+			pictureParam.width = (int)(screen.x * 322.0/720.0);
+			pictureParam.height = (int)(screen.x * 322.0/720.0);
+			pictureParam.topMargin = (int)(screen.x * 174.0/720.0);
+			
+			RelativeLayout.LayoutParams helpLayoutParam = (LayoutParams) helpLayout.getLayoutParams();
+			helpLayoutParam.width = (int)(screen.x * 62.0/720.0);
+			helpLayoutParam.height = (int)(screen.x * 62.0/720.0);
+			helpLayoutParam.topMargin = (int)(screen.x * 40.0/720.0);
+			helpLayoutParam.rightMargin = (int)(screen.x * 40.0/720.0);
+			
+			RelativeLayout.LayoutParams testCircleParam = (LayoutParams) testCircle.getLayoutParams();
+			testCircleParam.width = (int)(screen.x * 372.0/720.0);
+			testCircleParam.height = (int)(screen.x * 372.0/720.0);
+			
 			if(bgBmp!=null && !bgBmp.isRecycled())
 				bg.setImageBitmap(bgBmp);
 			
-			if(startLineBmp!=null && !startLineBmp.isRecycled())
-				startLine.setImageBitmap(startLineBmp);
-			startLine.setVisibility(View.VISIBLE);
+			if (startButtonBmp!=null && !startButtonBmp.isRecycled())
+				startButton.setImageBitmap(startButtonBmp);
 			
-			if (startCircleBmp!=null && !startCircleBmp.isRecycled())
-				startCircle.setImageBitmap(startCircleBmp);
-			//End
-			startCircle.setVisibility(View.VISIBLE);
-			startText.setText("點我開始");
+			if (startStrokeBmp!=null && !startStrokeBmp.isRecycled())
+				startStroke.setImageBitmap(startStrokeBmp);
+			
+			if (pictureStrokeBmp!=null && !pictureStrokeBmp.isRecycled())
+				pictureStroke.setImageBitmap(pictureStrokeBmp);
+			
+			if (helpButtonBmp!=null && !helpButtonBmp.isRecycled())
+				helpButton.setImageBitmap(helpButtonBmp);
+			
+			testCircle.setImageBitmap(null);
+
+			startText.setText("開始");
 			startText.setVisibility(View.VISIBLE);
 			
-			messageView.setText("請點選'點我開始'以進行測試");
+			messageView.setText("請點選'開始'以進行測試");
 			messageView.setTextColor(0xFFFFFFFF);
 			
-			startCircle.setOnClickListener(new StartOnClickListener());
+			startButton.setOnClickListener(new StartOnClickListener());
 			bg.setOnClickListener(null);
-		
-			sensor_button.setBackgroundColor(0xFF000000);
-			sensor_button.setVisibility(View.VISIBLE);
-			if (blink_anim!=null)
-				blink_anim.cancel();
-			sensor_lights[0].setVisibility(View.INVISIBLE);
-			sensor_lights[1].setVisibility(View.INVISIBLE);
+			helpButton.setOnClickListener(new TutorialOnClickListener());
+			
 			LoadingBox.dismiss();
 		}
 	}
@@ -622,28 +641,12 @@ public class TestFragment extends Fragment {
 				msgBox.settingInBackground();
 				msgBox.settingPostTask();
 			}
-			cleanRotate();
-			bg.setImageBitmap(null);
-			if (bgBmp!=null && !bgBmp.isRecycled()){
-				bgBmp.recycle();
-				bgBmp = null;
-			}
-			Point screen = FragmentTabs.getSize();
-			Bitmap tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_start_bg_2);
-			bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.y, true);
-			tmp.recycle();
-			if(bgBmp!=null && !bgBmp.isRecycled())
-				bg.setImageBitmap(bgBmp);
+			
 			if (msgBox!=null){
 				msgBox.generateGPSCheckBox();
 				messageView.setText("請依對話框指示進行操作");
 				messageView.setTextColor(0xFFFFFFFF);
-			}else{
-				messageView.setText("請依對話框指示進行操作XXXX");
-				messageView.setTextColor(0xFFFFFFFF);
 			}
-			sensor_lights[0].setVisibility(View.INVISIBLE);
-			sensor_lights[1].setVisibility(View.INVISIBLE);
 		}
 	}
     
@@ -661,85 +664,66 @@ public class TestFragment extends Fragment {
 				testHandler.removeMessages(0);
 				testHandler = null;
 			}
+			cleanBlowBmp();
 			
 			this.msgStr = msg.getData().getString("msg");
-			cleanRotate();
-			msgStr = msgStr.concat("\n請點選畫面以重新開始");
-			bg.setImageBitmap(null);
-			if(bgBmp!=null && !bgBmp.isRecycled()){
-				bgBmp.recycle();
-				bgBmp = null;
-			}
+
+			startButton.setOnClickListener(new EndTestOnClickListener());
 			
-			Point screen = FragmentTabs.getSize();
-			Bitmap tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_start_bg_2);
-			bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.y, true);
-			tmp.recycle();
+			msgStr = msgStr.concat("\n請點選按鈕以結束");
 			
-			bg.setImageBitmap(bgBmp);
-			sensor_button.setBackgroundColor(0xFF000000);
 			messageView.setText(msgStr);
 			messageView.setTextColor(0xFFFF0000);
-			bg.setOnClickListener(new EndTestOnClickListener());
 			
-			sensor_button.setVisibility(View.VISIBLE);
-			sensor_lights[0].setVisibility(View.INVISIBLE);
-			sensor_lights[1].setVisibility(View.VISIBLE);
-			
-			sensor_lights[1].setAnimation(blink_anim);
-			blink_anim.start();
 		}
 	}
 	@SuppressLint("HandlerLeak")
 	private class TestHandler extends Handler{
 		public void handleMessage(Message msg){
-			bg.setImageBitmap(null);
-			if (rotate == null)
-				rotate = new UIRotate(testFragment,main_layout);
-			rotate.settingPreTask();
-			
-			if(bgBmp!=null && !bgBmp.isRecycled()){
-				
-				bgBmp.recycle();
-				bgBmp = null;
-			}
-			
-			Point screen = FragmentTabs.getSize();   
-			Bitmap tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.test_camera_bg);
-			bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.y, true);
-			tmp.recycle();
-			
-			rotate.settingInBackground();
-			
-			bg.setImageBitmap(bgBmp);
+			startButton.setOnClickListener(null);
 			bg.setOnClickListener(null);
-			rotate.settingPostTask();
+			
+			cleanBlowBmp();
+			blowBmp = new Bitmap[6];
+			Bitmap tmp;
+			blowBmp[0] = null;
+			
+			Point screen = FragmentTabs.getSize();
+			int circleSize =  (int)(screen.x * 372.0/720.0);
+			for (int i=1;i<blowBmp.length;++i){
+				tmp = BitmapFactory.decodeResource(getResources(), BLOW_RESOURCE[i]);
+				blowBmp[i] = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
+				tmp.recycle();
+			}
 			
 			messageView.setText("請依照圓圈內指示進行測試,\n並將臉對於螢幕中央");
 			messageView.setTextColor(0xFFFFFFFF);
 			if (bt!=null && cameraRecorder!=null){
 				bt.start();
 				cameraRecorder.start();
+				startText.setText(BLOW_MSG[0]);
 			}
-			sensor_button.setVisibility(View.INVISIBLE);
-			sensor_lights[0].setVisibility(View.INVISIBLE);
-			sensor_lights[1].setVisibility(View.INVISIBLE);
 		}
 	}
 	
 	public void changeTestMessage(int time){
-		rotate.setText(time);
+		startText.setText(BLOW_MSG[time]);
+		if (time >= blowBmp.length)
+			time = blowBmp.length-1;
+		if (blowBmp!=null){
+			testCircle.setImageBitmap(blowBmp[time]);
+		}
 	}
 	
 	public void changeTestSpeed(int change){
-		rotate.setSpeed(change);
+
 	}
 	
 	public void stopByFail(){
 		Log.d("test","stop by time out");
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg","測試失敗,可能因為測試超時或酒測器沒電了");
+		data.putString("msg","測試超時或酒測器沒電了");
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
@@ -797,6 +781,31 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
+	private class TutorialOnClickListener implements View.OnClickListener{
+		public void onClick(View v) {
+			Log.d("test","showTutorial on click");
+			showTutorial();
+		}
+	}
+	
+	private void showTutorial(){
+		Log.d("test","showTutorial");
+		tutorialHandler.sendEmptyMessage(0);
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class TutorialHandler extends Handler{
+		public void handleMessage(Message msg){
+			tutorial.loading();
+			tutorial.setBmp();
+			tutorial.setTutorial(1);
+			tutorial.getView().setVisibility(View.VISIBLE);
+		}
+	}
+	
+	
+	
+	//Debug --------------------------------------------------------------------------------------------------------
 	private void checkDebug(){
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		Boolean debug = sp.getBoolean("debug", false);

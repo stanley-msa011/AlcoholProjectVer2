@@ -1,36 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/test_fragment_layout"
-    android:background="#FFAAAAFF"
-    tools:context=".NewMainActivity" >
-
+    android:layout_height="match_parent" 
+    android:id="@+id/test_fragment_main_layout">
+    
+    
     <FrameLayout
-	    android:id="@+id/new_camera_preview"
-	    android:layout_width="240dp"
-	    android:layout_height="320dp"
-	    android:layout_centerInParent="true"
-	    />
-     <TextView
-        android:id="@+id/bt_value"
+	    android:id="@+id/test_camera_preview_layout"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	     android:layout_centerHorizontal="true"
+	 />
+    
+    <ImageView
+        android:id = "@+id/test_background"
+        android:layout_width ="match_parent"
+        android:layout_height ="match_parent"
+        android:scaleType="fitStart"
+        />
+    
+    <RelativeLayout
+        android:id="@+id/test_start_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textColor="#FFFF0000"
-        android:textSize="24sp"
-         />
-     <Button
-         android:id="@+id/end_test"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:text="END" />
+        android:layout_centerHorizontal="true"
+    >
+    	<ImageView
+        	android:id = "@+id/test_start_button"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        	android:layout_centerInParent="true"
+        />
+    
+    	<ImageView
+	        android:id = "@+id/test_start_stroke"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        	android:layout_centerInParent="true"
+        />
+    	
+    	<ImageView
+	        android:id = "@+id/test_start_circle"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        	android:layout_centerInParent="true"
+        />
+    
+    	<TextView
+    	    android:id="@+id/test_start_text"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerInParent="true"
+    	    android:gravity="center"
+    	    android:textAlignment="center"
+    	    android:textColor="#FF231815" />
 
-	<Button
-         android:id="@+id/start_testing"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_toRightOf="@+id/end_test"
-         android:text="START" />
+    </RelativeLayout>
+    
+	<TextView
+        android:id = "@+id/test_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+	    android:textColor="#FFFFFFFF"
+	    android:gravity="center"
+        />
+	
+	<ImageView
+	    android:id="@+id/test_picture_stroke"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerHorizontal="true"
+    />
+	
+	<RelativeLayout
+        android:id="@+id/help_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+    >
+		<ImageView
+        	android:id = "@+id/help_background"
+        	android:layout_width ="match_parent"
+        	android:layout_height ="match_parent"
+        	android:layout_centerInParent="true"
+        	android:scaleType="fitXY"
+        />
+		<TextView
+        	android:id = "@+id/help_text"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerInParent="true"
+	    	android:textColor="#FFFFFFFF"
+	    	android:gravity="center"
+	    	android:textAlignment="center"
+	    	android:text="\?"
+        />
+	</RelativeLayout>
+	
+	
+	<ScrollView
+	    android:id="@+id/debugView"
+	    android:layout_width="match_parent"
+	    android:layout_height="150dp"
+	    android:layout_alignParentBottom="true"
+	    android:visibility="invisible"
+	    android:layout_marginBottom="50dp"
+	  >
+
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" >
+
+	        <EditText
+	            android:visibility="invisible"
+	            android:id="@+id/debug_msg"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:freezesText="true"
+	            android:inputType="textMultiLine"
+	            android:textColor="#FFFFFFFF" />
+
+	    </LinearLayout>
+	</ScrollView>
 	
 </RelativeLayout>

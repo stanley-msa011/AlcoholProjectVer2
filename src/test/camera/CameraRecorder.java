@@ -3,6 +3,7 @@ package test.camera;
 import java.util.Iterator;
 import java.util.List;
 
+import main.activities.FragmentTabs;
 import main.activities.R;
 import main.activities.TestFragment;
 
@@ -63,6 +64,7 @@ public class CameraRecorder {
 		Point bestSize = getBestSize(list);
 		params.setPictureSize(bestSize.x, bestSize.y);
 		camera.setParameters(params);
+		camera.startFaceDetection();
     }
     
     private Point getBestSize(List<Size> list){
@@ -103,6 +105,10 @@ public class CameraRecorder {
     	previewFrame.addView(previewCircleLayout);
     	previewCircleLayout.addView(circle);
     	circle.setVisibility(View.INVISIBLE);
+    	RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) circle.getLayoutParams();
+    	Point screen = FragmentTabs.getSize();
+    	cParam.width = (int)(screen.x * 320.0/720.0);
+    	cParam.height = (int)(screen.x * 320.0/720.0);
     }
     
     
@@ -158,15 +164,10 @@ public class CameraRecorder {
     	testFragment.stopByFail();
     }
     
-    public void drawFace(Rect rect){
-    	
-    	RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) circle.getLayoutParams();
-    	
-    	cParam.width = Math.abs(rect.width());
-    	cParam.height =Math.abs(rect.height());
-    	
-    	String rect_str = rect.left+"/"+rect.right+"/"+rect.top+"/"+rect.bottom;
-    	Log.d("preview",rect_str);
-    	circle.setVisibility(View.VISIBLE);
+    public void drawFace(boolean detected){
+    	if (detected)
+    		circle.setVisibility(View.VISIBLE);
+    	else
+    		circle.setVisibility(View.INVISIBLE);
     }
 }
