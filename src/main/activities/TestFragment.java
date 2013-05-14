@@ -164,6 +164,7 @@ public class TestFragment extends Fragment {
 		}
 		else{
 			setKeepMsgBox(false);
+			runGPS();
 		}
 		
 		Log.d("test","onresume end");
@@ -425,9 +426,9 @@ public class TestFragment extends Fragment {
 	}
 	
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
-		if (requestCode==_GPS){
+		/*if (requestCode==_GPS){
 			runGPS();
-		}
+		}*/
 	}
 	
 	public void stopDueToInit(){
