@@ -303,6 +303,7 @@ public class TestFragment extends Fragment {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(testFragment.getActivity());
 			boolean firstTime = sp.getBoolean("first", true);
 			helpButton.setOnClickListener(null);
+			startButton.setOnClickListener(null);
 			if (firstTime){
 				messageView.setText("");
 				SharedPreferences.Editor editor = sp.edit();
@@ -636,6 +637,7 @@ public class TestFragment extends Fragment {
 	private class MsgLoadingHandler extends Handler{
 		
 		public void handleMessage(Message msg){
+			startButton.setOnClickListener(null);
 			if (msgBox!=null){
 				msgBox.settingPreTask();
 				msgBox.settingInBackground();

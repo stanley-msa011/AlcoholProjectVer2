@@ -11,64 +11,60 @@
        	android:scaleType="fitXY"
      />
     
-    <ImageView
-        android:id = "@+id/statistic_week_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-    
-    <ImageView
-        android:id ="@+id/statistic_week_line1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-    
-    <ImageView
-        android:id ="@+id/statistic_week_line2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-    
     <TextView
-        android:id ="@+id/statistic_week_help"
+        android:id ="@+id/statistic_week_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFFFF"
+        android:textColor="#FF000000"
+        android:layout_centerHorizontal="true"
+        android:text="每周測試統計"
+     />
+    
+        <TextView
+            android:id="@+id/statistic_week_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/statistic_week_title"
+            android:gravity="center_vertical|right"
+            android:textAlignment="textEnd"
+            android:textColor="#FF000000" />
+    
+    <LinearLayout
+        android:id="@+id/statistic_week_date_label_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_toRightOf="@+id/statistic_week_month"
+        android:layout_below="@+id/statistic_week_title"
         />
     
-    <TextView
-        android:id ="@+id/statistic_week_label_1"
+
+    
+    <LinearLayout
+        android:id="@+id/statistic_week_timeblock_label_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFFFF"
-        android:text="早"
+        android:orientation="vertical"
+        android:layout_below="@+id/statistic_week_date_label_layout"
         />
     
-    <TextView
-        android:id ="@+id/statistic_week_label_2"
+	<GridLayout 
+	    android:id = "@+id/statistic_week_block_layout"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:rowCount="4"
+	    android:columnCount="7"
+	    android:layout_below="@+id/statistic_week_date_label_layout"
+	    android:layout_toRightOf="@+id/statistic_week_timeblock_label_layout"
+		 />
+	
+	<LinearLayout
+        android:id="@+id/statistic_week_label_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/statistic_week_label_1"
-        android:textColor="#FFFFFFFF"
-        android:text="中"
-        />
-    
-    <TextView
-        android:id ="@+id/statistic_week_label_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/statistic_week_label_2"
-        android:textColor="#FFFFFFFF"
-        android:text="下"
-        />
-    
-    <TextView
-        android:id ="@+id/statistic_week_label_4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/statistic_week_label_3"
-        android:textColor="#FFFFFFFF"
-        android:text="晚"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/statistic_week_block_layout"
         />
     
 </RelativeLayout>

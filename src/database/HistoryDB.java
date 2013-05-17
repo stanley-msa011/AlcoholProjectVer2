@@ -2,26 +2,33 @@ package database;
 
 import java.util.Calendar;
 
+import main.activities.FragmentTabs;
+
 import test.data.BracDataHandler;
 
 import history.BracGameHistory;
 import history.DateBracGameHistory;
 import history.InteractionHistory;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class HistoryDB {
 
-	private static final  int nBlocks = 2;
+	private static final int nBlocks = 4;
+	private int timeblock_type;
 	
 	private SQLiteOpenHelper dbHelper = null;
     private SQLiteDatabase db = null;
 	
 	public HistoryDB(Context context){
 		dbHelper = new DBHelper(context);
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+		timeblock_type = sp.getInt("timeblock_num", 2);
 	}
 	
     public DateBracGameHistory getLatestBracGameHistory(){
@@ -71,7 +78,7 @@ public class HistoryDB {
     	month = cal.get(Calendar.MONTH)+1;
     	date = cal.get(Calendar.DATE);
     	hour = cal.get(Calendar.HOUR_OF_DAY);
-    	timeblock = TimeBlock.getTimeBlock(hour);
+    	timeblock = TimeBlock.getTimeBlock(hour,nBlocks);
     	
     	String sql = "INSERT INTO HistoryGame (_LEVEL,_YEAR,_MONTH,_DATE,_TS,_TIMEBLOCK, _BRAC) VALUES ("
     							+level+","+year+","+month+","+date+","+ts+","+timeblock+","+brac+")";
@@ -81,8 +88,6 @@ public class HistoryDB {
     
     public BracGameHistory[] getTodayBracGameHistory(){
 
-    	
-    	
     	BracGameHistory[] historys = new BracGameHistory[nBlocks];
     	
     	Calendar cal = Calendar.getInstance();
@@ -93,6 +98,8 @@ public class HistoryDB {
     	db = dbHelper.getReadableDatabase();
     	
     	for (int i=0;i<nBlocks;++i){
+    		if (!TimeBlock.hasBlock(i, timeblock_type))
+    			continue;
     		String sql = "SELECT _BRAC FROM HistoryGame WHERE _YEAR="+year
     				+" AND _MONTH="+month
     				+" AND _DATE="+date
@@ -115,13 +122,13 @@ public class HistoryDB {
     
     public int getAllBracGameScore(){
 
-    	int MIN = 1;
-    	int MAX = 9;
-    	int MISS = -2;
-    	int PASS = +1;
-    	int FAIL = -1;
+    	int MIN = 0;
+    	int MAX = Integer.MAX_VALUE;
+    	int MISS = 0;
+    	int PASS = 1;
+    	int FAIL = 0;
     	
-    	int score = (MIN+MAX)/2;
+    	int score = 0;
     	db = dbHelper.getReadableDatabase();
     	
     	String sql = "SELECT * FROM HistoryGame WHERE _TIMEBLOCK <> -1 ORDER BY _ID ASC";
@@ -247,6 +254,9 @@ public class HistoryDB {
     	int _size = cursor.getCount();
     	
     	for (int i=0;i<historys.length;++i){
+    		int block = i%nBlocks;
+    		if (!TimeBlock.hasBlock(block, timeblock_type))
+    			continue;
     		
     		cursor_pointer = 0;
     		while (cursor_pointer <_size){
@@ -260,7 +270,6 @@ public class HistoryDB {
     					++cursor_pointer;
     					break;
     				}
-    				
     			}
     			++cursor_pointer;
     		}
@@ -384,7 +393,7 @@ public class HistoryDB {
     	int month = curCal.get(Calendar.MONTH)+1;
     	int date = curCal.get(Calendar.DATE);
     	int hour = curCal.get(Calendar.HOUR_OF_DAY);
-    	int time_block = TimeBlock.getTimeBlock(hour);
+    	int time_block = TimeBlock.getTimeBlock(hour,timeblock_type);
     	
     	String sql = "SELECT * FROM HistoryGame WHERE _YEAR ="+year
     							+" AND _MONTH = "+month

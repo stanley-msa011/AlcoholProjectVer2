@@ -1,20 +1,19 @@
 package statisticPageView.analysis;
 
-import history.InteractionHistory;
-import interaction.UserLevelCollector;
 import main.activities.R;
 import main.activities.StatisticFragment;
 import statisticPageView.StatisticPageView;
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.os.Handler;
-import android.os.Message;
+import android.preference.PreferenceManager;
+import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import database.HistoryDB;
@@ -27,27 +26,26 @@ public class AnalysisSavingView extends StatisticPageView {
 	
 	private TextView help;
 	private HistoryDB db;
-	private TextView high,low;
 	
-	private ImageView goalBar, currentBar;
-	private Bitmap goalBarBmp, currentBarBmp;
+	private ImageView goalBar, currentBar, start,end;
+	private Bitmap goalBarBmp, currentBarBmp, barStartBmp, barEndBmp;
 	
-	//private NetworkLoadingTask nTask;
+	private int goalMoney;
+	private int drinkCost;
+	private int currentMoney;
 	
-	private NetworkHandler netHandler;
+	private RelativeLayout contentLayout;
 	
 	public AnalysisSavingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_saving_view,statisticFragment);
 		db = new HistoryDB(context);
-		if (netHandler==null)
-			netHandler = new NetworkHandler();
-		netHandler.sendEmptyMessage(0);
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+		goalMoney = sp.getInt("goal_money", 10000);
+		drinkCost = sp.getInt("drink_cost", 200);
 	}
 
 	@Override
 	public void clear() {
-		if (netHandler!=null)
-			netHandler.removeMessages(0);
 		if (titleBmp!=null && !titleBmp.isRecycled()){
 			titleBmp.recycle();
 			titleBmp = null;
@@ -60,81 +58,90 @@ public class AnalysisSavingView extends StatisticPageView {
 			currentBarBmp.recycle();
 			currentBarBmp = null;
 		}
-		
+		if (barStartBmp !=null && !barStartBmp.isRecycled()){
+			barStartBmp.recycle();
+			barStartBmp = null;
+		}
+		if (barEndBmp !=null && !barEndBmp.isRecycled()){
+			barEndBmp.recycle();
+			barEndBmp = null;
+		}
 	}	
 	
 	@Override
 	public void onPreTask() {
 		Point screen = StatisticFragment.getStatisticPx();
 		
-		title = (TextView) view.findViewById(R.id.analysis_rating_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 44.0/720.0));
-		title.setTextColor(0xFFFFFFFF);
+		title = (TextView) view.findViewById(R.id.analysis_saving_title);
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 36.0/720.0));
 		
-		title_bg = (ImageView) view.findViewById(R.id.analysis_rating_title_bg);
+		title_bg = (ImageView) view.findViewById(R.id.analysis_saving_title_bg);
 		
-		help = (TextView) view.findViewById(R.id.analysis_rating_help);
+		help = (TextView) view.findViewById(R.id.analysis_saving_help);
 		help.setTextColor(0xFF545454);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 46.0/720.0));
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
 
-		goalBar = (ImageView) view.findViewById(R.id.analysis_goal_bar);
-		currentBar = (ImageView) view.findViewById(R.id.analysis_current_bar);
+		goalBar = (ImageView) view.findViewById(R.id.analysis_saving_bar);
+		currentBar = (ImageView) view.findViewById(R.id.analysis_saving_cur_bar);
+		start = (ImageView) view.findViewById(R.id.analysis_saving_cur_bar_start);
+		end = (ImageView) view.findViewById(R.id.analysis_saving_cur_bar_end);
 		
-		high = (TextView) view.findViewById(R.id.analysis_rating_high);
-		high.setTextColor(0xFF545454);
-		high.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
-		low = (TextView) view.findViewById(R.id.analysis_rating_low);
-		low.setTextColor(0xFF545454);
-		low.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 44.0/720.0));
-		
+		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_saving_content_layout);
 	}
 
-	private int goalMoney;
-	private int currentMoney;
+	
 	
 	@Override
 	public void onInBackground() {
 		
-		goalMoney = 10000;   // TODO get real numbers
-		currentMoney = 3000; //
+		int curDrink = db.getAllBracGameScore();
+		currentMoney = curDrink*drinkCost;
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
-		titleParam.height = (int)(screen.x * 50.0/720.0);
-		titleParam.leftMargin = (int)(screen.x * 120.0/720.0);
-		titleParam.topMargin = 0;
+		titleParam.leftMargin = (int)(screen.x * 90.0/720.0);
 		
 		RelativeLayout.LayoutParams titleBgParam = (RelativeLayout.LayoutParams)title_bg.getLayoutParams();
 		titleBgParam.width = screen.x;
-		titleBgParam.height = (int)(screen.x * 69.0/720.0);
+		titleBgParam.height = (int)(screen.x * 47.0/720.0);
 		
-		titleBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_titlebg);
+		titleBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_title_bar);
 		
-		RelativeLayout.LayoutParams helpParam = (RelativeLayout.LayoutParams)help.getLayoutParams();
-		helpParam.leftMargin = (int)(screen.x * 120.0/720.0);
-		helpParam.topMargin = (int)(screen.x * 100.0/720.0);
+		LinearLayout.LayoutParams helpParam = (LinearLayout.LayoutParams)help.getLayoutParams();
+		helpParam.topMargin = helpParam.bottomMargin =  (int)(screen.x * 16.0/720.0);
+		
+		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)goalBar.getLayoutParams();
+		barParam.width = (int)(screen.x * 542.0/720.0);
+		barParam.height = (int)(screen.x * 38.0/720.0);
+		barParam.leftMargin = (int)(screen.x * 89.0/720.0);
+		goalBarBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_bar);	
+		
+		RelativeLayout.LayoutParams startParam = (RelativeLayout.LayoutParams)start.getLayoutParams();
+		startParam.width = (int)(screen.x * 16.0/720.0);
+		startParam.height = (int)(screen.x * 38.0/720.0);
+		startParam.leftMargin = (int)(screen.x * 89.0/720.0);
+		barStartBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_start);	
+		
+		RelativeLayout.LayoutParams endParam = (RelativeLayout.LayoutParams)end.getLayoutParams();
+		endParam.width = (int)(screen.x * 18.0/720.0);
+		endParam.height = (int)(screen.x * 38.0/720.0);
+		barEndBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_end);	
+		
+		int maxWidth = barParam.width - startParam.width -endParam.width;
+		int width;
+		if (currentMoney> goalMoney)
+			width = maxWidth;
+		else{
+			width = maxWidth *currentMoney/goalMoney;
+		}
 		
 		RelativeLayout.LayoutParams currentBarParam = (RelativeLayout.LayoutParams)currentBar.getLayoutParams();
-		currentBarParam.width = (int)(screen.x * 480.0/720.0 * currentMoney/goalMoney);
-		currentBarParam.height = (int)(screen.x * 58.0/720.0);
-		currentBarParam.leftMargin = (int)(screen.x * 121.0/720.0);
-		currentBarParam.topMargin = (int)(screen.x * 200.0/720.0);
-		currentBarBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_group_bg);	
+		currentBarParam.width = width;
+		currentBarParam.height =(int)(screen.x * 38.0/720.0);
+		currentBarBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_internal);	
 		
-		RelativeLayout.LayoutParams goalBarParam = (RelativeLayout.LayoutParams)goalBar.getLayoutParams();
-		goalBarParam.width = (int)(screen.x * 480.0/720.0);
-		goalBarParam.height = (int)(screen.x * 58.0/720.0);
-		goalBarParam.leftMargin = (int)(screen.x * 121.0/720.0);
-		goalBarParam.topMargin = (int)(screen.x * 320.0/720.0);
-		goalBarBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.drunk_record_group_bg);	
-		
-		RelativeLayout.LayoutParams highParam = (RelativeLayout.LayoutParams)high.getLayoutParams();
-		highParam.topMargin = (int)(screen.x * 200.0/720.0);
-		highParam.rightMargin = (int)(screen.x * 120.0/720.0);
-		RelativeLayout.LayoutParams lowParam = (RelativeLayout.LayoutParams)low.getLayoutParams();
-		lowParam.topMargin = (int)(screen.x * 320.0/720.0);
-		lowParam.rightMargin = (int)(screen.x * 120.0/720.0);
-		
+		LinearLayout.LayoutParams contentParam = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
+		contentParam.bottomMargin =  (int)(screen.x * 20.0/720.0);
 	}
 
 	@Override
@@ -142,34 +149,20 @@ public class AnalysisSavingView extends StatisticPageView {
 		title_bg.setImageBitmap(titleBmp);
 		goalBar.setImageBitmap(goalBarBmp);
 		currentBar.setImageBitmap(currentBarBmp);
-		
-		help.setText("因戒酒所節省的酒錢");
-		high.setText("您已節省 NTD$" + String.valueOf(currentMoney));
-		low.setText("您的目標 NTD$" + String.valueOf(goalMoney));
-		//setPointer();
+		start.setImageBitmap(barStartBmp);
+		end.setImageBitmap(barEndBmp);
+		String text =  "<font color=#000000>您已節省 </font><font color=#f39700>$"
+								+currentMoney
+								+"</font><font color=#000000> 元，目標為 </font><font color=#f39700>$"
+								+goalMoney
+								+"</font><font color=#000000></font><font color=#000000> 元</font>";
+		help.setText(Html.fromHtml(text));
 		
 	}
 
 	@Override
 	public void onCancel() {
 		clear();
-	}
-	
-	private InteractionHistory[] historys;
-	private UserLevelCollector levelCollector;
-	
-	@SuppressLint("HandlerLeak")
-	private class NetworkHandler extends Handler{
-		public void handleMessage(Message msg){
-			Log.d("NetworkLoadingTask","StartLoading");
-			levelCollector = new UserLevelCollector(view.getContext());
-			historys = levelCollector.update();
-			
-			if (historys == null)
-				return;
-			for (int i=0;i<historys.length;++i)
-				db.insertInteractionHistory(historys[i]);
-		}
 	}
 	
 

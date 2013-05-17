@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/statistic_background_all" 
+    >
+    <RelativeLayout
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content">
+    	<RelativeLayout 
+        	android:id="@+id/history_book_layout"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	/>
+    	<LinearLayout 
+    	    android:id="@+id/history_stage_layout"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:orientation="vertical">
+    	    <TextView 
+    	        android:id = "@+id/history_stage"
+    	        android:layout_width="wrap_content"
+    	        android:layout_height="wrap_content"
+    	        android:textColor="#FF717071"
+    	        android:textAlignment="center"
+    	        android:gravity="center"
+    	        android:text="STAGE"
+    	        />
+    	    <TextView 
+    	        android:id = "@+id/history_stage_num"
+    	        android:layout_width="wrap_content"
+    	        android:layout_height="wrap_content"
+    	        android:textColor="#FF717071"
+    	        android:textAlignment="center"
+    	        android:gravity="center"
+    	        />
+    	</LinearLayout>
+    </RelativeLayout>  
+    <LinearLayout
+        android:id="@+id/history_content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+    
+</LinearLayout>

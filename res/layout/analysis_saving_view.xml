@@ -5,68 +5,78 @@
     android:orientation="vertical" >
     
    <RelativeLayout
-       android:id ="@+id/analysis_rating_layout"
+       	android:id="@+id/analysis_saving_title_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <ImageView
+        	android:id ="@+id/analysis_saving_title_bg"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        	android:layout_centerVertical="true"
+        	/>
+   		<TextView
+        	android:id ="@+id/analysis_saving_title"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="已節省金錢" 
+        	android:layout_centerVertical="true"
+        	android:gravity="center"
+        	android:textAlignment="center"
+        	android:textColor="#FFFFFFFF"
+        	/>
+   </RelativeLayout>
+
+    <TextView
+        android:id ="@+id/analysis_saving_help"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF000000"
+        android:textAlignment="center"
+        android:gravity="center"
+    	/>
+   
+    <RelativeLayout 
+        android:id="@+id/analysis_saving_content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         >
 
-       
-       <ImageView
-        android:id ="@+id/analysis_rating_title_bg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY"
-        />
-       
-       <TextView
-        android:id ="@+id/analysis_rating_help"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+	    <ImageView
+    	    android:id="@+id/analysis_saving_bar"
+       		android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        	android:layout_centerVertical="true"
+        	/>
         
-        <TextView
-        android:id ="@+id/analysis_rating_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="已節省金錢" />
-       
-       
-        <ImageView
-            android:id="@+id/analysis_goal_bar"
+	    <ImageView
+            android:id="@+id/analysis_saving_cur_bar_start"
        		android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:scaleType="fitXY"
-        />
-        
+        	android:layout_centerVertical="true"
+	        />
+	    
         <ImageView
-            android:id="@+id/analysis_current_bar"
+            android:id="@+id/analysis_saving_cur_bar"
        		android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:scaleType="fitXY"
-        />
-        
-
-
-        <TextView
-            android:id="@+id/analysis_rating_low"
-       		android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_alignParentRight="true"
-        />
-        
-        <TextView
-            android:id="@+id/analysis_rating_high"
-       		android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_alignParentRight="true"
-        />
+        	android:layout_centerVertical="true"
+        	android:layout_toRightOf="@+id/analysis_saving_cur_bar_start"
+	        />
         
         <ImageView
-            android:id="@+id/analysis_rating_pointer"
+            android:id="@+id/analysis_saving_cur_bar_end"
        		android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:scaleType="fitXY"
-        />
-    </RelativeLayout>
+        	android:layout_centerVertical="true"
+        	android:layout_toRightOf="@+id/analysis_saving_cur_bar"
+	        />
+        
+       </RelativeLayout>
 
 </LinearLayout>

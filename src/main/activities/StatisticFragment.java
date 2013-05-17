@@ -71,13 +71,10 @@ public class StatisticFragment extends Fragment {
     	super.onResume();
     	statisticFragment = this;
     	
-    	// Eric - add  
     	analysisViews = new StatisticPageView[3];
     	analysisViews[0] = new AnalysisProgressView(activity, statisticFragment);
     	analysisViews[1] = new AnalysisSavingView(activity, statisticFragment);
-		//analysisViews[2] = new AnalysisDrunkView(activity,statisticFragment);
 		analysisViews[2] = new AnalysisRatingView(activity,statisticFragment);
-		// Eric end
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
@@ -149,7 +146,7 @@ public class StatisticFragment extends Fragment {
 	private class LoadingHandler extends Handler{
 		public void handleMessage(Message msg){
         	Point screen = FragmentTabs.getSize();
-        	statistic_px = new Point(screen.x,(int) (screen.x*467.0/720.0));
+        	statistic_px = new Point(screen.x,(int) (screen.x*314.0/355.0));
         	
         	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
         	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
@@ -172,32 +169,20 @@ public class StatisticFragment extends Fragment {
         	statisticViewLayoutParam.height = statistic_px.y;
 			
         	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
-        	analysisViewLayoutParam.height = screen.y - statistic_px.y;
-    		LayoutParams analysisViewParam0 =  analysisViews[0].getView().getLayoutParams();
-    		analysisViewParam0.width = screen.x;
-    		analysisViewParam0.height = (int) (screen.x*370.0/720.0);
-    		
-    		LayoutParams analysisViewParam1 =  analysisViews[1].getView().getLayoutParams();
-    		analysisViewParam1.width = screen.x;
-    		analysisViewParam1.height = (int) (screen.x*500.0/720.0);
+        	analysisViewLayoutParam.height = (int)(screen.x*555.0/355.0) - statistic_px.y;
         	
-    		LayoutParams analysisViewParam2 =  analysisViews[2].getView().getLayoutParams();
-    		analysisViewParam2.width = screen.x;
-    		analysisViewParam2.height = (int) (screen.x*500.0/720.0);
-    		
-    		
-	    	dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_on);
-	    	dot_off = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drunk_record_dot_off);
+	    	dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_dot_on);
+	    	dot_off = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_dot_off);
 			
 	    	RelativeLayout.LayoutParams dotsLayoutParam = (android.widget.RelativeLayout.LayoutParams) dots_layout.getLayoutParams();
-	    	dotsLayoutParam.topMargin = (int) (statistic_px.y*378.0/467.0); 
+	    	dotsLayoutParam.topMargin = (int)(statistic_px.y*0.9); 
 	    	
 			statisticViewAdapter.onInBackground();
     		for (int i=0;i<analysisViews.length;++i)
     			analysisViews[i].onInBackground();
 			
-			int dot_size = (int) (screen.x*12.0/720.0);
-	    	int dot_gap = (int) (dot_size*4/3);
+			int dot_size = (int) (screen.x*18.0/720.0);
+	    	int dot_gap = (int) (dot_size);
 			
 	    	dots = new ImageView[3];
 	    	for (int i=0;i<3;++i){

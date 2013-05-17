@@ -14,14 +14,19 @@ public class LoadingBox {
         return mDialog;
 	}
 	
-	public static void show(Context context){
-		if (dialog == null){
-			dialog = new ProgressDialog(context);
-			dialog.setMessage("載入中");
-			dialog.setCancelable(false);
+	public static void cancel(){
+		if (dialog !=null){
+			dialog.cancel();
 		}
-		if (!dialog.isShowing())
+	}
+	
+	public static void show(Context context){
+		dialog = new ProgressDialog(context);
+		dialog.setMessage("載入中");
+		dialog.setCancelable(true);
+		if (!dialog.isShowing()){
 			dialog.show();
+		}
 	}
 	
 	public static void dismiss(){

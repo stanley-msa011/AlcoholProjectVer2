@@ -26,6 +26,8 @@ public class FragmentTabs extends FragmentActivity {
 
 	static private TabHost tabHost;
 
+	private static Context context;
+	
 	private static boolean enableTabs;
 	private static Point screen_px;
 	private static Point tab_px;
@@ -45,6 +47,8 @@ public class FragmentTabs extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		context = this;
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -105,13 +109,13 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onResume(){
 		super.onResume();
-		
 		enableTabs = true;
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){
 			Intent newIntent = new Intent(this, PreSettingActivity.class);
-			this.startActivityForResult(newIntent, 1);
+			this.startActivity(newIntent);
+			this.finish();
 			return;
 		}
 		Reuploader.reuploader(this);
@@ -119,8 +123,10 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onStop(){
 		Log.d("TABS","ONSTOP");
+		context = null;
 		super.onStop();
 	}
+	
 	
 	protected void onPause(){
 		Reuploader.cancel();
@@ -183,7 +189,8 @@ public class FragmentTabs extends FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	menu.add(0, 0, 0, "Debug");
-    	menu.add(1, 1, 1, "Normal");
+    	menu.add(0, 1, 1, "Normal");
+    	menu.add(0, 2, 1, "Setting");
     	return super.onCreateOptionsMenu(menu);
     }
 	
@@ -197,6 +204,10 @@ public class FragmentTabs extends FragmentActivity {
 		}else if (id == 1){
 			editor.putBoolean("debug", false);
 			editor.commit();
+		}else if (id == 2){
+			Intent newIntent = new Intent(this, PreSettingActivity.class);
+			this.startActivity(newIntent);
+			this.finish();
 		}
 		
 		return false;
@@ -230,7 +241,7 @@ public class FragmentTabs extends FragmentActivity {
 						else if (i==1)
 							fragments[i] = new StatisticFragment();
 						else if (i==2)
-							fragments[i] = new HistoryFragment();
+							fragments[i] = new HistoryFragment2();
 						ft.add(R.id.real_tabcontent,fragments[i],tabName[i] );
 					}else{
 						ft.attach(fragments[i]);
@@ -259,5 +270,11 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	static public void enableTab(boolean enable){
 		enableTabs = enable;
+	}
+	
+	static public Context getContext(){
+		if (context !=null)
+			return context;
+		return null;
 	}
 }

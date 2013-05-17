@@ -96,7 +96,10 @@ public class BracDataHandler {
     	month = cal.get(Calendar.MONTH)+1;
     	date = cal.get(Calendar.DATE);
     	hour = cal.get(Calendar.HOUR_OF_DAY);
-    	timeblock = TimeBlock.getTimeBlock(hour);
+    	
+    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+		int timeblock_type = sp.getInt("timeblock_num", 2);
+    	timeblock = TimeBlock.getTimeBlock(hour,timeblock_type);
     
     	//check time block
     	boolean check_time_block =true;

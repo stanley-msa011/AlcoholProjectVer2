@@ -13,36 +13,70 @@
      />
     
     <TextView
-        android:id="@+id/statistic_day_brac_value"
+        android:id="@+id/statistic_day_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:textColor="#FF000000"
+        android:text="今日測試"
         />
     
-    <ImageView
-        android:id="@+id/statistic_day_brac_result"
+    <TextView
+        android:id="@+id/statistic_day_brac_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-     />
-     <TextView
-        android:id="@+id/statistic_day_brac_result2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_below="@+id/statistic_day_brac_result"
+        android:layout_below="@+id/statistic_day_title"
+        android:textColor="#FF000000"
         />
-     <TextView
-        android:id="@+id/statistic_day_brac_result3"
+    
+    <RelativeLayout 
+        android:id = "@+id/statistic_day_value_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_above="@+id/statistic_day_brac_result2"
-        android:textColor="#FFFFFFFF"
+        android:layout_toRightOf="@+id/statistic_day_title">
+       <ImageView 
+        	android:id = "@+id/statistic_day_value_bg"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerInParent="true"
         />
-      <ImageView
-        android:id="@+id/statistic_day_brac_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+    
+    	<ImageView 
+        	android:id = "@+id/statistic_day_value_circle"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerInParent="true"
         />
+    
+    	<TextView
+        	android:id="@+id/statistic_day_brac_value"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:gravity="center"
+        	android:textAlignment="center"
+        	android:layout_centerInParent="true"
+        	android:textColor="#FFFFFFFF"
+        />
+
+    	<TextView
+    	    android:id="@+id/statistic_day_brac"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_below="@+id/statistic_day_brac_value"
+    	    android:layout_centerHorizontal="true"
+    	    android:text="brac"
+    	    android:textAlignment="textStart"
+    	    android:textColor="#FFFFFFFF" />
+
+    </RelativeLayout>
+    
+      <LinearLayout 
+          android:id = "@+id/statistic_day_block_layout"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:layout_centerHorizontal="true"
+          android:layout_below="@+id/statistic_day_value_layout">
+          
+      </LinearLayout>
+      
 </RelativeLayout>
