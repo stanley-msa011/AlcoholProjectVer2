@@ -273,7 +273,7 @@ public class StatisticDayView extends StatisticPageView {
 			lParam.leftMargin = blockWidth;
 			lParam.rightMargin = blockWidth;
 			if (!TimeBlock.hasBlock(i, timeblock_type))
-				lLayout.setAlpha(0.1F);
+				lLayout.setAlpha(0.0F);
 		}
 	}
 

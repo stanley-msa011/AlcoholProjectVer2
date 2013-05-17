@@ -102,7 +102,7 @@ public class StatisticMonthView extends StatisticPageView {
 			time_labels[i].setGravity(Gravity.CENTER);
 			timeLayout.addView(time_labels[i]);
 			if (!TimeBlock.hasBlock(i, timeblock_type))
-				time_labels[i].setAlpha(0.1F);
+				time_labels[i].setAlpha(0.0F);
 		}
 
 		monthFrom = (TextView) view.findViewById(R.id.statistic_month_from);;
@@ -223,7 +223,7 @@ public class StatisticMonthView extends StatisticPageView {
 			int idx = (i%nBlocks)*nDate + i/nBlocks;
 			if (!TimeBlock.hasBlock(i%4, timeblock_type)){
 				circles[idx].setImageBitmap(circleBmps[0]);
-				circles[idx].setAlpha(0.1F);
+				circles[idx].setAlpha(0.0F);
 				continue;
 			}
 			if (historys[i] == null)
