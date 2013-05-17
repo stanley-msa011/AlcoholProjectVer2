@@ -37,6 +37,9 @@ public class Bluetooth {
 	private InputStream in;
 	private Context context;
 	
+	private float local_min;
+	private float local_max;
+	private float prev_prev_pressure;
 	private float prev_pressure;
 	private float now_pressure;
 	private boolean isPeak = false;
@@ -83,6 +86,9 @@ public class Bluetooth {
 		btAdapter =  BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null)
 			Log.e("BT","NOT SUPPORT BT");
+		local_min = 0.f;
+		local_max = 0.f;
+		prev_prev_pressure = 0.f;
 		prev_pressure = 0.f;
 		now_pressure = 0.f;
 		success = false;
@@ -125,7 +131,7 @@ public class Bluetooth {
 		public void onReceive(Context context, Intent intent) {
 			if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-				if (device.getName().equals(DEVICE_NAME)){
+				if (device.getName().equals(DEVICE_NAME)){ // add DEVICE_NAME2?
 					btAdapter.cancelDiscovery();
 					sensor = device;
 				}
@@ -163,7 +169,10 @@ public class Bluetooth {
 		String msg = "";
 		isPeak=false;
 		success = false;
+		local_min = 0;
+		local_max = 0;
 		now_pressure = 0;
+		prev_prev_pressure = 0;
 		prev_pressure = 0;
 		int read_type = READ_NULL;
 		duration = 0;
@@ -181,6 +190,7 @@ public class Bluetooth {
 				long time = System.currentTimeMillis();
 				if (first_start_time == -1){
 					first_start_time = time;
+					Log.d("ERIC", "start");
 				}
 				else if (time - first_start_time > 10000){
 					Log.d("BT","TIME OUT");
@@ -238,30 +248,57 @@ public class Bluetooth {
 				//Log.d("BT","READ-M");
 				if (prev_pressure == 0.f){
 					prev_pressure = Float.valueOf(msg.substring(1));
+					prev_prev_pressure = Float.valueOf(msg.substring(1));
+					Log.d("ERIC", "first pressure: "+prev_pressure);
 					testFragment.showDebug("set_pressure: "+ prev_pressure);
 				}
 				else {
+					prev_prev_pressure = prev_pressure;
 					prev_pressure = now_pressure;
 					now_pressure = Float.valueOf(msg.substring(1));
 					testFragment.showDebug("set_pressure: "+ now_pressure);
+					Log.d("ERIC", "set_pressure: "+ now_pressure);
 					float diff = now_pressure - prev_pressure;
 					
 					long time = System.currentTimeMillis();
-					testFragment.showDebug("P_diff: "+diff );
-					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
+					if(prev_pressure < prev_prev_pressure && prev_pressure < now_pressure && !isPeak){
+						local_min = prev_pressure;
+						Log.d("ERIC", "set local min = " + prev_pressure);
+					}
+					else if(prev_pressure > prev_prev_pressure && prev_pressure > now_pressure){
+						local_max = prev_pressure;
+						Log.d("ERIC", "set local max = " + prev_pressure);
+					}
+					if(local_min > 1 && now_pressure > local_min + 1000 && !isPeak){
 						testFragment.showDebug("P_PeakStart" );
+						Log.d("ERIC", "P_PeakStart");
 						isPeak = true;
 						change_speed(0);
 						start_time = time;
+					}
+					
+					//long time = System.currentTimeMillis();
+					testFragment.showDebug("P_diff: "+diff );
+					Log.d("ERIC", "P_diff: "+diff);
+					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
+						/*
+						testFragment.showDebug("P_PeakStart" );
+						Log.d("ERIC", "P_PeakStart");
+						isPeak = true;
+						change_speed(0);
+						start_time = time;
+						*/
 					}else if (diff > -PRESSURE_DIFF_MIN/2){
 						if (isPeak){
 							testFragment.showDebug("P_Peak" );
+							Log.d("ERIC","P_Peak");
 							end_time = time;
 							duration += (end_time-start_time);
 							start_time = end_time;
 							
 							if (duration > MILLIS_5){
 								testFragment.showDebug("End of Blowing" );
+								Log.d("ERIC","End of Blowing");
 								show_in_UI(5);
 							}else if (duration > MILLIS_4){
 								show_in_UI(4);
@@ -293,6 +330,7 @@ public class Bluetooth {
 						}
 					}else if (diff <-PRESSURE_DIFF_MIN/2 ){
 						testFragment.showDebug("P_PeakEnd" );
+						Log.d("ERIC","P_PeakEnd");
 						isPeak = false;
 						start_time = end_time = 0;
 						change_speed(-1);
