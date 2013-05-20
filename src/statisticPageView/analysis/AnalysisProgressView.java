@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
@@ -36,6 +37,8 @@ public class AnalysisProgressView extends StatisticPageView {
 	private static final int totalWeek = 12;
 	private int currentWeek;
 	private int restWeek;
+	
+	private Typeface wordTypeface;
 	
 	public AnalysisProgressView(Context context,StatisticFragment statisticFragment){
 		super(context, R.layout.analysis_progress_view,statisticFragment);
@@ -67,17 +70,20 @@ public class AnalysisProgressView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		title = (TextView) view.findViewById(R.id.analysis_progress_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 36.0/720.0));
+		title.setTypeface(wordTypeface);
 		
 		title_bg = (ImageView) view.findViewById(R.id.analysis_progress_title_bg);
 		title_bg.setScaleType(ScaleType.FIT_XY);
 		
 		help = (TextView) view.findViewById(R.id.analysis_progress_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		help.setTypeface(wordTypeface);
 		
 		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_progress_content_layout);
 		

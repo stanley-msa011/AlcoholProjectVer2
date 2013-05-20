@@ -5,6 +5,12 @@
     tools:context=".PreSettingActivity" 
     android:orientation="vertical">
 
+      <TextView
+        android:id="@+id/version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" />
+    
         <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -22,13 +28,13 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Target money:" />
+        android:text="Target:(1: 機車 50000 2:汽車 700000 3:筆電: 30000 )" />
     
         <EditText
             android:id="@+id/target_money_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
+            android:ems="3"
             android:inputType="number" >
         <requestFocus />
     </EditText>

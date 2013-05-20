@@ -13,6 +13,7 @@ import test.camera.CameraRunHandler;
 import test.data.BracDataHandler;
 import test.file.BracValueFileHandler;
 import test.file.ImageFileHandler;
+import test.file.QuestionFile;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
 import test.ui.Tutorial;
@@ -50,6 +51,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.Point;
 import android.graphics.drawable.AnimationDrawable;
@@ -138,6 +140,12 @@ public class TestFragment extends Fragment {
 	private RelativeLayout tutorialLayout;
 	private TutorialHandler tutorialHandler;
 	
+	private QuestionFile questionFile;
+	
+	private Typeface digitTypeface;
+	private Typeface wordTypeface;
+	private Typeface wordTypefaceBold;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -175,11 +183,17 @@ public class TestFragment extends Fragment {
 	}
 	
 	private void setting(){
+		
+		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		wordTypefaceBold  = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w5.otf");
+		
 		bg = (ImageView) view.findViewById(R.id.test_background);
 		startLayout = (RelativeLayout) view.findViewById(R.id.test_start_layout);
 		startButton = (ImageView) view.findViewById(R.id.test_start_button);
 		startStroke = (ImageView) view.findViewById(R.id.test_start_stroke);
 		startText =(TextView) view.findViewById(R.id.test_start_text);
+		
 		
 		pictureStroke = (ImageView) view.findViewById(R.id.test_picture_stroke);
 		
@@ -188,13 +202,18 @@ public class TestFragment extends Fragment {
 		
 		testCircle = (ImageView) view.findViewById(R.id.test_start_circle);
 		
+		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
+		
 		Point screen = FragmentTabs.getSize();
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 74.0/720.0));
-
-		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
+		startText.setTypeface(wordTypefaceBold);
+		
+		
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 49.0/720.0));
 		messageView = (TextView) view.findViewById(R.id.test_message);
 		messageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 42.0/720.0));
+		messageView.setTypeface(wordTypeface);
+		
 		RelativeLayout.LayoutParams mParam = (LayoutParams) messageView.getLayoutParams();
 		mParam.topMargin = (int)(screen.x * 36.0/720.0);
 		if (msgBox==null)
@@ -356,7 +375,7 @@ public class TestFragment extends Fragment {
 		
 		bracFileHandler = new BracValueFileHandler(mainDirectory,timestamp);
 		imgFileHandler = new ImageFileHandler(mainDirectory,timestamp);
-		
+		questionFile = new QuestionFile(mainDirectory);
 	}
 	
 	public void updateInitState(int type){
@@ -805,6 +824,9 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
+	public void writeQuestionFile(int emotion,int desire){
+		questionFile.write(emotion, desire);
+	}
 	
 	
 	//Debug --------------------------------------------------------------------------------------------------------

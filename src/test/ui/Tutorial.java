@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -27,6 +28,9 @@ public class Tutorial {
 	private Bitmap bgBmp,deviceBmp;//,arrowBmp;
 	private int curPage;
 	
+	private Typeface digitTypeface;
+	private Typeface wordTypeface;
+	
 	public Tutorial(Fragment fragment){
 		this.context = fragment.getActivity();
 		this.r = context.getResources();
@@ -42,6 +46,9 @@ public class Tutorial {
 	}
 	
 	private void setting(){
+		
+		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinpromedium.ttf");
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		
 		curPage = 1;
 		
@@ -62,12 +69,14 @@ public class Tutorial {
 		
 		step = (TextView) view.findViewById(R.id.tutorial_step);
 		step.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) (screen.x*72.0/720.0));
+		step.setTypeface(digitTypeface);
 		RelativeLayout.LayoutParams sParam = (RelativeLayout.LayoutParams)step.getLayoutParams();
 		sParam.leftMargin =  (int) (screen.x*100.0/720.0);
 		sParam.topMargin =  (int) (screen.x*60.0/720.0);
 		
 		msg = (TextView) view.findViewById(R.id.tutorial_message);
 		msg.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) (screen.x*36.0/720.0));
+		msg.setTypeface(wordTypeface);
 		RelativeLayout.LayoutParams mParam = (RelativeLayout.LayoutParams)msg.getLayoutParams();
 		mParam.leftMargin =  (int) (screen.x*150.0/720.0);
 		mParam.topMargin =  (int) (screen.x*90.0/720.0);

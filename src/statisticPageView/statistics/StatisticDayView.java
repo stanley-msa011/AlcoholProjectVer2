@@ -51,6 +51,9 @@ public class StatisticDayView extends StatisticPageView {
 	private static final int nBlocks = 4;
 	private int timeblock_type;
 	
+	private Typeface digitTypeface;
+	private Typeface wordTypeface;
+	
 	public StatisticDayView(Context context,StatisticFragment statisticFragment){
 		super(context,R.layout.statistic_day_view,statisticFragment);
 		db = new HistoryDB(context);
@@ -88,11 +91,16 @@ public class StatisticDayView extends StatisticPageView {
 	public void onPreTask() {
 		Point statistic_size = StatisticFragment.getStatisticPx();
 		
+		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		
 		bracTitle = (TextView) view.findViewById(R.id.statistic_day_title);
 		bracTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,  (int) (statistic_size.x * 56.0/720.0));
+		bracTitle.setTypeface(wordTypeface);
 		
 		bracValue = (TextView) view.findViewById(R.id.statistic_day_brac_value);
 		bracValue.setTextSize(TypedValue.COMPLEX_UNIT_PX,  (int) (statistic_size.x * 90.0/720.0));
+		bracValue.setTypeface(digitTypeface);
 		
 		BracGameHistory history = db.getLatestBracGameHistory();
 
@@ -101,6 +109,8 @@ public class StatisticDayView extends StatisticPageView {
 		
 		bracTime = (TextView) view.findViewById(R.id.statistic_day_brac_time);
 		bracTime.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) (statistic_size.x * 42.0/720.0));
+		bracTime.setTypeface(wordTypeface);
+		
 		bg = (ImageView) view.findViewById(R.id.statistic_day_brac_bg);
 		
 		circleImages = new ImageView[nBlocks];
@@ -117,12 +127,17 @@ public class StatisticDayView extends StatisticPageView {
 			circleTexts[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			circleTexts[i].setTextColor(0xFF000000);
 			circleTexts[i].setText(blockHint[i]);
+			circleTexts[i].setTypeface(wordTypeface);
+			if (!TimeBlock.hasBlock(i, timeblock_type))
+				circleTexts[i].setText("");
 			
 			circleValues[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
 			circleValues[i].setTextColor(0xFFFFFFFF);
+			circleValues[i].setTypeface(digitTypeface);
 		}
 		bracHelp = (TextView) view.findViewById(R.id.statistic_day_brac);
 		bracHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		bracHelp.setTypeface(digitTypeface);
 		
 		valueBg = (ImageView) view.findViewById(R.id.statistic_day_value_bg);
 		valueCircle = (ImageView) view.findViewById(R.id.statistic_day_value_circle);
@@ -208,11 +223,16 @@ public class StatisticDayView extends StatisticPageView {
 			int hour = cal.get(Calendar.HOUR);
 			int min = cal.get(Calendar.MINUTE);
 			int am_pm = cal.get(Calendar.AM_PM);
+			String min_str;
+			if (min < 10)
+				min_str = "0"+String.valueOf(min);
+			else
+				min_str = String.valueOf(min);
 			
 			if (am_pm == Calendar.AM)
-				time = month+" / "+day+"\n"+hour+":"+min+" A.M.";
+				time = month+" / "+day+"\n"+hour+":"+min_str+" A.M.";
 			else
-				time = month+" / "+day+"\n"+hour+":"+min+" P.M.";
+				time = month+" / "+day+"\n"+hour+":"+min_str+" P.M.";
 		}
 
 		bracTime.setText(time);
@@ -240,15 +260,21 @@ public class StatisticDayView extends StatisticPageView {
 			RelativeLayout.LayoutParams circleParam =(RelativeLayout.LayoutParams ) circleImages[i].getLayoutParams();
 			circleParam.width =circleSize;
 			circleParam.height =circleSize;
+			if (!TimeBlock.hasBlock(i, timeblock_type))
+				circleParam.width = circleParam.height= 0;
 			circleParam.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
 			RelativeLayout.LayoutParams valueParam =(RelativeLayout.LayoutParams ) circleValues[i].getLayoutParams();
 			valueParam.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
 			
 			lLayout.addView(sLayout);
 			lLayout.addView(circleTexts[i]);
+			
 			RelativeLayout.LayoutParams sParam =(RelativeLayout.LayoutParams ) sLayout.getLayoutParams();
 			sParam.width=circleSize;
 			sParam.height=circleSize;
+			if (!TimeBlock.hasBlock(i, timeblock_type))
+				sParam.width = sParam.height= 0;
+			
 			RelativeLayout.LayoutParams tParam =(RelativeLayout.LayoutParams ) circleTexts[i].getLayoutParams();
 			tParam.addRule(RelativeLayout.RIGHT_OF,0x999);
 			tParam.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
@@ -272,8 +298,10 @@ public class StatisticDayView extends StatisticPageView {
 			LinearLayout.LayoutParams lParam =(LinearLayout.LayoutParams ) lLayout.getLayoutParams();
 			lParam.leftMargin = blockWidth;
 			lParam.rightMargin = blockWidth;
-			if (!TimeBlock.hasBlock(i, timeblock_type))
+			if (!TimeBlock.hasBlock(i, timeblock_type)){
 				lLayout.setAlpha(0.0F);
+				lParam.leftMargin = lParam.rightMargin = 0 ;
+			}
 		}
 	}
 

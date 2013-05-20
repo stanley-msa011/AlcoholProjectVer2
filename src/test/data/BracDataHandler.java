@@ -64,7 +64,7 @@ public class BracDataHandler {
 	public int start(){
 		
 		File mainStorageDir;
-		File textFile, geoFile, stateFile;
+		File textFile, geoFile, stateFile, questionFile;
 		File[] imageFiles = new File[3];
 		int result = SUCCESS;
 		
@@ -75,6 +75,7 @@ public class BracDataHandler {
         
         textFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + ts + ".txt");
         geoFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "geo.txt");
+        questionFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "question.txt");
         
         imageFiles[0] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_1.jpg");
         imageFiles[1] = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "IMG_" + ts + "_2.jpg");
@@ -139,7 +140,7 @@ public class BracDataHandler {
 		}
        	
        	/*Connection to server*/
-       	int server_connect = connectingToServer(textFile,geoFile,stateFile,imageFiles);
+       	int server_connect = connectingToServer(textFile,geoFile,stateFile,questionFile,imageFiles);
 		if (server_connect == ERROR) // error happens when preparing files
 			result = ERROR;
 		if (result == ERROR){
@@ -179,7 +180,7 @@ public class BracDataHandler {
 	}
 	
 	
-	private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles){
+	private int connectingToServer(File textFile, File geoFile, File stateFile, File questionFile, File[] imageFiles){
 		try {
 			
 			Log.d("DataHandler","Start Init");
@@ -221,6 +222,10 @@ public class BracDataHandler {
 			}
 			if(stateFile.exists()){
 				ContentBody cbStateFile = new FileBody(stateFile, "application/octet-stream");
+				mpEntity.addPart("userfile[]", cbStateFile);
+			}
+			if (questionFile.exists()){
+				ContentBody cbStateFile = new FileBody(questionFile, "application/octet-stream");
 				mpEntity.addPart("userfile[]", cbStateFile);
 			}
 			

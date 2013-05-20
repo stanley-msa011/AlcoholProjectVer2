@@ -1,12 +1,17 @@
 package main.activities;
 
+import java.util.Calendar;
+
 import tabControl.CustomTab;
 import test.data.Reuploader;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -48,7 +53,7 @@ public class FragmentTabs extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		context = this;
-		
+        
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -110,6 +115,7 @@ public class FragmentTabs extends FragmentActivity {
 	protected void onResume(){
 		super.onResume();
 		enableTabs = true;
+		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){
@@ -277,4 +283,5 @@ public class FragmentTabs extends FragmentActivity {
 			return context;
 		return null;
 	}
+	
 }

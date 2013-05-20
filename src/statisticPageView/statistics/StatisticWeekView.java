@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -58,6 +59,9 @@ public class StatisticWeekView extends StatisticPageView {
 	
 	private int timeblock_type;
 	
+	private Typeface digitTypeface;
+	private Typeface wordTypeface;
+	
 	public StatisticWeekView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_week_view, statisticFragment);
 		db = new HistoryDB(context);
@@ -85,6 +89,9 @@ public class StatisticWeekView extends StatisticPageView {
 	public void onPreTask() {
 		Point screen = StatisticFragment.getStatisticPx();
 		
+		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		
 		dateLayout = (LinearLayout) view.findViewById(R.id.statistic_week_date_label_layout);
 		timeLayout = (LinearLayout) view.findViewById(R.id.statistic_week_timeblock_label_layout);
 		blockLayout = (GridLayout) view.findViewById(R.id.statistic_week_block_layout);
@@ -93,6 +100,7 @@ public class StatisticWeekView extends StatisticPageView {
 		int textSize2 =  (int) (screen.x * 36.0/720.0);
 		title= (TextView) view.findViewById(R.id.statistic_week_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+		title.setTypeface(wordTypeface);
 		
 		time_labels = new TextView[nBlocks];
 		for (int i=0;i<nBlocks;++i){
@@ -100,6 +108,7 @@ public class StatisticWeekView extends StatisticPageView {
 			time_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
 			time_labels[i].setTextColor(0xFF000000);
 			time_labels[i].setText(blockHint[i]);
+			time_labels[i].setTypeface(wordTypeface);
 			if (Build.VERSION.SDK_INT>=17)
 				time_labels[i].setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
 			time_labels[i].setGravity(Gravity.CENTER);
@@ -110,6 +119,7 @@ public class StatisticWeekView extends StatisticPageView {
 
 		monthText = (TextView) view.findViewById(R.id.statistic_week_month);;
 		monthText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+		monthText.setTypeface(digitTypeface);
 		
 		date_labels = new TextView[nDate];
 		for (int i=0;i<nDate;++i){
@@ -117,6 +127,7 @@ public class StatisticWeekView extends StatisticPageView {
 			date_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
 			date_labels[i].setTextColor(0xFF000000);
 			date_labels[i].setGravity(Gravity.CENTER);
+			date_labels[i].setTypeface(digitTypeface);
 			if (Build.VERSION.SDK_INT>=17)
 				date_labels[i].setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
 			dateLayout.addView(date_labels[i]);
@@ -143,6 +154,7 @@ public class StatisticWeekView extends StatisticPageView {
 			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
 			labels[i].setTextColor(0xFF000000);
 			labels[i].setGravity(Gravity.CENTER);
+			labels[i].setTypeface(wordTypeface);
 			if (Build.VERSION.SDK_INT>=17)
 				labels[i].setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
 			labels[i].setText(labelHint[i]);
@@ -194,20 +206,28 @@ public class StatisticWeekView extends StatisticPageView {
 		mParam.topMargin = (int)(screen.x*30.0/720.0);
 		mParam.leftMargin = (int)(screen.x*40.0/720.0);
 		
-		for (int i=0;i<nBlocks;++i){
-			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) time_labels[i].getLayoutParams();
-			param.width = c_width;
-			param.height = c_height;
-		}
 		for (int i=0;i<nDate;++i){
 			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) date_labels[i].getLayoutParams();
 			param.width = c_width;
 			param.height = c_height;
 		}
+		
+		int height = (c_height*4)/timeblock_type;
+		
+		for (int i=0;i<nBlocks;++i){
+			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) time_labels[i].getLayoutParams();
+			param.width = c_width;
+			param.height = height;
+			if (!TimeBlock.hasBlock(i, timeblock_type))
+				param.width = param.height = 0;
+		}
+		
 		for (int i=0;i<nBlocks*nDate;++i){
 			GridLayout.LayoutParams cParam = (GridLayout.LayoutParams) circles[i].getLayoutParams();
 			cParam.width = c_width;
-			cParam.height = c_height;
+			cParam.height = height;
+			if (!TimeBlock.hasBlock(i/nDate, timeblock_type))
+				cParam.width = cParam.height = 0;
 		}
 		
 		RelativeLayout.LayoutParams lParam = (RelativeLayout.LayoutParams) labelLayout.getLayoutParams();

@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -39,6 +40,8 @@ public class AnalysisRatingView extends StatisticPageView {
 	private RelativeLayout contentLayout;
 	
 	private int minLeftPointer, maxLeftPointer;
+	
+	private Typeface wordTypeface;
 	
 	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
@@ -113,16 +116,21 @@ public class AnalysisRatingView extends StatisticPageView {
 	
 	@Override
 	public void onPreTask() {
+		
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		title = (TextView) view.findViewById(R.id.analysis_rating_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 36.0/720.0));
+		title.setTypeface(wordTypeface);
 		
 		title_bg = (ImageView) view.findViewById(R.id.analysis_rating_title_bg);
 		
 		help = (TextView) view.findViewById(R.id.analysis_rating_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
-
+		help.setTypeface(wordTypeface);
+		
 		bar = (ImageView) view.findViewById(R.id.analysis_rating_bar);
 		pointer  = (ImageView) view.findViewById(R.id.analysis_rating_pointer);
 		
@@ -148,9 +156,10 @@ public class AnalysisRatingView extends StatisticPageView {
 		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)bar.getLayoutParams();
 		barParam.width = (int)(screen.x * 542.0/720.0);
 		barParam.height = (int)(screen.x * 38.0/720.0);
-		barParam.leftMargin = minLeftPointer = (int)(screen.x * 89.0/720.0);
+		barParam.leftMargin = (int)(screen.x * 89.0/720.0);
+		minLeftPointer  = (int)(screen.x * 120.0/720.0);
 		barBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_rating_bar);
-		maxLeftPointer = minLeftPointer +  barParam.width;
+		maxLeftPointer = minLeftPointer +   (int)(screen.x * 465.0/720.0);
 		
 		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
 		pointerParam.width = (int)(screen.x * 4.0/720.0);

@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -56,6 +57,9 @@ public class StatisticMonthView extends StatisticPageView {
 	
 	private int timeblock_type;
 	
+	private Typeface digitTypeface;
+	private Typeface wordTypeface;
+	
 	public StatisticMonthView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_month_view, statisticFragment);
 		db = new HistoryDB(context);
@@ -83,6 +87,9 @@ public class StatisticMonthView extends StatisticPageView {
 	public void onPreTask() {
 		Point screen = StatisticFragment.getStatisticPx();
 		
+		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		
 		timeLayout = (LinearLayout) view.findViewById(R.id.statistic_month_timeblock_label_layout);
 		blockLayout = (GridLayout) view.findViewById(R.id.statistic_month_block_layout);
 		
@@ -90,6 +97,7 @@ public class StatisticMonthView extends StatisticPageView {
 		int textSize2 =  (int) (screen.x * 36.0/720.0);
 		title= (TextView) view.findViewById(R.id.statistic_month_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+		title.setTypeface(wordTypeface);
 		
 		time_labels = new TextView[nBlocks];
 		for (int i=0;i<nBlocks;++i){
@@ -97,6 +105,7 @@ public class StatisticMonthView extends StatisticPageView {
 			time_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
 			time_labels[i].setTextColor(0xFF000000);
 			time_labels[i].setText(blockHint[i]);
+			time_labels[i].setTypeface(wordTypeface);
 			if (Build.VERSION.SDK_INT>=17)
 				time_labels[i].setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
 			time_labels[i].setGravity(Gravity.CENTER);
@@ -107,8 +116,10 @@ public class StatisticMonthView extends StatisticPageView {
 
 		monthFrom = (TextView) view.findViewById(R.id.statistic_month_from);;
 		monthFrom.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+		monthFrom.setTypeface(digitTypeface);
 		monthTo = (TextView) view.findViewById(R.id.statistic_month_to);;
 		monthTo.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+		monthTo.setTypeface(digitTypeface);
 		
 		bg = (ImageView) view.findViewById(R.id.statistic_month_bg);
 		
@@ -134,6 +145,7 @@ public class StatisticMonthView extends StatisticPageView {
 			if (Build.VERSION.SDK_INT>=17)
 				labels[i].setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
 			labels[i].setText(labelHint[i]);
+			labels[i].setTypeface(wordTypeface);
 			labelLayout.addView(labels[i]);
 		}
 	}
@@ -174,6 +186,8 @@ public class StatisticMonthView extends StatisticPageView {
 		int c_width =  (int) (screen.x * 75.0/720.0);
 		int c_height =  (int) (screen.x * 50.0/720.0);
 		
+		int height = (c_height*4)/timeblock_type;
+		
 		RelativeLayout.LayoutParams mParam =  (RelativeLayout.LayoutParams)monthFrom.getLayoutParams();
 		mParam.width = c_width;
 		mParam.height = c_height;
@@ -188,16 +202,19 @@ public class StatisticMonthView extends StatisticPageView {
 		for (int i=0;i<nBlocks;++i){
 			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) time_labels[i].getLayoutParams();
 			param.width = c_width;
-			param.height = c_height;
+			param.height = height;
+			if (!TimeBlock.hasBlock(i, timeblock_type))
+				param.width = param.height = 0;
 		}
 		
 		int b_width =  (int) (screen.x * 18.0/720.0);
 		int b_gap =  (int) (screen.x * 10.0/720.0);
-		int b_height =  (int) (screen.x * 50.0/720.0);
 		for (int i=0;i<nBlocks*nDate;++i){
 			GridLayout.LayoutParams cParam = (GridLayout.LayoutParams) circles[i].getLayoutParams();
 			cParam.width = b_width;
-			cParam.height = b_height;
+			cParam.height = height;
+			if (!TimeBlock.hasBlock(i/nDate, timeblock_type))
+				cParam.width = cParam.height = 0;
 			if (i%7==6)
 				cParam.rightMargin = b_gap;
 		}

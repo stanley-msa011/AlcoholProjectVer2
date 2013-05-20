@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -83,6 +84,8 @@ public class HistoryFragment2 extends Fragment {
 	
 	private LinearLayout stageLayout;
 	private TextView stage,stageNum;
+	
+	private Typeface stageTypeface;
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -167,10 +170,15 @@ public class HistoryFragment2 extends Fragment {
     	curPageTouch = touchPoint;
     	
     	stageLayout = (LinearLayout) view.findViewById(R.id.history_stage_layout);
+    	
+    	stageTypeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/dinpromedium.ttf");
+    	
     	stage = (TextView) view.findViewById(R.id.history_stage);
     	stage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(bg_x*40.0/720.0));
+    	stage.setTypeface(stageTypeface);
     	stageNum = (TextView) view.findViewById(R.id.history_stage_num);
     	stageNum.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(bg_x*100.0/720.0));
+    	stageNum.setTypeface(stageTypeface);
     	Log.d("History","step1 end");
     }
     

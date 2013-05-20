@@ -3,11 +3,13 @@ package statisticPageView.analysis;
 import main.activities.R;
 import main.activities.StatisticFragment;
 import statisticPageView.StatisticPageView;
+import statisticSetting.TargetSetting;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
@@ -36,12 +38,14 @@ public class AnalysisSavingView extends StatisticPageView {
 	
 	private RelativeLayout contentLayout;
 	
+	private Typeface wordTypeface;
+	
 	public AnalysisSavingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_saving_view,statisticFragment);
 		db = new HistoryDB(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		goalMoney = sp.getInt("goal_money", 10000);
-		drinkCost = sp.getInt("drink_cost", 200);
+		drinkCost = sp.getInt("drink_cost", 1);
 	}
 
 	@Override
@@ -70,17 +74,22 @@ public class AnalysisSavingView extends StatisticPageView {
 	
 	@Override
 	public void onPreTask() {
+		
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		title = (TextView) view.findViewById(R.id.analysis_saving_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 36.0/720.0));
+		title.setTypeface(wordTypeface);
 		
 		title_bg = (ImageView) view.findViewById(R.id.analysis_saving_title_bg);
 		
 		help = (TextView) view.findViewById(R.id.analysis_saving_help);
 		help.setTextColor(0xFF545454);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
-
+		help.setTypeface(wordTypeface);
+		
 		goalBar = (ImageView) view.findViewById(R.id.analysis_saving_bar);
 		currentBar = (ImageView) view.findViewById(R.id.analysis_saving_cur_bar);
 		start = (ImageView) view.findViewById(R.id.analysis_saving_cur_bar_start);
@@ -129,10 +138,10 @@ public class AnalysisSavingView extends StatisticPageView {
 		
 		int maxWidth = barParam.width - startParam.width -endParam.width;
 		int width;
-		if (currentMoney> goalMoney)
+		if (currentMoney> TargetSetting.getTargetValue(goalMoney))
 			width = maxWidth;
 		else{
-			width = maxWidth *currentMoney/goalMoney;
+			width = maxWidth *currentMoney/TargetSetting.getTargetValue(goalMoney);
 		}
 		
 		RelativeLayout.LayoutParams currentBarParam = (RelativeLayout.LayoutParams)currentBar.getLayoutParams();
@@ -153,8 +162,10 @@ public class AnalysisSavingView extends StatisticPageView {
 		end.setImageBitmap(barEndBmp);
 		String text =  "<font color=#000000>您已節省 </font><font color=#f39700>$"
 								+currentMoney
-								+"</font><font color=#000000> 元，目標為 </font><font color=#f39700>$"
-								+goalMoney
+								+"</font><font color=#000000> 元，"
+								+TargetSetting.getTargetName(goalMoney)
+								+"為 </font><font color=#f39700>$"
+								+TargetSetting.getTargetValue(goalMoney)
 								+"</font><font color=#000000></font><font color=#000000> 元</font>";
 		help.setText(Html.fromHtml(text));
 		

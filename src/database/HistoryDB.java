@@ -395,6 +395,10 @@ public class HistoryDB {
     	int hour = curCal.get(Calendar.HOUR_OF_DAY);
     	int time_block = TimeBlock.getTimeBlock(hour,timeblock_type);
     	
+    	if (!TimeBlock.isBlock(hour, timeblock_type)){
+    		db.close();
+    		return true;
+    	}
     	String sql = "SELECT * FROM HistoryGame WHERE _YEAR ="+year
     							+" AND _MONTH = "+month
     							+" AND _DATE= "+date

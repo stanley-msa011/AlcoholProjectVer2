@@ -32,6 +32,8 @@ public class PreSettingActivity extends Activity {
 	private TextView mDateDisplay;
 	private Button mPickDate;
 	
+	private TextView versionText;
+	
 	private int target_t,drink_t,tb_t;
 	
 	static final int DATE_DIALOG_ID = 0;
@@ -71,8 +73,10 @@ public class PreSettingActivity extends Activity {
 		ok_button = (Button) this.findViewById(R.id.uid_OK);
 		ok_button.setOnClickListener(new OKOnclickListener());
 		
+		versionText = (TextView) this.findViewById(R.id.version);
 		
-
+		versionText.setText("Verstion: "+Version.VERSION);
+		
 	    mPickDate.setOnClickListener(new View.OnClickListener() {
 	        public void onClick(View v) {
 	            showDialog(DATE_DIALOG_ID);
@@ -102,7 +106,7 @@ public class PreSettingActivity extends Activity {
 				check = false;
 			else{
 				drink_t = Integer.valueOf(drink.getText().toString());
-				if (drink_t == 0 || drink_t >target_t)
+				if (drink_t == 0)
 					check = false;
 			}
 			if (tb.getText().toString().length()!=1)
