@@ -214,6 +214,17 @@ public class BracDataHandler {
 			mpEntity.addPart("userData[]", new StringBody(ts));
 			mpEntity.addPart("userData[]", new StringBody(devId));
 			
+			
+			Calendar c = Calendar.getInstance();
+			
+		    int mYear = sp.getInt("sYear", c.get(Calendar.YEAR));
+		    int mMonth = sp.getInt("sMonth", c.get(Calendar.MONTH));
+		    int mDay = sp.getInt("sDate", c.get(Calendar.DATE));
+		    
+		    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
+		    
+		    mpEntity.addPart("userData[]", new StringBody(joinDate));
+			
 			ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
 			mpEntity.addPart("userfile[]", cbFile);
 			if (geoFile.exists()){

@@ -1,12 +1,9 @@
 package main.activities;
 
 import statisticPageView.StatisticPageView;
-import statisticPageView.analysis.AnalysisDrunkView;
 import statisticPageView.analysis.AnalysisProgressView;
 import statisticPageView.analysis.AnalysisRatingView;
-import statisticPageView.analysis.AnalysisRestView;
 import statisticPageView.analysis.AnalysisSavingView;
-import statisticPageView.analysis.AnalysisSuccessView;
 import statisticPageView.statistics.StatisticPagerAdapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;

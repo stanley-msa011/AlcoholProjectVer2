@@ -211,7 +211,7 @@ public class SocialFragment extends Fragment {
     		
     		if (historys[i].uid.equals(uid)){
     			Log.d("social","match uid");
-    			iconBg.setBackgroundResource(R.drawable.square);
+    		//	iconBg.setBackgroundResource(R.drawable.square);
     		}
     		
     	}
@@ -222,6 +222,7 @@ public class SocialFragment extends Fragment {
     	
 		@SuppressWarnings("deprecation")
 		public void handleMessage(Message msg){
+			/*
 			iconsBmp = new Bitmap[ICON_TYPES];
 			iconsBmp[0] = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_social_icon1);
 			iconsBmp[1] = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_social_icon2);
@@ -234,7 +235,7 @@ public class SocialFragment extends Fragment {
 			iconCoverBmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_social_iconcover);
 			
 			bgBmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.drunk_social_bg);
-			
+			*/
 			BitmapDrawable bgDrawable = new BitmapDrawable(bgBmp);
 			mainView.setBackgroundDrawable(bgDrawable);
 

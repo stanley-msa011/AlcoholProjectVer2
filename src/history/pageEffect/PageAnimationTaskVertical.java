@@ -2,7 +2,6 @@ package history.pageEffect;
 
 import main.activities.FragmentTabs;
 import main.activities.HistoryFragment;
-import main.activities.HistoryFragment2;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;
@@ -19,7 +18,7 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	private static final int clip_time = 2000;
 	private static final int sleep_time = clip_time/gaps;
 	private int[] bgs;
-	private HistoryFragment2 historyFragment;
+	private HistoryFragment historyFragment;
 	
 	private PointF endTouch;
 	private int startImageIdx;
@@ -28,7 +27,7 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	private Bitmap cur=null,next=null,tmp=null;
 	private Bitmap prev_cur=null,prev_next=null;
 	
-	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,PointF middle1,PointF middle2,PointF middle3, int[] bgs,HistoryFragment2 historyFragment,PointF endTouch,int startImageIdx,int endImageIdx){
+	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,PointF middle1,PointF middle2,PointF middle3, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx){
 		this.pageWidget = pageWidget;
 		this.from = from;
 		this.endTouch = endTouch;

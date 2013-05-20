@@ -247,7 +247,7 @@ public class FragmentTabs extends FragmentActivity {
 						else if (i==1)
 							fragments[i] = new StatisticFragment();
 						else if (i==2)
-							fragments[i] = new HistoryFragment2();
+							fragments[i] = new HistoryFragment();
 						ft.add(R.id.real_tabcontent,fragments[i],tabName[i] );
 					}else{
 						ft.attach(fragments[i]);

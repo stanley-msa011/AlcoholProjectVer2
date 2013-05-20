@@ -97,12 +97,12 @@ public class UIRotate {
 	public void settingInBackground(){
 		
 		Bitmap tmp;
-		tmp = BitmapFactory.decodeResource(r, R.drawable.teat_camera_rotate_bg);
-		bgBmp = Bitmap.createScaledBitmap(tmp,  (int)(screen.x * 369.0/720.0), (int)(screen.x * 367.0/720.0), true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.test_camera_rotate);
-		ringBmp =  Bitmap.createScaledBitmap(tmp,   (int)(screen.x * 266.0/720.0), (int)(screen.x * 266.0/720.0), true);
-		tmp.recycle();
+		//tmp = BitmapFactory.decodeResource(r, R.drawable.teat_camera_rotate_bg);
+		//bgBmp = Bitmap.createScaledBitmap(tmp,  (int)(screen.x * 369.0/720.0), (int)(screen.x * 367.0/720.0), true);
+		//tmp.recycle();
+		//tmp = BitmapFactory.decodeResource(r, R.drawable.test_camera_rotate);
+		//ringBmp =  Bitmap.createScaledBitmap(tmp,   (int)(screen.x * 266.0/720.0), (int)(screen.x * 266.0/720.0), true);
+		//tmp.recycle();
 		//bgBmp = BitmapFactory.decodeResource(r, R.drawable.teat_camera_rotate_bg,opts);
 		//ringBmp = BitmapFactory.decodeResource(r, R.drawable.test_camera_rotate,opts);
 		

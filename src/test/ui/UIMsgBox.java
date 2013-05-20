@@ -33,7 +33,6 @@ public class UIMsgBox {
 	private RelativeLayout box = null;
 	
 	private Bitmap bgBmp;
-	private Bitmap buttonBmp;
 	
 	private TextView help;
 	private ImageView bg;
@@ -92,19 +91,12 @@ public class UIMsgBox {
 			bgBmp.recycle();
 			bgBmp=null;
 		}
-		if(buttonBmp!=null && !buttonBmp.isRecycled()){
-			buttonBmp.recycle();
-			buttonBmp=null;
-		}
 		
 		Point screen = FragmentTabs.getSize();
 		
 		Bitmap tmp;
 		tmp = BitmapFactory.decodeResource(r, R.drawable.test_box_bg_1);
 		bgBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 666.0/720.0),  (int)(screen.x * 440.0/720.0), true);
-		tmp.recycle();
-		tmp = buttonBmp = BitmapFactory.decodeResource(r, R.drawable.test_box_button);
-		buttonBmp = BitmapFactory.decodeResource(r, R.drawable.test_box_button);
 		tmp.recycle();
 		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) box.getLayoutParams();
@@ -126,10 +118,6 @@ public class UIMsgBox {
 		if(bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp=null;
-		}
-		if(buttonBmp!=null && !buttonBmp.isRecycled()){
-			buttonBmp.recycle();
-			buttonBmp=null;
 		}
 	}
 	

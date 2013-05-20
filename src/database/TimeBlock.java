@@ -103,7 +103,7 @@ public class TimeBlock {
 		case 4:
 			cals[0].set(year, month, day, 8, 0, 0);
 			cals[1].set(year, month, day, 12, 0, 0);
-			cals[2].set(year, month, day, 17, 0, 0);
+			cals[2].set(year, month, day, 16, 0, 0);
 			cals[3].set(year, month, day, 21, 0, 0);
 			break;
 		}

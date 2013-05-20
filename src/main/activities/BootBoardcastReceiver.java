@@ -58,7 +58,7 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		}
 		
 		//Testing
-		//alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 12000,AlarmManager.INTERVAL_DAY, pending);
+		//alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 10000,AlarmManager.INTERVAL_DAY, pending);
 		
 	}
 
