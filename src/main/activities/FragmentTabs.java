@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
@@ -48,12 +49,14 @@ public class FragmentTabs extends FragmentActivity {
 	private android.support.v4.app.FragmentManager fm;
 	TabChangeListener tabChangeListener;
 	
+	public static  ImageView loadingPage;
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		context = this;
-        
+
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -284,4 +287,12 @@ public class FragmentTabs extends FragmentActivity {
 		return null;
 	}
 	
+	static public void detach_loading_page(){
+		if (loadingPage!=null)
+			loadingPage.setVisibility(View.INVISIBLE);
+	}
+	static public void attach_loading_page(){
+		if (loadingPage!=null)
+			loadingPage.setVisibility(View.VISIBLE);
+	}
 }

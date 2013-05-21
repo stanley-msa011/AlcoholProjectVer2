@@ -322,7 +322,7 @@ public class TestFragment extends Fragment {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(testFragment.getActivity());
 			boolean firstTime = sp.getBoolean("first", true);
 			helpButton.setOnClickListener(null);
-			startButton.setOnClickListener(null);
+			
 			if (firstTime){
 				messageView.setText("");
 				SharedPreferences.Editor editor = sp.edit();
@@ -331,6 +331,7 @@ public class TestFragment extends Fragment {
 				showTutorial();
 			}
 			else{
+				startButton.setOnClickListener(null);
 				startText.setText("");
 				reset();
 				messageView.setText("請按酒測裝置黑色按鈕\n以啟用酒測裝置");

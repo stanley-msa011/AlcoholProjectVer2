@@ -42,13 +42,13 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		Intent service_intent = new Intent();
 		service_intent.setClass(context, AlarmReceiver.class);
 
-		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, 0);
-
-		alarm.cancel(pending);
+		
 		
 		Calendar c = Calendar.getInstance();
 		
 		for (int i=0;i<cal.length;++i){
+			PendingIntent pending = PendingIntent.getBroadcast(context, requestCode+i, service_intent, 0);
+			alarm.cancel(pending);
 			long time;
 			if (cal[i].after(c))
 				time = cal[i].getTimeInMillis() - c.getTimeInMillis();
