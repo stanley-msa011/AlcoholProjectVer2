@@ -1,4 +1,4 @@
-package statisticSetting;
+package statistic.statisticSetting;
 
 public class TargetSetting {
 

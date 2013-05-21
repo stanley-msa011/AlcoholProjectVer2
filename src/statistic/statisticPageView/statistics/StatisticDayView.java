@@ -1,4 +1,4 @@
-package statisticPageView.statistics;
+package statistic.statisticPageView.statistics;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -10,7 +10,7 @@ import main.activities.FragmentTabs;
 import main.activities.Lang;
 import main.activities.R;
 import main.activities.StatisticFragment;
-import statisticPageView.StatisticPageView;
+import statistic.statisticPageView.StatisticPageView;
 import test.data.BracDataHandler;
 import history.BracGameHistory;
 import android.content.Context;

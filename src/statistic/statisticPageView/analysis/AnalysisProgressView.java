@@ -1,11 +1,11 @@
-package statisticPageView.analysis;
+package statistic.statisticPageView.analysis;
 
 import java.util.Calendar;
 
 import main.activities.Lang;
 import main.activities.R;
 import main.activities.StatisticFragment;
-import statisticPageView.StatisticPageView;
+import statistic.statisticPageView.StatisticPageView;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;

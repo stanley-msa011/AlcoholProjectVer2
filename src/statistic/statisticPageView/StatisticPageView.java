@@ -1,4 +1,4 @@
-package statisticPageView;
+package statistic.statisticPageView;
 
 import main.activities.StatisticFragment;
 import android.content.Context;

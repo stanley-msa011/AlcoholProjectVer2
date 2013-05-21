@@ -104,7 +104,10 @@ public class UIMsgBox2 {
 		emotionSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_emotion_seek_bar);
 		desireSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_desire_seek_bar);
 		gpsSwitch = (Switch) boxLayout.findViewById(R.id.msg_gps_switch);
-		
+		gpsSwitch.setTextOff("否");
+		gpsSwitch.setTextOn("是");
+		gpsSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		gpsSwitch.setTypeface(wordTypeface);
 		
 		emotionShow = (ImageView) boxLayout.findViewById(R.id.msg_emotion_show);
 		desireShow = (ImageView) boxLayout.findViewById(R.id.msg_desire_show);

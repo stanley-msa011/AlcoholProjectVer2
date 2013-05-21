@@ -85,8 +85,63 @@
             />
         
        </RelativeLayout>
-
        
+    <TextView
+        android:id ="@+id/analysis_rating_help2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF000000"
+        android:textAlignment="center"
+        android:gravity="center"
+    	/>
+           <RelativeLayout 
+        android:id="@+id/analysis_rating_content_layout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+	    <ImageView
+    	    android:id="@+id/analysis_rating_bar2"
+       		android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        	android:layout_centerVertical="true"
+        	android:layout_centerHorizontal="true"
+        	/>
+        
+        <ImageView
+            android:id="@+id/analysis_rating_pointer2"
+       		android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
+        	android:layout_centerVertical="true"
+	        />
+        
+        <TextView
+            android:id = "@+id/analysis_rating_low2"
+            android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerVertical="true"
+        	android:layout_toLeftOf="@+id/analysis_rating_bar2"
+        	android:textAlignment="center"
+        	android:gravity="center"
+        	android:textColor="#FF000000"
+        	android:text="低"
+            />
+        
+         <TextView
+            android:id = "@+id/analysis_rating_high2"
+            android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerVertical="true"
+        	android:layout_toRightOf="@+id/analysis_rating_bar2"
+        	android:textAlignment="center"
+        	android:gravity="center"
+        	android:textColor="#FF000000"
+        	android:text="高"
+            />
+        
+       </RelativeLayout>
 
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package statisticPageView.statistics;
+package statistic.statisticPageView.statistics;
 
 
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import main.activities.FragmentTabs;
 import main.activities.R;
 import main.activities.StatisticFragment;
 
-import statisticPageView.StatisticPageView;
+import statistic.statisticPageView.StatisticPageView;
 
 import android.content.Context;
 import android.graphics.Bitmap;

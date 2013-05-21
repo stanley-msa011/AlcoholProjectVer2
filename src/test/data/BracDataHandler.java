@@ -83,10 +83,16 @@ public class BracDataHandler {
        	
         avg_result = parseTextFile(textFile);
         
-        BracGameHistory history= db.getLatestBracGameHistory();
+        int q_result = getQuestionResult(questionFile);
+        int emotion = q_result/100;
+        int desire = q_result%100;
+        
+        DateBracGameHistory history= db.getLatestBracGameHistory();
         
         history.brac = (float)avg_result;
         history.timestamp = Long.parseLong(ts);
+        history.emotion = emotion;
+        history.desire = desire;
         
         DateBracGameHistory prevHistory = db.getLatestBracGameHistory();
         int year,month,date,timeblock,hour;
@@ -109,7 +115,7 @@ public class BracDataHandler {
     		else if (year == prevHistory.year && month == prevHistory.month && date == prevHistory.date && timeblock == prevHistory.timeblock);
     		else{
     			if (avg_result != ERROR){
-    				if (avg_result > THRESHOLD)
+    				if (avg_result >= THRESHOLD)
     					history.changeLevel(0);
     				else
     					history.changeLevel(+1);
@@ -120,14 +126,28 @@ public class BracDataHandler {
     		}
     	}else{
 			if (avg_result != ERROR){
-				if (avg_result > THRESHOLD)
+				if (avg_result >= THRESHOLD)
 					history.changeLevel(0);
 				else
 					history.changeLevel(+1);
 			}
     	}
-        
-        db.insertNewState(history);
+    	
+    	db.insertNewState(history);
+    	
+		SharedPreferences.Editor editor = sp.edit();
+    	if (avg_result  < THRESHOLD){
+    		if (emotion <=3)
+    			editor.putInt("latest_result", 1);
+    		else
+    			editor.putInt("latest_result", 0);
+    	}else if (avg_result < THRESHOLD2){
+    		editor.putInt("latest_result", 2);
+    	}else{
+    		editor.putInt("latest_result", 3);
+    	}
+    	editor.putBoolean("tested", true);
+    	editor.commit();
         
        	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");
        	try {
@@ -177,6 +197,28 @@ public class BracDataHandler {
 			return ERROR;
 		}
         return avg;
+	}
+	
+	private int getQuestionResult(File textFile){
+		int result = -1; 
+        try {
+			Scanner s = new Scanner(textFile);
+
+			int emotion = 0;
+			int desire = 0;
+			
+			if(s.hasNextInt())
+				emotion = s.nextInt();
+			if(s.hasNextInt())
+				desire = s.nextInt();
+			
+			result = emotion * 100 + desire;
+			Log.d("Question parse",String.valueOf(result));
+			
+		} catch (FileNotFoundException e1) {
+			return ERROR;
+		}
+        return result;
 	}
 	
 	

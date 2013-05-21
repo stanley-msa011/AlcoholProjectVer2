@@ -25,7 +25,9 @@ public class DBHelper extends SQLiteOpenHelper {
         				" _DATE INTEGER NOT NULL,"+
         				" _TS INTEGER NOT NULL," +
         				" _TIMEBLOCK INTEGER NOT NULL,"+
-                        " _BRAC FLOAT NOT NULL"+
+                        " _BRAC FLOAT NOT NULL,"+
+                        " _EMOTION INTEGER NOT NULL,"+
+                        " _DESIRE INTEGER NOT NULL"+
                 ")"
         );
         db.execSQL(

@@ -227,7 +227,7 @@ public class HistoryFragment extends Fragment {
     		aaEndHandler = new AlphaAnimationEndHandler(); 
     	}
     	
-    	stage.setText("STAGE");
+    	stage.setText("等級");
     	pageWidget.setOnClickListener(new PageOnClickListener());
     }
     

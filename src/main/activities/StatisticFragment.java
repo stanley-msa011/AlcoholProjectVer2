@@ -1,32 +1,40 @@
 package main.activities;
 
-import statisticPageView.StatisticPageView;
-import statisticPageView.analysis.AnalysisProgressView;
-import statisticPageView.analysis.AnalysisRatingView;
-import statisticPageView.analysis.AnalysisSavingView;
-import statisticPageView.statistics.StatisticPagerAdapter;
+import statistic.statisticPageView.StatisticPageView;
+import statistic.statisticPageView.analysis.AnalysisProgressView;
+import statistic.statisticPageView.analysis.AnalysisRatingView;
+import statistic.statisticPageView.analysis.AnalysisSavingView;
+import statistic.statisticPageView.statistics.StatisticPagerAdapter;
+import statistic.ui.QuestionMsgBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 public class StatisticFragment extends Fragment {
 	private View view;
@@ -43,16 +51,29 @@ public class StatisticFragment extends Fragment {
 	private LoadingHandler loadHandler;
 	private StatisticFragment statisticFragment;
 	
+	private RelativeLayout questionLayout;
+	private ImageView questionButton;
+	private Bitmap questionButtonBmp;
 	
+	private ImageView showImage;
+	private Bitmap showImageBmp;
+	private TextView showText;
+	
+	private Typeface wordTypeface;
+	
+	private ShowDismissHandler showDismissHandler;
 	
 	private static final int[] DOT_ID={0xFF0,0xFF1,0xFF2};
+	
+	private AlphaAnimation questionAnimation;
+	
+	private QuestionMsgBox msgBox;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("Statistic Fragment","onCreate");
-        activity = this.getActivity(); 
-        
+        activity = this.getActivity();
     }
 
     @Override
@@ -75,8 +96,14 @@ public class StatisticFragment extends Fragment {
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
+		msgBox = new QuestionMsgBox(statisticFragment,(RelativeLayout) view);
+		
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
+		
+		if (showDismissHandler == null)
+			showDismissHandler = new ShowDismissHandler();
+		
 		loadHandler.sendEmptyMessage(0);
     }
     
@@ -96,12 +123,22 @@ public class StatisticFragment extends Fragment {
     		dot_off.recycle();
     		dot_off=null;
     	}
+    	if (questionButtonBmp !=null && !questionButtonBmp.isRecycled()){
+    		questionButtonBmp.recycle();
+    		questionButtonBmp = null;
+    	}
+    	if (showImageBmp !=null && !showImageBmp.isRecycled()){
+    		showImageBmp.recycle();
+    		showImageBmp = null;
+    	}
     	statisticViewAdapter.clear();
     	for (int i=0;i<analysisViews.length;++i){
     		analysisViews[i].clear();
     	}
     	if (analysisLayout!=null)
     		analysisLayout.removeAllViews();
+    	if (msgBox!=null)
+    		msgBox.clear();
     	System.gc();
     }
     
@@ -141,6 +178,8 @@ public class StatisticFragment extends Fragment {
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
 		public void handleMessage(Message msg){
+			FragmentTabs.enableTab(false);
+			
         	Point screen = FragmentTabs.getSize();
         	statistic_px = new Point(screen.x,(int) (screen.x*314.0/355.0));
         	
@@ -154,6 +193,18 @@ public class StatisticFragment extends Fragment {
         	analysisView = (ScrollView) view.findViewById(R.id.brac_analysis);
         	dots_layout = (RelativeLayout) view.findViewById(R.id.brac_statistics_dots);
         	
+        	wordTypeface = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w3.otf");
+        	
+        	questionLayout = (RelativeLayout) view.findViewById(R.id.question_layout);
+    		questionButton = (ImageView) view.findViewById(R.id.question_background);
+        	questionLayout.setOnClickListener(new QuestionOnClickListener());
+    		
+    		
+    		showImage = (ImageView) view.findViewById(R.id.statistic_picture);
+    		showText = (TextView) view.findViewById(R.id.statistic_text);
+    		showText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 42.0/720.0));
+    		showText.setTypeface(wordTypeface);
+    		
         	for (int i=0;i<analysisViews.length;++i)
     			analysisLayout.addView(analysisViews[i].getView());
     		
@@ -211,8 +262,121 @@ public class StatisticFragment extends Fragment {
 				dots[i].setImageBitmap(dot_off);
 			dots[0].setImageBitmap(dot_on);
 			
+			Bitmap tmp;
+			if (questionButtonBmp==null ||questionButtonBmp.isRecycled()){
+				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.test_tutorial_button);
+				questionButtonBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 62.0/720.0), (int)(screen.x * 62.0/720.0), true);
+				tmp.recycle();
+			}
+			RelativeLayout.LayoutParams questionLayoutParam = (RelativeLayout.LayoutParams) questionLayout.getLayoutParams();
+			questionLayoutParam.width = (int)(screen.x * 62.0/720.0);
+			questionLayoutParam.height = (int)(screen.x * 62.0/720.0);
+			questionLayoutParam.topMargin = (int)(screen.x * 40.0/720.0);
+			questionLayoutParam.rightMargin = (int)(screen.x * 40.0/720.0);
+			
+			if (questionButtonBmp!=null && !questionButtonBmp.isRecycled())
+				questionButton.setImageBitmap(questionButtonBmp);
+			
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
+			boolean tested = sp.getBoolean("tested", false);
+			int result = sp.getInt("latest_result", 0);
+			if (tested){
+				if (result <=1){
+					tmp= BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_show_pass);
+					showText.setText("做得好，請繼續加油");
+				}
+				else{
+					tmp= BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_show_fail);
+					showText.setText("請繼續加油");
+				}
+				showImageBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 180.0/720.0), (int)(screen.x * 180.0/720.0), true);
+				tmp.recycle();
+				showImage.setImageBitmap(showImageBmp);
+				showImage.setVisibility(View.VISIBLE);
+				showText.setVisibility(View.VISIBLE);
+				SharedPreferences.Editor editor = sp.edit();
+		    	editor.putBoolean("tested", false);
+		    	editor.commit();
+				Thread t = new Thread(new ShowTimer());
+				t.start();
+			}
+			else{
+				showImage.setVisibility(View.INVISIBLE);
+				showText.setVisibility(View.INVISIBLE);
+				FragmentTabs.enableTab(true);
+			}
+			
+			if (msgBox!=null){
+				msgBox.settingPreTask();
+				msgBox.settingInBackground();
+				msgBox.settingPostTask();
+			}
+			
+			questionAnimation = new AlphaAnimation(1.0F,0.0F);
+			questionAnimation.setDuration(200);
+			questionAnimation.setRepeatCount(Animation.INFINITE);
+			questionAnimation.setRepeatMode(Animation.REVERSE);
+			
+			setQuestionAnimation();
+			
 			LoadingBox.dismiss();
 		}
 	}
     
+	@SuppressLint("HandlerLeak")
+	private class ShowDismissHandler extends Handler{
+		public void handleMessage(Message msg){
+			showImage.setVisibility(View.INVISIBLE);
+			showText.setVisibility(View.INVISIBLE);
+			FragmentTabs.enableTab(true);
+		}
+	}
+	
+	private class ShowTimer implements Runnable{
+
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+			}
+			showDismissHandler.sendEmptyMessage(0);
+		}
+	}
+	
+	private class QuestionOnClickListener implements View.OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
+			int result = sp.getInt("latest_result", 0);
+			if (msgBox == null)
+				return;
+			if (result == 0){
+				msgBox.generateType0Box();
+			}
+			else if (result == 1){
+				msgBox.generateType1Box();
+			}else if (result == 2){
+				msgBox.generateType2Box();
+			}else if (result == 3){
+				msgBox.generateType3Box();
+			}
+		}
+		
+	} 
+	
+	public void setQuestionAnimation(){
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
+		int result = sp.getInt("latest_result", 0);
+		if (result <=1){
+			questionAnimation.cancel();
+			questionLayout.setAnimation(null);
+			questionLayout.setAlpha(1.0F);
+		}
+		else{
+			questionLayout.setAnimation(questionAnimation);
+			questionAnimation.start();
+		}
+	}
 }

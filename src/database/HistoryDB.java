@@ -43,26 +43,30 @@ public class HistoryDB {
     	if (cursor.getCount()==0){
     		cursor.close();
     		db.close();
-    		return new DateBracGameHistory(0,0,0);
+    		return new DateBracGameHistory(0,0,0,0,0);
     	}
     	
     	cursor.moveToFirst();
     	int level_idx = cursor.getColumnIndex("_LEVEL");
     	int ts_idx = cursor.getColumnIndex("_TS");
     	int brac_idx = cursor.getColumnIndex("_BRAC");
+    	int emotion_idx = cursor.getColumnIndex("_EMOTION");
+    	int desire_idx = cursor.getColumnIndex("_DESIRE");
     	
     	if (level_idx==-1||ts_idx==-1||brac_idx==-1){
     		Log.d("DATABASE","CANNOT FIND IDXs");
     		cursor.close();
     		db.close();
-    		return new DateBracGameHistory(0,0,0);
+    		return new DateBracGameHistory(0,0,0,0,0);
     	}
     	int level = cursor.getInt(level_idx);
     	long ts = cursor.getLong(ts_idx);
     	float brac = cursor.getFloat(brac_idx);
+    	int emotion = cursor.getInt(emotion_idx);
+    	int desire = cursor.getInt(desire_idx);
     	cursor.close();
     	db.close();
-    	return new DateBracGameHistory(level,ts,brac);
+    	return new DateBracGameHistory(level,ts,brac,emotion,desire);
     }
     
     public void insertNewState(BracGameHistory history){
@@ -80,8 +84,11 @@ public class HistoryDB {
     	hour = cal.get(Calendar.HOUR_OF_DAY);
     	timeblock = TimeBlock.getTimeBlock(hour,nBlocks);
     	
-    	String sql = "INSERT INTO HistoryGame (_LEVEL,_YEAR,_MONTH,_DATE,_TS,_TIMEBLOCK, _BRAC) VALUES ("
-    							+level+","+year+","+month+","+date+","+ts+","+timeblock+","+brac+")";
+    	int emotion = history.emotion;
+    	int desire = history.desire;
+    	
+    	String sql = "INSERT INTO HistoryGame (_LEVEL,_YEAR,_MONTH,_DATE,_TS,_TIMEBLOCK, _BRAC, _EMOTION, _DESIRE) VALUES ("
+    							+level+","+year+","+month+","+date+","+ts+","+timeblock+","+brac+","+emotion+","+desire+")";
     	db.execSQL(sql);
     	db.close();
     }
@@ -113,7 +120,7 @@ public class HistoryDB {
         	}
     		cursor.moveToFirst();
     		float brac = cursor.getFloat(0);
-    		historys[i] = new BracGameHistory(0,0,brac);
+    		historys[i] = new BracGameHistory(0,0,brac,0,0);
     		cursor.close();
     	}
     	db.close();
@@ -266,7 +273,7 @@ public class HistoryDB {
     				_tb = cursor.getInt(tb_idx);
     				if (_tb ==i%nBlocks){
     					_brac = cursor.getFloat(brac_idx);
-    					historys[i] = new BracGameHistory(0,_ts,_brac);
+    					historys[i] = new BracGameHistory(0,_ts,_brac,0,0);
     					++cursor_pointer;
     					break;
     				}

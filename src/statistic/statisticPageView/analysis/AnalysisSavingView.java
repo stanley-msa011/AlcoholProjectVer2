@@ -1,9 +1,9 @@
-package statisticPageView.analysis;
+package statistic.statisticPageView.analysis;
 
 import main.activities.R;
 import main.activities.StatisticFragment;
-import statisticPageView.StatisticPageView;
-import statisticSetting.TargetSetting;
+import statistic.statisticPageView.StatisticPageView;
+import statistic.statisticSetting.TargetSetting;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;

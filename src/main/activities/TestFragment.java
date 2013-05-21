@@ -205,11 +205,9 @@ public class TestFragment extends Fragment {
 		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
 		
 		Point screen = FragmentTabs.getSize();
-		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 74.0/720.0));
+		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 49.0/720.0));
 		startText.setTypeface(wordTypefaceBold);
 		
-		
-		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 49.0/720.0));
 		messageView = (TextView) view.findViewById(R.id.test_message);
 		messageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 42.0/720.0));
 		messageView.setTypeface(wordTypeface);

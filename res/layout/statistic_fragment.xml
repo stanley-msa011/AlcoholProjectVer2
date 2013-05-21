@@ -46,4 +46,47 @@
     </ScrollView>
 
 </LinearLayout>
+
+<ImageView
+    android:id = "@+id/statistic_picture"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+     android:background="#FFFFFFFF"
+    />
+<TextView
+    android:id = "@+id/statistic_text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_below="@+id/statistic_picture"
+    android:background="#FFFFFFFF"
+    android:textColor="#FF000000"
+    />
+
+	<RelativeLayout
+        android:id="@+id/question_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+    >
+		<ImageView
+        	android:id = "@+id/question_background"
+        	android:layout_width ="match_parent"
+        	android:layout_height ="match_parent"
+        	android:layout_centerInParent="true"
+        	android:scaleType="fitXY"
+        />
+		<TextView
+        	android:id = "@+id/question_text"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerInParent="true"
+	    	android:textColor="#FFFFFFFF"
+	    	android:gravity="center"
+	    	android:textAlignment="center"
+	    	android:text="!"
+        />
+	</RelativeLayout>
+
 </RelativeLayout>

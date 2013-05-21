@@ -192,7 +192,7 @@ public class Bluetooth {
 					first_start_time = time;
 					Log.d("ERIC", "start");
 				}
-				else if (time - first_start_time > 10000){
+				else if (time - first_start_time > 15000){
 					Log.d("BT","TIME OUT");
 					end =-1; 
 					throw new Exception("time out");
