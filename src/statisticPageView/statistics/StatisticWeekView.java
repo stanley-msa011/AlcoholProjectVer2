@@ -168,16 +168,19 @@ public class StatisticWeekView extends StatisticPageView {
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
-		circleBmps = new Bitmap[3];
+		circleBmps = new Bitmap[4];
 		int circleSize = (int) (screen.x * 30.0/720.0);
-		Bitmap[] tmp = new Bitmap[3];
+		Bitmap[] tmp = new Bitmap[4];
 		tmp[0] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_none);
 		circleBmps[0] = Bitmap.createScaledBitmap(tmp[0], circleSize, circleSize, true);
 		tmp[1] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_fail);
 		circleBmps[1] = Bitmap.createScaledBitmap(tmp[1], circleSize, circleSize, true);
 		tmp[2] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_pass);
 		circleBmps[2] = Bitmap.createScaledBitmap(tmp[2], circleSize, circleSize, true);
-		for (int i=0;i<3;++i)
+		tmp[3] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_empty);
+		circleBmps[3] = Bitmap.createScaledBitmap(tmp[3], circleSize, circleSize, true);
+		
+		for (int i=0;i<tmp.length;++i)
 			if (circleBmps[i]!=tmp[i])
 				tmp[0].recycle();
 		
@@ -247,6 +250,9 @@ public class StatisticWeekView extends StatisticPageView {
 	public void onPostTask() {
 		
 		BracGameHistory[] historys = db.getMultiDayInfo(nDate);
+		
+		int cur_hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+		
 		for (int i=0;i<historys.length;++i){
 			int idx = (i%nBlocks)*nDate + i/nBlocks;
 			if (!TimeBlock.hasBlock(i%nBlocks, timeblock_type)){
@@ -254,8 +260,17 @@ public class StatisticWeekView extends StatisticPageView {
 				circles[idx].setAlpha(0.0F);
 				continue;
 			}
-			if (historys[i] == null)
-				circles[idx].setImageBitmap(circleBmps[0]);
+			if (historys[i] == null){
+				if (i < historys.length - nBlocks)
+					circles[idx].setImageBitmap(circleBmps[0]);
+				else
+					if (TimeBlock.isEmpty(i%nBlocks, cur_hour)){
+						circles[idx].setImageBitmap(circleBmps[3]);
+						circles[idx].setAlpha(0.1F);
+					}
+					else
+						circles[idx].setImageBitmap(circleBmps[0]);
+			}
 			else if (historys[i].brac < BracDataHandler.THRESHOLD)
 				circles[idx].setImageBitmap(circleBmps[2]);
 			else

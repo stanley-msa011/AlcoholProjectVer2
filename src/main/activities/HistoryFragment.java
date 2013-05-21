@@ -103,7 +103,6 @@ public class HistoryFragment extends Fragment {
 		
 		level = db.getLatestBracGameHistory().level;
 		
-		LoadingBox.show(this.getActivity());
 		if (loadHandler == null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);
@@ -227,6 +226,8 @@ public class HistoryFragment extends Fragment {
     		prevImage.setAnimation(prevAnimation);
     		aaEndHandler = new AlphaAnimationEndHandler(); 
     	}
+    	
+    	stage.setText("STAGE");
     	pageWidget.setOnClickListener(new PageOnClickListener());
     }
     
@@ -237,13 +238,13 @@ public class HistoryFragment extends Fragment {
 			if (level/3 == 0)
 				return;
 			if (!runAnimation){
+				FragmentTabs.enableTab(false);
 				runAnimation = true;
 				int[] aBgs = generateAnimationBgs();
 				int pageIdx = getMaxPageNum();
 				setStageVisible(false);
 				pageAnimationTask = new PageAnimationTaskVertical(pageWidget,from,to,middle1,middle2,middle3,aBgs,historyFragment,curPageTouch,0,pageIdx);
 				pageAnimationTask.execute();
-				FragmentTabs.enableTab(false);
 			}
 		}
     }
@@ -276,6 +277,7 @@ public class HistoryFragment extends Fragment {
 			LoadingBox.dismiss();
 			startAnim();
 			Log.d("History","end loadHandler");
+			
 		}
 	}
 
@@ -302,6 +304,7 @@ public class HistoryFragment extends Fragment {
 			return;
 		boolean isChange = isChangePage();
 		if (isChange){
+			FragmentTabs.enableTab(false);
 			runAnimation = true;
 			int[] aBgs = generateAnimationBgs();
 			int pageIdx = getMaxPageNum();
@@ -312,7 +315,7 @@ public class HistoryFragment extends Fragment {
 			setStageVisible(false);
 			pageAnimationTask = new PageAnimationTaskVertical(pageWidget,from,to,middle1,middle2,middle3,aBgs,historyFragment,curPageTouch,startIdx,pageIdx);
 			pageAnimationTask.execute();
-			FragmentTabs.enableTab(false);
+			
 			
 		}else{
 			if (prevAnimation!=null){

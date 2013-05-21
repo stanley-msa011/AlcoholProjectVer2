@@ -107,7 +107,28 @@ public class TimeBlock {
 			cals[3].set(year, month, day, 21, 0, 0);
 			break;
 		}
-		
 		return cals;
+	}
+	
+	public static boolean isEmpty(int timeblock,  int cur_hour){
+		switch (timeblock){
+			case 0:
+				if (cur_hour >= 10)
+					return false;
+				break;
+			case 1:
+				if (cur_hour >= 14)
+					return false;
+				break;
+			case 2:
+				if (cur_hour >= 18)
+					return false;
+				break;
+			case 3:
+				if (cur_hour >=24)
+					return false;
+				break;
+		}
+		return true;
 	}
 }

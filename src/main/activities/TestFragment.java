@@ -18,6 +18,7 @@ import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
 import test.ui.Tutorial;
 import test.ui.UIMsgBox;
+import test.ui.UIMsgBox2;
 import test.ui.UIRotate;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -100,7 +101,7 @@ public class TestFragment extends Fragment {
 	private BracDataHandler BDH;
 	
 	private RelativeLayout main_layout;
-	private UIMsgBox msgBox;
+	private UIMsgBox2 msgBox;
 	//private UIRotate rotate;
 
 	private LoadingHandler loadingHandler;
@@ -168,7 +169,6 @@ public class TestFragment extends Fragment {
 		super.onResume();
 		Log.d("test","onresume");
 		if (!isKeepMsgBox()){
-			LoadingBox.show(this.getActivity());
 			context = this.getActivity();
 			testFragment = this;
 			setting();
@@ -217,7 +217,7 @@ public class TestFragment extends Fragment {
 		RelativeLayout.LayoutParams mParam = (LayoutParams) messageView.getLayoutParams();
 		mParam.topMargin = (int)(screen.x * 36.0/720.0);
 		if (msgBox==null)
-			msgBox = new UIMsgBox(testFragment,main_layout);
+			msgBox = new UIMsgBox2(testFragment,main_layout);
 		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
 
 		tutorial = new Tutorial(this);
@@ -406,7 +406,7 @@ public class TestFragment extends Fragment {
 			if (!DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
 				stop();
 					if (msgBox == null)
-						msgBox = new UIMsgBox(testFragment,main_layout);
+						msgBox = new UIMsgBox2(testFragment,main_layout);
 					if (msgLoadingHandler == null)
 						msgLoadingHandler = new MsgLoadingHandler();
 					msgLoadingHandler.sendEmptyMessage(0);
@@ -649,7 +649,9 @@ public class TestFragment extends Fragment {
 			bg.setOnClickListener(null);
 			helpButton.setOnClickListener(new TutorialOnClickListener());
 			
+			FragmentTabs.detach_loading_page(0);
 			LoadingBox.dismiss();
+			
 		}
 	}
     

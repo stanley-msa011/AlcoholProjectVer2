@@ -13,6 +13,8 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -27,6 +29,8 @@ public class Tutorial {
 	private TextView step,msg;
 	private Bitmap bgBmp,deviceBmp;//,arrowBmp;
 	private int curPage;
+	
+	private AlphaAnimation arrowAnimation;
 	
 	private Typeface digitTypeface;
 	private Typeface wordTypeface;
@@ -64,8 +68,8 @@ public class Tutorial {
 		
 		arrow = (ImageView) view.findViewById(R.id.tutorial_arrow);
 		RelativeLayout.LayoutParams aParam = (RelativeLayout.LayoutParams)arrow.getLayoutParams();
-		aParam.width = (int) (screen.x*52.0/720.0);
-		aParam.height = (int) (screen.x*58.0/720.0);
+		aParam.width = (int) (screen.x*78.0/720.0);
+		aParam.height = (int) (screen.x*87.0/720.0);
 		
 		step = (TextView) view.findViewById(R.id.tutorial_step);
 		step.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) (screen.x*72.0/720.0));
@@ -83,9 +87,15 @@ public class Tutorial {
 		
 		view.setOnClickListener(new StepListener());
 		
+		arrowAnimation = new AlphaAnimation(1.0F,0.0F);
+		arrowAnimation.setDuration(200);
+		arrowAnimation.setRepeatCount(Animation.INFINITE);
+		arrowAnimation.setRepeatMode(Animation.REVERSE);
+		arrow.setAnimation(arrowAnimation);
+		arrowAnimation.cancel();
+		
 		bgBmp = null; 
 		deviceBmp = null;
-//		arrowBmp = null;
 	}
 	
 	public void loading(){
@@ -111,14 +121,6 @@ public class Tutorial {
 			Log.d("Tutorial","load deviceBmp");
 		}
 		
-/*		if (arrowBmp == null || arrowBmp.isRecycled()){
-			tmp = BitmapFactory.decodeResource(r, R.drawable.tutorial_arrow);
-			arrowBmp = Bitmap.createScaledBitmap(tmp,  (int) (screen.x*52.0/720.0), (int) (screen.x*58.0/720.0), true);
-			tmp.recycle();
-			Log.d("Tutorial","load arrowBmp");
-		}*/
-		
-		
 	}
 	
 	public void setBmp(){
@@ -126,8 +128,6 @@ public class Tutorial {
 			bg.setImageBitmap(bgBmp);
 		if (deviceBmp!=null && !deviceBmp.isRecycled())
 			device.setImageBitmap(deviceBmp);
-/*		if (arrowBmp!=null && !arrowBmp.isRecycled())
-			arrow.setImageBitmap(arrowBmp);*/
 		else{
 			Log.d("Tutorial","no arrowBmp");
 		}
@@ -142,6 +142,8 @@ public class Tutorial {
 		device.setImageBitmap(null);
 		arrow.setImageBitmap(null);
 		
+		arrowAnimation.cancel();
+		
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;
@@ -150,10 +152,6 @@ public class Tutorial {
 			deviceBmp.recycle();
 			deviceBmp = null;
 		}
-	/*	if (arrowBmp!=null && !arrowBmp.isRecycled()){
-			arrowBmp.recycle();
-			arrowBmp = null;
-		}*/
 	}
 	
 	public void setTutorial(int step_num){
@@ -168,27 +166,30 @@ public class Tutorial {
 			msg.setText("按下開關，使指示燈亮起");
 			
 			aParam.leftMargin =(int) (screen.x*620.0/720.0);
-			aParam.topMargin =(int) (screen.x*277.0/355.0) +(int) (screen.x*155.0/720.0) ;
+			aParam.topMargin =(int) (screen.x*277.0/355.0) +(int) (screen.x*135.0/720.0) ;
 			arrow.setRotation(-90);
 			arrow.setImageResource(R.drawable.tutorial_arrow);
+			arrowAnimation.start();
 			break;
 		case 2:
 			curPage = 2;
 			step.setText("2");
 			msg.setText("進入測試頁面按下開始按鈕");
 			aParam.leftMargin =(int) (screen.x*94.0/720.0);
-			aParam.topMargin =(int) (screen.x*555.0/355.0) - (int) (screen.x*60.0/720.0);
+			aParam.topMargin =(int) (screen.x*555.0/355.0) - (int) (screen.x*90.0/720.0);
 			arrow.setRotation(180);
 			arrow.setImageResource(R.drawable.tutorial_arrow);
+			arrowAnimation.start();
 			break;
 		case 3:
 			curPage = 3;
 			step.setText("3");
 			msg.setText("對準吹氣口持續吹氣五秒鐘");
-			aParam.leftMargin =(int) (screen.x*334.0/720.0);
-			aParam.topMargin =(int) (screen.x*277.0/355.0) ;
+			aParam.leftMargin =(int) (screen.x*314.0/720.0);
+			aParam.topMargin =(int) (screen.x*267.0/355.0) ;
 			arrow.setRotation(0);
 			arrow.setImageResource(R.drawable.tutorial_arrow);
+			arrowAnimation.start();
 			break;
 		default:
 			setTutorial(1);

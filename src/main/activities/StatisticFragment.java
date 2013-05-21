@@ -75,7 +75,6 @@ public class StatisticFragment extends Fragment {
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
-		LoadingBox.show(this.getActivity());
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);

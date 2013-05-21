@@ -43,7 +43,7 @@ public class StatisticMonthView extends StatisticPageView {
 	private TextView[] labels;
 	private ImageView[] labelImgs;
 	
-	private TextView monthFrom, monthTo;
+	private TextView month0, month1, month2, month3, month4;
 	
 	private TextView title;
 	
@@ -114,12 +114,21 @@ public class StatisticMonthView extends StatisticPageView {
 				time_labels[i].setAlpha(0.0F);
 		}
 
-		monthFrom = (TextView) view.findViewById(R.id.statistic_month_from);;
-		monthFrom.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
-		monthFrom.setTypeface(digitTypeface);
-		monthTo = (TextView) view.findViewById(R.id.statistic_month_to);;
-		monthTo.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
-		monthTo.setTypeface(digitTypeface);
+		month0 = (TextView) view.findViewById(R.id.statistic_month_0);;
+		month0.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+		month0.setTypeface(digitTypeface);
+		month1 = (TextView) view.findViewById(R.id.statistic_month_1);;
+		month1.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+		month1.setTypeface(digitTypeface);
+		month2 = (TextView) view.findViewById(R.id.statistic_month_2);;
+		month2.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+		month2.setTypeface(digitTypeface);
+		month3 = (TextView) view.findViewById(R.id.statistic_month_3);;
+		month3.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+		month3.setTypeface(digitTypeface);
+		month4 = (TextView) view.findViewById(R.id.statistic_month_4);;
+		month4.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+		month4.setTypeface(digitTypeface);
 		
 		bg = (ImageView) view.findViewById(R.id.statistic_month_bg);
 		
@@ -156,17 +165,19 @@ public class StatisticMonthView extends StatisticPageView {
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
-		circleBmps = new Bitmap[3];
+		circleBmps = new Bitmap[4];
 		int circleWidth = (int) (screen.x * 10.0/720.0);
 		int circleHeight = (int) (screen.x *38.0/720.0);
-		Bitmap[] tmp = new Bitmap[3];
+		Bitmap[] tmp = new Bitmap[4];
 		tmp[0] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_none);
 		circleBmps[0] = Bitmap.createScaledBitmap(tmp[0], circleWidth, circleHeight, true);
 		tmp[1] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_fail);
 		circleBmps[1] = Bitmap.createScaledBitmap(tmp[1], circleWidth, circleHeight, true);
 		tmp[2] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_pass);
 		circleBmps[2] = Bitmap.createScaledBitmap(tmp[2], circleWidth, circleHeight, true);
-		for (int i=0;i<3;++i)
+		tmp[3] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_empty);
+		circleBmps[3] = Bitmap.createScaledBitmap(tmp[3], circleWidth, circleHeight, true);
+		for (int i=0;i<tmp.length;++i)
 			if (circleBmps[i]!=tmp[i])
 				tmp[0].recycle();
 		
@@ -188,16 +199,33 @@ public class StatisticMonthView extends StatisticPageView {
 		
 		int height = (c_height*4)/timeblock_type;
 		
-		RelativeLayout.LayoutParams mParam =  (RelativeLayout.LayoutParams)monthFrom.getLayoutParams();
-		mParam.width = c_width;
+		int label_topMargin = (int)(screen.x*30.0/720.0);
+		int label_width =  (int)(screen.x*136.0/720.0);
+		
+		RelativeLayout.LayoutParams mParam =  (RelativeLayout.LayoutParams)month0.getLayoutParams();
+		mParam.width = label_width;
 		mParam.height = c_height;
-		mParam.topMargin = (int)(screen.x*30.0/720.0);
-		mParam.leftMargin = (int)(screen.x*80.0/720.0);
-		mParam =  (RelativeLayout.LayoutParams)monthTo.getLayoutParams();
-		mParam.width = c_width;
+		mParam.topMargin = label_topMargin;
+		mParam.leftMargin = (int)(screen.x*110.0/720.0);
+		
+		mParam =  (RelativeLayout.LayoutParams)month1.getLayoutParams();
+		mParam.width = label_width;
 		mParam.height = c_height;
-		mParam.topMargin = (int)(screen.x*30.0/720.0);
-		mParam.rightMargin = (int)(screen.x*40.0/720.0);
+		mParam.topMargin = label_topMargin;
+		
+		mParam =  (RelativeLayout.LayoutParams)month2.getLayoutParams();
+		mParam.width = label_width;
+		mParam.height = c_height;
+		mParam.topMargin = label_topMargin;
+		
+		mParam =  (RelativeLayout.LayoutParams)month3.getLayoutParams();
+		mParam.width = label_width*3/4;
+		mParam.height = c_height;
+		mParam.topMargin = label_topMargin;
+		
+		mParam =  (RelativeLayout.LayoutParams)month4.getLayoutParams();
+		mParam.height = c_height;
+		mParam.topMargin = label_topMargin;
 		
 		for (int i=0;i<nBlocks;++i){
 			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) time_labels[i].getLayoutParams();
@@ -235,6 +263,8 @@ public class StatisticMonthView extends StatisticPageView {
 	@Override
 	public void onPostTask() {
 		
+		int cur_hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+		
 		BracGameHistory[] historys = db.getMultiDayInfo(nDate);
 		for (int i=0;i<historys.length;++i){
 			int idx = (i%nBlocks)*nDate + i/nBlocks;
@@ -243,8 +273,17 @@ public class StatisticMonthView extends StatisticPageView {
 				circles[idx].setAlpha(0.0F);
 				continue;
 			}
-			if (historys[i] == null)
-				circles[idx].setImageBitmap(circleBmps[0]);
+			if (historys[i] == null){
+				if (i < historys.length - nBlocks)
+					circles[idx].setImageBitmap(circleBmps[0]);
+				else
+					if (TimeBlock.isEmpty(i%nBlocks, cur_hour)){
+						circles[idx].setImageBitmap(circleBmps[3]);
+						circles[idx].setAlpha(0.1F);
+					}
+					else
+						circles[idx].setImageBitmap(circleBmps[0]);
+			}
 			else if (historys[i].brac < BracDataHandler.THRESHOLD)
 				circles[idx].setImageBitmap(circleBmps[2]);
 			else
@@ -253,19 +292,34 @@ public class StatisticMonthView extends StatisticPageView {
 		}
 		
 		Calendar cal = Calendar.getInstance();
-		long Millis28 = 86400*1000L*28;
+		final long Millis6 = 86400*1000L*6;
+		final long Millis7 = 86400*1000L*7;
 		
 		int month = cal.get(Calendar.MONTH)+1;
 		int date = cal.get(Calendar.DATE);
 		String month_label = month+"/"+date;
-		monthTo.setText(month_label);
-		
-		cal.setTimeInMillis(cal.getTimeInMillis()-Millis28);
-		
+		month4.setText("");
+
+		cal.setTimeInMillis(cal.getTimeInMillis()-Millis6);
 		month = cal.get(Calendar.MONTH)+1;
 		date = cal.get(Calendar.DATE);
-		String month_label2 = month+"/"+date;
-		monthFrom.setText(month_label2);
+		month_label = month+"/"+date;
+		month3.setText(month_label);
+		cal.setTimeInMillis(cal.getTimeInMillis()-Millis7);
+		month = cal.get(Calendar.MONTH)+1;
+		date = cal.get(Calendar.DATE);
+		month_label = month+"/"+date;
+		month2.setText(month_label);
+		cal.setTimeInMillis(cal.getTimeInMillis()-Millis7);
+		month = cal.get(Calendar.MONTH)+1;
+		date = cal.get(Calendar.DATE);
+		month_label = month+"/"+date;
+		month1.setText(month_label);
+		cal.setTimeInMillis(cal.getTimeInMillis()-Millis7);
+		month = cal.get(Calendar.MONTH)+1;
+		date = cal.get(Calendar.DATE);
+		month_label = month+"/"+date;
+		month0.setText(month_label);
 		
 		labelImgs[0].setImageBitmap(circleBmps[2]);
 		labelImgs[1].setImageBitmap(circleBmps[1]);

@@ -24,7 +24,6 @@
     	        android:textColor="#FF717071"
     	        android:textAlignment="center"
     	        android:gravity="center"
-    	        android:text="STAGE"
     	        />
     	    <TextView 
     	        android:id = "@+id/history_stage_num"

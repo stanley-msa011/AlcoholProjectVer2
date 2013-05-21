@@ -30,6 +30,7 @@ public class AnalysisRatingView extends StatisticPageView {
 	private Bitmap titleBmp;
 	
 	private TextView help;
+	private TextView low,high;
 	private HistoryDB db;
 	
 	private ImageView bar, pointer;
@@ -134,6 +135,14 @@ public class AnalysisRatingView extends StatisticPageView {
 		bar = (ImageView) view.findViewById(R.id.analysis_rating_bar);
 		pointer  = (ImageView) view.findViewById(R.id.analysis_rating_pointer);
 		
+		low = (TextView) view.findViewById(R.id.analysis_rating_low);
+		low.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		low.setTypeface(wordTypeface);
+		
+		high = (TextView) view.findViewById(R.id.analysis_rating_high);
+		high.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		high.setTypeface(wordTypeface);
+		
 		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_rating_content_layout);
 		
 	}
@@ -156,7 +165,7 @@ public class AnalysisRatingView extends StatisticPageView {
 		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)bar.getLayoutParams();
 		barParam.width = (int)(screen.x * 542.0/720.0);
 		barParam.height = (int)(screen.x * 38.0/720.0);
-		barParam.leftMargin = (int)(screen.x * 89.0/720.0);
+		//barParam.leftMargin = (int)(screen.x * 89.0/720.0);
 		minLeftPointer  = (int)(screen.x * 120.0/720.0);
 		barBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_rating_bar);
 		maxLeftPointer = minLeftPointer +   (int)(screen.x * 465.0/720.0);

@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import tabControl.CustomTab;
 import test.data.Reuploader;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -11,6 +12,8 @@ import android.content.Intent;import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -49,15 +52,29 @@ public class FragmentTabs extends FragmentActivity {
 	private android.support.v4.app.FragmentManager fm;
 	TabChangeListener tabChangeListener;
 	
-	public static  ImageView loadingPage;
+	private static  ImageView loadingPage;
+	
+	private FragmentTabs fragmentTabs; 
+	
+	private LoadingPageHandler loadingPageHandler;
+	
+	
+	private static boolean firstLoading = true;
 	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		firstLoading = true;
 		context = this;
-
+		fragmentTabs = this;
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.tab_layout);
+		
+		loadingPage = (ImageView) this.findViewById(R.id.loading_page);
+		
+		if (loadingPageHandler == null)
+			loadingPageHandler = new LoadingPageHandler();
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
@@ -72,7 +89,11 @@ public class FragmentTabs extends FragmentActivity {
 
 		tab_px = new Point(screen_px.x,(int)(screen_px.y*(104.0/1280.0)));
 		
-		setContentView(R.layout.tab_layout);
+		if (firstLoading){
+			Thread t = new Thread (new TimerRunnable());
+			t.start();
+		}
+		
 		tabHost = (TabHost) this.findViewById(android.R.id.tabhost);
 		tabHost.setup();
 		
@@ -80,7 +101,6 @@ public class FragmentTabs extends FragmentActivity {
 			tabs = new TabSpec[3];
 		if (customTabs==null)
 			customTabs = new CustomTab[3];
-		
 		
 		for (int i=0;i<3;++i){
 			customTabs[i] = new CustomTab(this,iconId[i],iconText[i]);
@@ -93,7 +113,7 @@ public class FragmentTabs extends FragmentActivity {
 		tabHost.setOnTabChangedListener(new TabChangeListener());
 		enableTabs = true;
 		
-		tabHost.setCurrentTab(2);
+		tabHost.setCurrentTab(1);
 		tabHost.setCurrentTab(0);
 		
 		DisplayMetrics dm = new DisplayMetrics();
@@ -112,6 +132,29 @@ public class FragmentTabs extends FragmentActivity {
 		widgetParam.height = tab_px.y;
 		
 		Log.d("TAB PX",tab_px.toString());
+		
+
+		
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class LoadingPageHandler extends Handler{
+		public void handleMessage(Message msg){
+			detach_loading_page();
+			firstLoading = false;
+		}
+	}
+	
+	
+	private class TimerRunnable implements Runnable{
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {}
+			
+			loadingPageHandler.sendEmptyMessage(0);
+		}
 		
 	}
 	
@@ -237,6 +280,9 @@ public class FragmentTabs extends FragmentActivity {
 			if (lastTabId.equals(tabId))
 				return;
 			
+			if (!firstLoading)
+				LoadingBox.show(fragmentTabs);
+			
 			ft = fm.beginTransaction();
 			for (int i=0;i<fragments.length;++i){
 					if (fragments[i]!=null)
@@ -291,6 +337,15 @@ public class FragmentTabs extends FragmentActivity {
 		if (loadingPage!=null)
 			loadingPage.setVisibility(View.INVISIBLE);
 	}
+	
+	private static boolean[] pages = {false,false,false};
+	
+	static public void detach_loading_page(int page){
+		pages[page] = true;
+		if (pages[0]&&pages[1]&&pages[2])
+			detach_loading_page();
+	}
+	
 	static public void attach_loading_page(){
 		if (loadingPage!=null)
 			loadingPage.setVisibility(View.VISIBLE);

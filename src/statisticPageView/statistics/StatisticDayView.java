@@ -178,7 +178,7 @@ public class StatisticDayView extends StatisticPageView {
 		Bitmap tmp;
 		
 		if (brac_time == 0)
-			tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.statistic_day_main_circle_none);
+			tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.statistic_day_main_circle_empty);
 		else if (brac < BracDataHandler.THRESHOLD)
 			tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.statistic_day_main_circle_pass);
 		else
@@ -191,7 +191,7 @@ public class StatisticDayView extends StatisticPageView {
 		valueBgBmp = Bitmap.createScaledBitmap(tmp,valueSize, valueSize, true);
 		tmp.recycle();
 		
-		circleBmps = new Bitmap[3];
+		circleBmps = new Bitmap[4];
 		int circleSize = (int)(statistic_size.x * 70.0/720.0);
 		tmp= BitmapFactory.decodeResource(view.getResources(), R.drawable.statistic_day_circle_none);
 		circleBmps[0] = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
@@ -203,6 +203,10 @@ public class StatisticDayView extends StatisticPageView {
 		
 		tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.statistic_day_circle_pass);
 		circleBmps[2] = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
+		tmp.recycle();
+		
+		tmp = BitmapFactory.decodeResource(view.getResources(), R.drawable.statistic_day_circle_empty);
+		circleBmps[3] = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
 		tmp.recycle();
 		
 	}
@@ -250,6 +254,9 @@ public class StatisticDayView extends StatisticPageView {
 		Point statistic_size = StatisticFragment.getStatisticPx();
 		int circleSize = (int)(statistic_size.x * 70.0/720.0);
 		int blockWidth = (int)(statistic_size.x * 20.0/720.0);
+		
+		int cur_hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+		
 		for (int i =0; i<nBlocks; ++i){
 			RelativeLayout lLayout = new RelativeLayout(context);
 			
@@ -281,7 +288,12 @@ public class StatisticDayView extends StatisticPageView {
 			
 			if (historys[i]==null){
 				circleValues[i].setText("");
-				circleImages[i].setImageBitmap(circleBmps[0] );
+				if (TimeBlock.isEmpty(i, cur_hour)){
+					circleImages[i].setImageBitmap(circleBmps[3] );
+					circleImages[i].setAlpha(0.1F);
+				}
+				else
+					circleImages[i].setImageBitmap(circleBmps[0] );
 			}
 			else{
 				String value =format.format(historys[i].brac);
