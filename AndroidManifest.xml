@@ -64,10 +64,16 @@
         <receiver android:name="main.activities.BootBoardcastReceiver">   
         <intent-filter>   
             <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            <action android:name="android.intent.action.TIME_SET" />  
+    		<action android:name="android.intent.action.TIMEZONE_CHANGED" />
+    		<action android:name="android.intent.action.DEFAULT" />
         </intent-filter>   
 		</receiver>   
 		
-        <receiver android:name="main.activities.AlarmReceiver">   
+        <receiver android:name="main.activities.AlarmReceiver">
+            <intent-filter>  
+   				<action android:name="com.android.alarmclock.ALARM_ALERT" />  
+  			</intent-filter>
 		</receiver>
 		<service android:name="main.activities.AlarmService" >
         </service>

@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -167,6 +168,9 @@ public class TestFragment extends Fragment {
 	
 	public void onResume(){
 		super.onResume();
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+		checkDebug2(sp.getBoolean("debug", false));
+		
 		Log.d("test","onresume");
 		if (!isKeepMsgBox()){
 			context = this.getActivity();
@@ -835,6 +839,12 @@ public class TestFragment extends Fragment {
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		Boolean debug = sp.getBoolean("debug", false);
 		ScrollView sv = (ScrollView) view.findViewById(R.id.debugView);
+		Button[] conditionButtons = new Button[4];
+		conditionButtons[0] = (Button) view.findViewById(R.id.condition_button_1);
+		conditionButtons[1] = (Button) view.findViewById(R.id.condition_button_2);
+		conditionButtons[2] = (Button) view.findViewById(R.id.condition_button_3);
+		conditionButtons[3] = (Button) view.findViewById(R.id.condition_button_4);
+		
 		if (debug){
 			sv.setVisibility(View.VISIBLE);
 			msgHandler = new ChangeMsgHandler();
@@ -843,11 +853,62 @@ public class TestFragment extends Fragment {
 			debugMsg.setClickable(false);
 			debugMsg.setOnKeyListener(null);
 			debugMsg.setEnabled(false);
+
+			for (int i=0;i<4;++i){
+				conditionButtons[i].setVisibility(View.VISIBLE);
+				conditionButtons[i].setOnClickListener(new ConditionOnClickListener(i+1));
+			}
+			
 		}else{
 			sv.setVisibility(View.INVISIBLE);
 			debugMsg.setVisibility(View.INVISIBLE);
+			for (int i=0;i<4;++i){
+				conditionButtons[i].setVisibility(View.VISIBLE);
+				conditionButtons[i].setOnClickListener(null);
+			}
+		}
+	}
+	
+	private void checkDebug2(boolean debug){
+		Button[] conditionButtons = new Button[4];
+		conditionButtons[0] = (Button) view.findViewById(R.id.condition_button_1);
+		conditionButtons[1] = (Button) view.findViewById(R.id.condition_button_2);
+		conditionButtons[2] = (Button) view.findViewById(R.id.condition_button_3);
+		conditionButtons[3] = (Button) view.findViewById(R.id.condition_button_4);
+		
+		if (debug){
+			for (int i=0;i<4;++i){
+				conditionButtons[i].setVisibility(View.VISIBLE);
+				conditionButtons[i].setOnClickListener(new ConditionOnClickListener(i));
+			}
+			
+		}else{
+			for (int i=0;i<4;++i){
+				conditionButtons[i].setVisibility(View.VISIBLE);
+				conditionButtons[i].setOnClickListener(null);
+			}
 		}
 			
+	}
+	
+	private class ConditionOnClickListener implements View.OnClickListener{
+
+		private int cond;
+		public ConditionOnClickListener(int cond){
+			this.cond = cond;
+			
+		}
+		
+		@Override
+		public void onClick(View v) {
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences.Editor editor = sp.edit();
+	    	editor.putInt("latest_result", cond);
+	    	editor.putBoolean("tested", true);
+	    	editor.commit();
+	    	FragmentTabs.changeTab(1);
+		}
+		
 	}
 	
 	

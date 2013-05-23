@@ -101,7 +101,7 @@
         />
 	</RelativeLayout>
 	
-	
+	<!--  Used for Debugging -->
 	<ScrollView
 	    android:id="@+id/debugView"
 	    android:layout_width="match_parent"
@@ -126,5 +126,42 @@
 
 	    </LinearLayout>
 	</ScrollView>
+	
+	<Button 
+	    android:id="@+id/condition_button_1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="1"
+	    android:layout_alignParentTop="true"
+	    android:layout_alignParentLeft="true"
+	    android:visibility="invisible"
+	    />
+	<Button 
+	    android:id="@+id/condition_button_2"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="2"
+	    android:layout_below="@+id/condition_button_1"
+	    android:layout_alignParentLeft="true"
+	    android:visibility="invisible"
+	    />
+	<Button 
+	    android:id="@+id/condition_button_3"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="3"
+	    android:layout_below="@+id/condition_button_2"
+	    android:layout_alignParentLeft="true"
+	    android:visibility="invisible"
+	    />
+	<Button 
+	    android:id="@+id/condition_button_4"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="4"
+	    android:layout_below="@+id/condition_button_3"
+	    android:layout_alignParentLeft="true"
+	    android:visibility="invisible"
+	    />
 	
 </RelativeLayout>
