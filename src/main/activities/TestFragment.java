@@ -839,12 +839,7 @@ public class TestFragment extends Fragment {
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		Boolean debug = sp.getBoolean("debug", false);
 		ScrollView sv = (ScrollView) view.findViewById(R.id.debugView);
-		Button[] conditionButtons = new Button[4];
-		conditionButtons[0] = (Button) view.findViewById(R.id.condition_button_1);
-		conditionButtons[1] = (Button) view.findViewById(R.id.condition_button_2);
-		conditionButtons[2] = (Button) view.findViewById(R.id.condition_button_3);
-		conditionButtons[3] = (Button) view.findViewById(R.id.condition_button_4);
-		
+
 		if (debug){
 			sv.setVisibility(View.VISIBLE);
 			msgHandler = new ChangeMsgHandler();
@@ -853,19 +848,10 @@ public class TestFragment extends Fragment {
 			debugMsg.setClickable(false);
 			debugMsg.setOnKeyListener(null);
 			debugMsg.setEnabled(false);
-
-			for (int i=0;i<4;++i){
-				conditionButtons[i].setVisibility(View.VISIBLE);
-				conditionButtons[i].setOnClickListener(new ConditionOnClickListener(i+1));
-			}
 			
 		}else{
 			sv.setVisibility(View.INVISIBLE);
 			debugMsg.setVisibility(View.INVISIBLE);
-			for (int i=0;i<4;++i){
-				conditionButtons[i].setVisibility(View.VISIBLE);
-				conditionButtons[i].setOnClickListener(null);
-			}
 		}
 	}
 	
@@ -884,7 +870,7 @@ public class TestFragment extends Fragment {
 			
 		}else{
 			for (int i=0;i<4;++i){
-				conditionButtons[i].setVisibility(View.VISIBLE);
+				conditionButtons[i].setVisibility(View.INVISIBLE);
 				conditionButtons[i].setOnClickListener(null);
 			}
 		}
