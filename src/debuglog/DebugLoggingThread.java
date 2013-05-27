@@ -18,6 +18,7 @@ public class DebugLoggingThread extends AsyncTask<Void, Void, Void> {
 	public DebugLoggingThread(){
 		Log.d("ALCOHOLDEBUG", "DebugLoggingThread constructed");
 		
+		// open drunk_detection/debug_log/debug_log.txt and mkdirs if necessary
 		File rootDir = new File(Environment.getExternalStorageDirectory(), "drunk_detection");
 		if(!rootDir.exists()){
 			rootDir.mkdir();
@@ -28,13 +29,11 @@ public class DebugLoggingThread extends AsyncTask<Void, Void, Void> {
 			logDir.mkdir();
 		}
 		
-		logFile = new File(logDir, "debug_log.txt");		
-		
+		logFile = new File(logDir, "debug_log.txt");
 	}
-	
-	@Override
+
 	protected Void doInBackground(Void... params) {
-		Log.d("Eric", "debug thread background");
+		Log.d("ALCOHOLDEBUG", "debug thread in background");
 		try {
 			writer = new BufferedWriter(new FileWriter(logFile, true));
 			Process process = Runtime.getRuntime().exec("logcat -d -s ALCOHOLDEBUG");
@@ -45,12 +44,19 @@ public class DebugLoggingThread extends AsyncTask<Void, Void, Void> {
 				writer.write(line);
 				writer.flush();
 			}
-		} catch (IOException e) {
-			Log.d("debugLogging", "fail to open debug logfile");
+		} catch (Exception e) {
+			Log.d("debugLogging", e.getMessage());
 		}
 		
-		return null;		
+		return null;
 	}
-
-
+	
+	protected void onPostExecute(){
+		Log.d("debugLogging", "debug thread Ended");
+		try {
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

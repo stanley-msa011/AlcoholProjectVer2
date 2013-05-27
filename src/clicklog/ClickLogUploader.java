@@ -39,24 +39,24 @@ import android.util.Log;
 
 public class ClickLogUploader {
 	
-	private static ClickLogReuploader reuploader = null;
+	private static ClickLogUploaderThread clickUploader = null;
 	
 	public static void upload(Context context){
 		cancel();
-		reuploader = new ClickLogReuploader(context);
-		reuploader.execute();
+		clickUploader = new ClickLogUploaderThread(context);
+		clickUploader.execute();
 	}
 	
 	public static void cancel(){
-		if (reuploader!=null){
-			if (!reuploader.isCancelled()){
-				reuploader.cancel(true);
+		if (clickUploader!=null){
+			if (!clickUploader.isCancelled()){
+				clickUploader.cancel(true);
 			}
 		}
 	}
 	
 	
-	public static class ClickLogReuploader extends AsyncTask<Void, Void, Void>{
+	public static class ClickLogUploaderThread extends AsyncTask<Void, Void, Void>{
 
 		private Context context;
 		private File rootDir;
@@ -67,7 +67,7 @@ public class ClickLogUploader {
 		private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/clicklog_upload.php";
 		
 		
-		public ClickLogReuploader(Context context){
+		public ClickLogUploaderThread(Context context){
 			this.context = context;
 		}
 		
@@ -76,9 +76,10 @@ public class ClickLogUploader {
 
 			String not_uploaded_files[] = getNotUploadedFiles();
 			if (not_uploaded_files == null){
-				Log.d("Eric", "no logFile needed to upload");
+				Log.d("ALCOHOLDEBUG", "no logFile needed to upload");
 				return null;
 			}
+			
 			for (int i=0; i<not_uploaded_files.length; ++i){
 				File logFile = new File(logDir.getPath(), not_uploaded_files[i]);
 				if(logFile.exists()){
@@ -124,7 +125,6 @@ public class ClickLogUploader {
 				}
 			}
 			
-			
 			return all_logs;
 		}
 		
@@ -160,7 +160,7 @@ public class ClickLogUploader {
 
 		private int connectingToServer(File logFile){
 			try {
-				Log.d("Eric", "connecting start");
+				Log.d("ALCOHOLDEBUG", "upload logFile connecting to server");
 				DefaultHttpClient httpClient = new DefaultHttpClient();
 				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 				InputStream instream = context.getResources().openRawResource(R.raw.alcohol_certificate);
@@ -191,7 +191,7 @@ public class ClickLogUploader {
 				httpPost.setEntity(mpEntity);
 				int result = uploader(httpClient, httpPost,context);
 				if (result == 1){
-					Log.d("Eric", "success upload logFile: " + logFile.getName());
+					Log.d("ALCOHOLDEBUG", "success upload logFile: " + logFile.getName());
 					set_uploaded_logfile(logFile.getName());
 				}
 				
@@ -211,13 +211,12 @@ public class ClickLogUploader {
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				Log.d("BRAC WRITER","FAIL TO OPEN");
 				writer = null;
 			}
 		}
 
 		private int uploader(HttpClient httpClient, HttpPost httpPost,Context context){
-			Log.d("ReDataUploader","start reupload");
+			Log.d("ALCOHOLDEBUG","start upload");
 			HttpResponse httpResponse;
 			int  result = -1;
 			try {
