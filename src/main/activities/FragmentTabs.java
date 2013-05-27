@@ -1,20 +1,16 @@
 package main.activities;
 
-import java.util.Calendar;
-
 import tabControl.CustomTab;
 import test.data.Reuploader;
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;import android.content.SharedPreferences;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -30,6 +26,9 @@ import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
+import clicklog.ClickLogUploader;
+import clicklog.ClickLogger;
+import debuglog.DebugLoggingThread;
 
 public class FragmentTabs extends FragmentActivity {
 
@@ -171,6 +170,9 @@ public class FragmentTabs extends FragmentActivity {
 			return;
 		}
 		Reuploader.reuploader(this);
+		ClickLogUploader.upload(this);
+		DebugLoggingThread debug_thread = new DebugLoggingThread();
+		debug_thread.execute();
 	}
 	
 	protected void onStop(){
@@ -279,6 +281,10 @@ public class FragmentTabs extends FragmentActivity {
 				return;
 			if (lastTabId.equals(tabId))
 				return;
+			
+			Log.d("Eric", tabId);
+			ClickLogger logger = new ClickLogger();
+			logger.click_logging(System.currentTimeMillis(), tabId + "_click");
 			
 			if (!firstLoading)
 				LoadingBox.show(fragmentTabs);

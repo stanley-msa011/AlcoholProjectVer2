@@ -8,7 +8,6 @@ import statistic.statisticPageView.statistics.StatisticPagerAdapter;
 import statistic.ui.QuestionMsgBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import clicklog.ClickLogger;
 
 public class StatisticFragment extends Fragment {
 	private View view;
@@ -69,6 +69,9 @@ public class StatisticFragment extends Fragment {
 	
 	private QuestionMsgBox msgBox;
 	
+	// For Click Sequence Logging
+	private ClickLogger clickLogger;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +90,9 @@ public class StatisticFragment extends Fragment {
     
     public void onResume(){
     	super.onResume();
+    	
+    	clickLogger = new ClickLogger();
+    	
     	statisticFragment = this;
     	
     	analysisViews = new StatisticPageView[3];
@@ -159,15 +165,18 @@ public class StatisticFragment extends Fragment {
 
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
-			
 		}
 
 		@Override
 		public void onPageScrolled(int arg0, float arg1, int arg2) {
+			//Log.d("Eric", "Scrolled:" + arg0 + "," + arg1 + "," + arg2);
 		}
 
 		@Override
 		public void onPageSelected(int arg0) {
+			
+			clickLogger.click_logging(System.currentTimeMillis(), "RecordStatisticPage" + (arg0+1) + "_scrolled");
+			
 			for (int i=0;i<3;++i)
 				dots[i].setImageBitmap(dot_off);
 			dots[arg0].setImageBitmap(dot_on);

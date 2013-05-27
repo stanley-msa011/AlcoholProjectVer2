@@ -17,9 +17,17 @@ import test.file.QuestionFile;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
 import test.ui.Tutorial;
-import test.ui.UIMsgBox;
 import test.ui.UIMsgBox2;
-import test.ui.UIRotate;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.Typeface;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,33 +40,15 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
-import android.graphics.BitmapFactory.Options;
-import android.graphics.Point;
-import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import clicklog.ClickLogger;
 
 public class TestFragment extends Fragment {
 
@@ -148,6 +138,9 @@ public class TestFragment extends Fragment {
 	private Typeface wordTypeface;
 	private Typeface wordTypefaceBold;
 	
+	// For Click Sequence logging
+	private ClickLogger clickLogger;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -187,6 +180,9 @@ public class TestFragment extends Fragment {
 	}
 	
 	private void setting(){
+		
+		// For Click Sequence logging
+		clickLogger = new ClickLogger();
 		
 		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
@@ -320,6 +316,8 @@ public class TestFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
+			
+			clickLogger.click_logging(System.currentTimeMillis(), "TestStart_click");
 
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(testFragment.getActivity());
 			boolean firstTime = sp.getBoolean("first", true);
@@ -347,6 +345,9 @@ public class TestFragment extends Fragment {
 	private class EndTestOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			
+			clickLogger.click_logging(System.currentTimeMillis(), "TestEnd_click");
+			
 			stopDueToInit();
 			if (loadingHandler!=null)
 				loadingHandler.sendEmptyMessage(0);
@@ -809,6 +810,9 @@ public class TestFragment extends Fragment {
 	
 	private class TutorialOnClickListener implements View.OnClickListener{
 		public void onClick(View v) {
+			
+			clickLogger.click_logging(System.currentTimeMillis(), "TestTutorial_click");
+			
 			Log.d("test","showTutorial on click");
 			showTutorial();
 		}
@@ -887,6 +891,9 @@ public class TestFragment extends Fragment {
 		
 		@Override
 		public void onClick(View v) {
+			
+			clickLogger.click_logging(System.currentTimeMillis(), "TestCondition_click");
+			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 			SharedPreferences.Editor editor = sp.edit();
 	    	editor.putInt("latest_result", cond);
