@@ -254,6 +254,7 @@ public class HistoryFragment extends Fragment {
     	runAnimation = false;
     	setStageVisible(true);
     	FragmentTabs.enableTab(true);
+    	FragmentTabs.changeTab(2);
     }
     
     public void setPage(){

@@ -147,6 +147,7 @@ public class BracDataHandler {
     		editor.putInt("latest_result", 3);
     	}
     	editor.putBoolean("tested", true);
+    	editor.putBoolean("hourly_alarm", false);
     	editor.commit();
         
        	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");

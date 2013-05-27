@@ -129,8 +129,8 @@ public class PreSettingActivity extends Activity {
 				editor.putInt("timeblock_num", tb_t);
 				editor.commit();
 			}
-			Intent newIntent = new Intent(activity, FragmentTabs.class);
-			activity.startActivity(newIntent);
+			//Intent newIntent = new Intent(activity, FragmentTabs.class);
+			//activity.startActivity(newIntent);
 			activity.finish();
 		}
 		

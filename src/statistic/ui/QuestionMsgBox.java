@@ -1,10 +1,16 @@
 package statistic.ui;
 
+import java.util.Set;
+
+import main.activities.AlarmReceiver;
 import main.activities.FragmentTabs;
 import main.activities.R;
 import main.activities.StatisticFragment;
 import main.activities.TestFragment;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.DataSetObserver;
@@ -59,21 +65,34 @@ public class QuestionMsgBox {
 	private int iconSize;
 	private int margin;
 	
-	private static final int ICON_NUM = 5;
+	private static final int ICON_NUM = 6;
 	private static final int[] ICON_DRAWABLE_ID = {
 		R.drawable.question_icon_helper,
 		R.drawable.question_icon_neighbor,
 		R.drawable.question_icon_mind,
 		R.drawable.question_icon_hospital,
-		R.drawable.question_icon_self
+		R.drawable.question_icon_self,
+		R.drawable.question_icon_home
 	};
 	private static final String[] ICON_TEXT = {
 		"尋求親友協助",
 		"社區心理諮商",
 		"心情專線",
 		"就醫",
-		"自行處理"
+		"自行處理",
+		"回家休息"
 	};
+	
+	private View.OnClickListener[] iconOnClickListener = {
+			new HelpOnClickListener(-1),
+			new HelpOnClickListener(-1),
+			new EndOnClickListener(),
+			new EndOnClickListener(),
+			new SelfOnClickListener(),
+			new EndOnClickListener()
+		};
+		
+		private Bitmap[] iconBmps;
 	
 	private static final int ICON2_NUM = 5;
 	private static final int[] ICON2_DRAWABLE_ID = {
@@ -91,6 +110,16 @@ public class QuestionMsgBox {
 		"身體不適"
 	};
 	
+	private View.OnClickListener[] icon2OnClickListener = {
+			new SolverOnClickListener(0),
+			new SolverOnClickListener(1),
+			new SolverOnClickListener(2),
+			new SolverOnClickListener(3),
+			new SolverOnClickListener(4),
+		};
+		
+	private Bitmap[] icon2Bmps;
+	
 	private static final int ICON3_NUM = 5;
 	private static final int[] ICON3_DRAWABLE_ID = {
 		R.drawable.question_icon3_exit,
@@ -107,35 +136,34 @@ public class QuestionMsgBox {
 		"請休息或就診"
 	};
 	
-	private View.OnClickListener[] iconOnClickListener = {
-		new EndOnClickListener(),
-		new EndOnClickListener(),
-		new EndOnClickListener(),
-		new EndOnClickListener(),
-		new SelfOnClickListener()
+	private View.OnClickListener[] icon3OnClickListener = {
+			new ClockOnClickListener(0),
+			new ClockOnClickListener(0),
+			new ClockOnClickListener(0),
+			new ClockOnClickListener(0),
+			new ClockOnClickListener(0)
+		};
+		
+	private Bitmap[] icon3Bmps;
+	
+	private static final int ICON4_NUM = 2;
+	private static final int[] ICON4_DRAWABLE_ID = {
+		R.drawable.question_done,
+		R.drawable.question_icon_clock
+	};
+	private static final String[] ICON4_TEXT = {
+		"完成",
+		"啟用"
 	};
 	
-	private Bitmap[] iconBmps;
-	
-	private View.OnClickListener[] icon2OnClickListener = {
-			new SolverOnClickListener(0),
-			new SolverOnClickListener(1),
-			new SolverOnClickListener(2),
-			new SolverOnClickListener(3),
-			new SolverOnClickListener(4),
+	private View.OnClickListener[] icon4OnClickListener = {
+			new EndOnClickListener(),
+			new StartClockOnClickListener()
 		};
 		
-	private Bitmap[] icon2Bmps;
+	private Bitmap[] icon4Bmps;
 	
-	private View.OnClickListener[] icon3OnClickListener = {
-			new EndOnClickListener(),
-			new EndOnClickListener(),
-			new EndOnClickListener(),
-			new EndOnClickListener(),
-			new EndOnClickListener()
-		};
-		
-	private Bitmap[] icon3Bmps;	
+	private Bitmap iconDoneBmp;
 	
 	public QuestionMsgBox(StatisticFragment statisticFragment,RelativeLayout mainLayout){
 		Log.d("UIMSG","NEW");
@@ -162,7 +190,7 @@ public class QuestionMsgBox {
 		questionLayout = (LinearLayout) boxLayout.findViewById(R.id.question_layout);
 		exitView = (ImageView) boxLayout.findViewById(R.id.question_exit);
 		RelativeLayout.LayoutParams exitParam = (RelativeLayout.LayoutParams) exitView.getLayoutParams();
-		exitParam.width = exitParam.height =  (int)(screen.x * 60.0/720.0);
+		exitParam.width = exitParam.height =  (int)(screen.x * 90.0/720.0);
 		exitView.setOnClickListener(new ExitOnClickListener());
 		
 		textSize = (int)(screen.x * 42.0/720.0);
@@ -187,6 +215,7 @@ public class QuestionMsgBox {
 		iconBmps = new Bitmap[ICON_NUM];
 		icon2Bmps = new Bitmap[ICON2_NUM];
 		icon3Bmps = new Bitmap[ICON3_NUM];
+		icon4Bmps = new Bitmap[ICON4_NUM];
 		
 		Bitmap tmp;
 		for (int i=0;i<ICON_NUM;++i){
@@ -204,6 +233,15 @@ public class QuestionMsgBox {
 			icon3Bmps[i] = Bitmap.createScaledBitmap(tmp, iconSize, iconSize, true);
 			tmp.recycle();
 		}
+		for (int i=0;i<ICON4_NUM;++i){
+			tmp = BitmapFactory.decodeResource(r, ICON4_DRAWABLE_ID[i]);
+			icon4Bmps[i] = Bitmap.createScaledBitmap(tmp, iconSize, iconSize, true);
+			tmp.recycle();
+		}
+		
+		tmp = BitmapFactory.decodeResource(r, R.drawable.question_done);
+		iconDoneBmp = Bitmap.createScaledBitmap(tmp, iconSize, iconSize, true);
+		tmp.recycle();
 		
 	}
 	
@@ -240,9 +278,55 @@ public class QuestionMsgBox {
 			}
 			icon3Bmps = null;
 		}
+		
+		if (icon4Bmps!=null){
+			for (int i=0;i<icon4Bmps.length;++i){
+				if (icon4Bmps[i]!=null && ! icon4Bmps[i].isRecycled()){
+					icon4Bmps[i].recycle();
+					icon4Bmps[i] = null;
+				}
+			}
+			icon4Bmps = null;
+		}
+		
+		if (iconDoneBmp !=null && !iconDoneBmp.isRecycled()){
+			iconDoneBmp.recycle();
+			iconDoneBmp = null;
+		}
 	}
 	
 	public void generateType0Box(){
+		
+		questionLayout.removeAllViews();
+		
+		TextView help = new TextView(context);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		help.setTypeface(wordTypeface);
+		help.setTextColor(0xFF000000);
+		help.setText("為了家人" +
+				"\n請繼續加油"
+				);
+		
+		questionLayout.addView(help);
+
+		int[] item = {0};
+		
+		for (int i=0;i<item.length;++i){
+			questionLayout.addView(createIconView(item[i],4));
+		}
+		for (int i=0;i<questionLayout.getChildCount();++i){
+			View v = questionLayout.getChildAt(i);
+			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
+			param.topMargin = param.bottomMargin = margin;
+		}
+		
+		
+		boxLayout.setVisibility(View.VISIBLE);
+		
+	}
+	
+	
+	public void generateType1Box(){
 		
 		questionLayout.removeAllViews();
 		
@@ -255,7 +339,7 @@ public class QuestionMsgBox {
 		
 		questionLayout.addView(help);
 		
-		int[] item = {0,1,2};
+		int[] item = {0,2,1};
 		
 		for (int i=0;i<item.length;++i){
 			questionLayout.addView(createIconView(item[i],1));
@@ -270,37 +354,7 @@ public class QuestionMsgBox {
 		
 	}
 	
-	public void generateType1Box(){
-		
-		questionLayout.removeAllViews();
-		
-		TextView help = new TextView(context);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-		help.setTypeface(wordTypeface);
-		help.setTextColor(0xFF000000);
-		help.setText("如果想要喝酒的話，" +
-				"\n請先離開至無酒精的地方，" +
-				"\n做閉眼深呼吸" +
-				"\n並確認今日行程是否要更改");
-		
-		
-		questionLayout.addView(help);
 
-		int[] item = {4};
-		
-		for (int i=0;i<item.length;++i){
-			questionLayout.addView(createIconView(item[i],1));
-		}
-		for (int i=0;i<questionLayout.getChildCount();++i){
-			View v = questionLayout.getChildAt(i);
-			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
-			param.topMargin = param.bottomMargin = margin;
-		}
-		
-		
-		boxLayout.setVisibility(View.VISIBLE);
-		
-	}
 	
 	public void generateType2Box(){
 		
@@ -343,7 +397,7 @@ public class QuestionMsgBox {
 		
 		questionLayout.addView(help);
 		
-		int[] item = {0,1,2,3};
+		int[] item = {5,0};
 		
 		for (int i=0;i<item.length;++i){
 			questionLayout.addView(createIconView(item[i],1));
@@ -440,6 +494,123 @@ public class QuestionMsgBox {
 		}
 	}
 	
+	private class HelpOnClickListener implements View.OnClickListener{
+		
+		int type;
+		
+		String[] dummyTexts = {
+				"dummy: 0212345678",
+				"dummy: 0212345678",
+				"dummy: 0212345678"
+				};
+		OnClickListener[] dummyListeners = {
+				new EndOnClickListener(),
+				new EndOnClickListener(),
+				new EndOnClickListener()
+		};
+		OnClickListener[] dummyListeners2 = {
+				new ClockOnClickListener(1),
+				new ClockOnClickListener(1),
+				new ClockOnClickListener(1)
+		};
+		
+		HelpOnClickListener( int type){
+			this.type = type;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			questionLayout.removeAllViews();
+			
+			TextView help = new TextView(context);
+			help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+			help.setTypeface(wordTypeface);
+			help.setTextColor(0xFF000000);
+			help.setText("請選擇聯絡對象:");
+			
+			questionLayout.addView(help);
+
+			String[] texts = dummyTexts;
+			OnClickListener[] listeners = dummyListeners;
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			int cond = sp.getInt("latest_result", 0);
+			if (cond == 2)
+				listeners = dummyListeners2;
+			
+			for (int i=0;i<texts.length;++i){
+				questionLayout.addView(createIconView(texts[i],iconDoneBmp,listeners[i]));
+			}
+			for (int i=0;i<questionLayout.getChildCount();++i){
+				View view = questionLayout.getChildAt(i);
+				LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) view.getLayoutParams();
+				param.topMargin = param.bottomMargin = margin;
+			}
+			
+			boxLayout.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	private class ClockOnClickListener implements View.OnClickListener{
+		
+		int type;
+		public ClockOnClickListener(int type){
+			this.type = type;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			questionLayout.removeAllViews();
+			
+			TextView help = new TextView(context);
+			help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+			help.setTypeface(wordTypeface);
+			help.setTextColor(0xFF000000);
+			help.setText("將啟用每小時定期提醒:");
+			
+			questionLayout.addView(help);
+			
+			int[] item = {1};
+			
+			for (int i=0;i<item.length;++i){
+				questionLayout.addView(createIconView(item[i],4));
+			}
+			for (int i=0;i<questionLayout.getChildCount();++i){
+				View view = questionLayout.getChildAt(i);
+				LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) view.getLayoutParams();
+				param.topMargin = param.bottomMargin = margin;
+			}
+			
+			boxLayout.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	private class StartClockOnClickListener implements View.OnClickListener{
+		
+		static public final long HOURMILLIS = 60*60*1000;
+		
+		@Override
+		public void onClick(View v) {
+
+			AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			
+			Intent service_intent = new Intent();
+			service_intent.setClass(context, AlarmReceiver.class);
+			service_intent.setAction("Hourly_notification");
+			
+			PendingIntent pending = PendingIntent.getBroadcast(context, 0x9999, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			alarm.cancel(pending);
+			alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,HOURMILLIS,HOURMILLIS,pending);
+			
+			boxLayout.setVisibility(View.INVISIBLE);
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences.Editor editor = sp.edit();
+			editor.putInt("latest_result", 0);
+			editor.putBoolean("hourly_alarm", true);
+	    	editor.commit();
+	    	statisticFragment.setQuestionAnimation();
+		}
+	}
+	
 	private class ItemOnTouchListener implements View.OnTouchListener{
 
 		@Override
@@ -484,11 +655,16 @@ public class QuestionMsgBox {
 			texts = ICON2_TEXT;
 			bmps = icon2Bmps;
 			listener = icon2OnClickListener;
-		} else{
+		} else if (type == 3){
 			NUM = ICON3_NUM;
 			texts = ICON3_TEXT;
 			bmps = icon3Bmps;
 			listener = icon3OnClickListener;
+		}else {
+			NUM = ICON4_NUM;
+			texts = ICON4_TEXT;
+			bmps = icon4Bmps;
+			listener = icon4OnClickListener;
 		}
 		
 		
@@ -508,6 +684,27 @@ public class QuestionMsgBox {
 		
 		layout.setBackgroundColor(0xFFFFFFFF);
 		layout.setOnClickListener(listener[id]);
+		layout.setOnTouchListener(onTouchListener);
+		
+		return layout;
+	}
+	
+	private View createIconView(String textStr, Bitmap bmp,OnClickListener listener){
+		
+		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
+		TextView text = (TextView) layout.findViewById(R.id.question_description);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTypeface(wordTypeface);
+		text.setTextColor(0xFF000000);
+		text.setText(textStr);
+		
+		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
+		icon.setImageBitmap(bmp);
+		LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) icon.getLayoutParams();
+		param.rightMargin = margin;
+		
+		layout.setBackgroundColor(0xFFFFFFFF);
+		layout.setOnClickListener(listener);
 		layout.setOnTouchListener(onTouchListener);
 		
 		return layout;

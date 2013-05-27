@@ -46,6 +46,9 @@ public class StatisticDayView extends StatisticPageView {
 	private RelativeLayout valueLayout;
 	private LinearLayout blockLayout;
 	
+	private ImageView emotion,desire;
+	private Bitmap emotionBmp, desireBmp;
+	
 	private String[] blockHint = {"早","中","下","晚"};
 	
 	private static final int nBlocks = 4;
@@ -53,6 +56,26 @@ public class StatisticDayView extends StatisticPageView {
 	
 	private Typeface digitTypeface;
 	private Typeface wordTypeface;
+	
+	private static final int[] emotionId = {
+			R.drawable.msg_emotion_1,
+			R.drawable.msg_emotion_2,
+			R.drawable.msg_emotion_3,
+			R.drawable.msg_emotion_4,
+			R.drawable.msg_emotion_5
+	};
+	private static final int[] desireId = {
+		R.drawable.msg_desire_1,
+		R.drawable.msg_desire_2,
+		R.drawable.msg_desire_3,
+		R.drawable.msg_desire_4,
+		R.drawable.msg_desire_5,
+		R.drawable.msg_desire_6,
+		R.drawable.msg_desire_7,
+		R.drawable.msg_desire_8,
+		R.drawable.msg_desire_9,
+		R.drawable.msg_desire_10,
+	};
 	
 	public StatisticDayView(Context context,StatisticFragment statisticFragment){
 		super(context,R.layout.statistic_day_view,statisticFragment);
@@ -79,6 +102,14 @@ public class StatisticDayView extends StatisticPageView {
 				}
 			}
 			circleBmps = null;
+		}
+		if (emotionBmp != null && ! emotionBmp.isRecycled()){
+			emotionBmp.recycle();
+			emotionBmp = null;
+		}
+		if (desireBmp != null && ! desireBmp.isRecycled()){
+			desireBmp.recycle();
+			desireBmp = null;
 		}
 	}
 
@@ -144,6 +175,8 @@ public class StatisticDayView extends StatisticPageView {
 		valueLayout = (RelativeLayout) view.findViewById(R.id.statistic_day_value_layout);
 		blockLayout = (LinearLayout) view.findViewById(R.id.statistic_day_block_layout);
 		
+		emotion = (ImageView) view.findViewById(R.id.statistic_day_emotion);
+		desire = (ImageView) view.findViewById(R.id.statistic_day_desire);
 	}
 
 	@Override
@@ -164,6 +197,14 @@ public class StatisticDayView extends StatisticPageView {
 		RelativeLayout.LayoutParams dateParam = (LayoutParams) bracTime.getLayoutParams();
 		dateParam.leftMargin = (int) (statistic_size.x*100.0/720.0);
 		dateParam.topMargin = (int) (statistic_size.x*40.0/720.0);
+		
+		RelativeLayout.LayoutParams emotionParam = (LayoutParams) emotion.getLayoutParams();
+		emotionParam.leftMargin = (int) (statistic_size.x*100.0/720.0);
+		emotionParam.topMargin = (int) (statistic_size.x*20.0/720.0);
+		
+		RelativeLayout.LayoutParams desireParam = (LayoutParams) desire.getLayoutParams();
+		desireParam.leftMargin = (int) (statistic_size.x*20.0/720.0);
+		desireParam.topMargin = (int) (statistic_size.x*20.0/720.0);
 		
 		int valueSize= (int) (statistic_size.x*302.0/720.0);
 		RelativeLayout.LayoutParams vParam = (LayoutParams) valueLayout.getLayoutParams();
@@ -209,6 +250,18 @@ public class StatisticDayView extends StatisticPageView {
 		circleBmps[3] = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
 		tmp.recycle();
 		
+		BracGameHistory history = db.getLatestBracGameHistory();
+		if (history.timestamp > 0){
+			int e_idx = history.emotion - 1;
+			int d_idx = history.desire - 1;
+			tmp = BitmapFactory.decodeResource(view.getResources(), emotionId[e_idx]);
+			emotionBmp = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
+			tmp.recycle();
+		
+			tmp = BitmapFactory.decodeResource(view.getResources(), desireId[d_idx]);
+			desireBmp = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
+			tmp.recycle();
+		}
 	}
 
 	@Override
@@ -249,6 +302,12 @@ public class StatisticDayView extends StatisticPageView {
 		
 		if (valueCircleBmp !=null && !valueCircleBmp.isRecycled())
 			valueCircle.setImageBitmap(valueCircleBmp);
+		
+		if (emotionBmp !=null && !emotionBmp.isRecycled())
+			emotion.setImageBitmap(emotionBmp);
+		
+		if (desireBmp !=null && !desireBmp.isRecycled())
+			desire.setImageBitmap(desireBmp);
 		
 		BracGameHistory[] historys = db.getTodayBracGameHistory();
 		Point statistic_size = StatisticFragment.getStatisticPx();
