@@ -898,6 +898,7 @@ public class TestFragment extends Fragment {
 			SharedPreferences.Editor editor = sp.edit();
 	    	editor.putInt("latest_result", cond);
 	    	editor.putBoolean("tested", true);
+	    	editor.putBoolean("hourly_alarm", false);
 	    	editor.commit();
 	    	FragmentTabs.changeTab(1);
 		}
@@ -906,6 +907,8 @@ public class TestFragment extends Fragment {
 	
 	
 	public void showDebug(String message){
+		if (this == null)
+			return;
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		Boolean debug = sp.getBoolean("debug", false);
 		if (msgHandler!=null && debug){

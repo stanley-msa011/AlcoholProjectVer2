@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">戒酒小幫手</string>
 
+    <string name="app_name">戒酒小幫手</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_emotion">EmotionActivity</string>
+    <string name="title_activity_emotion_manage">EmotionManageActivity</string>
 
 </resources>

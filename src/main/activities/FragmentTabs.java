@@ -166,7 +166,7 @@ public class FragmentTabs extends FragmentActivity {
 		if (uid.length() == 0){
 			Intent newIntent = new Intent(this, PreSettingActivity.class);
 			this.startActivity(newIntent);
-			this.finish();
+			//this.finish();
 			return;
 		}
 		Reuploader.reuploader(this);
@@ -234,17 +234,13 @@ public class FragmentTabs extends FragmentActivity {
 		}
 	}
 	
-	public void onActivityResult(int requestCode, int resultCode, Intent data){
-		if (requestCode==1){
-			finish();
-		}
-	}
-	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	menu.add(0, 0, 0, "Debug");
     	menu.add(0, 1, 1, "Normal");
     	menu.add(0, 2, 1, "Setting");
+    	menu.add(1, 0, 1, "心情DIY");
+    	menu.add(1, 1, 1, "情緒管理");
     	return super.onCreateOptionsMenu(menu);
     }
 	
@@ -252,18 +248,28 @@ public class FragmentTabs extends FragmentActivity {
     	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
     	SharedPreferences.Editor editor = sp.edit();
 		int id = item.getItemId();
-		if (id == 0){
-			editor.putBoolean("debug", true);
-			editor.commit();
-		}else if (id == 1){
-			editor.putBoolean("debug", false);
-			editor.commit();
-		}else if (id == 2){
-			Intent newIntent = new Intent(this, PreSettingActivity.class);
-			this.startActivity(newIntent);
-			this.finish();
+		int gid = item.getGroupId();
+		if (gid == 0){
+			if (id == 0){
+				editor.putBoolean("debug", true);
+				editor.commit();
+			}else if (id == 1){
+				editor.putBoolean("debug", false);
+				editor.commit();
+			}else if (id == 2){
+				Intent newIntent = new Intent(this, PreSettingActivity.class);
+				this.startActivity(newIntent);
+			}
 		}
-		
+		if (gid == 1){
+			if (id == 0){
+				Intent newIntent = new Intent(this, EmotionActivity.class);
+				this.startActivity(newIntent);
+			}else if (id == 1){
+				Intent newIntent = new Intent(this, EmotionManageActivity.class);
+				this.startActivity(newIntent);
+			}
+		}
 		return false;
     }
     

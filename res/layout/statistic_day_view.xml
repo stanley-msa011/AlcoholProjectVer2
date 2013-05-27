@@ -28,6 +28,21 @@
         android:textColor="#FF000000"
         />
     
+    <ImageView 
+        android:id="@+id/statistic_day_emotion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/statistic_day_brac_time"
+        />
+    
+	<ImageView 
+        android:id="@+id/statistic_day_desire"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/statistic_day_brac_time"
+        android:layout_toRightOf="@+id/statistic_day_emotion"
+        />
+    
     <RelativeLayout 
         android:id = "@+id/statistic_day_value_layout"
         android:layout_width="wrap_content"

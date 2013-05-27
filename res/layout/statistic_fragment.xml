@@ -52,7 +52,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
-     android:background="#FFFFFFFF"
     />
 <TextView
     android:id = "@+id/statistic_text"
@@ -60,7 +59,6 @@
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_below="@+id/statistic_picture"
-    android:background="#FFFFFFFF"
     android:textColor="#FF000000"
     />
 
