@@ -1,19 +1,15 @@
 package statistic.ui;
 
-import java.util.Set;
-
 import main.activities.AlarmReceiver;
 import main.activities.FragmentTabs;
 import main.activities.R;
 import main.activities.StatisticFragment;
-import main.activities.TestFragment;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -21,22 +17,14 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.SpinnerAdapter;
-import android.widget.Switch;
 import android.widget.TextView;
 
 public class QuestionMsgBox {
@@ -55,10 +43,9 @@ public class QuestionMsgBox {
 	private Resources r;
 	private Point screen;
 	
-	private EndOnClickListener endListener;
 	private ItemOnTouchListener onTouchListener;
 	
-	private Typeface digitTypeface;
+	//private Typeface digitTypeface;
 	private Typeface wordTypeface;
 	
 	private int textSize;
@@ -83,16 +70,7 @@ public class QuestionMsgBox {
 		"回家休息"
 	};
 	
-	private View.OnClickListener[] iconOnClickListener = {
-			new HelpOnClickListener(-1),
-			new HelpOnClickListener(-1),
-			new EndOnClickListener(),
-			new EndOnClickListener(),
-			new SelfOnClickListener(),
-			new EndOnClickListener()
-		};
-		
-		private Bitmap[] iconBmps;
+	private Bitmap[] iconBmps;
 	
 	private static final int ICON2_NUM = 5;
 	private static final int[] ICON2_DRAWABLE_ID = {
@@ -110,14 +88,6 @@ public class QuestionMsgBox {
 		"身體不適"
 	};
 	
-	private View.OnClickListener[] icon2OnClickListener = {
-			new SolverOnClickListener(0),
-			new SolverOnClickListener(1),
-			new SolverOnClickListener(2),
-			new SolverOnClickListener(3),
-			new SolverOnClickListener(4),
-		};
-		
 	private Bitmap[] icon2Bmps;
 	
 	private static final int ICON3_NUM = 5;
@@ -136,31 +106,20 @@ public class QuestionMsgBox {
 		"請休息或就診"
 	};
 	
-	private View.OnClickListener[] icon3OnClickListener = {
-			new ClockOnClickListener(0),
-			new ClockOnClickListener(0),
-			new ClockOnClickListener(0),
-			new ClockOnClickListener(0),
-			new ClockOnClickListener(0)
-		};
-		
 	private Bitmap[] icon3Bmps;
 	
-	private static final int ICON4_NUM = 2;
+	private static final int ICON4_NUM = 3;
 	private static final int[] ICON4_DRAWABLE_ID = {
 		R.drawable.question_done,
-		R.drawable.question_icon_clock
+		R.drawable.question_icon_clock,
+		R.drawable.question_done
 	};
 	private static final String[] ICON4_TEXT = {
 		"完成",
-		"啟用"
+		"啟用",
+		"不啟用"
 	};
 	
-	private View.OnClickListener[] icon4OnClickListener = {
-			new EndOnClickListener(),
-			new StartClockOnClickListener()
-		};
-		
 	private Bitmap[] icon4Bmps;
 	
 	private Bitmap iconDoneBmp;
@@ -178,10 +137,9 @@ public class QuestionMsgBox {
 	
 	private void setting(){
 		
-		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
+		//digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		
-		endListener = new EndOnClickListener();
 		onTouchListener = new ItemOnTouchListener();
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.question_box_layout,null);
@@ -309,11 +267,10 @@ public class QuestionMsgBox {
 		
 		questionLayout.addView(help);
 
-		int[] item = {0};
 		
-		for (int i=0;i<item.length;++i){
-			questionLayout.addView(createIconView(item[i],4));
-		}
+		View view = createIconView(ICON4_TEXT[0], icon4Bmps[0],new EndOnClickListener());
+		questionLayout.addView(view);
+		
 		for (int i=0;i<questionLayout.getChildCount();++i){
 			View v = questionLayout.getChildAt(i);
 			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
@@ -341,8 +298,13 @@ public class QuestionMsgBox {
 		
 		int[] item = {0,2,1};
 		
+		OnClickListener[] listener = new OnClickListener[item.length];
+		listener[0] = new HelpOnClickListener(-1);
+		listener[1] = new EndOnClickListener();
+		listener[2] = new HelpOnClickListener(-1);
+		
 		for (int i=0;i<item.length;++i){
-			questionLayout.addView(createIconView(item[i],1));
+			questionLayout.addView(createIconView(ICON_TEXT[item[i]],iconBmps[item[i]],listener[i]));
 		}
 		for (int i=0;i<questionLayout.getChildCount();++i){
 			View v = questionLayout.getChildAt(i);
@@ -371,8 +333,13 @@ public class QuestionMsgBox {
 
 		int[] item = {4,0};
 		
+		OnClickListener[] listener = new OnClickListener[item.length];
+		listener[0] = new SelfOnClickListener(1);
+		listener[1] = new HelpOnClickListener(-1);
+
+		
 		for (int i=0;i<item.length;++i){
-			questionLayout.addView(createIconView(item[i],1));
+			questionLayout.addView(createIconView(ICON_TEXT[item[i]],iconBmps[item[i]],listener[i]));
 		}
 		for (int i=0;i<questionLayout.getChildCount();++i){
 			View v = questionLayout.getChildAt(i);
@@ -397,10 +364,15 @@ public class QuestionMsgBox {
 		
 		questionLayout.addView(help);
 		
-		int[] item = {5,0};
+		int[] item = {5,0,4};
+		OnClickListener[] listener = new OnClickListener[item.length];
+		listener[0] = new EndOnClickListener();
+		listener[1] = new HelpOnClickListener(-1);
+		listener[2] = new SelfOnClickListener(0);
+		
 		
 		for (int i=0;i<item.length;++i){
-			questionLayout.addView(createIconView(item[i],1));
+			questionLayout.addView(createIconView(ICON_TEXT[item[i]],iconBmps[item[i]],listener[i]));
 		}
 		for (int i=0;i<questionLayout.getChildCount();++i){
 			View v = questionLayout.getChildAt(i);
@@ -433,6 +405,14 @@ public class QuestionMsgBox {
 	
 	
 	private class SelfOnClickListener implements View.OnClickListener{
+		
+		int type;
+		//type == 1 : clock
+		//type == 0 : no clock
+		
+		SelfOnClickListener(int type){
+			this.type = type;
+		}
 		@Override
 		public void onClick(View v) {
 			questionLayout.removeAllViews();
@@ -446,9 +426,13 @@ public class QuestionMsgBox {
 			questionLayout.addView(help);
 			
 			int[] item = {0,1,2,3,4};
+			OnClickListener[] listener = new OnClickListener[item.length];
+			
+			for (int i=0;i<listener.length;++i)
+				listener[i] = new SolverOnClickListener(i,type);
 			
 			for (int i=0;i<item.length;++i){
-				questionLayout.addView(createIconView(item[i],2));
+				questionLayout.addView(createIconView(ICON2_TEXT[item[i]],icon2Bmps[item[i]],listener[i]));
 			}
 			for (int i=0;i<questionLayout.getChildCount();++i){
 				View view = questionLayout.getChildAt(i);
@@ -463,8 +447,10 @@ public class QuestionMsgBox {
 	private class SolverOnClickListener implements View.OnClickListener{
 		
 		private int result;
-		SolverOnClickListener(int result){
+		private int type;
+		SolverOnClickListener(int result,int type){
 			this.result = result;
+			this.type = type;
 		}
 		
 		@Override
@@ -481,8 +467,15 @@ public class QuestionMsgBox {
 			
 			int[] item = {result};
 			
+			OnClickListener[] listener = new OnClickListener[item.length];
+			if (type == 0){
+				listener[0] = new EndOnClickListener();
+			}else {
+				listener[0] = new ClockOnClickListener(0);
+			}
+			
 			for (int i=0;i<item.length;++i){
-				questionLayout.addView(createIconView(item[i],3));
+				questionLayout.addView(createIconView(ICON3_TEXT[item[i]],icon3Bmps[item[i]],listener[i]));
 			}
 			for (int i=0;i<questionLayout.getChildCount();++i){
 				View view = questionLayout.getChildAt(i);
@@ -569,10 +562,14 @@ public class QuestionMsgBox {
 			
 			questionLayout.addView(help);
 			
-			int[] item = {1};
+			int[] item = {1,2};
+			OnClickListener[] listener = new OnClickListener[item.length];
+			listener[0] = new StartClockOnClickListener();
+			listener[1] = new EndOnClickListener();
+			
 			
 			for (int i=0;i<item.length;++i){
-				questionLayout.addView(createIconView(item[i],4));
+				questionLayout.addView(createIconView(ICON4_TEXT[item[i]],icon4Bmps[item[i]],listener[i]));
 			}
 			for (int i=0;i<questionLayout.getChildCount();++i){
 				View view = questionLayout.getChildAt(i);
@@ -639,56 +636,7 @@ public class QuestionMsgBox {
 			boxLayout.setVisibility(View.INVISIBLE);
 			return;
 	}
-	
-	private View createIconView(int id,int type){
-		int NUM;
-		String[] texts;
-		Bitmap[] bmps;
-		OnClickListener[] listener;
-		if (type == 1){
-			NUM = ICON_NUM;
-			texts = ICON_TEXT;
-			bmps = iconBmps;
-			listener = iconOnClickListener;
-		}else if (type == 2){
-			NUM = ICON2_NUM;
-			texts = ICON2_TEXT;
-			bmps = icon2Bmps;
-			listener = icon2OnClickListener;
-		} else if (type == 3){
-			NUM = ICON3_NUM;
-			texts = ICON3_TEXT;
-			bmps = icon3Bmps;
-			listener = icon3OnClickListener;
-		}else {
-			NUM = ICON4_NUM;
-			texts = ICON4_TEXT;
-			bmps = icon4Bmps;
-			listener = icon4OnClickListener;
-		}
-		
-		
-		if (id < 0 || id >= NUM)
-			return null;
-		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
-		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-		text.setTypeface(wordTypeface);
-		text.setTextColor(0xFF000000);
-		text.setText(texts[id]);
-		
-		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
-		icon.setImageBitmap(bmps[id]);
-		LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) icon.getLayoutParams();
-		param.rightMargin = margin;
-		
-		layout.setBackgroundColor(0xFFFFFFFF);
-		layout.setOnClickListener(listener[id]);
-		layout.setOnTouchListener(onTouchListener);
-		
-		return layout;
-	}
-	
+
 	private View createIconView(String textStr, Bitmap bmp,OnClickListener listener){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);

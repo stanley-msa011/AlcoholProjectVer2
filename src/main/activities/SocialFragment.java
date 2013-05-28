@@ -7,7 +7,6 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -26,8 +25,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.ImageView.ScaleType;
-import android.widget.RelativeLayout.LayoutParams;
 
 public class SocialFragment extends Fragment {
 
@@ -38,7 +35,7 @@ public class SocialFragment extends Fragment {
 	private Bitmap bgBmp;
 	private ScrollView mainView;
 	private RelativeLayout main_layout;
-	private final static int ICON_TYPES = 5;
+//	private final static int ICON_TYPES = 5;
 	private int horizontalGap, verticalGap;
 	
 	private LayoutInflater inflater;

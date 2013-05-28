@@ -289,20 +289,28 @@ public class StatisticFragment extends Fragment {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			boolean tested = sp.getBoolean("tested", false);
 			int result = sp.getInt("latest_result", 0);
+			
+			RelativeLayout.LayoutParams showParam = (RelativeLayout.LayoutParams) showImage.getLayoutParams();
+			showParam.width = (int)(screen.x * 240.0/720.0);
+			showParam.height = (int)(screen.x * 240.0/720.0);
+			
 			if (tested){
 				if (result <=1){
-					tmp= BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_show_pass2);
+					//tmp= BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_show_pass2);
 					//showText.setText("做得好，請繼續加油");
+					showImage.setImageResource(R.drawable.statistic_show_pass2);
 				}
 				else{
-					tmp= BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_show_fail2);
+					//tmp= BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_show_fail2);
 					//showText.setText("請繼續加油");
+					showImage.setImageResource(R.drawable.statistic_show_fail2);
 				}
-				showImageBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 240.0/720.0), (int)(screen.x * 240.0/720.0), true);
-				tmp.recycle();
-				showImage.setImageBitmap(showImageBmp);
+				//showImageBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 240.0/720.0), (int)(screen.x * 240.0/720.0), true);
+				//tmp.recycle();
+				//showImage.setImageBitmap(showImageBmp);
+				
 				showImage.setVisibility(View.VISIBLE);
-				showText.setVisibility(View.VISIBLE);
+				//showText.setVisibility(View.VISIBLE);
 				SharedPreferences.Editor editor = sp.edit();
 		    	editor.putBoolean("tested", false);
 		    	editor.commit();
@@ -339,7 +347,7 @@ public class StatisticFragment extends Fragment {
 			showImage.setVisibility(View.INVISIBLE);
 			showText.setVisibility(View.INVISIBLE);
 			FragmentTabs.enableTab(true);
-			FragmentTabs.changeTab(1);
+			//FragmentTabs.changeTab(1);
 		}
 	}
 	

@@ -2,14 +2,10 @@ package main.activities;
 
 import database.QuestionDB;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,10 +36,10 @@ public class EmotionActivity extends Activity {
 	
 	private static final String[] texts = {
 		"閉眼專注觀察呼吸",
-		"專心健走三十分鐘",
-		"聽音樂或閱讀書籍",
+		"專心健走 10 ~ 30 分鐘",
+		"從事休閒活動\n(如聽音樂)",
 		"社區心理諮商",
-		"尋求親友協助"
+		"與親友聊天"
 	} ;
 	
 	private OnClickListener[] clickListeners = {

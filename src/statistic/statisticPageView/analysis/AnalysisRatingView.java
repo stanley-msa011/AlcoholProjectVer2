@@ -224,7 +224,7 @@ public class AnalysisRatingView extends StatisticPageView {
 		pointer2.setImageBitmap(pointerBmp);
 		
 		help.setText("與其他戒酒朋友相比，您的排名為" );
-		help2.setText("與表現較好的成員相比，您的排名為" );
+		help2.setText("與AA成員相比，您的排名為" );
 		setPointer();
 		
 	}

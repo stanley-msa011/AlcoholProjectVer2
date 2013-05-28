@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.View;
@@ -78,7 +77,8 @@ public class PreSettingActivity extends Activity {
 		versionText.setText("Verstion: "+Version.VERSION);
 		
 	    mPickDate.setOnClickListener(new View.OnClickListener() {
-	        public void onClick(View v) {
+	        @SuppressWarnings("deprecation")
+			public void onClick(View v) {
 	            showDialog(DATE_DIALOG_ID);
 	        }
 	    });
@@ -128,9 +128,8 @@ public class PreSettingActivity extends Activity {
 				editor.putInt("sDate", mDay);
 				editor.putInt("timeblock_num", tb_t);
 				editor.commit();
+				Log.d("PreSetting","Done");
 			}
-			//Intent newIntent = new Intent(activity, FragmentTabs.class);
-			//activity.startActivity(newIntent);
 			activity.finish();
 		}
 		

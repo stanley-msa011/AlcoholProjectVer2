@@ -6,8 +6,6 @@ import java.util.Calendar;
 import database.HistoryDB;
 import database.TimeBlock;
 
-import main.activities.FragmentTabs;
-import main.activities.Lang;
 import main.activities.R;
 import main.activities.StatisticFragment;
 import statistic.statisticPageView.StatisticPageView;
@@ -20,12 +18,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -103,11 +97,11 @@ public class StatisticDayView extends StatisticPageView {
 			}
 			circleBmps = null;
 		}
-		if (emotionBmp != null && ! emotionBmp.isRecycled()){
+		if (emotionBmp != null && !emotionBmp.isRecycled()){
 			emotionBmp.recycle();
 			emotionBmp = null;
 		}
-		if (desireBmp != null && ! desireBmp.isRecycled()){
+		if (desireBmp != null && !desireBmp.isRecycled()){
 			desireBmp.recycle();
 			desireBmp = null;
 		}
@@ -256,11 +250,13 @@ public class StatisticDayView extends StatisticPageView {
 			int d_idx = history.desire - 1;
 			tmp = BitmapFactory.decodeResource(view.getResources(), emotionId[e_idx]);
 			emotionBmp = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
-			tmp.recycle();
+			if (emotionBmp != tmp)
+				tmp.recycle();
 		
 			tmp = BitmapFactory.decodeResource(view.getResources(), desireId[d_idx]);
 			desireBmp = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
-			tmp.recycle();
+			if (desireBmp != tmp)
+				tmp.recycle();
 		}
 	}
 

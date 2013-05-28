@@ -5,7 +5,6 @@ import main.activities.R;
 import main.activities.TestFragment;
 import android.content.Context;
 import android.content.res.Resources;
-import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -14,15 +13,13 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
+import android.widget.SeekBar;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.SpinnerAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 
 public class UIMsgBox {
@@ -30,14 +27,20 @@ public class UIMsgBox {
 	private TestFragment testFragment;
 	private Context context;
 	private LayoutInflater inflater;
-	private RelativeLayout box = null;
+	private RelativeLayout boxLayout = null;
 	
-	private Bitmap bgBmp;
+	private TextView help,emotionText,desireText,gpsText;
+	private SeekBar emotionSeekBar,desireSeekBar;
+	private Switch gpsSwitch;
+	private Button okButton;
 	
-	private TextView help;
-	private ImageView bg;
+	private RelativeLayout mainLayout;
 	
-	private RelativeLayout mainLayout = null;
+	private ImageView emotionShow;
+	private ImageView desireShow;
+	private TextView emotionShowText;
+	private TextView desireShowText;
+	
 	
 	private LinearLayout questionLayout;
 	
@@ -46,10 +49,14 @@ public class UIMsgBox {
 	
 	private EndOnClickListener endListener;
 	
-	private EndSetting endSetting;
-	
 	private Typeface digitTypeface;
 	private Typeface wordTypeface;
+	
+	private int textSize;
+	
+	private Bitmap[] emotionBmps;
+	private Bitmap[] desireBmps;
+	
 	
 	public UIMsgBox(TestFragment testFragment,RelativeLayout mainLayout){
 		Log.d("UIMSG","NEW");
@@ -68,262 +75,220 @@ public class UIMsgBox {
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		
 		endListener = new EndOnClickListener();
-		box = (RelativeLayout) inflater.inflate(R.layout.test_msg_box,null);
-		box.setVisibility(View.INVISIBLE);
-		bg = (ImageView) box.findViewById(R.id.test_msg_box_bg);
+		boxLayout = (RelativeLayout) inflater.inflate(R.layout.message_box_layout,null);
+		boxLayout.setVisibility(View.INVISIBLE);
 		
-		int textSize = (int)(screen.x * 49.0/720.0);
+		questionLayout = (LinearLayout) boxLayout.findViewById(R.id.msg_question_layout);
 		
-		help = (TextView) box.findViewById(R.id.test_msg_box_help);
+		textSize = (int)(screen.x * 42.0/720.0);
+		
+		help = (TextView) boxLayout.findViewById(R.id.msg_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		help.setTypeface(wordTypeface);
+		
+		emotionText = (TextView) boxLayout.findViewById(R.id.msg_emotion_text);
+		emotionText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		emotionText.setTypeface(wordTypeface);
+		
+		desireText = (TextView) boxLayout.findViewById(R.id.msg_desire_text);
+		desireText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		desireText.setTypeface(wordTypeface);
+		
+		gpsText = (TextView) boxLayout.findViewById(R.id.msg_gps_text);
+		gpsText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		gpsText.setTypeface(wordTypeface);
+		
+		emotionSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_emotion_seek_bar);
+		desireSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_desire_seek_bar);
+		gpsSwitch = (Switch) boxLayout.findViewById(R.id.msg_gps_switch);
+		gpsSwitch.setTextOff("否");
+		gpsSwitch.setTextOn("是");
+		gpsSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		gpsSwitch.setTypeface(wordTypeface);
+		
+		emotionShow = (ImageView) boxLayout.findViewById(R.id.msg_emotion_show);
+		desireShow = (ImageView) boxLayout.findViewById(R.id.msg_desire_show);
+		
+		emotionSeekBar.setOnSeekBarChangeListener(new EmotionListener());
+		desireSeekBar.setOnSeekBarChangeListener(new DesireListener());
+		
+		okButton = (Button) boxLayout.findViewById(R.id.msg_button);
+		
+		emotionShowText = (TextView) boxLayout.findViewById(R.id.msg_emotion_show_text);
+		emotionShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		emotionShowText.setTypeface(digitTypeface);
+		
+		desireShowText = (TextView) boxLayout.findViewById(R.id.msg_desire_show_text);
+		desireShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		desireShowText.setTypeface(digitTypeface);
 		
 	}
 	
 	public void settingPreTask(){
-		mainLayout.addView(box);
+		mainLayout.addView(boxLayout);
 	}
 	
 	
 	public void settingInBackground(){
 		
-		if(bgBmp!=null && !bgBmp.isRecycled()){
-			bgBmp.recycle();
-			bgBmp=null;
-		}
-		
 		Point screen = FragmentTabs.getSize();
 		
+		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
+		boxParam.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
+		boxParam.width = (int)(screen.x*600.0/720.0);
+		
+		int size = (int)(screen.x*80.0/720.0);
+		
+		LinearLayout.LayoutParams eParam = (LinearLayout.LayoutParams) emotionShowText.getLayoutParams();
+		eParam.width = size;
+		LinearLayout.LayoutParams dParam = (LinearLayout.LayoutParams) desireShowText.getLayoutParams();
+		dParam.width = size;
+		
+		
+		emotionBmps = new Bitmap[5];
 		Bitmap tmp;
-		tmp = BitmapFactory.decodeResource(r, R.drawable.test_box_bg_1);
-		bgBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 666.0/720.0),  (int)(screen.x * 440.0/720.0), true);
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_1);
+		emotionBmps[0] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_2);
+		emotionBmps[1] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_3);
+		emotionBmps[2] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_4);
+		emotionBmps[3] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_5);
+		emotionBmps[4] = Bitmap.createScaledBitmap(tmp, size, size, true);
 		tmp.recycle();
 		
-		RelativeLayout.LayoutParams boxParam = (LayoutParams) box.getLayoutParams();
-		boxParam.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
-		boxParam.topMargin = (int)(screen.x * 372.0/720.0);
-		
-		RelativeLayout.LayoutParams bgParam = (LayoutParams) bg.getLayoutParams();
-		bgParam.width = (int)(screen.x * 666.0/720.0);
-		bgParam.height = (int)(screen.x * 440.0/720.0);
-		
+		desireBmps = new Bitmap[10];
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_1);
+		desireBmps[0] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_2);
+		desireBmps[1] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_3);
+		desireBmps[2] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_4);
+		desireBmps[3] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_5);
+		desireBmps[4] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_6);
+		desireBmps[5] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_7);
+		desireBmps[6] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_8);
+		desireBmps[7] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_9);
+		desireBmps[8] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_10);
+		desireBmps[9] = Bitmap.createScaledBitmap(tmp, size, size, true);
+		tmp.recycle();
 	}
 	
 	public  void settingPostTask(){
+		emotionSeekBar.setProgress(emotionSeekBar.getMax()/2);
+		desireSeekBar.setProgress(desireSeekBar.getMax()/2);
 	}
 	
 	public void clear(){
 		Log.d("UIMSG","CLEAR");
-		mainLayout.removeView(box);
-		if(bgBmp!=null && !bgBmp.isRecycled()){
-			bgBmp.recycle();
-			bgBmp=null;
+		mainLayout.removeView(boxLayout);
+		if (emotionBmps!=null){
+			for (int i=0;i<emotionBmps.length;++i){
+				if (emotionBmps[i]!=null && !emotionBmps[i].isRecycled()){
+					emotionBmps[i].recycle();
+					emotionBmps[i] = null;
+				}
+			}
+			emotionBmps = null;
+		}
+		if (desireBmps!=null){
+			for (int i=0;i<desireBmps.length;++i){
+				if (desireBmps[i]!=null && !desireBmps[i].isRecycled()){
+					desireBmps[i].recycle();
+					desireBmps[i] = null;
+				}
+			}
+			desireBmps = null;
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void generateGPSCheckBox(){
-		if (bgBmp == null || bgBmp.isRecycled())
-			return;
-		if (bg==null || help == null)
-			return;
 		
-		RelativeLayout.LayoutParams bgParam = (LayoutParams) bg.getLayoutParams();
-		bgParam.height = bgParam.height*3/2;
-		
-		bg.setImageBitmap(bgBmp);
 		help.setText("");
-		//new
+		questionLayout.setVisibility(View.VISIBLE);
+		boxLayout.setVisibility(View.VISIBLE);
+		okButton.setOnClickListener(endListener);
 		
-		//new version--------------------------------------------------------
-		if (questionLayout!=null)
-			box.removeView(questionLayout);
-		
-		int textSize = (int)(screen.x * 49.0/720.0);
-		questionLayout = new LinearLayout(context);
-		
-		questionLayout.setOrientation(LinearLayout.VERTICAL);
-		TextView emotionQuestion = new TextView(context);
-		emotionQuestion.setText("你的心情指數(由低到高):");
-		emotionQuestion.setTypeface(wordTypeface);
-		emotionQuestion.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-		emotionQuestion.setTextColor(0xFF545454);
-		Spinner emotionSpinner = new Spinner(context);
-		SpinnerAdapter emotionAdapter = new QuestionAdapter(5);
-		emotionSpinner.setAdapter(emotionAdapter);
-		emotionSpinner.setSelection(emotionAdapter.getCount()/2);
-		questionLayout.addView(emotionQuestion);
-		questionLayout.addView(emotionSpinner);
-		
-		TextView desireQuestion = new TextView(context);
-		desireQuestion.setText("你的渴飲程度(由低到高):");
-		desireQuestion.setTypeface(wordTypeface);
-		desireQuestion.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-		desireQuestion.setTextColor(0xFF545454);
-		Spinner desireSpinner = new Spinner(context);
-		SpinnerAdapter desireAdapter = new QuestionAdapter(10);
-		desireSpinner.setAdapter(desireAdapter);
-		desireSpinner.setSelection(desireAdapter.getCount()/2);
-		questionLayout.addView(desireQuestion);
-		questionLayout.addView(desireSpinner);
-		
-		CheckBox gpsCheckBox = new CheckBox(context);
-		gpsCheckBox.setText("是否回報現在位置?");
-		gpsCheckBox.setTypeface(wordTypeface);
-		gpsCheckBox.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-		gpsCheckBox.setTextColor(0xFF545454);
-		gpsCheckBox.setSelected(false);
-		questionLayout.addView(gpsCheckBox);
-		
-		Button checkButton = new Button(context);
-		checkButton.setText("確定");
-		checkButton.setTypeface(wordTypeface);
-		checkButton.setOnClickListener(endListener);
-		questionLayout.addView(checkButton);
-		
-		box.addView(questionLayout);
-		
-		RelativeLayout.LayoutParams qParam = (RelativeLayout.LayoutParams)questionLayout.getLayoutParams();
-		qParam.leftMargin = (int)(screen.x * 50.0/720.0);
-		qParam.topMargin = (int)(screen.x * 60.0/720.0);
-		
-		endSetting = new EndSetting();
-		endSetting.gps = gpsCheckBox;
-		endSetting.emotion = emotionSpinner;
-		endSetting.desire = desireSpinner;
-		//-----------------------------------------------------------------------
-		
-		
-		box.setOnClickListener(null);
-		
-		box.setVisibility(View.VISIBLE);
 	}
 	
 	private class EndOnClickListener implements View.OnClickListener{
 
 		@Override
 		public void onClick(View v) {
-			box.setVisibility(View.INVISIBLE);
-			if (questionLayout!=null)
-				box.removeView(questionLayout);
-			if (endSetting!=null){
-				boolean enableGPS = endSetting.gps.isChecked();
-				
-				int desire = (Integer) endSetting.desire.getSelectedItem();
-				int emotion =  (Integer) endSetting.emotion.getSelectedItem();
+			boxLayout.setVisibility(View.INVISIBLE);
+				boolean enableGPS = gpsSwitch.isChecked();
+				int desire = desireSeekBar.getProgress()+1;
+				int emotion =  emotionSeekBar.getProgress()+1;
 				
 				String setting_str = desire+"/"+emotion+"/"+enableGPS; 
 				Log.d("MSGBOX SETTING",setting_str);
 				testFragment.writeQuestionFile(emotion, desire);
 				
 				testFragment.startGPS(enableGPS);
-			}
 		}
 		
 	}
 	
 	public void generateInitializingBox(){
-		if (bgBmp == null || bgBmp.isRecycled())
-			return;
-		if (bg==null || help == null)
-			return;
-		bg.setImageBitmap(bgBmp);
+		okButton.setOnClickListener(null);
 		help.setText("請稍待");
-		
-		RelativeLayout.LayoutParams helpParam = (LayoutParams) help.getLayoutParams();
-		helpParam.topMargin = (int)(screen.x * 140.0/720.0);
-		
-		box.setOnClickListener(null);
-		
-		box.setVisibility(View.VISIBLE);
+		questionLayout.setVisibility(View.INVISIBLE);
+		boxLayout.setVisibility(View.VISIBLE);
 	}
 	
 	public void closeInitializingBox(){
-			box.setVisibility(View.INVISIBLE);
+			boxLayout.setVisibility(View.INVISIBLE);
 			return;
 	}
-	public class EndSetting{
-		public CheckBox gps;
-		public Spinner emotion;
-		public Spinner desire;
+	
+	private class EmotionListener implements SeekBar.OnSeekBarChangeListener{
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress, 	boolean fromUser) {
+			emotionShow.setImageBitmap(emotionBmps[progress]);
+			String value = String.valueOf(progress+1);
+			emotionShowText.setText(value);
+		}
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {}
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {}
+		
 	}
 	
-	private class QuestionAdapter implements SpinnerAdapter{
-
-		private int[] results;
-		private int textSize;
-		public QuestionAdapter(int num){
-			results = new int[num];
-			for (int i=1;i<=num;++i)
-				results[i-1] = i;
-			textSize = (int)(screen.x * 49.0/720.0);
-		}
-		
+	private class DesireListener implements SeekBar.OnSeekBarChangeListener{
 		@Override
-		public int getCount() {
-			return results.length;
+		public void onProgressChanged(SeekBar seekBar, int progress, 	boolean fromUser) {
+			desireShow.setImageBitmap(desireBmps[progress]);
+			String value = String.valueOf(progress+1);
+			desireShowText.setText(value);
 		}
-
 		@Override
-		public Object getItem(int position) {
-			return results[position];
-		}
-
+		public void onStartTrackingTouch(SeekBar seekBar) {}
 		@Override
-		public long getItemId(int position) {
-			return results[position];
-		}
-
-		@Override
-		public int getItemViewType(int position) {
-			return 0;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			TextView t = new TextView(context);
-			t.setText(String.valueOf(results[position]));
-			t.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-			t.setBackgroundColor(0xFFFFFFFF);
-			t.setTypeface(digitTypeface);
-			t.setTextColor(0xFF545454);
-			return t;
-		}
-
-		@Override
-		public int getViewTypeCount() {
-			return 0;
-		}
-
-		@Override
-		public boolean hasStableIds() {
-			return true;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return false;
-		}
-
-		@Override
-		public void registerDataSetObserver(DataSetObserver observer) {
-		}
-
-		@Override
-		public void unregisterDataSetObserver(DataSetObserver observer) {
-		}
-
-		@Override
-		public View getDropDownView(int position, View convertView,
-				ViewGroup parent) {
-			TextView t = new TextView(context);
-			t.setText(String.valueOf(results[position]));
-			t.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-			t.setBackgroundColor(0xFFFFFFFF);
-			t.setTextColor(0xFF545454);
-			t.setTypeface(digitTypeface);
-			return t;
-		}
+		public void onStopTrackingTouch(SeekBar seekBar) {}
 		
 	}
+	
 }

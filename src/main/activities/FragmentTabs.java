@@ -36,7 +36,6 @@ public class FragmentTabs extends FragmentActivity {
 
 	private static Context context;
 	
-	private static boolean enableTabs;
 	private static Point screen_px;
 	private static Point tab_px;
 	static private TabSpec[] tabs;
@@ -110,7 +109,6 @@ public class FragmentTabs extends FragmentActivity {
 		fm =  getSupportFragmentManager();
 		fragments = new Fragment[3];
 		tabHost.setOnTabChangedListener(new TabChangeListener());
-		enableTabs = true;
 		
 		tabHost.setCurrentTab(1);
 		tabHost.setCurrentTab(0);
@@ -159,14 +157,13 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onResume(){
 		super.onResume();
-		enableTabs = true;
+		enableTab(true);
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){
 			Intent newIntent = new Intent(this, PreSettingActivity.class);
 			this.startActivity(newIntent);
-			//this.finish();
 			return;
 		}
 		Reuploader.reuploader(this);
@@ -283,8 +280,8 @@ public class FragmentTabs extends FragmentActivity {
     	
 		@Override
 		public void onTabChanged(String tabId) {
-			if (!enableTabs)
-				return;
+			//if (!enableTabs)
+			//	return;
 			if (lastTabId.equals(tabId))
 				return;
 			
@@ -296,9 +293,11 @@ public class FragmentTabs extends FragmentActivity {
 				LoadingBox.show(fragmentTabs);
 			
 			ft = fm.beginTransaction();
+			
 			for (int i=0;i<fragments.length;++i){
-					if (fragments[i]!=null)
+					if (fragments[i]!=null){
 						ft.detach(fragments[i]);
+					}
 			}
 			for (int i=0;i<tabName.length;++i){
 				if (tabId.equals(tabName[i])){
@@ -336,7 +335,13 @@ public class FragmentTabs extends FragmentActivity {
 		
 	}
 	static public void enableTab(boolean enable){
-		enableTabs = enable;
+		if (tabHost==null || tabHost.getTabWidget()==null)
+			return;
+		
+		int count = tabHost.getTabWidget().getChildCount();
+		for (int i=0;i<count;++i){
+			tabHost.getTabWidget().getChildAt(i).setClickable(enable);
+		}
 	}
 	
 	static public Context getContext(){

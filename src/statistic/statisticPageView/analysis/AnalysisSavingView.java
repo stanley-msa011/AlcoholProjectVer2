@@ -12,7 +12,6 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.Html;
-import android.util.Log;
 import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -160,13 +159,13 @@ public class AnalysisSavingView extends StatisticPageView {
 		currentBar.setImageBitmap(currentBarBmp);
 		start.setImageBitmap(barStartBmp);
 		end.setImageBitmap(barEndBmp);
-		String text =  "<font color=#000000>您已節省 </font><font color=#f39700>$"
+		String text =  "<font color=#000000>您已節省 </font><font color=#f39700><strong>$"
 								+currentMoney
-								+"</font><font color=#000000> 元，"
+								+"</strong></font><font color=#000000> 元，"
 								+TargetSetting.getTargetName(goalMoney)
-								+"為 </font><font color=#f39700>$"
+								+"為 </font><font color=#f39700><strong>$"
 								+TargetSetting.getTargetValue(goalMoney)
-								+"</font><font color=#000000></font><font color=#000000> 元</font>";
+								+"</strong></font><font color=#000000></font><font color=#000000> 元</font>";
 		help.setText(Html.fromHtml(text));
 		
 	}

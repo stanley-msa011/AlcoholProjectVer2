@@ -1,6 +1,5 @@
 package test.data;
 
-import history.BracGameHistory;
 import history.DateBracGameHistory;
 
 import java.io.BufferedWriter;

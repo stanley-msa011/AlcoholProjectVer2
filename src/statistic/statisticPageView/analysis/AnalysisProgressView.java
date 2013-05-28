@@ -2,7 +2,6 @@ package statistic.statisticPageView.analysis;
 
 import java.util.Calendar;
 
-import main.activities.Lang;
 import main.activities.R;
 import main.activities.StatisticFragment;
 import statistic.statisticPageView.StatisticPageView;
@@ -20,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import database.HistoryDB;
 
@@ -31,7 +29,7 @@ public class AnalysisProgressView extends StatisticPageView {
 	private Bitmap titleBmp;
 	private TextView help;
 	private HistoryDB db;
-	private RelativeLayout contentLayout;
+	//private RelativeLayout contentLayout;
 	private Calendar fromCal;
 	
 	private static final int totalWeek = 12;
@@ -85,7 +83,7 @@ public class AnalysisProgressView extends StatisticPageView {
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
 		help.setTypeface(wordTypeface);
 		
-		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_progress_content_layout);
+		//contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_progress_content_layout);
 		
 	}
 
@@ -123,11 +121,11 @@ public class AnalysisProgressView extends StatisticPageView {
 	@Override
 	public void onPostTask() {
 		title_bg.setImageBitmap(titleBmp);
-		String text =  "<font color=#000000>已戒酒 </font><font color=#f39700>"
+		String text =  "<font color=#000000>已戒酒 </font><font color=#f39700><strong>"
 				+currentWeek
-				+"</font><font color=#000000> 周，完成此療程尚餘 </font><font color=#f39700>"
+				+"</strong></font><font color=#000000> 周，完成此療程尚餘 </font><font color=#f39700><strong>"
 				+restWeek
-				+"</font><font color=#000000></font><font color=#000000> 周</font>";
+				+"</strong></font><font color=#000000></font><font color=#000000> 周</font>";
 		help.setText(Html.fromHtml(text));
 		
 	}

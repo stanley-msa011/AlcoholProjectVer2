@@ -1,9 +1,5 @@
 package database;
 
-import java.util.Calendar;
-
-import android.content.Context;
-
 public class TimeBlock {
 
 	public final static int MAX = 3,MIN=0;
@@ -79,35 +75,6 @@ public class TimeBlock {
 			return false;
 		}
 		return false;
-	}
-	
-	public static Calendar[] getCalendar(Context context,int type){
-		Calendar[] cals = new Calendar[type];
-		for (int i=0;i<cals.length;++i){
-			cals[i] = Calendar.getInstance();
-		}
-		int year = cals[0].get(Calendar.YEAR);
-		int month = cals[0].get(Calendar.MONTH);
-		int day = cals[0].get(Calendar.DAY_OF_MONTH);
-		
-		switch (type){
-		case 2 :
-			cals[0].set(year, month, day, 8, 0, 0);
-			cals[1].set(year, month, day, 21, 0, 0);
-			break;
-		case 3:
-			cals[0].set(year, month, day, 8, 0, 0);
-			cals[1].set(year, month, day, 12, 0, 0);
-			cals[2].set(year, month, day, 21, 0, 0);
-			break;
-		case 4:
-			cals[0].set(year, month, day, 8, 0, 0);
-			cals[1].set(year, month, day, 12, 0, 0);
-			cals[2].set(year, month, day, 16, 0, 0);
-			cals[3].set(year, month, day, 21, 0, 0);
-			break;
-		}
-		return cals;
 	}
 	
 	public static boolean isEmpty(int timeblock,  int cur_hour){

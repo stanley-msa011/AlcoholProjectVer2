@@ -17,7 +17,7 @@ import test.file.QuestionFile;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
 import test.ui.Tutorial;
-import test.ui.UIMsgBox2;
+import test.ui.UIMsgBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -92,7 +92,7 @@ public class TestFragment extends Fragment {
 	private BracDataHandler BDH;
 	
 	private RelativeLayout main_layout;
-	private UIMsgBox2 msgBox;
+	private UIMsgBox msgBox;
 	//private UIRotate rotate;
 
 	private LoadingHandler loadingHandler;
@@ -134,7 +134,7 @@ public class TestFragment extends Fragment {
 	
 	private QuestionFile questionFile;
 	
-	private Typeface digitTypeface;
+	//private Typeface digitTypeface;
 	private Typeface wordTypeface;
 	private Typeface wordTypefaceBold;
 	
@@ -184,7 +184,7 @@ public class TestFragment extends Fragment {
 		// For Click Sequence logging
 		clickLogger = new ClickLogger();
 		
-		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
+		//digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		wordTypefaceBold  = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w5.otf");
 		
@@ -215,7 +215,7 @@ public class TestFragment extends Fragment {
 		RelativeLayout.LayoutParams mParam = (LayoutParams) messageView.getLayoutParams();
 		mParam.topMargin = (int)(screen.x * 36.0/720.0);
 		if (msgBox==null)
-			msgBox = new UIMsgBox2(testFragment,main_layout);
+			msgBox = new UIMsgBox(testFragment,main_layout);
 		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
 
 		tutorial = new Tutorial(this);
@@ -409,7 +409,7 @@ public class TestFragment extends Fragment {
 			if (!DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
 				stop();
 					if (msgBox == null)
-						msgBox = new UIMsgBox2(testFragment,main_layout);
+						msgBox = new UIMsgBox(testFragment,main_layout);
 					if (msgLoadingHandler == null)
 						msgLoadingHandler = new MsgLoadingHandler();
 					msgLoadingHandler.sendEmptyMessage(0);

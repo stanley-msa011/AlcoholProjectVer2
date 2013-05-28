@@ -5,7 +5,6 @@ import java.util.Calendar;
 
 import database.HistoryDB;
 import database.TimeBlock;
-import main.activities.FragmentTabs;
 import main.activities.R;
 import main.activities.StatisticFragment;
 import history.BracGameHistory;

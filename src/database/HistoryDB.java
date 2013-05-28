@@ -2,8 +2,6 @@ package database;
 
 import java.util.Calendar;
 
-import main.activities.FragmentTabs;
-
 import test.data.BracDataHandler;
 
 import history.BracGameHistory;

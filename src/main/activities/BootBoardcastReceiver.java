@@ -2,18 +2,11 @@ package main.activities;
 
 import java.util.Calendar;
 
-import database.HistoryDB;
-import database.TimeBlock;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 
