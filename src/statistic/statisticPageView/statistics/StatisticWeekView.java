@@ -48,8 +48,6 @@ public class StatisticWeekView extends StatisticPageView {
 	
 	private TextView title;
 	
-	private ImageView bg;
-	
 	private static final int nBlocks = 4;
 	private static final int nDate = 7;
 	
@@ -60,6 +58,7 @@ public class StatisticWeekView extends StatisticPageView {
 	
 	private Typeface digitTypeface;
 	private Typeface wordTypeface;
+	private Typeface wordTypefaceBold;
 	
 	public StatisticWeekView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_week_view, statisticFragment);
@@ -90,16 +89,17 @@ public class StatisticWeekView extends StatisticPageView {
 		
 		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w5.otf");
 		
 		dateLayout = (LinearLayout) view.findViewById(R.id.statistic_week_date_label_layout);
 		timeLayout = (LinearLayout) view.findViewById(R.id.statistic_week_timeblock_label_layout);
 		blockLayout = (GridLayout) view.findViewById(R.id.statistic_week_block_layout);
 		
-		int textSize =  (int) (screen.x * 42.0/720.0);
-		int textSize2 =  (int) (screen.x * 36.0/720.0);
+		int textSize = screen.x * 72/1080;
+		int textSize2 = screen.x * 54/1080;
 		title= (TextView) view.findViewById(R.id.statistic_week_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
-		title.setTypeface(wordTypeface);
+		title.setTypeface(wordTypefaceBold);
 		
 		time_labels = new TextView[nBlocks];
 		for (int i=0;i<nBlocks;++i){
@@ -131,8 +131,6 @@ public class StatisticWeekView extends StatisticPageView {
 				date_labels[i].setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
 			dateLayout.addView(date_labels[i]);
 		}
-		
-		bg = (ImageView) view.findViewById(R.id.statistic_week_bg);
 		
 		circles = new ImageView[nBlocks*nDate];
 		
@@ -167,37 +165,37 @@ public class StatisticWeekView extends StatisticPageView {
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
-		circleBmps = new Bitmap[4];
-		int circleSize = (int) (screen.x * 30.0/720.0);
-		Bitmap[] tmp = new Bitmap[4];
-		tmp[0] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_none);
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+    	opt.inSampleSize = 2;
+		
+		circleBmps = new Bitmap[3];
+		int circleSize = screen.x * 49/1080;
+		Bitmap[] tmp = new Bitmap[3];
+		tmp[0] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_none,opt);
 		circleBmps[0] = Bitmap.createScaledBitmap(tmp[0], circleSize, circleSize, true);
-		tmp[1] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_fail);
+		tmp[1] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_fail,opt);
 		circleBmps[1] = Bitmap.createScaledBitmap(tmp[1], circleSize, circleSize, true);
-		tmp[2] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_pass);
+		tmp[2] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_pass,opt);
 		circleBmps[2] = Bitmap.createScaledBitmap(tmp[2], circleSize, circleSize, true);
-		tmp[3] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_week_empty);
-		circleBmps[3] = Bitmap.createScaledBitmap(tmp[3], circleSize, circleSize, true);
 		
 		for (int i=0;i<tmp.length;++i)
 			if (circleBmps[i]!=tmp[i])
-				tmp[0].recycle();
+				tmp[i].recycle();
 		
 		
 		RelativeLayout.LayoutParams dParam = (RelativeLayout.LayoutParams) dateLayout.getLayoutParams();
-		dParam.leftMargin = (int)(screen.x*00.0/720.0);
-		dParam.topMargin = (int)(screen.x*30.0/720.0);
+		dParam.topMargin =  screen.x * 30/1080;
 		
 		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams) timeLayout.getLayoutParams();
-		tParam.leftMargin = (int)(screen.x*40.0/720.0);
-		tParam.topMargin = (int)(screen.x*20.0/720.0);
+		tParam.leftMargin =  screen.x * 60/1080;
+		tParam.topMargin =  screen.x * 30/1080;
 		
 		RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams) blockLayout.getLayoutParams();
-		bParam.leftMargin = (int)(screen.x*00.0/720.0);
-		bParam.topMargin = (int)(screen.x*20.0/720.0);
+		bParam.topMargin =  screen.x * 30/1080;
 		
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams) title.getLayoutParams();
-		titleParam.topMargin = (int)(screen.x*80.0/720.0);
+		titleParam.topMargin =  screen.x * 240/1080;
+		titleParam.leftMargin =  screen.x * 190/1080;
 		
 		int c_width =  (int) (screen.x * 75.0/720.0);
 		int c_height =  (int) (screen.x * 50.0/720.0);
@@ -205,8 +203,8 @@ public class StatisticWeekView extends StatisticPageView {
 		RelativeLayout.LayoutParams mParam =  (RelativeLayout.LayoutParams)monthText.getLayoutParams();
 		mParam.width = c_width;
 		mParam.height = c_height;
-		mParam.topMargin = (int)(screen.x*30.0/720.0);
-		mParam.leftMargin = (int)(screen.x*40.0/720.0);
+		mParam.topMargin =  screen.x * 30/1080;
+		mParam.leftMargin =  screen.x * 60/1080;
 		
 		for (int i=0;i<nDate;++i){
 			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) date_labels[i].getLayoutParams();
@@ -233,7 +231,7 @@ public class StatisticWeekView extends StatisticPageView {
 		}
 		
 		RelativeLayout.LayoutParams lParam = (RelativeLayout.LayoutParams) labelLayout.getLayoutParams();
-		lParam.topMargin = (int)(screen.x*20.0/720.0);
+		lParam.topMargin =  screen.x * 30/1080;
 		for (int i=0;i<3;++i){
 			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) labels[i].getLayoutParams();
 			param.width = (int)(c_width*1.5);
@@ -264,7 +262,7 @@ public class StatisticWeekView extends StatisticPageView {
 					circles[idx].setImageBitmap(circleBmps[0]);
 				else
 					if (TimeBlock.isEmpty(i%nBlocks, cur_hour)){
-						circles[idx].setImageBitmap(circleBmps[3]);
+						circles[idx].setImageBitmap(circleBmps[0]);
 						circles[idx].setAlpha(0.1F);
 					}
 					else
@@ -295,9 +293,6 @@ public class StatisticWeekView extends StatisticPageView {
 		labelImgs[0].setImageBitmap(circleBmps[2]);
 		labelImgs[1].setImageBitmap(circleBmps[1]);
 		labelImgs[2].setImageBitmap(circleBmps[0]);
-		
-		if (StatisticPagerAdapter.background!=null && !StatisticPagerAdapter.background.isRecycled())
-			bg.setImageBitmap(StatisticPagerAdapter.background);
 		
 	}
 

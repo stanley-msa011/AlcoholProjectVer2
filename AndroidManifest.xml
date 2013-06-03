@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="main.activities"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.21" >
 
     <uses-sdk
         android:maxSdkVersion="17"
@@ -23,8 +23,10 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.GET_TASKS" />
-	<uses-permission android:name="android.permission.CALL_PHONE"/>
-	<uses-permission android:name="android.permission.READ_LOGS" />    <permission
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+
+    <permission
         android:name="main.activities.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
@@ -82,16 +84,22 @@
 
         <activity
             android:name="main.activities.PreSettingActivity"
-            android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="main.activities.EmotionActivity"
-            android:label="@string/title_activity_emotion" >
+             android:screenOrientation="portrait" 
+            >
         </activity>
         <activity
             android:name="main.activities.EmotionManageActivity"
-            android:label="@string/title_activity_emotion_manage" >
+             android:screenOrientation="portrait" 
+            >
+        </activity>
+        <activity
+            android:name="main.activities.TutorialActivity"
+             android:screenOrientation="portrait" 
+            >
         </activity>
     </application>
 

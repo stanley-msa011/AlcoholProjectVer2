@@ -79,14 +79,14 @@ public class AnalysisSavingView extends StatisticPageView {
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		title = (TextView) view.findViewById(R.id.analysis_saving_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 36.0/720.0));
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 54/1080);
 		title.setTypeface(wordTypeface);
 		
 		title_bg = (ImageView) view.findViewById(R.id.analysis_saving_title_bg);
 		
 		help = (TextView) view.findViewById(R.id.analysis_saving_help);
 		help.setTextColor(0xFF545454);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 54/1080);
 		help.setTypeface(wordTypeface);
 		
 		goalBar = (ImageView) view.findViewById(R.id.analysis_saving_bar);
@@ -105,35 +105,45 @@ public class AnalysisSavingView extends StatisticPageView {
 		int curDrink = db.getAllBracGameScore();
 		currentMoney = curDrink*drinkCost;
 		
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+    	opt.inSampleSize = 2;
+		
 		Point screen = StatisticFragment.getStatisticPx();
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
-		titleParam.leftMargin = (int)(screen.x * 90.0/720.0);
+		titleParam.leftMargin =screen.x * 135/1080;
 		
 		RelativeLayout.LayoutParams titleBgParam = (RelativeLayout.LayoutParams)title_bg.getLayoutParams();
 		titleBgParam.width = screen.x;
-		titleBgParam.height = (int)(screen.x * 47.0/720.0);
+		titleBgParam.height =screen.x * 59/1080;
 		
-		titleBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_title_bar);
+		Bitmap tmp;
+    	
+		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_title_bar,opt);
+		titleBmp = Bitmap.createScaledBitmap(tmp, screen.x,screen.x * 59/1080,true);
+		tmp.recycle();
 		
 		LinearLayout.LayoutParams helpParam = (LinearLayout.LayoutParams)help.getLayoutParams();
-		helpParam.topMargin = helpParam.bottomMargin =  (int)(screen.x * 16.0/720.0);
+		helpParam.topMargin = helpParam.bottomMargin = screen.x * 24/1080;
 		
 		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)goalBar.getLayoutParams();
-		barParam.width = (int)(screen.x * 542.0/720.0);
-		barParam.height = (int)(screen.x * 38.0/720.0);
-		barParam.leftMargin = (int)(screen.x * 89.0/720.0);
-		goalBarBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_bar);	
+		barParam.width = screen.x * 901/1080;
+		barParam.height = screen.x * 65/1080;
+		barParam.leftMargin = screen.x * 90/1080;
+		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_bar,opt);	
+		
+		goalBarBmp = Bitmap.createScaledBitmap(tmp, barParam.width, barParam.height, true);
+		tmp.recycle();
 		
 		RelativeLayout.LayoutParams startParam = (RelativeLayout.LayoutParams)start.getLayoutParams();
-		startParam.width = (int)(screen.x * 16.0/720.0);
-		startParam.height = (int)(screen.x * 38.0/720.0);
-		startParam.leftMargin = (int)(screen.x * 89.0/720.0);
-		barStartBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_start);	
+		startParam.width = screen.x * 27/1080;
+		startParam.height = screen.x * 65/1080;
+		startParam.leftMargin = screen.x * 90/1080;
+		barStartBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_start,opt);	
 		
 		RelativeLayout.LayoutParams endParam = (RelativeLayout.LayoutParams)end.getLayoutParams();
-		endParam.width = (int)(screen.x * 18.0/720.0);
-		endParam.height = (int)(screen.x * 38.0/720.0);
-		barEndBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_end);	
+		endParam.width = screen.x * 29/1080;
+		endParam.height =screen.x * 65/1080;
+		barEndBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_end,opt);	
 		
 		int maxWidth = barParam.width - startParam.width -endParam.width;
 		int width;
@@ -145,11 +155,11 @@ public class AnalysisSavingView extends StatisticPageView {
 		
 		RelativeLayout.LayoutParams currentBarParam = (RelativeLayout.LayoutParams)currentBar.getLayoutParams();
 		currentBarParam.width = width;
-		currentBarParam.height =(int)(screen.x * 38.0/720.0);
-		currentBarBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_internal);	
+		currentBarParam.height =screen.x * 65/1080;
+		currentBarBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_money_cur_bar_internal,opt);	
 		
 		LinearLayout.LayoutParams contentParam = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
-		contentParam.bottomMargin =  (int)(screen.x * 20.0/720.0);
+		contentParam.bottomMargin =  screen.x * 30/1080;
 	}
 
 	@Override

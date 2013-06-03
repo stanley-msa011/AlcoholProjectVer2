@@ -3,7 +3,8 @@
     android:id="@+id/statistic_fragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/statistic_background_all" >
+    android:background="#FFFFFFFF"
+   >
 
 <LinearLayout 
     android:layout_width="match_parent"
@@ -62,29 +63,12 @@
     android:textColor="#FF000000"
     />
 
-	<RelativeLayout
-        android:id="@+id/question_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-    >
 		<ImageView
         	android:id = "@+id/question_background"
         	android:layout_width ="match_parent"
         	android:layout_height ="match_parent"
-        	android:layout_centerInParent="true"
+        	android:layout_alignParentRight="true"
         	android:scaleType="fitXY"
-        />
-		<TextView
-        	android:id = "@+id/question_text"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_centerInParent="true"
-	    	android:textColor="#FFFFFFFF"
-	    	android:gravity="center"
-	    	android:textAlignment="center"
-	    	android:text="!"
-        />
-	</RelativeLayout>
+       />
 
 </RelativeLayout>

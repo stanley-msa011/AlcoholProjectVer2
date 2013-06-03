@@ -15,10 +15,13 @@ public class BTUIHandler extends Handler {
 	public void handleMessage(Message msg){
 		if (msg.what == 0){
 			int time = msg.getData().getInt("TIME");
-			testFragment.changeTestMessage(time);
+			//testFragment.changeTestMessage(time);
 		}else if (msg.what == 1){
 			int change = msg.getData().getInt("CHANGE");
-			testFragment.changeTestSpeed(change);
+		}else if (msg.what == 2){
+			float value = msg.getData().getFloat("value");
+			int time = msg.getData().getInt("TIME");
+			testFragment.changeTestMessage(value,time);
 		}
 	}
 

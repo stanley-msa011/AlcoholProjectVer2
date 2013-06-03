@@ -29,6 +29,52 @@ public class HistoryDB {
 		timeblock_type = sp.getInt("timeblock_num", 2);
 	}
 	
+	public DateBracGameHistory[] getAllHistory(){
+    	
+    	String sql = "SELECT * FROM HistoryGame WHERE _TIMEBLOCK <> -1 ORDER BY _ID ASC";
+    	
+    	db = dbHelper.getReadableDatabase();
+    	Cursor cursor = db.rawQuery(sql, null);
+
+    	String cu = cursor.getCount()+"";
+    	int num = cursor.getCount();
+    	Log.d("CHART","DB_COUNT = "+cu);
+    	
+    	if (num == 0){
+    		cursor.close();
+    		db.close();
+    		return null;
+    	}
+    	
+    	DateBracGameHistory[] historys = new DateBracGameHistory[num];
+    	Log.d("CHART","NEW HISTOYRS");
+    	int brac_idx = cursor.getColumnIndex("_BRAC");
+    	int ts_idx = cursor.getColumnIndex("_TS");
+    	int e_idx = cursor.getColumnIndex("_EMOTION");
+    	int d_idx = cursor.getColumnIndex("_DESIRE");
+    	int l_idx = cursor.getColumnIndex("_LEVEL");
+    	
+    	cursor.moveToFirst();
+    	
+    	for (int i=0;i<historys.length;++i){
+    		cursor.moveToPosition(i);
+    		float brac = cursor.getFloat(brac_idx);
+    		int level = cursor.getInt(l_idx);
+    		long ts = cursor.getLong(ts_idx);
+    		Calendar cal = Calendar.getInstance();
+    		int id = cursor.getInt(cursor.getColumnIndex("_ID"));
+    		cal.setTimeInMillis(ts*1000);
+    		//Log.d("CHART_2",id+">>"+cal.toString());
+    		
+    		int emotion = cursor.getInt(e_idx);
+    		int desire = cursor.getInt(d_idx);
+    		historys[i] = new DateBracGameHistory(level, ts, brac, emotion, desire);
+    	}
+    	cursor.close();
+    	db.close();
+    	return historys;
+	}
+	
     public DateBracGameHistory getLatestBracGameHistory(){
 
     	db = dbHelper.getReadableDatabase();

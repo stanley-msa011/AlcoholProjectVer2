@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
     android:id="@+id/test_fragment_main_layout"
+    android:background="#FF000000"
     >
     
     
@@ -10,14 +11,15 @@
 	    android:id="@+id/test_camera_preview_layout"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	     android:layout_centerHorizontal="true"
+	    android:layout_centerHorizontal="true"
 	 />
     
     <ImageView
         android:id = "@+id/test_background"
         android:layout_width ="match_parent"
         android:layout_height ="match_parent"
-        android:scaleType="fitStart"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitXY"
         />
     
     <RelativeLayout
@@ -51,13 +53,15 @@
         />
     
     	<TextView
-    	    android:id="@+id/test_start_text"
+    	    android:id="@+id/test_start_button_text"
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
     	    android:gravity="center"
     	    android:textAlignment="center"
-    	    android:textColor="#FF231815" />
+    	    android:textColor="#FF000000" 
+    	    android:text="開始"
+    	    />
 
     </RelativeLayout>
     
@@ -70,12 +74,28 @@
 	    android:gravity="center"
         />
 	
-	<ImageView
-	    android:id="@+id/test_picture_stroke"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_centerHorizontal="true"
-    />
+	   <TextView
+    	    android:id="@+id/test_brac_value_text"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerHorizontal="true"
+    	    android:gravity="center"
+    	    android:textAlignment="center"
+    	    android:textColor="#FFc98123" 
+    	    android:layout_below="@+id/test_start_layout"
+    	    />
+	   
+	   	<TextView
+    	    android:id="@+id/test_brac_text"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerHorizontal="true"
+    	    android:gravity="center"
+    	    android:textAlignment="center"
+    	    android:textColor="#FFc98123" 
+    	    android:text="BrAC"
+    	    android:layout_below="@+id/test_brac_value_text"
+    	    />
 	
 	<RelativeLayout
         android:id="@+id/help_layout"

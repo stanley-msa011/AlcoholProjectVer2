@@ -23,8 +23,6 @@ public class StatisticPagerAdapter extends PagerAdapter {
 	private ArrayList<View> viewsList;
 	private StatisticPageView[] statisticViews;
 	
-	public static Bitmap background;
-	
 	private StatisticFragment statisticFragment;
 	
 	public StatisticPagerAdapter(Context context,StatisticFragment statisticFragment){
@@ -70,12 +68,6 @@ public class StatisticPagerAdapter extends PagerAdapter {
 		}
 	}
 	public void onInBackground(){
-		if (background == null || background.isRecycled()){
-			Point screen = FragmentTabs.getSize();
-			Bitmap tmp = BitmapFactory.decodeResource(statisticFragment.getResources(), R.drawable.statistic_background);
-			background = Bitmap.createScaledBitmap(tmp, screen.x, (int) (screen.x*314.0/355.0), true);
-			tmp.recycle();
-		}
 		for (int i=0;i<statisticViews.length;++i){
 			statisticViews[i].onInBackground();
 		}
@@ -96,10 +88,6 @@ public class StatisticPagerAdapter extends PagerAdapter {
 		Log.d("CLEAR","STATISTIC");
 		for (int i=0;i<statisticViews.length;++i){
 			statisticViews[i].clear();
-		}
-		if (background!=null && !background.isRecycled()){
-			background.recycle();
-			background = null;
 		}
 	}
 	

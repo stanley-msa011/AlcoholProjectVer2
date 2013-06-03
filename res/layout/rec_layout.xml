@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:background="#FFCCCCAA"
+    >
+    
+    <TextView 
+        android:id="@+id/rec_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF000000"
+        android:textSize="24dp"
+        android:textAlignment="center"
+        />
+    
+    <Button 
+        android:id="@+id/rec_close_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X"
+        android:textColor="#FF000000"
+        android:layout_alignParentRight="true"
+        />
+    
+    <Button 
+        android:id="@+id/rec_play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="播放"
+        android:textColor="#FF000000"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        />
+    
+    <Button 
+        android:id="@+id/rec_rec_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="錄音"
+        android:textColor="#FF000000"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        />
+    
+    
+
+</RelativeLayout>

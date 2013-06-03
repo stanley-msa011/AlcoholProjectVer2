@@ -23,6 +23,7 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 	private SurfaceHolder surfaceHolder;
 	private FaceListener faceListener;
 	private Paint paint;
+	private boolean face;
 	
 	public PreviewWindow(Context context,CameraRecorder cameraRecorder) {
 		super(context);
@@ -30,6 +31,8 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 		this.surfaceHolder = this.getHolder();
 		this.cameraRecorder = cameraRecorder;
 		faceListener = new FaceListener();
+		face = (cameraRecorder.camera.getParameters().getMaxNumDetectedFaces()>0);
+		face = false;
 		paint = new Paint();
 		paint.setColor(Color.RED);
 		paint.setStyle(Paint.Style.STROKE);
@@ -55,10 +58,13 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		 try {
-			 cameraRecorder.camera.setFaceDetectionListener(faceListener);
+			
+			if (face)
+				cameraRecorder.camera.setFaceDetectionListener(faceListener);
 			 cameraRecorder.camera.setPreviewDisplay(holder);
 			 cameraRecorder.camera.startPreview();
-			 cameraRecorder.camera.startFaceDetection();
+			 if (face)
+				 cameraRecorder.camera.startFaceDetection();
 		 } catch (Exception e) { }
 	}
 
@@ -70,11 +76,14 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 		if (cameraRecorder.camera!=null){
 			try{
 				cameraRecorder.camera.setFaceDetectionListener(null);
-				cameraRecorder.camera.stopFaceDetection();
+				if (face)
+					cameraRecorder.camera.stopFaceDetection();
 				cameraRecorder.camera.stopPreview();
 				cameraRecorder.camera.startPreview();
-				cameraRecorder.camera.setFaceDetectionListener(faceListener);
-				cameraRecorder.camera.startFaceDetection();
+				if (face){
+					cameraRecorder.camera.setFaceDetectionListener(faceListener);
+					cameraRecorder.camera.startFaceDetection();
+				}
 			}catch(Exception e){
 				Log.d("preview window",e.getMessage().toString());
 			}

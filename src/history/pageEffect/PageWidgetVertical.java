@@ -20,7 +20,7 @@ public class PageWidgetVertical extends View {
 	private int width, height, cornerX, cornerY;
 	private Path path0, path1;
 	
-	private Bitmap curPageBmp,nextPageBmp; 
+	public Bitmap curPageBmp,nextPageBmp; 
 	
 	private PointF touch = new PointF();
 	private PointF BezierStart1 = new PointF();
@@ -57,6 +57,7 @@ public class PageWidgetVertical extends View {
 	
 	public PageWidgetVertical(Context context, int _width, int _height) {
 		super(context);
+		this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		this.width = _width;
 		this.height = _height;
 		this.maxLength = (float) Math.hypot(_width, _height);

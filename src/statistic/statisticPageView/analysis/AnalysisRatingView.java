@@ -134,17 +134,19 @@ public class AnalysisRatingView extends StatisticPageView {
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
+		int textSize = screen.x * 54/1080;
+		
 		title = (TextView) view.findViewById(R.id.analysis_rating_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 36.0/720.0));
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		title.setTypeface(wordTypeface);
 		
 		title_bg = (ImageView) view.findViewById(R.id.analysis_rating_title_bg);
 		
 		help = (TextView) view.findViewById(R.id.analysis_rating_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		help.setTypeface(wordTypeface);
 		help2 = (TextView) view.findViewById(R.id.analysis_rating_help2);
-		help2.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		help2.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		help2.setTypeface(wordTypeface);
 		
 		bar = (ImageView) view.findViewById(R.id.analysis_rating_bar);
@@ -153,17 +155,17 @@ public class AnalysisRatingView extends StatisticPageView {
 		pointer2  = (ImageView) view.findViewById(R.id.analysis_rating_pointer2);
 		
 		low = (TextView) view.findViewById(R.id.analysis_rating_low);
-		low.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		low.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		low.setTypeface(wordTypeface);
 		low2 = (TextView) view.findViewById(R.id.analysis_rating_low2);
-		low2.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		low2.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		low2.setTypeface(wordTypeface);
 		
 		high = (TextView) view.findViewById(R.id.analysis_rating_high);
-		high.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		high.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		high.setTypeface(wordTypeface);
 		high2 = (TextView) view.findViewById(R.id.analysis_rating_high2);
-		high2.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		high2.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		high2.setTypeface(wordTypeface);
 		
 		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_rating_content_layout);
@@ -175,44 +177,51 @@ public class AnalysisRatingView extends StatisticPageView {
 	public void onInBackground() {
 		Point screen = StatisticFragment.getStatisticPx();
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
-		titleParam.leftMargin = (int)(screen.x * 90.0/720.0);
+		titleParam.leftMargin = screen.x * 135/1080;
 		
 		RelativeLayout.LayoutParams titleBgParam = (RelativeLayout.LayoutParams)title_bg.getLayoutParams();
 		titleBgParam.width = screen.x;
-		titleBgParam.height = (int)(screen.x * 47.0/720.0);
+		titleBgParam.height = screen.x * 59/1080;
 		
-		titleBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_title_bar);
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+    	opt.inSampleSize = 2;
+		Bitmap tmp;
+    	
+		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_title_bar,opt);
+		titleBmp = Bitmap.createScaledBitmap(tmp, screen.x,screen.x * 59/1080,true);
+		tmp.recycle();
 		
 		LinearLayout.LayoutParams helpParam = (LinearLayout.LayoutParams)help.getLayoutParams();
-		helpParam.topMargin = helpParam.bottomMargin =  (int)(screen.x * 16.0/720.0);
+		helpParam.topMargin = helpParam.bottomMargin =  screen.x * 24/1080;
 		LinearLayout.LayoutParams helpParam2 = (LinearLayout.LayoutParams)help2.getLayoutParams();
-		helpParam2.topMargin = helpParam2.bottomMargin =  (int)(screen.x * 16.0/720.0);
+		helpParam2.topMargin = helpParam2.bottomMargin =  screen.x * 24/1080;
 		
 		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)bar.getLayoutParams();
-		barParam.width = (int)(screen.x * 542.0/720.0);
-		barParam.height = (int)(screen.x * 38.0/720.0);
+		barParam.width = screen.x * 901/1080;
+		barParam.height = screen.x * 65/1080;
 		RelativeLayout.LayoutParams barParam2 = (RelativeLayout.LayoutParams)bar2.getLayoutParams();
-		barParam2.width = (int)(screen.x * 542.0/720.0);
-		barParam2.height = (int)(screen.x * 38.0/720.0);
+		barParam2.width =screen.x * 901/1080;
+		barParam2.height = screen.x * 65/1080;
 		
-		minLeftPointer  = (int)(screen.x * 120.0/720.0);
-		barBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_rating_bar);
-		maxLeftPointer = minLeftPointer +   (int)(screen.x * 465.0/720.0);
+		minLeftPointer  = screen.x * 117/1080;
+		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_rating_bar,opt);
+		barBmp = Bitmap.createScaledBitmap(tmp, barParam.width,barParam.height,true);
+		maxLeftPointer = minLeftPointer +  screen.x * 850/1080;
 		
 		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
-		pointerParam.width = (int)(screen.x * 4.0/720.0);
-		pointerParam.height = (int)(screen.x * 38.0/720.0);
+		pointerParam.width =screen.x * 6/1080;
+		pointerParam.height = screen.x * 65/1080;
 		RelativeLayout.LayoutParams pointerParam2 = (RelativeLayout.LayoutParams)pointer2.getLayoutParams();
-		pointerParam2.width = (int)(screen.x * 4.0/720.0);
-		pointerParam2.height = (int)(screen.x * 38.0/720.0);
+		pointerParam2.width = screen.x * 6/1080;
+		pointerParam2.height = screen.x * 65/1080;
 		
 		pointerBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_rating_pointer);
 		
 		
 		LinearLayout.LayoutParams contentParam = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
-		contentParam.bottomMargin =  (int)(screen.x * 20.0/720.0);
+		contentParam.bottomMargin = screen.x * 30/1080;
 		LinearLayout.LayoutParams contentParam2 = (LinearLayout.LayoutParams)contentLayout2.getLayoutParams();
-		contentParam2.bottomMargin =  (int)(screen.x * 20.0/720.0);
+		contentParam2.bottomMargin =  screen.x * 30/1080;
 	}
 
 	@Override

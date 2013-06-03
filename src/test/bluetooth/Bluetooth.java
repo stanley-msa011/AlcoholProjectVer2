@@ -78,6 +78,9 @@ public class Bluetooth {
 	
 	private TestFragment testFragment;
 	
+	private int count;
+	private float sum;
+	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
@@ -94,6 +97,8 @@ public class Bluetooth {
 		success = false;
 		btUIHandler=new BTUIHandler(testFragment);
 		start = false;
+		sum = 0;
+		count = 0;
 	}
 	
 	public void enableAdapter(){
@@ -131,7 +136,7 @@ public class Bluetooth {
 		public void onReceive(Context context, Intent intent) {
 			if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-				if (device.getName().equals(DEVICE_NAME)){ // add DEVICE_NAME2?
+				if (device.getName().equals(DEVICE_NAME)||device.getName().equals(DEVICE_NAME2)){ // add DEVICE_NAME2?
 					btAdapter.cancelDiscovery();
 					sensor = device;
 				}
@@ -178,6 +183,8 @@ public class Bluetooth {
 		duration = 0;
 		first_start_time = -1;
 		image_count  =0;
+		sum = 0;
+		count = 0;
 		try {
 			in = socket.getInputStream();
 			bytes =in.read(temp);
@@ -239,6 +246,9 @@ public class Bluetooth {
 					String output = timeStamp+"\t"+alcohol+"\n";
 					testFragment.showDebug("time: "+timeStamp);
 					testFragment.showDebug("alcohol: "+alcohol);
+					
+					sum+=alcohol;
+					++count;
 					/*write to the file*/
 					write_to_file(output);
 				}
@@ -273,7 +283,6 @@ public class Bluetooth {
 						testFragment.showDebug("P_PeakStart" );
 						Log.d("ERIC", "P_PeakStart");
 						isPeak = true;
-						change_speed(0);
 						start_time = time;
 					}
 					
@@ -296,18 +305,24 @@ public class Bluetooth {
 							duration += (end_time-start_time);
 							start_time = end_time;
 							
+							float value;
+							if (count == 0)
+								value = 0;
+							else
+								value = sum/count;
+							
 							if (duration > MILLIS_5){
 								testFragment.showDebug("End of Blowing" );
 								Log.d("ERIC","End of Blowing");
-								show_in_UI(5);
+								show_in_UI(value,5);
 							}else if (duration > MILLIS_4){
-								show_in_UI(4);
+								show_in_UI(value,4);
 							}else if (duration > MILLIS_3){
-								show_in_UI(3);
+								show_in_UI(value,3);
 							}else if (duration > MILLIS_2){
-								show_in_UI(2);
+								show_in_UI(value,2);
 							}else if (duration > MILLIS_1){
-								show_in_UI(1);
+								show_in_UI(value,1);
 							}
 							
 							if (image_count == 0 && duration > IMAGE_MILLIS_0){
@@ -321,8 +336,7 @@ public class Bluetooth {
 							else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
-								show_in_UI(6);
-								change_speed(-1);
+								show_in_UI(value,6);
 								success = true;
 								return -1;
 							}
@@ -333,7 +347,6 @@ public class Bluetooth {
 						Log.d("ERIC","P_PeakEnd");
 						isPeak = false;
 						start_time = end_time = 0;
-						change_speed(-1);
 					}
 				}
 			}
@@ -365,7 +378,7 @@ public class Bluetooth {
 		msg.setData(data);
 		bracFileHandler.sendMessage(msg);
 	}
-	
+	/*
 	private void show_in_UI(int time){
 		Message msg = new Message();
 		Bundle data = new Bundle();
@@ -374,13 +387,15 @@ public class Bluetooth {
 		msg.what = 0;
 		btUIHandler.sendMessage(msg);
 	}
-	
-	private void change_speed(int change){
+	*/
+	private void show_in_UI(float value,int time){
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putInt("CHANGE", change);
+		data.putFloat("value", value);
+		data.putInt("TIME", time);
 		msg.setData(data);
-		msg.what = 1;
+		msg.what = 2;
 		btUIHandler.sendMessage(msg);
 	}
+	
 }

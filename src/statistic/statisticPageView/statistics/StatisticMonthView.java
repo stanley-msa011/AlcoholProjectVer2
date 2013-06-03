@@ -42,11 +42,9 @@ public class StatisticMonthView extends StatisticPageView {
 	private TextView[] labels;
 	private ImageView[] labelImgs;
 	
-	private TextView month0, month1, month2, month3, month4;
+	private TextView month0, month1, month2, month3;
 	
 	private TextView title;
-	
-	private ImageView bg;
 	
 	private static final int nBlocks = 4;
 	private static final int nDate = 28;
@@ -58,6 +56,7 @@ public class StatisticMonthView extends StatisticPageView {
 	
 	private Typeface digitTypeface;
 	private Typeface wordTypeface;
+	private Typeface wordTypefaceBold;
 	
 	public StatisticMonthView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_month_view, statisticFragment);
@@ -88,15 +87,16 @@ public class StatisticMonthView extends StatisticPageView {
 		
 		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w5.otf");
 		
 		timeLayout = (LinearLayout) view.findViewById(R.id.statistic_month_timeblock_label_layout);
 		blockLayout = (GridLayout) view.findViewById(R.id.statistic_month_block_layout);
 		
-		int textSize =  (int) (screen.x * 42.0/720.0);
-		int textSize2 =  (int) (screen.x * 36.0/720.0);
+		int textSize = screen.x * 72/1080;
+		int textSize2 = screen.x * 54/1080;
 		title= (TextView) view.findViewById(R.id.statistic_month_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
-		title.setTypeface(wordTypeface);
+		title.setTypeface(wordTypefaceBold);
 		
 		time_labels = new TextView[nBlocks];
 		for (int i=0;i<nBlocks;++i){
@@ -125,11 +125,6 @@ public class StatisticMonthView extends StatisticPageView {
 		month3 = (TextView) view.findViewById(R.id.statistic_month_3);;
 		month3.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
 		month3.setTypeface(digitTypeface);
-		month4 = (TextView) view.findViewById(R.id.statistic_month_4);;
-		month4.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
-		month4.setTypeface(digitTypeface);
-		
-		bg = (ImageView) view.findViewById(R.id.statistic_month_bg);
 		
 		circles = new ImageView[nBlocks*nDate];
 		
@@ -164,48 +159,49 @@ public class StatisticMonthView extends StatisticPageView {
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+    	opt.inSampleSize = 2;
+		
 		circleBmps = new Bitmap[4];
-		int circleWidth = (int) (screen.x * 10.0/720.0);
-		int circleHeight = (int) (screen.x *38.0/720.0);
+		int circleWidth = screen.x *16/1080;
+		int circleHeight = screen.x *62/1080;
 		Bitmap[] tmp = new Bitmap[4];
-		tmp[0] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_none);
+		tmp[0] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_none,opt);
 		circleBmps[0] = Bitmap.createScaledBitmap(tmp[0], circleWidth, circleHeight, true);
-		tmp[1] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_fail);
+		tmp[1] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_fail,opt);
 		circleBmps[1] = Bitmap.createScaledBitmap(tmp[1], circleWidth, circleHeight, true);
-		tmp[2] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_pass);
+		tmp[2] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_pass,opt);
 		circleBmps[2] = Bitmap.createScaledBitmap(tmp[2], circleWidth, circleHeight, true);
-		tmp[3] = BitmapFactory.decodeResource(context.getResources(),R.drawable.statistic_month_empty);
-		circleBmps[3] = Bitmap.createScaledBitmap(tmp[3], circleWidth, circleHeight, true);
 		for (int i=0;i<tmp.length;++i)
 			if (circleBmps[i]!=tmp[i])
-				tmp[0].recycle();
+				tmp[i].recycle();
 		
 		
 		
 		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams) timeLayout.getLayoutParams();
-		tParam.leftMargin = (int)(screen.x*40.0/720.0);
-		tParam.topMargin = (int)(screen.x*20.0/720.0);
+		tParam.leftMargin =  screen.x * 60/1080;
+		tParam.topMargin =  screen.x * 30/1080;
 		
 		RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams) blockLayout.getLayoutParams();
-		bParam.leftMargin = (int)(screen.x*00.0/720.0);
-		bParam.topMargin = (int)(screen.x*20.0/720.0);
+		bParam.topMargin =  screen.x * 30/1080;
 		
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams) title.getLayoutParams();
-		titleParam.topMargin = (int)(screen.x*80.0/720.0);
+		titleParam.topMargin =  screen.x * 240/1080;
+		titleParam.leftMargin =  screen.x * 190/1080;
 		
-		int c_width =  (int) (screen.x * 75.0/720.0);
-		int c_height =  (int) (screen.x * 50.0/720.0);
+		int c_width =  screen.x * 113/1080;
+		int c_height = screen.x * 75/1080;
 		
 		int height = (c_height*4)/timeblock_type;
 		
-		int label_topMargin = (int)(screen.x*30.0/720.0);
-		int label_width =  (int)(screen.x*136.0/720.0);
+		int label_topMargin = screen.x * 30/1080;
+		int label_width =  screen.x*204/1080;
 		
 		RelativeLayout.LayoutParams mParam =  (RelativeLayout.LayoutParams)month0.getLayoutParams();
 		mParam.width = label_width;
 		mParam.height = c_height;
 		mParam.topMargin = label_topMargin;
-		mParam.leftMargin = (int)(screen.x*110.0/720.0);
+		mParam.leftMargin = screen.x*165/1080;
 		
 		mParam =  (RelativeLayout.LayoutParams)month1.getLayoutParams();
 		mParam.width = label_width;
@@ -222,9 +218,6 @@ public class StatisticMonthView extends StatisticPageView {
 		mParam.height = c_height;
 		mParam.topMargin = label_topMargin;
 		
-		mParam =  (RelativeLayout.LayoutParams)month4.getLayoutParams();
-		mParam.height = c_height;
-		mParam.topMargin = label_topMargin;
 		
 		for (int i=0;i<nBlocks;++i){
 			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) time_labels[i].getLayoutParams();
@@ -234,8 +227,8 @@ public class StatisticMonthView extends StatisticPageView {
 				param.width = param.height = 0;
 		}
 		
-		int b_width =  (int) (screen.x * 18.0/720.0);
-		int b_gap =  (int) (screen.x * 10.0/720.0);
+		int b_width =  screen.x*27/1080;
+		int b_gap =  screen.x*15/1080;
 		for (int i=0;i<nBlocks*nDate;++i){
 			GridLayout.LayoutParams cParam = (GridLayout.LayoutParams) circles[i].getLayoutParams();
 			cParam.width = b_width;
@@ -247,7 +240,7 @@ public class StatisticMonthView extends StatisticPageView {
 		}
 		
 		RelativeLayout.LayoutParams lParam = (RelativeLayout.LayoutParams) labelLayout.getLayoutParams();
-		lParam.topMargin = (int)(screen.x*20.0/720.0);
+		lParam.topMargin = screen.x*30/1080;
 		for (int i=0;i<3;++i){
 			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) labels[i].getLayoutParams();
 			param.width = (int)(c_width*1.5);
@@ -277,7 +270,7 @@ public class StatisticMonthView extends StatisticPageView {
 					circles[idx].setImageBitmap(circleBmps[0]);
 				else
 					if (TimeBlock.isEmpty(i%nBlocks, cur_hour)){
-						circles[idx].setImageBitmap(circleBmps[3]);
+						circles[idx].setImageBitmap(circleBmps[0]);
 						circles[idx].setAlpha(0.1F);
 					}
 					else
@@ -297,7 +290,6 @@ public class StatisticMonthView extends StatisticPageView {
 		int month = cal.get(Calendar.MONTH)+1;
 		int date = cal.get(Calendar.DATE);
 		String month_label = month+"/"+date;
-		month4.setText("");
 
 		cal.setTimeInMillis(cal.getTimeInMillis()-Millis6);
 		month = cal.get(Calendar.MONTH)+1;
@@ -324,8 +316,6 @@ public class StatisticMonthView extends StatisticPageView {
 		labelImgs[1].setImageBitmap(circleBmps[1]);
 		labelImgs[2].setImageBitmap(circleBmps[0]);
 		
-		if (StatisticPagerAdapter.background!=null && !StatisticPagerAdapter.background.isRecycled())
-			bg.setImageBitmap(StatisticPagerAdapter.background);
 		
 	}
 

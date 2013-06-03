@@ -73,14 +73,14 @@ public class AnalysisProgressView extends StatisticPageView {
 		Point screen = StatisticFragment.getStatisticPx();
 		
 		title = (TextView) view.findViewById(R.id.analysis_progress_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int)(screen.x * 36.0/720.0));
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 54/1080);
 		title.setTypeface(wordTypeface);
 		
 		title_bg = (ImageView) view.findViewById(R.id.analysis_progress_title_bg);
 		title_bg.setScaleType(ScaleType.FIT_XY);
 		
 		help = (TextView) view.findViewById(R.id.analysis_progress_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 36.0/720.0));
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 54/1080);
 		help.setTypeface(wordTypeface);
 		
 		//contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_progress_content_layout);
@@ -102,16 +102,16 @@ public class AnalysisProgressView extends StatisticPageView {
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
-		titleParam.leftMargin = (int)(screen.x * 90.0/720.0);
+		titleParam.leftMargin =screen.x * 135/1080;
 		
 		RelativeLayout.LayoutParams titleBgParam = (RelativeLayout.LayoutParams)title_bg.getLayoutParams();
 		titleBgParam.width = screen.x;
-		titleBgParam.height = (int)(screen.x * 47.0/720.0);
+		titleBgParam.height = screen.x * 59/1080;
 		
 		titleBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_title_bar);
 		
 		LinearLayout.LayoutParams helpParam = (LinearLayout.LayoutParams)help.getLayoutParams();
-		helpParam.topMargin = helpParam.bottomMargin =  (int)(screen.x *16.0/720.0);
+		helpParam.topMargin = helpParam.bottomMargin =  screen.x *24/1080;
 		
 		//LinearLayout.LayoutParams contentParam = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
 		//contentParam.bottomMargin =  (int)(screen.x * 30.0/720.0);

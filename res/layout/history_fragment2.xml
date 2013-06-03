@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/statistic_background_all" 
     >
+    <LinearLayout 
+        android:id="@+id/history_main_layout"
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:orientation="vertical"
+        >
     <RelativeLayout
         	android:layout_width="match_parent"
-        	android:layout_height="wrap_content">
+        	android:layout_height="wrap_content"
+        	>
     	<RelativeLayout 
         	android:id="@+id/history_book_layout"
         	android:layout_width="match_parent"
@@ -34,11 +40,17 @@
     	        android:gravity="center"
     	        />
     	</LinearLayout>
-    </RelativeLayout>  
-    <LinearLayout
+    </RelativeLayout>
+    <HorizontalScrollView 
+       android:id  ="@+id/history_scroll_view"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       >
+    <RelativeLayout
         android:id="@+id/history_content_layout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
-    
-</LinearLayout>
+    </HorizontalScrollView>
+    </LinearLayout>
+</RelativeLayout>

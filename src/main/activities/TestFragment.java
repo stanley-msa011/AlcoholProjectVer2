@@ -16,8 +16,8 @@ import test.file.ImageFileHandler;
 import test.file.QuestionFile;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
-import test.ui.Tutorial;
 import test.ui.UIMsgBox;
+import test.ui.UIMsgBox2;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -93,7 +93,6 @@ public class TestFragment extends Fragment {
 	
 	private RelativeLayout main_layout;
 	private UIMsgBox msgBox;
-	//private UIRotate rotate;
 
 	private LoadingHandler loadingHandler;
 	private FailBgHandler failBgHandler;
@@ -105,16 +104,17 @@ public class TestFragment extends Fragment {
 	private RelativeLayout startLayout;
 	private ImageView bg, startButton, startStroke;
 	private Bitmap bgBmp, startButtonBmp, startStrokeBmp;
+	private TextView bracText;
+	private TextView brac;
 	private TextView startText;
-
-	private FrameLayout preview_layout;
 	
-	private ImageView pictureStroke;
-	private Bitmap pictureStrokeBmp;
+	
+	private FrameLayout preview_layout;
 	
 	private RelativeLayout helpLayout;
 	private ImageView helpButton;
 	private Bitmap helpButtonBmp;
+	private TextView helpText;
 	
 	private ImageView testCircle;
 	
@@ -128,23 +128,27 @@ public class TestFragment extends Fragment {
 	private static final int[] BLOW_RESOURCE = {0,R.drawable.test_circle1,R.drawable.test_circle2,R.drawable.test_circle3,R.drawable.test_circle4,R.drawable.test_circle5};
 	private Bitmap[] blowBmp;
 	
-	private Tutorial tutorial;
-	private RelativeLayout tutorialLayout;
-	private TutorialHandler tutorialHandler;
-	
 	private QuestionFile questionFile;
 	
 	//private Typeface digitTypeface;
 	private Typeface wordTypeface;
+	private Typeface digitTypeface;
 	private Typeface wordTypefaceBold;
 	
 	// For Click Sequence logging
 	private ClickLogger clickLogger;
 	
+	private DecimalFormat format;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		keepMsgBox = false;
+		format = new DecimalFormat();
+		format.setMaximumIntegerDigits(1);
+		format.setMinimumIntegerDigits(1);
+		format.setMinimumFractionDigits(2);
+		format.setMaximumFractionDigits(2);
 	}
 	
 	public void onPause(){
@@ -184,7 +188,7 @@ public class TestFragment extends Fragment {
 		// For Click Sequence logging
 		clickLogger = new ClickLogger();
 		
-		//digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
+		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		wordTypefaceBold  = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w5.otf");
 		
@@ -192,36 +196,43 @@ public class TestFragment extends Fragment {
 		startLayout = (RelativeLayout) view.findViewById(R.id.test_start_layout);
 		startButton = (ImageView) view.findViewById(R.id.test_start_button);
 		startStroke = (ImageView) view.findViewById(R.id.test_start_stroke);
-		startText =(TextView) view.findViewById(R.id.test_start_text);
+		bracText =(TextView) view.findViewById(R.id.test_brac_value_text);
+		brac = (TextView) view.findViewById(R.id.test_brac_text);
+		startText = (TextView) view.findViewById(R.id.test_start_button_text);
 		
-		
-		pictureStroke = (ImageView) view.findViewById(R.id.test_picture_stroke);
+		Point screen = FragmentTabs.getSize();
 		
 		helpLayout = (RelativeLayout) view.findViewById(R.id.help_layout);
 		helpButton = (ImageView) view.findViewById(R.id.help_background);
+		helpText = (TextView) view.findViewById(R.id.help_text);
+		helpText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 64/1080);
+		helpText.setTypeface(wordTypefaceBold);
+		
 		
 		testCircle = (ImageView) view.findViewById(R.id.test_start_circle);
 		
 		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
 		
-		Point screen = FragmentTabs.getSize();
-		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 49.0/720.0));
+		
+		bracText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 144/1080);
+		bracText.setTypeface(digitTypeface);
+		
+		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 96/1080);
 		startText.setTypeface(wordTypefaceBold);
 		
+		brac.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 54/1080);
+		brac.setTypeface(wordTypeface);
+		
 		messageView = (TextView) view.findViewById(R.id.test_message);
-		messageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 42.0/720.0));
+		messageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 54/1080);
 		messageView.setTypeface(wordTypeface);
 		
 		RelativeLayout.LayoutParams mParam = (LayoutParams) messageView.getLayoutParams();
-		mParam.topMargin = (int)(screen.x * 36.0/720.0);
+		mParam.topMargin = screen.x * 54/1080;
 		if (msgBox==null)
 			msgBox = new UIMsgBox(testFragment,main_layout);
 		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
 
-		tutorial = new Tutorial(this);
-		tutorialLayout = (RelativeLayout) tutorial.getView();
-		main_layout.addView(tutorialLayout);
-		
 		debugMsg = (EditText) view.findViewById(R.id.debug_msg);
 		
 		loadingHandler = new LoadingHandler();
@@ -230,7 +241,6 @@ public class TestFragment extends Fragment {
 		testHandler = new TestHandler();
 		timeUpHandler = new TimeUpHandler();
 		changeTabsHandler = new ChangeTabsHandler(); 
-		tutorialHandler = new TutorialHandler();
 	}
 	
 	public void reset(){
@@ -322,7 +332,7 @@ public class TestFragment extends Fragment {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(testFragment.getActivity());
 			boolean firstTime = sp.getBoolean("first", true);
 			helpButton.setOnClickListener(null);
-			
+			helpButton.setOnLongClickListener(null);
 			if (firstTime){
 				messageView.setText("");
 				SharedPreferences.Editor editor = sp.edit();
@@ -332,8 +342,12 @@ public class TestFragment extends Fragment {
 			}
 			else{
 				startButton.setOnClickListener(null);
-				startText.setText("");
+				startButton.setVisibility(View.INVISIBLE);
+				startText.setVisibility(View.INVISIBLE);
+				helpText.setTextColor(0xFF424242);
+				bracText.setText("0.00");
 				reset();
+				
 				messageView.setText("請按酒測裝置黑色按鈕\n以啟用酒測裝置");
 				messageView.setTextColor(0xFFFFFFFF);
 				Thread t = new Thread(new TimeUpRunnable(0,1500));
@@ -426,12 +440,6 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
-	public void onActivityResult(int requestCode, int resultCode, Intent data){
-		/*if (requestCode==_GPS){
-			runGPS();
-		}*/
-	}
-	
 	public void stopDueToInit(){
 		if (cameraRecorder!=null)
 			cameraRecorder.close();
@@ -455,9 +463,6 @@ public class TestFragment extends Fragment {
 			gpsRunTask.cancel(true);
 		}
 		
-		if (tutorialHandler != null){
-			tutorialHandler .removeMessages(0);
-		}
 	}
 	
 	public void stop(){
@@ -506,28 +511,18 @@ public class TestFragment extends Fragment {
 			msgHandler.removeMessages(0);
 			msgHandler = null;
 		}
-		if (tutorialHandler != null){
-			tutorialHandler .removeMessages(0);
-		}
 	}
 	
 	private void clear(){
 		Log.d("test","clear");
 		cleanMsgBox();
 		cleanBlowBmp();
-		cleanTutorial();
 	}
 	
     private void cleanMsgBox(){
     	if (msgBox!=null){
     		msgBox.clear();
     		msgBox = null;
-    	}
-    }
-    
-    private void cleanTutorial(){
-    	if (tutorial!=null){
-    		tutorial.clear();
     	}
     }
     
@@ -557,73 +552,67 @@ public class TestFragment extends Fragment {
 			
 			Bitmap tmp;
 			if (bgBmp==null || bgBmp.isRecycled()){
-				tmp = BitmapFactory.decodeResource(r, R.drawable.test_background);
-				bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, (int)(screen.x/355.0*555.0), true);
+				BitmapFactory.Options opt = new BitmapFactory.Options();
+				opt.inSampleSize = 4;
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_background,opt);
+				bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.x*1709/1080, true);
 				tmp.recycle();
-				String bgBmp_size = bgBmp.getWidth() + "/"+bgBmp.getHeight();
-				Log.d("bgBMP",bgBmp_size);
-				RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams)bg.getLayoutParams();
-				bParam.width = screen.x;
-				bParam.height = bParam.width*555/355;
 			}
-			
+			RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams)bg.getLayoutParams();
+			bParam.width = screen.x;
+			bParam.height = bParam.width*1709/1080;
 			
 			if (startButtonBmp==null ||startButtonBmp.isRecycled()){
 				tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_button);
-				startButtonBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 320.0/720.0), (int)(screen.x * 320.0/720.0), true);
+				startButtonBmp = Bitmap.createScaledBitmap(tmp, screen.x * 497/1080, screen.x * 497/1080, true);
 				tmp.recycle();
 			}
 			
 			if (startStrokeBmp==null ||startStrokeBmp.isRecycled()){
-				tmp = BitmapFactory.decodeResource(r, R.drawable.test_start_button);
-				startStrokeBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 372.0/720.0), (int)(screen.x * 372.0/720.0), true);
-				tmp.recycle();
-			}
-			
-			if (pictureStrokeBmp==null ||pictureStrokeBmp.isRecycled()){
-				tmp = BitmapFactory.decodeResource(r, R.drawable.test_picture_stroke);
-				pictureStrokeBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 322.0/720.0), (int)(screen.x * 322.0/720.0), true);
+				tmp = BitmapFactory.decodeResource(r, R.drawable.test_button_stroke);
+				startStrokeBmp = Bitmap.createScaledBitmap(tmp, screen.x * 593/1080, screen.x * 591/1080, true);
 				tmp.recycle();
 			}
 			
 			if (helpButtonBmp==null ||helpButtonBmp.isRecycled()){
 				tmp = BitmapFactory.decodeResource(r, R.drawable.test_tutorial_button);
-				helpButtonBmp = Bitmap.createScaledBitmap(tmp, (int)(screen.x * 62.0/720.0), (int)(screen.x * 62.0/720.0), true);
+				helpButtonBmp = Bitmap.createScaledBitmap(tmp,screen.x * 102/1080, screen.x * 102/1080, true);
 				tmp.recycle();
 			}
 			
 			RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
-			startLayoutParam.width= (int)(screen.x * 372.0/720.0);
-			startLayoutParam.height= (int)(screen.x * 372.0/720.0);
-			startLayoutParam.topMargin =  (int)(screen.x * 620.0/720.0);
+			startLayoutParam.width= screen.x * 593/1080;
+			startLayoutParam.height= screen.x * 591/1080;
+			startLayoutParam.topMargin = screen.x * 423/1080;
 			
 			RelativeLayout.LayoutParams startButtonParam = (LayoutParams) startButton.getLayoutParams();
-			startButtonParam.width = (int)(screen.x * 320.0/720.0);
-			startButtonParam.height = (int)(screen.x * 320.0/720.0);
+			startButtonParam.width = screen.x * 497/1080;
+			startButtonParam.height = screen.x * 497/1080;
 			
 			RelativeLayout.LayoutParams startStrokeParam = (LayoutParams) startStroke.getLayoutParams();
-			startStrokeParam.width = (int)(screen.x * 372.0/720.0);
-			startStrokeParam.height = (int)(screen.x * 372.0/720.0);
+			startStrokeParam.width = screen.x * 593/1080;
+			startStrokeParam.height = screen.x * 591/1080;
 			
 			RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
-			previewParam.width = (int)(screen.x * 320.0/720.0);
-			previewParam.height = (int)(screen.x * 320.0/720.0);
-			previewParam.topMargin = (int)(screen.x * 174.0/720.0);
-			
-			RelativeLayout.LayoutParams pictureParam = (LayoutParams) pictureStroke.getLayoutParams();
-			pictureParam.width = (int)(screen.x * 322.0/720.0);
-			pictureParam.height = (int)(screen.x * 322.0/720.0);
-			pictureParam.topMargin = (int)(screen.x * 174.0/720.0);
+			previewParam.width =screen.x * 593/1080;
+			previewParam.height = screen.x * 591/1080;
+			previewParam.topMargin = screen.x * 423/1080;
 			
 			RelativeLayout.LayoutParams helpLayoutParam = (LayoutParams) helpLayout.getLayoutParams();
-			helpLayoutParam.width = (int)(screen.x * 62.0/720.0);
-			helpLayoutParam.height = (int)(screen.x * 62.0/720.0);
-			helpLayoutParam.topMargin = (int)(screen.x * 40.0/720.0);
-			helpLayoutParam.rightMargin = (int)(screen.x * 40.0/720.0);
+			helpLayoutParam.width = screen.x * 102/1080;
+			helpLayoutParam.height = screen.x * 102/1080;
+			helpLayoutParam.topMargin =screen.x * 107/1080;
+			helpLayoutParam.rightMargin = screen.x * 58/1080;
 			
 			RelativeLayout.LayoutParams testCircleParam = (LayoutParams) testCircle.getLayoutParams();
-			testCircleParam.width = (int)(screen.x * 372.0/720.0);
-			testCircleParam.height = (int)(screen.x * 372.0/720.0);
+			testCircleParam.width = screen.x * 593/1080;
+			testCircleParam.height =screen.x * 591/1080;
+			
+			RelativeLayout.LayoutParams bracVParam = (LayoutParams) bracText.getLayoutParams();
+			bracVParam.topMargin =screen.x * 150/1080;
+			
+			RelativeLayout.LayoutParams bracParam = (LayoutParams) brac.getLayoutParams();
+			bracParam.topMargin =screen.x * 20/1080;
 			
 			if(bgBmp!=null && !bgBmp.isRecycled())
 				bg.setImageBitmap(bgBmp);
@@ -634,24 +623,23 @@ public class TestFragment extends Fragment {
 			if (startStrokeBmp!=null && !startStrokeBmp.isRecycled())
 				startStroke.setImageBitmap(startStrokeBmp);
 			
-			if (pictureStrokeBmp!=null && !pictureStrokeBmp.isRecycled())
-				pictureStroke.setImageBitmap(pictureStrokeBmp);
-			
 			if (helpButtonBmp!=null && !helpButtonBmp.isRecycled())
 				helpButton.setImageBitmap(helpButtonBmp);
 			
 			testCircle.setImageBitmap(null);
 
-			startText.setText("開始");
-			startText.setVisibility(View.VISIBLE);
+			bracText.setText("0.00");
+			bracText.setVisibility(View.VISIBLE);
 			
 			messageView.setText("請點選'開始'以進行測試");
 			messageView.setTextColor(0xFFFFFFFF);
 			
 			startButton.setOnClickListener(new StartOnClickListener());
-			bg.setOnClickListener(null);
+			startButton.setVisibility(View.VISIBLE);
+			startText.setVisibility(View.VISIBLE);
 			helpButton.setOnClickListener(new TutorialOnClickListener());
-			
+			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
+			helpText.setTextColor(0xFFc98123);
 			FragmentTabs.detach_loading_page(0);
 			LoadingBox.dismiss();
 			
@@ -696,6 +684,7 @@ public class TestFragment extends Fragment {
 			this.msgStr = msg.getData().getString("msg");
 
 			startButton.setOnClickListener(new EndTestOnClickListener());
+			startButton.setVisibility(View.VISIBLE);
 			
 			msgStr = msgStr.concat("\n請點選按鈕以結束");
 			
@@ -708,7 +697,7 @@ public class TestFragment extends Fragment {
 	private class TestHandler extends Handler{
 		public void handleMessage(Message msg){
 			startButton.setOnClickListener(null);
-			bg.setOnClickListener(null);
+			
 			
 			cleanBlowBmp();
 			blowBmp = new Bitmap[6];
@@ -716,34 +705,30 @@ public class TestFragment extends Fragment {
 			blowBmp[0] = null;
 			
 			Point screen = FragmentTabs.getSize();
-			int circleSize =  (int)(screen.x * 372.0/720.0);
+			int circleWidth =  screen.x * 593/1080;
+			int circleHeight = screen.x * 591/1080;
 			for (int i=1;i<blowBmp.length;++i){
 				tmp = BitmapFactory.decodeResource(getResources(), BLOW_RESOURCE[i]);
-				blowBmp[i] = Bitmap.createScaledBitmap(tmp, circleSize, circleSize, true);
+				blowBmp[i] = Bitmap.createScaledBitmap(tmp,  circleWidth,  circleHeight, true);
 				tmp.recycle();
 			}
 			
-			messageView.setText("請依照圓圈內指示進行測試,\n並將臉對於螢幕中央");
+			messageView.setText("請將臉對於螢幕中央，\n並開始吹氣");
 			messageView.setTextColor(0xFFFFFFFF);
 			if (bt!=null && cameraRecorder!=null){
 				bt.start();
 				cameraRecorder.start();
-				startText.setText(BLOW_MSG[0]);
+				bracText.setText("0.00");
 			}
 		}
 	}
-	
-	public void changeTestMessage(int time){
-		startText.setText(BLOW_MSG[time]);
+	public void changeTestMessage(float value,int time){
+		bracText.setText(format.format(value));
 		if (time >= blowBmp.length)
 			time = blowBmp.length-1;
 		if (blowBmp!=null){
 			testCircle.setImageBitmap(blowBmp[time]);
 		}
-	}
-	
-	public void changeTestSpeed(int change){
-
 	}
 	
 	public void stopByFail(){
@@ -817,21 +802,21 @@ public class TestFragment extends Fragment {
 			showTutorial();
 		}
 	}
+	private class TutorialOnLongClickListener implements View.OnLongClickListener{
+		public boolean onLongClick(View v) {
+				context.openOptionsMenu();
+				return true;
+		}
+	}
 	
 	private void showTutorial(){
 		Log.d("test","showTutorial");
-		tutorialHandler.sendEmptyMessage(0);
+		Intent intent= new Intent();
+		intent.setClass(context, TutorialActivity.class);
+		context.startActivity(intent);
+		//tutorialHandler.sendEmptyMessage(0);
 	}
 	
-	@SuppressLint("HandlerLeak")
-	private class TutorialHandler extends Handler{
-		public void handleMessage(Message msg){
-			tutorial.loading();
-			tutorial.setBmp();
-			tutorial.setTutorial(1);
-			tutorial.getView().setVisibility(View.VISIBLE);
-		}
-	}
 	
 	public void writeQuestionFile(int emotion,int desire){
 		questionFile.write(emotion, desire);

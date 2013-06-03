@@ -34,6 +34,13 @@ public class DateBracGameHistory extends BracGameHistory {
     		timeblock = TimeBlock.getTimeBlock(hour,timeblock_type);
     	}
 	}
+	
+	public String toString(){
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(timestamp*1000);
+		String s= "lv: " + level + " brac: "+ brac + " e: "+emotion + " d: "+ desire +"@"+cal.toString(); 
+		return s;
+	}
 
 
 }

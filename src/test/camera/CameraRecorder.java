@@ -64,7 +64,8 @@ public class CameraRecorder {
 		Point bestSize = getBestSize(list);
 		params.setPictureSize(bestSize.x, bestSize.y);
 		camera.setParameters(params);
-		camera.startFaceDetection();
+		//if (camera.getParameters().getMaxNumDetectedFaces()>0)
+		//	camera.startFaceDetection();
     }
     
     private Point getBestSize(List<Size> list){
@@ -127,7 +128,7 @@ public class CameraRecorder {
     	if (camera!=null){
     		Camera tmp = camera;
     		camera = null;
-    		tmp.stopFaceDetection();
+    		//tmp.stopFaceDetection();
     		tmp.stopPreview();
     		tmp.release();
     		tmp = null;

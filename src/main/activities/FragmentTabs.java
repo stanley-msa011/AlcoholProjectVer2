@@ -6,7 +6,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
@@ -43,6 +48,7 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private static final String[] tabName ={"Test","Record","History"}; 
 	private static final int[] iconId ={R.drawable.tabs_test,R.drawable.tabs_statistic,R.drawable.tabs_history}; 
+	private static final int[] iconOnId ={R.drawable.tabs_test_on,R.drawable.tabs_statistic_on,R.drawable.tabs_history_on}; 
 	private static final String[] iconText ={"測試","紀錄","人生新頁"}; 
 	
 	private Fragment[] fragments;
@@ -56,16 +62,18 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private LoadingPageHandler loadingPageHandler;
 	
+	private Bitmap tabBmp;
 	
 	private static boolean firstLoading = true;
 	
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "unused" })
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		firstLoading = true;
 		context = this;
 		fragmentTabs = this;
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.tab_layout);
 		
@@ -85,7 +93,7 @@ public class FragmentTabs extends FragmentActivity {
 			display.getSize(screen_px);
 		}
 
-		tab_px = new Point(screen_px.x,(int)(screen_px.y*(104.0/1280.0)));
+		tab_px = new Point(screen_px.x,screen_px.x*211/1080);
 		
 		if (firstLoading){
 			Thread t = new Thread (new TimerRunnable());
@@ -101,7 +109,7 @@ public class FragmentTabs extends FragmentActivity {
 			customTabs = new CustomTab[3];
 		
 		for (int i=0;i<3;++i){
-			customTabs[i] = new CustomTab(this,iconId[i],iconText[i]);
+			customTabs[i] = new CustomTab(this,iconId[i],iconOnId [i],iconText[i]);
 			tabs[i] = tabHost.newTabSpec(tabName[i]).setIndicator(customTabs[i].getTab());
 			tabs[i].setContent(new DummyTabFactory(this));
 			tabHost.addTab(tabs[i]);
@@ -119,7 +127,15 @@ public class FragmentTabs extends FragmentActivity {
 		
 		
 		TabWidget tabWidget = tabHost.getTabWidget();
-		tabWidget.setBackgroundResource(R.drawable.tabs_background);
+		
+		if (tabBmp == null || tabBmp.isRecycled()){
+			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tabs_background);
+			tabBmp = Bitmap.createScaledBitmap(tmp, tab_px.x, tab_px.y, true);
+			tmp.recycle();
+		}
+		Drawable d = new BitmapDrawable(tabBmp);
+		//tabWidget.setBackgroundResource(R.drawable.tabs_background);
+		tabWidget.setBackgroundDrawable(d);
 		
 		int count  = tabWidget.getChildCount();
 		for (int i=0;i<count;++i)
@@ -130,7 +146,6 @@ public class FragmentTabs extends FragmentActivity {
 		
 		Log.d("TAB PX",tab_px.toString());
 		
-
 		
 	}
 	
@@ -147,7 +162,7 @@ public class FragmentTabs extends FragmentActivity {
 		@Override
 		public void run() {
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {}
 			
 			loadingPageHandler.sendEmptyMessage(0);
@@ -170,11 +185,17 @@ public class FragmentTabs extends FragmentActivity {
 		ClickLogUploader.upload(this);
 		DebugLoggingThread debug_thread = new DebugLoggingThread();
 		debug_thread.execute();
+		
 	}
 	
 	protected void onStop(){
 		Log.d("TABS","ONSTOP");
 		context = null;
+		/*if (customTabs!=null)
+			for (int i=0;i<customTabs.length;++i)
+				if (customTabs[i]!=null)
+					customTabs[i].clear();
+					*/
 		super.onStop();
 	}
 	
@@ -236,6 +257,7 @@ public class FragmentTabs extends FragmentActivity {
     	menu.add(0, 0, 0, "Debug");
     	menu.add(0, 1, 1, "Normal");
     	menu.add(0, 2, 1, "Setting");
+    	menu.add(0, 3, 1,"DummyData");
     	menu.add(1, 0, 1, "心情DIY");
     	menu.add(1, 1, 1, "情緒管理");
     	return super.onCreateOptionsMenu(menu);
@@ -256,6 +278,8 @@ public class FragmentTabs extends FragmentActivity {
 			}else if (id == 2){
 				Intent newIntent = new Intent(this, PreSettingActivity.class);
 				this.startActivity(newIntent);
+			}else if (id == 3){
+				DummyData.generateDummyData(this);
 			}
 		}
 		if (gid == 1){

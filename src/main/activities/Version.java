@@ -1,5 +1,5 @@
 package main.activities;
 
 public class Version {
-	static final String VERSION="1.12";
+	static final String VERSION="1.21";
 }

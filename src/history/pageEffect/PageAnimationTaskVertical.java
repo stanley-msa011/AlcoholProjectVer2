@@ -14,8 +14,8 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	private PointF from;
 	private float width_gap_1,width_gap_2,width_gap_3,width_gap_4;
 	private float height_gap_1,height_gap_2,height_gap_3,height_gap_4;
-	public static final int gaps = 1000;
-	private static final int clip_time = 2000;
+	public static final int gaps = 100;
+	private static final int clip_time = 1000;
 	private static final int sleep_time = clip_time/gaps;
 	private int[] bgs;
 	private HistoryFragment historyFragment;
@@ -27,7 +27,9 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	private Bitmap cur=null,next=null,tmp=null;
 	private Bitmap prev_cur=null,prev_next=null;
 	
-	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,PointF middle1,PointF middle2,PointF middle3, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx){
+	private int end_type=-1; 
+	
+	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx){
 		this.pageWidget = pageWidget;
 		this.from = from;
 		this.endTouch = endTouch;
@@ -39,7 +41,22 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 		width_gap_1 = (to.x - from.x)/(float)gaps;
 		height_gap_1 = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;	
-}
+	}
+	
+	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx,int type){
+		this.pageWidget = pageWidget;
+		this.from = from;
+		this.endTouch = endTouch;
+		this.startImageIdx = startImageIdx;
+		this.endImageIdx = endImageIdx;
+		
+		this.historyFragment = historyFragment;
+		
+		width_gap_1 = (to.x - from.x)/(float)gaps;
+		height_gap_1 = (to.y - from.y)/(float)gaps;
+		this.bgs = bgs;	
+		end_type = type;
+	}
 	
 	@Override
 	protected Void doInBackground(Void... arg0) {
@@ -106,8 +123,10 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	}
 	@Override
 	 protected void onPostExecute(Void result) {
-		//
-		historyFragment.endAnimation();
+		if (end_type == -1)
+			historyFragment.endAnimation();
+		else
+			historyFragment.endAnimation(end_type);
     }
 	@Override
 	protected void onCancelled(){
