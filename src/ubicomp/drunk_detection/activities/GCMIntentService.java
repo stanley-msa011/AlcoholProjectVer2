@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
-import static main.activities.CommonUtilities.SENDER_ID;
+import static ubicomp.drunk_detection.activities.CommonUtilities.SENDER_ID;
 
 /*
 import java.util.List;

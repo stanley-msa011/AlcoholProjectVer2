@@ -1,8 +1,8 @@
 package test.ui;
 
-import main.activities.FragmentTabs;
-import main.activities.R;
-import main.activities.TestFragment;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;

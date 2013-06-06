@@ -1,4 +1,4 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
 import history.BracGameHistory;
 
@@ -65,7 +65,7 @@ public class DummyData {
 			for (int i=0;i<num_of_data;++i){
 				
 				int miss = rand.nextInt(5);
-				if (miss > 2){
+				if (miss > 1){
 					from += millis;
 					continue;
 				}

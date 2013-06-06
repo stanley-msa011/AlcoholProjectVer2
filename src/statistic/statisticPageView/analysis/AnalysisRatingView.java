@@ -1,8 +1,7 @@
 package statistic.statisticPageView.analysis;
 
 import database.HistoryDB;
-import main.activities.R;
-import main.activities.StatisticFragment;
+import ubicomp.drunk_detection.activities.R;
 import history.InteractionHistory;
 import interaction.UserLevelCollector;
 import android.annotation.SuppressLint;
@@ -22,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import statistic.statisticPageView.StatisticPageView;
+import ubicomp.drunk_detection.activities.StatisticFragment;
 
 public class AnalysisRatingView extends StatisticPageView {
 

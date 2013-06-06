@@ -1,8 +1,10 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
 
 import java.io.File;
 import java.text.DecimalFormat;
+
+import ubicomp.drunk_detection.activities.R;
 
 import test.bluetooth.BTInitHandler;
 import test.bluetooth.BTRunTask;
@@ -128,6 +130,9 @@ public class TestFragment extends Fragment {
 	private static final int[] BLOW_RESOURCE = {0,R.drawable.test_circle1,R.drawable.test_circle2,R.drawable.test_circle3,R.drawable.test_circle4,R.drawable.test_circle5};
 	private Bitmap[] blowBmp;
 	
+	private ImageView face;
+	private Bitmap faceBmp;
+	
 	private QuestionFile questionFile;
 	
 	//private Typeface digitTypeface;
@@ -205,9 +210,10 @@ public class TestFragment extends Fragment {
 		helpLayout = (RelativeLayout) view.findViewById(R.id.help_layout);
 		helpButton = (ImageView) view.findViewById(R.id.help_background);
 		helpText = (TextView) view.findViewById(R.id.help_text);
-		helpText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 64/1080);
+		helpText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 80/1080);
 		helpText.setTypeface(wordTypefaceBold);
 		
+		face = (ImageView) view.findViewById(R.id.test_face);
 		
 		testCircle = (ImageView) view.findViewById(R.id.test_start_circle);
 		
@@ -527,6 +533,11 @@ public class TestFragment extends Fragment {
     }
     
     private void cleanBlowBmp(){
+    	if (faceBmp!=null && !faceBmp.isRecycled()){
+    		faceBmp.recycle();
+    		faceBmp = null;
+    	}
+    	
     	if (blowBmp == null)
     		return;
     	for (int i=1;i<blowBmp.length;++i){
@@ -599,8 +610,8 @@ public class TestFragment extends Fragment {
 			previewParam.topMargin = screen.x * 423/1080;
 			
 			RelativeLayout.LayoutParams helpLayoutParam = (LayoutParams) helpLayout.getLayoutParams();
-			helpLayoutParam.width = screen.x * 102/1080;
-			helpLayoutParam.height = screen.x * 102/1080;
+			helpLayoutParam.width = screen.x * 153/1080;
+			helpLayoutParam.height = screen.x * 153/1080;
 			helpLayoutParam.topMargin =screen.x * 107/1080;
 			helpLayoutParam.rightMargin = screen.x * 58/1080;
 			
@@ -640,6 +651,7 @@ public class TestFragment extends Fragment {
 			helpButton.setOnClickListener(new TutorialOnClickListener());
 			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
 			helpText.setTextColor(0xFFc98123);
+			face.setImageBitmap(null);
 			FragmentTabs.detach_loading_page(0);
 			LoadingBox.dismiss();
 			
@@ -699,12 +711,22 @@ public class TestFragment extends Fragment {
 			startButton.setOnClickListener(null);
 			
 			
+			
 			cleanBlowBmp();
 			blowBmp = new Bitmap[6];
 			Bitmap tmp;
 			blowBmp[0] = null;
 			
 			Point screen = FragmentTabs.getSize();
+			
+			faceBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_face);
+			
+			RelativeLayout.LayoutParams fParam = (LayoutParams) face.getLayoutParams();
+			fParam.width = screen.x*255/1080;
+			fParam.height = screen.x*187/1080;
+			face.setImageBitmap(faceBmp);
+			
+			
 			int circleWidth =  screen.x * 593/1080;
 			int circleHeight = screen.x * 591/1080;
 			for (int i=1;i<blowBmp.length;++i){
@@ -712,6 +734,8 @@ public class TestFragment extends Fragment {
 				blowBmp[i] = Bitmap.createScaledBitmap(tmp,  circleWidth,  circleHeight, true);
 				tmp.recycle();
 			}
+
+			
 			
 			messageView.setText("請將臉對於螢幕中央，\n並開始吹氣");
 			messageView.setTextColor(0xFFFFFFFF);

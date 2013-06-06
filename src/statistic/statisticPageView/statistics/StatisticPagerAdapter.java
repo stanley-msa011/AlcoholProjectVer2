@@ -3,11 +3,11 @@ package statistic.statisticPageView.statistics;
 
 import java.util.ArrayList;
 
-import main.activities.FragmentTabs;
-import main.activities.R;
-import main.activities.StatisticFragment;
+import ubicomp.drunk_detection.activities.R;
 
 import statistic.statisticPageView.StatisticPageView;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.StatisticFragment;
 
 import android.content.Context;
 import android.graphics.Bitmap;

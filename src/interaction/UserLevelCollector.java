@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.security.KeyStore;
 
 
-import main.activities.R;
+import ubicomp.drunk_detection.activities.R;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;

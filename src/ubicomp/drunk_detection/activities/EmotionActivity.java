@@ -1,5 +1,6 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
+import ubicomp.drunk_detection.activities.R;
 import database.QuestionDB;
 import android.os.Bundle;
 import android.app.Activity;

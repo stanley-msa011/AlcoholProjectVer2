@@ -72,7 +72,7 @@
     	    android:layout_height="wrap_content"
     	    android:layout_below="@+id/statistic_day_brac_value"
     	    android:layout_centerHorizontal="true"
-    	    android:text="BrAC"
+    	    android:text="酒精濃度"
     	    android:textAlignment="textStart"
     	    android:textColor="#FFFFFFFF" />
 

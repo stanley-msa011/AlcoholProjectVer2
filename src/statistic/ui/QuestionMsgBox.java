@@ -1,9 +1,9 @@
 package statistic.ui;
 
-import main.activities.AlarmReceiver;
-import main.activities.FragmentTabs;
-import main.activities.R;
-import main.activities.StatisticFragment;
+import ubicomp.drunk_detection.activities.AlarmReceiver;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.StatisticFragment;
+import ubicomp.drunk_detection.activities.R;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;

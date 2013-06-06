@@ -12,7 +12,7 @@ import java.security.KeyStore;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import main.activities.R;
+import ubicomp.drunk_detection.activities.R;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;

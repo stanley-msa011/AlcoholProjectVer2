@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Scanner;
 
 
-import main.activities.R;
-import main.activities.TestFragment;
+import ubicomp.drunk_detection.activities.R;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpPost;
@@ -27,6 +26,8 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
+
+import ubicomp.drunk_detection.activities.TestFragment;
 
 import database.HistoryDB;
 import database.TimeBlock;
@@ -104,13 +105,13 @@ public class BracDataHandler {
     	hour = cal.get(Calendar.HOUR_OF_DAY);
     	
     	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		int timeblock_type = sp.getInt("timeblock_num", 2);
+		int timeblock_type = sp.getInt("timeblock_num", 3);
     	timeblock = TimeBlock.getTimeBlock(hour,timeblock_type);
     
     	//check time block
     	boolean check_time_block =true;
     	if (check_time_block){
-    		if (timeblock==-1);
+    		if (timeblock==-1 || timeblock == 2);
     		else if (year == prevHistory.year && month == prevHistory.month && date == prevHistory.date && timeblock == prevHistory.timeblock);
     		else{
     			if (avg_result != ERROR){

@@ -1,6 +1,6 @@
 package test.gps;
 
-import main.activities.TestFragment;
+import ubicomp.drunk_detection.activities.TestFragment;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.AsyncTask;

@@ -1,5 +1,6 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
+import ubicomp.drunk_detection.activities.R;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,6 +18,8 @@ import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -32,6 +35,7 @@ public class TutorialActivity extends Activity {
 	
 	private TextView step;
 	private TextView help;
+	private TextView notify; 
 	
 	private LoadingHandler loadingHandler;
 	private static Point size;
@@ -43,6 +47,9 @@ public class TutorialActivity extends Activity {
 	
 	private static final String[] STEP_STR = {"步驟 1","步驟 2","步驟 3"};
 	private static final String[] HELP_STR = {"按下開關，使指示燈亮起","進入測試頁面按下開始按鈕","對準吹氣口持續吹氣五秒鐘"};
+	
+	private AlphaAnimation animation;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -84,6 +91,10 @@ public class TutorialActivity extends Activity {
 		help.setTypeface(wordTypeface);
 		RelativeLayout.LayoutParams hParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
 		hParam.topMargin = size.x * 1150/1080;
+		
+		notify= (TextView) this.findViewById(R.id.tutorial_notify);
+		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 96/1080);
+		notify.setTypeface(wordTypefaceBold);
 		
 		tab = (ImageView) this.findViewById(R.id.tutorial_tab);
 		
@@ -181,11 +192,20 @@ public class TutorialActivity extends Activity {
 			if (arrowBmps[2]!= tmp)
 				tmp.recycle();
 			
+			animation = new AlphaAnimation(1.F,0.F);
+			animation.setRepeatCount(Animation.INFINITE);
+			animation.setRepeatMode(Animation.REVERSE);
+			animation.setDuration(300);
+			arrow.setAnimation(animation);
+			
 			
 			layout.setBackground(new BitmapDrawable(bgBmp));
 			settingState(0);
 			if (mDialog!=null)
 				mDialog.dismiss();
+			
+
+			
 		}
 	}
 
@@ -210,6 +230,7 @@ public class TutorialActivity extends Activity {
 			aParam.leftMargin = 0;
 			aParam.width = size.x * 98/1080;
 			aParam.height = size.x * 356/1080;
+			animation.start();
 		}
 		else if (state == 1){
 			layout .setOnClickListener(new Listener(1));
@@ -225,6 +246,7 @@ public class TutorialActivity extends Activity {
 			aParam.leftMargin = size.x * 140/1080;
 			aParam.width = size.x * 93/1080;
 			aParam.height = size.x * 410/1080;
+			animation.start();
 		}
 		else if (state == 2){
 			layout .setOnClickListener(new EndListener());
@@ -241,6 +263,7 @@ public class TutorialActivity extends Activity {
 			aParam.leftMargin = 0;
 			aParam.width = size.x * 350/1080;
 			aParam.height = size.x * 389/1080;
+			animation.start();
 		}
 	}
 	
@@ -260,6 +283,8 @@ public class TutorialActivity extends Activity {
 	private class EndListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			arrow.setAnimation(null);
+			animation.cancel();
 			finish();
 		}
 	}

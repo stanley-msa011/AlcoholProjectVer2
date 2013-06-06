@@ -1,7 +1,7 @@
 package tabControl;
 
-import main.activities.FragmentTabs;
-import main.activities.R;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

@@ -26,7 +26,7 @@ public class HistoryDB {
 	public HistoryDB(Context context){
 		dbHelper = new DBHelper(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		timeblock_type = sp.getInt("timeblock_num", 2);
+		timeblock_type = sp.getInt("timeblock_num", 3);
 	}
 	
 	public DateBracGameHistory[] getAllHistory(){
@@ -62,9 +62,7 @@ public class HistoryDB {
     		int level = cursor.getInt(l_idx);
     		long ts = cursor.getLong(ts_idx);
     		Calendar cal = Calendar.getInstance();
-    		int id = cursor.getInt(cursor.getColumnIndex("_ID"));
     		cal.setTimeInMillis(ts*1000);
-    		//Log.d("CHART_2",id+">>"+cal.toString());
     		
     		int emotion = cursor.getInt(e_idx);
     		int desire = cursor.getInt(d_idx);

@@ -3,11 +3,11 @@ package test.camera;
 import java.util.Iterator;
 import java.util.List;
 
-import main.activities.FragmentTabs;
-import main.activities.R;
-import main.activities.TestFragment;
+import ubicomp.drunk_detection.activities.R;
 
 import test.file.ImageFileHandler;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.TestFragment;
 
 import android.app.Activity;
 import android.graphics.Point;

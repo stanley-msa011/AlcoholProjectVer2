@@ -1,5 +1,6 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
+import ubicomp.drunk_detection.activities.R;
 import tabControl.CustomTab;
 import test.data.Reuploader;
 import android.annotation.SuppressLint;

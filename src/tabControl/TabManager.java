@@ -3,7 +3,8 @@ package tabControl;
 
 import java.util.HashMap;
 
-import main.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+
 
 import android.content.Context;
 import android.os.Bundle;

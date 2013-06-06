@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
-import static main.activities.CommonUtilities.SERVER_URL;
+import static ubicomp.drunk_detection.activities.CommonUtilities.SERVER_URL;
 
 import com.google.android.gcm.GCMRegistrar;
 

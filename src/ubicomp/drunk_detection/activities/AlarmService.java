@@ -1,6 +1,8 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
 import java.util.Calendar;
+
+import ubicomp.drunk_detection.activities.R;
 
 import database.HistoryDB;
 import android.app.Notification;

@@ -1,6 +1,6 @@
 package test.camera;
 
-import main.activities.TestFragment;
+import ubicomp.drunk_detection.activities.TestFragment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;

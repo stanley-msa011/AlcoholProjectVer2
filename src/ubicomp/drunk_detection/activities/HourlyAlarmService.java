@@ -1,5 +1,6 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
+import ubicomp.drunk_detection.activities.R;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

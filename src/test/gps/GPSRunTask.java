@@ -5,7 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import main.activities.TestFragment;
+import ubicomp.drunk_detection.activities.TestFragment;
+
 
 import android.location.Location;
 import android.location.LocationListener;

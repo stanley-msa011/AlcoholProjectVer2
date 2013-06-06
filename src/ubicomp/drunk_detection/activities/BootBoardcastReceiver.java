@@ -1,4 +1,4 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
 import java.util.Calendar;
 

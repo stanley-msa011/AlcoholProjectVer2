@@ -44,11 +44,22 @@
         android:layout_height="wrap_content"
          android:layout_alignParentBottom="true"
         />
-    
+     <TextView 
+        android:id="@+id/tutorial_notify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+       	android:textColor="#FF7c7d7c"
+       	android:text="下一步"
+        />
+     
+     
      <ImageView 
         android:id="@+id/tutorial_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="fitXY"
         />
+     
+
 </RelativeLayout>

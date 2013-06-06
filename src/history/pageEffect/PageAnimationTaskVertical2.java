@@ -1,7 +1,7 @@
 package history.pageEffect;
 
-import main.activities.FragmentTabs;
-import main.activities.HistoryFragment;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.HistoryFragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;

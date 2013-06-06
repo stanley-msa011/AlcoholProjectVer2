@@ -8,7 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 1;
+	private static final int DB_VERSION = 2;
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -56,16 +56,40 @@ public class DBHelper extends SQLiteOpenHelper {
         				"_TYPE INTEGER NOT NULL," +
         				"_REASON CHAR[255] NOT NULL)"
         		);
+        
+        //Add after ver 2
+        db.execSQL(
+        		"CREATE TABLE RecDB ("+
+        				"_ID INTEGER PRIMARY KEY," +
+        				"_YEAR INTEGER NOT NULL," +
+        				"_MONTH INTEGER NOT NULL," +
+        				"_DATE INTEGER NOT NULL," +
+        				"_FILENAME CHAR[255] NOT NULL)"
+        		);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int old_ver, int new_ver){
-		db.execSQL("DROP TABLE IF EXISTS HistoryGame");
-		db.execSQL("DROP TABLE IF EXISTS InteractionGame");
-		db.execSQL("DROP TABLE IF EXISTS NotUploadedTS");
-		db.execSQL("DROP TABLE IF EXISTS EmotionDB");
-		db.execSQL("DROP TABLE IF EXISTS EmotionManageDB");
-		onCreate(db);
+		if (old_ver < 2){
+	        db.execSQL(
+	        		"CREATE TABLE RecDB ("+
+	        				"_ID INTEGER PRIMARY KEY," +
+	        				"_YEAR INTEGER NOT NULL," +
+	        				"_MONTH INTEGER NOT NULL," +
+	        				"_DATE INTEGER NOT NULL," +
+	        				"_FILENAME CHAR[255] NOT NULL)"
+	        		);
+		}
+		/*
+		else{
+			db.execSQL("DROP TABLE IF EXISTS HistoryGame");
+			db.execSQL("DROP TABLE IF EXISTS InteractionGame");
+			db.execSQL("DROP TABLE IF EXISTS NotUploadedTS");
+			db.execSQL("DROP TABLE IF EXISTS EmotionDB");
+			db.execSQL("DROP TABLE IF EXISTS EmotionManageDB");
+			onCreate(db);
+		}
+		*/
 	}
 	
 	public void onOpen(SQLiteDatabase db){

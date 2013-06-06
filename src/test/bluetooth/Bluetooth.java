@@ -7,10 +7,10 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
-import main.activities.TestFragment;
 
 import test.camera.CameraRunHandler;
 import test.file.BracValueFileHandler;
+import ubicomp.drunk_detection.activities.TestFragment;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;

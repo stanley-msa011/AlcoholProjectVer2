@@ -5,8 +5,7 @@ import java.util.Calendar;
 
 import database.HistoryDB;
 import database.TimeBlock;
-import main.activities.R;
-import main.activities.StatisticFragment;
+import ubicomp.drunk_detection.activities.R;
 import history.BracGameHistory;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -27,6 +26,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import statistic.statisticPageView.StatisticPageView;
 import test.data.BracDataHandler;
+import ubicomp.drunk_detection.activities.StatisticFragment;
 
 public class StatisticWeekView extends StatisticPageView {
 
@@ -64,7 +64,7 @@ public class StatisticWeekView extends StatisticPageView {
 		super(context, R.layout.statistic_week_view, statisticFragment);
 		db = new HistoryDB(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		timeblock_type = sp.getInt("timeblock_num", 2);
+		timeblock_type = sp.getInt("timeblock_num", 3);
 	}
 
 

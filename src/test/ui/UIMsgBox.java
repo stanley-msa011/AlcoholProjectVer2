@@ -1,8 +1,8 @@
 package test.ui;
 
-import main.activities.FragmentTabs;
-import main.activities.R;
-import main.activities.TestFragment;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -41,6 +42,11 @@ public class UIMsgBox {
 	private TextView emotionShowText;
 	private TextView desireShowText;
 	
+	private LinearLayout emotionLabel,desireLabel;
+	
+	private static final String[] emotionStr = {"很沮喪　","　低落　","　普通　", "　愉快　","　　快樂"};
+	private static final String[] desireStr = {"無　　　","輕度\n尚未行動","中~強度\n等下去買","非常強烈\n即將要喝"};
+	private static final int[] desireWeight = {2,3,3,2};
 	
 	private LinearLayout questionLayout;
 	
@@ -80,7 +86,7 @@ public class UIMsgBox {
 		
 		questionLayout = (LinearLayout) boxLayout.findViewById(R.id.msg_question_layout);
 		
-		textSize = (int)(screen.x * 42.0/720.0);
+		textSize = screen.x * 63/1080;
 		
 		help = (TextView) boxLayout.findViewById(R.id.msg_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
@@ -122,12 +128,15 @@ public class UIMsgBox {
 		desireShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		desireShowText.setTypeface(digitTypeface);
 		
+		emotionLabel = (LinearLayout) boxLayout.findViewById(R.id.msg_emotion_label);
+		desireLabel = (LinearLayout) boxLayout.findViewById(R.id.msg_desire_label);
 	}
 	
 	public void settingPreTask(){
 		mainLayout.addView(boxLayout);
 	}
 	
+	private int box_width;
 	
 	public void settingInBackground(){
 		
@@ -135,9 +144,9 @@ public class UIMsgBox {
 		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
 		boxParam.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
-		boxParam.width = (int)(screen.x*600.0/720.0);
+		boxParam.width = box_width = screen.x*900/1080;
 		
-		int size = (int)(screen.x*80.0/720.0);
+		int size = screen.x*120/1080;
 		
 		LinearLayout.LayoutParams eParam = (LinearLayout.LayoutParams) emotionShowText.getLayoutParams();
 		eParam.width = size;
@@ -199,6 +208,35 @@ public class UIMsgBox {
 	public  void settingPostTask(){
 		emotionSeekBar.setProgress(emotionSeekBar.getMax()/2);
 		desireSeekBar.setProgress(desireSeekBar.getMax()/2);
+		
+		int textSize2 = screen.x * 40/1080;
+		
+		for (int i=0;i<emotionStr.length;++i){
+			TextView t = new TextView(context);
+			t.setText(emotionStr[i]);
+			t.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize2);
+			t.setTypeface(wordTypeface);
+			t.setTextColor(0xFF000000);
+			t.setGravity(Gravity.CENTER_HORIZONTAL);
+			emotionLabel.addView(t);
+			LinearLayout.LayoutParams tp = (LinearLayout.LayoutParams)t.getLayoutParams();
+			tp.weight = 1;
+			tp.width = box_width /5;
+		}
+		
+		for (int i=0;i<desireStr.length;++i){
+			TextView t = new TextView(context);
+			t.setText(desireStr[i]);
+			t.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize2);
+			t.setTypeface(wordTypeface);
+			t.setTextColor(0xFF000000);
+			t.setGravity(Gravity.CENTER_HORIZONTAL);
+			desireLabel.addView(t);
+			LinearLayout.LayoutParams tp = (LinearLayout.LayoutParams)t.getLayoutParams();
+			//tp.weight = desireWeight[i];
+			tp.width = box_width *desireWeight[i]/10;
+		}
+		
 	}
 	
 	public void clear(){

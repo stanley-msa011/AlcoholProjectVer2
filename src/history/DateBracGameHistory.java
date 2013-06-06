@@ -2,7 +2,8 @@ package history;
 
 import java.util.Calendar;
 
-import main.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.FragmentTabs;
+
 
 import android.content.Context;
 import android.content.SharedPreferences;

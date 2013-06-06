@@ -1,6 +1,8 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
 import java.util.Calendar;
+
+import ubicomp.drunk_detection.activities.R;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -55,7 +57,7 @@ public class PreSettingActivity extends Activity {
 		drink.setText(String.valueOf(sp.getInt("drink_cost", 200)));
 
 		tb= (EditText) this.findViewById(R.id.target_tb_edit);
-		tb.setText(String.valueOf(sp.getInt("timeblock_num", 2)));
+		tb.setText(String.valueOf(sp.getInt("timeblock_num", 3)));
 		
 		mDateDisplay = (TextView) findViewById(R.id.date);        
 	    mPickDate = (Button) findViewById(R.id.date_button);
@@ -126,7 +128,8 @@ public class PreSettingActivity extends Activity {
 				editor.putInt("sYear",mYear );
 				editor.putInt("sMonth",mMonth );
 				editor.putInt("sDate", mDay);
-				editor.putInt("timeblock_num", tb_t);
+				//editor.putInt("timeblock_num", tb_t);
+				editor.putInt("timeblock_num", 3);
 				editor.commit();
 				Log.d("PreSetting","Done");
 			}

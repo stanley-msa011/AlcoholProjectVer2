@@ -1,6 +1,6 @@
 package test.bluetooth;
 
-import main.activities.TestFragment;
+import ubicomp.drunk_detection.activities.TestFragment;
 import android.os.Handler;
 import android.os.Message;
 

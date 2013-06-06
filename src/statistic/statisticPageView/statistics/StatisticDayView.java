@@ -6,10 +6,10 @@ import java.util.Calendar;
 import database.HistoryDB;
 import database.TimeBlock;
 
-import main.activities.R;
-import main.activities.StatisticFragment;
+import ubicomp.drunk_detection.activities.R;
 import statistic.statisticPageView.StatisticPageView;
 import test.data.BracDataHandler;
+import ubicomp.drunk_detection.activities.StatisticFragment;
 import history.BracGameHistory;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -42,7 +42,7 @@ public class StatisticDayView extends StatisticPageView {
 	private ImageView emotion,desire;
 	private Bitmap emotionBmp, desireBmp;
 	
-	private String[] blockHint = {"早","中","下","晚"};
+	private String[] blockHint = {"早上\n0~12","中午\n12~18","下","晚上\n18~24"};
 	
 	private static final int nBlocks = 4;
 	private int timeblock_type;
@@ -75,7 +75,7 @@ public class StatisticDayView extends StatisticPageView {
 		super(context,R.layout.statistic_day_view,statisticFragment);
 		db = new HistoryDB(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		timeblock_type = sp.getInt("timeblock_num", 2);
+		timeblock_type = sp.getInt("timeblock_num", 3);
 	}
 	
 		@Override

@@ -1,5 +1,6 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
+import ubicomp.drunk_detection.activities.R;
 import statistic.statisticPageView.StatisticPageView;
 import statistic.statisticPageView.analysis.AnalysisProgressView;
 import statistic.statisticPageView.analysis.AnalysisRatingView;
@@ -298,14 +299,13 @@ public class StatisticFragment extends Fragment {
 			
 			if (questionButtonBmp==null ||questionButtonBmp.isRecycled()){
 				BitmapFactory.Options opt = new BitmapFactory.Options();
-	        	opt.inSampleSize = 2;
-				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button,opt);
+				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button);
 				questionButtonBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
 				tmp.recycle();
 			}
 			RelativeLayout.LayoutParams questionParam = (RelativeLayout.LayoutParams) questionButton.getLayoutParams();
-			questionParam.width =  screen.x * 70 / 1080;
-			questionParam.height =  screen.x * 70 / 1080;
+			questionParam.width =  screen.x * 153 / 1080;
+			questionParam.height =  screen.x * 153 / 1080;
 			questionParam.topMargin =  screen.x * 107 / 1080;
 			questionParam.rightMargin =  screen.x * 58 / 1080;
 			

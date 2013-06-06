@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="main.activities"
-    android:versionCode="1"
-    android:versionName="1.21" >
+    package="ubicomp.drunk_detection.activities"
+    android:versionCode="2"
+    android:versionName="1.01" >
 
     <uses-sdk
         android:maxSdkVersion="17"
-        android:minSdkVersion="8"
+        android:minSdkVersion="14"
         android:targetSdkVersion="17" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -25,12 +25,12 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
-
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <permission
-        android:name="main.activities.permission.C2D_MESSAGE"
+        android:name="ubicomp.drunk_detection.activities.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="main.activities.permission.C2D_MESSAGE" />
+    <uses-permission android:name="ubicomp.drunk_detection.activities.permission.C2D_MESSAGE" />
 
     <supports-screens
         android:anyDensity="true"
@@ -44,7 +44,7 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
         <activity
-            android:name="main.activities.FragmentTabs"
+            android:name="ubicomp.drunk_detection.activities.FragmentTabs"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" >
@@ -63,7 +63,7 @@
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
             </intent-filter>
         </receiver>
-        <receiver android:name="main.activities.BootBoardcastReceiver" >
+        <receiver android:name="ubicomp.drunk_detection.activities.BootBoardcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIME_SET" />
@@ -71,33 +71,33 @@
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </receiver>
-        <receiver android:name="main.activities.AlarmReceiver" >
+        <receiver android:name="ubicomp.drunk_detection.activities.AlarmReceiver" >
             <intent-filter>
                 <action android:name="com.android.alarmclock.ALARM_ALERT" />
             </intent-filter>
         </receiver>
 
-        <service android:name="main.activities.AlarmService" >
+        <service android:name="ubicomp.drunk_detection.activities.AlarmService" >
         </service>
-        <service android:name="main.activities.HourlyAlarmService" >
+        <service android:name="ubicomp.drunk_detection.activities.HourlyAlarmService" >
         </service>
 
         <activity
-            android:name="main.activities.PreSettingActivity"
+            android:name="ubicomp.drunk_detection.activities.PreSettingActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="main.activities.EmotionActivity"
+            android:name="ubicomp.drunk_detection.activities.EmotionActivity"
              android:screenOrientation="portrait" 
             >
         </activity>
         <activity
-            android:name="main.activities.EmotionManageActivity"
+            android:name="ubicomp.drunk_detection.activities.EmotionManageActivity"
              android:screenOrientation="portrait" 
             >
         </activity>
         <activity
-            android:name="main.activities.TutorialActivity"
+            android:name="ubicomp.drunk_detection.activities.TutorialActivity"
              android:screenOrientation="portrait" 
             >
         </activity>

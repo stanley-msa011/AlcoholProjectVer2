@@ -23,7 +23,7 @@ import org.apache.http.params.CoreProtocolPNames;
 
 import database.HistoryDB;
 
-import main.activities.R;
+import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;

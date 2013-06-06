@@ -1,9 +1,9 @@
 package statistic.statisticPageView.analysis;
 
-import main.activities.R;
-import main.activities.StatisticFragment;
+import ubicomp.drunk_detection.activities.R;
 import statistic.statisticPageView.StatisticPageView;
 import statistic.statisticSetting.TargetSetting;
+import ubicomp.drunk_detection.activities.StatisticFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;

@@ -1,4 +1,4 @@
-package main.activities;
+package ubicomp.drunk_detection.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;

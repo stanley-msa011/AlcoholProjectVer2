@@ -1,6 +1,6 @@
 package statistic.statisticPageView;
 
-import main.activities.StatisticFragment;
+import ubicomp.drunk_detection.activities.StatisticFragment;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
