@@ -192,11 +192,6 @@ public class FragmentTabs extends FragmentActivity {
 	protected void onStop(){
 		Log.d("TABS","ONSTOP");
 		context = null;
-		/*if (customTabs!=null)
-			for (int i=0;i<customTabs.length;++i)
-				if (customTabs[i]!=null)
-					customTabs[i].clear();
-					*/
 		super.onStop();
 	}
 	
@@ -305,8 +300,7 @@ public class FragmentTabs extends FragmentActivity {
     	
 		@Override
 		public void onTabChanged(String tabId) {
-			//if (!enableTabs)
-			//	return;
+
 			if (lastTabId.equals(tabId))
 				return;
 			
@@ -388,8 +382,4 @@ public class FragmentTabs extends FragmentActivity {
 			detach_loading_page();
 	}
 	
-	static public void attach_loading_page(){
-		if (loadingPage!=null)
-			loadingPage.setVisibility(View.VISIBLE);
-	}
 }

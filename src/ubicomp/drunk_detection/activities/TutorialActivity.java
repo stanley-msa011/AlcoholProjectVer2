@@ -41,7 +41,7 @@ public class TutorialActivity extends Activity {
 	private static Point size;
 	
 	private RelativeLayout layout;
-	private Typeface digitTypeface;
+	//private Typeface digitTypeface;
 	private Typeface wordTypeface;
 	private Typeface wordTypefaceBold;
 	
@@ -50,6 +50,7 @@ public class TutorialActivity extends Activity {
 	
 	private AlphaAnimation animation;
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -71,7 +72,7 @@ public class TutorialActivity extends Activity {
 			display.getSize(size);
 		}
 		
-		digitTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dinproregular.ttf");
+		//digitTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dfheistd-w3.otf");
 		wordTypefaceBold  = Typeface.createFromAsset(this.getAssets(), "fonts/dfheistd-w5.otf");
 		
@@ -110,11 +111,20 @@ public class TutorialActivity extends Activity {
 		super.onResume();
 		mDialog = new ProgressDialog(this);
         mDialog.setMessage("載入中");
-        mDialog.setCancelable(true);
+        mDialog.setCancelable(false);
+        mDialog.show();
 		loadingHandler.sendEmptyMessage(0);
 	}
 	
 	protected void onPause(){
+		super.onPause();
+		mDialog = new ProgressDialog(this);
+        mDialog.setMessage("載入中");
+        mDialog.setCancelable(false);
+        mDialog.show();
+		loadingHandler.removeMessages(0);
+		if (layout!=null)
+			layout.setBackground(null);
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;
@@ -146,8 +156,7 @@ public class TutorialActivity extends Activity {
 					arrowBmps[i] = null;
 				}
 		}
-		
-		super.onPause();
+		mDialog.dismiss();
 	}
 	
 	@SuppressLint("HandlerLeak")
@@ -198,10 +207,11 @@ public class TutorialActivity extends Activity {
 			animation.setDuration(300);
 			arrow.setAnimation(animation);
 			
-			
-			layout.setBackground(new BitmapDrawable(bgBmp));
+			if (bgBmp!=null && !bgBmp.isRecycled())
+				layout.setBackground(new BitmapDrawable(bgBmp));
+			//layout.setBackgroundResource(R.drawable.tutorial_bg);
 			settingState(0);
-			if (mDialog!=null)
+			if (mDialog!=null && mDialog.isShowing())
 				mDialog.dismiss();
 			
 
@@ -224,7 +234,8 @@ public class TutorialActivity extends Activity {
 			replay.setOnClickListener(null);
 			replay.setVisibility(View.INVISIBLE);
 			tab.setVisibility(View.INVISIBLE);
-			arrow.setImageBitmap(arrowBmps[0]);
+			if (arrowBmps!=null && arrowBmps[0]!=null && !arrowBmps[0].isRecycled())
+				arrow.setImageBitmap(arrowBmps[0]);
 			aParam.addRule(RelativeLayout.RIGHT_OF, help.getId());
 			aParam.topMargin = size.x * 1200/1080;
 			aParam.leftMargin = 0;
@@ -238,9 +249,11 @@ public class TutorialActivity extends Activity {
 			next.setVisibility(View.INVISIBLE);
 			replay.setOnClickListener(null);
 			replay.setVisibility(View.INVISIBLE);
-			tab.setImageBitmap(tabBmp);
+			if (tabBmp!=null && !tabBmp.isRecycled())
+				tab.setImageBitmap(tabBmp);
 			tab.setVisibility(View.VISIBLE);
-			arrow.setImageBitmap(arrowBmps[1]);
+			if (arrowBmps!=null && arrowBmps[1]!=null && !arrowBmps[1].isRecycled())
+				arrow.setImageBitmap(arrowBmps[1]);
 			aParam.addRule(RelativeLayout.ABOVE, tab.getId());
 			aParam.topMargin = 0;
 			aParam.leftMargin = size.x * 140/1080;
@@ -251,17 +264,20 @@ public class TutorialActivity extends Activity {
 		else if (state == 2){
 			layout .setOnClickListener(new EndListener());
 			next.setOnClickListener(new EndListener());
-			next.setImageBitmap(nextBmp);
+			if (nextBmp!=null && !nextBmp.isRecycled())
+				next.setImageBitmap(nextBmp);
 			next.setVisibility(View.VISIBLE);
 			replay.setOnClickListener(new Listener(-1));
-			replay.setImageBitmap(replayBmp);
+			if (replayBmp!=null && !replayBmp.isRecycled())
+				replay.setImageBitmap(replayBmp);
 			replay.setVisibility(View.VISIBLE);
 			tab.setVisibility(View.INVISIBLE);
-			arrow.setImageBitmap(arrowBmps[2]);
+			if (arrowBmps!=null && arrowBmps[2]!=null && !arrowBmps[2].isRecycled())
+				arrow.setImageBitmap(arrowBmps[2]);
 			aParam.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
 			aParam.topMargin = size.x * 850/1080;
 			aParam.leftMargin = 0;
-			aParam.width = size.x * 350/1080;
+			aParam.width = size.x * 393/1080;
 			aParam.height = size.x * 389/1080;
 			animation.start();
 		}

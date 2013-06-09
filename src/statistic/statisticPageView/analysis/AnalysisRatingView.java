@@ -55,6 +55,18 @@ public class AnalysisRatingView extends StatisticPageView {
 
 	@Override
 	public void clear() {
+		if (title_bg!=null)
+			title_bg.setImageBitmap(null);
+		
+		if (bar !=null)
+			bar.setImageBitmap(null);
+		if (pointer !=null)
+			pointer.setImageBitmap(null);
+		if (bar2!=null)
+			bar2.setImageBitmap(null);
+		if (pointer !=null)
+			pointer.setImageBitmap(null);
+		
 		if (netHandler!=null)
 			netHandler.removeMessages(0);
 		if (titleBmp!=null && !titleBmp.isRecycled()){

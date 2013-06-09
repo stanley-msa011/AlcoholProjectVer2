@@ -13,13 +13,13 @@ import test.camera.CameraInitHandler;
 import test.camera.CameraRecorder;
 import test.camera.CameraRunHandler;
 import test.data.BracDataHandler;
+import test.file.BracValueDebugHandler;
 import test.file.BracValueFileHandler;
 import test.file.ImageFileHandler;
 import test.file.QuestionFile;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
 import test.ui.UIMsgBox;
-import test.ui.UIMsgBox2;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -89,6 +89,7 @@ public class TestFragment extends Fragment {
 	private File mainDirectory;
 	private BracValueFileHandler bracFileHandler;
 	private ImageFileHandler imgFileHandler;
+	private BracValueDebugHandler bracDebugHandler;
 	
 	//Uploader
 	private BracDataHandler BDH;
@@ -126,7 +127,6 @@ public class TestFragment extends Fragment {
 	private EditText debugMsg;
 	private ChangeMsgHandler msgHandler;
 	
-	private static final String[] BLOW_MSG = {"開始\n吹氣","加油\n1","加油\n2","加油\n3","加油\n4","加油\n5"," 完成"};
 	private static final int[] BLOW_RESOURCE = {0,R.drawable.test_circle1,R.drawable.test_circle2,R.drawable.test_circle3,R.drawable.test_circle4,R.drawable.test_circle5};
 	private Bitmap[] blowBmp;
 	
@@ -256,7 +256,7 @@ public class TestFragment extends Fragment {
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		cameraRecorder = new CameraRecorder(testFragment,imgFileHandler);
 		cameraRunHandler = new CameraRunHandler(cameraRecorder);
-		bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler);
+		bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
 		for (int i=0;i<3;++i)
 			INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
 	}
@@ -398,6 +398,7 @@ public class TestFragment extends Fragment {
 			}
 		
 		bracFileHandler = new BracValueFileHandler(mainDirectory,timestamp);
+		bracDebugHandler = new BracValueDebugHandler(mainDirectory,timestamp);
 		imgFileHandler = new ImageFileHandler(mainDirectory,timestamp);
 		questionFile = new QuestionFile(mainDirectory);
 	}

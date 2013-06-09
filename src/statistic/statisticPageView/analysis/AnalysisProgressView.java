@@ -57,6 +57,8 @@ public class AnalysisProgressView extends StatisticPageView {
 	@Override
 	public void clear() {
 		Log.d("CLEAR","DRUNK");
+		if (title_bg!=null)
+			title_bg.setImageBitmap(null);
 		if (titleBmp!=null && !titleBmp.isRecycled()){
 			titleBmp.recycle();
 			titleBmp = null;

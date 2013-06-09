@@ -49,6 +49,17 @@ public class AnalysisSavingView extends StatisticPageView {
 
 	@Override
 	public void clear() {
+		if (title_bg!=null)
+			title_bg.setImageBitmap(null);
+		if (goalBar!=null)
+			goalBar.setImageBitmap(null);
+		if (currentBar !=null)
+			currentBar.setImageBitmap(null);
+		if (start !=null)
+			start.setImageBitmap(null);
+		if (end !=null)
+			end.setImageBitmap(null);
+		
 		if (titleBmp!=null && !titleBmp.isRecycled()){
 			titleBmp.recycle();
 			titleBmp = null;

@@ -71,6 +71,12 @@ public class StatisticWeekView extends StatisticPageView {
 	@Override
 	public void clear() {
 		Log.d("CLEAR","WEEK");
+		if (circles!=null)
+			for (int i=0;i<circles.length;++i)
+				circles[i].setImageBitmap(null);
+		if (labelImgs !=null)
+			for (int i=0;i<labelImgs.length;++i)
+				labelImgs[i].setImageBitmap(null);
 		
 		if (circleBmps!=null){
 			for (int i=0;i<circleBmps.length;++i){
@@ -254,7 +260,7 @@ public class StatisticWeekView extends StatisticPageView {
 			int idx = (i%nBlocks)*nDate + i/nBlocks;
 			if (!TimeBlock.hasBlock(i%nBlocks, timeblock_type)){
 				circles[idx].setImageBitmap(circleBmps[0]);
-				circles[idx].setAlpha(0.0F);
+				circles[idx].setAlpha(0.3F);
 				continue;
 			}
 			if (historys[i] == null){
@@ -263,7 +269,7 @@ public class StatisticWeekView extends StatisticPageView {
 				else
 					if (TimeBlock.isEmpty(i%nBlocks, cur_hour)){
 						circles[idx].setImageBitmap(circleBmps[0]);
-						circles[idx].setAlpha(0.1F);
+						circles[idx].setAlpha(0.3F);
 					}
 					else
 						circles[idx].setImageBitmap(circleBmps[0]);

@@ -121,15 +121,9 @@ public class StatisticFragment extends Fragment {
     	super.onPause();
     }
     
-    @SuppressWarnings("deprecation")
 	private void clear(){
     	for (int i=0;i<dots.length;++i)
     		dots[i].setImageBitmap(null);
-    	//view.setBackgroundDrawable(null);
-    	/*if (bgBmp!=null && !bgBmp.isRecycled()){
-    		bgBmp.recycle();
-    		bgBmp=null;
-    	}*/
     	
     	if (dot_on!=null && !dot_on.isRecycled()){
     		dot_on.recycle();

@@ -55,6 +55,7 @@ public class HistoryFragment extends Fragment {
 	private ImageView prevImage;
 	private RelativeLayout pageLayout;
 	private RelativeLayout chartLayout;
+	private RelativeLayout chartAreaLayout;
 	private HistoryDB hdb;
 	private AudioDB adb;
 	private PageWidgetVertical pageWidget;
@@ -77,6 +78,8 @@ public class HistoryFragment extends Fragment {
 	private ArrayList<Boolean> hasAudio;
 	
 	private ChartView chart;
+	private ChartTitleView  chartTitle;
+	private ChartYAxisView chartYAxis;
 	
     private int bar_width;
     private int bar_gap;
@@ -108,20 +111,17 @@ public class HistoryFragment extends Fragment {
 	
 	private LinearLayout stageLayout;
 	private TextView stage,stageNum;
-	
 	private Typeface stageTypeface;
 	
 	private Calendar from_cal;
-	
 	private Calendar to_cal;
 	
 	private Bitmap labelBmp;
 
 	private int achieve_level;
+	private boolean chartTouchable = true;
 	
 	private AudioRecordBox recordBox;
-	
-	private boolean chartTouchable = true;
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -236,6 +236,7 @@ public class HistoryFragment extends Fragment {
     	pageLayout = (RelativeLayout) view.findViewById(R.id.history_book_layout);
     	chartLayout = (RelativeLayout) view.findViewById(R.id.history_content_layout);
     	scrollView = (HorizontalScrollView) view.findViewById(R.id.history_scroll_view);
+    	chartAreaLayout = (RelativeLayout) view.findViewById(R.id.history_chart_area_layout);
     	
     	/*Setting the play*/
     	bg_x = screen.x;
@@ -309,7 +310,7 @@ public class HistoryFragment extends Fragment {
     	
     	
     	//Set chart
-    	LinearLayout.LayoutParams scrollParam = (LinearLayout.LayoutParams)scrollView.getLayoutParams();
+    	RelativeLayout.LayoutParams scrollParam = (RelativeLayout.LayoutParams)scrollView.getLayoutParams();
     	scrollParam.width = screen.x;
     	scrollParam.height = screen.x * 1709/1080 - height;
     	
@@ -323,6 +324,9 @@ public class HistoryFragment extends Fragment {
     	chart = new ChartView(this.getActivity());
     	chartLayout.addView(chart);
     	
+
+		
+    	
     	chartHeight = screen.x * 1709/1080 - height;
     	chart_width =  bar_left * 3/2 + (bar_width + bar_gap)* NUM_OF_BARS;
     	if (chart_width < screen.x)
@@ -331,6 +335,18 @@ public class HistoryFragment extends Fragment {
     	RelativeLayout.LayoutParams chartParam = (RelativeLayout.LayoutParams) chart.getLayoutParams();
 		chartParam.width= chart_width;
 		chartParam.height =  screen.x * 1709/1080 - height;
+		
+		chartYAxis = new ChartYAxisView(this.getActivity());
+		chartAreaLayout.addView(chartYAxis);
+		RelativeLayout.LayoutParams chartYParam = (RelativeLayout.LayoutParams) chartYAxis.getLayoutParams();
+		chartYParam.width = screen.x * 94/1080;
+		chartYParam.height = chartParam.height;
+		
+    	chartTitle = new ChartTitleView(this.getActivity());
+    	chartAreaLayout.addView(chartTitle);
+    	RelativeLayout.LayoutParams chartTitleParam = (RelativeLayout.LayoutParams) chartTitle.getLayoutParams();
+		chartTitleParam.width = labelBmp.getWidth();
+		chartTitleParam.height = labelBmp.getHeight();
 		
 		pageWidget.setOnTouchListener(gtListener);
 		
@@ -548,6 +564,9 @@ public class HistoryFragment extends Fragment {
 
 		bars.clear();
 		
+		if (NUM_OF_BARS == 0)
+			return;
+		
 		long from_t = from_cal.getTimeInMillis()/1000;
 		Calendar ccal = Calendar.getInstance();
 		ccal.setTimeInMillis(from_cal.getTimeInMillis());
@@ -613,12 +632,96 @@ public class HistoryFragment extends Fragment {
 		
 	}
 	
+	private int chart_type = 0;
+	
+	private class ChartTitleView extends View{
+
+		private Paint text_paint_large = new Paint();
+		
+		public ChartTitleView(Context context) {
+			super(context);
+			text_paint_large.setColor(0xFFFFFFFF);
+			text_paint_large.setTextSize(screen.x * 64F/1080F);
+			text_paint_large.setTextAlign(Align.LEFT);
+		}
+		
+		@Override  
+	    public boolean onTouchEvent(MotionEvent event) {
+			if (!chartTouchable)
+	    		return true;
+			if (event.getAction() == MotionEvent.ACTION_DOWN){
+				chart_type = (chart_type+1)%4;
+				invalidate();
+				chart.invalidate();
+				chartYAxis.invalidate();
+			}
+			return true;
+		}
+		
+		@Override
+		protected void onDraw(Canvas canvas){
+			super.onDraw(canvas);
+			canvas.drawBitmap(labelBmp,0, 0, null);
+			if (chart_type == 0)
+				canvas.drawText("心情量尺", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
+			else if (chart_type == 1)
+				canvas.drawText("渴癮指數", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
+			else if (chart_type == 2)
+				canvas.drawText("酒測結果", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
+			else
+				canvas.drawText("綜合資料", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
+		}
+	}
+	
+	private class ChartYAxisView extends View{
+
+		private Paint axis_paint = new Paint();
+		private Paint text_paint_small = new Paint();
+		
+		public ChartYAxisView(Context context) {
+			super(context);
+			text_paint_small.setColor(0xFF000000);
+			text_paint_small.setTextAlign(Align.CENTER);
+			text_paint_small.setTextSize(screen.x * 48F/1080F);
+			axis_paint.setColor(0xFF000000);
+			axis_paint.setStrokeWidth(screen.x * 7 / 1080);
+		}
+		
+		@Override
+		protected void onDraw(Canvas canvas){
+			super.onDraw(canvas);
+			
+			canvas.drawColor(0xFF999999);
+			
+			int max_height = (chartHeight - bar_bottom)*5/10;
+			int _bottom = chartHeight - bar_bottom;
+			
+			canvas.drawLine(3*bar_width, _bottom, 3*bar_width, _bottom - max_height - bar_width, axis_paint);
+			//Draw Y axis label
+			canvas.drawText("0", 3*bar_width/2, _bottom, text_paint_small);
+			String maxLabel;
+			if (chart_type == 0)
+				maxLabel = "5";
+			else if (chart_type == 1)
+				maxLabel = "10";
+			else if (chart_type == 2)
+				maxLabel = "0.5";
+			else
+				maxLabel = "最高";
+			canvas.drawText(maxLabel, 3*bar_width/2, _bottom - max_height, text_paint_small);
+		}
+	}
 	
 	private class ChartView extends View{
 
 		private Paint paint_pass = new Paint();
 		private Paint paint_fail= new Paint();
 		private Paint paint_none = new Paint();
+		
+		private Paint paint_pass_d = new Paint();
+		private Paint paint_fail_d= new Paint();
+		private Paint paint_none_d = new Paint();
+		
 		private Paint paint_highlight = new Paint();
 		private Paint circle_paint_stroke = new Paint();
 		private Paint button_paint = new Paint();
@@ -647,7 +750,7 @@ public class HistoryFragment extends Fragment {
 	    private ArrayList<Point> selected_centers;
 	    private ArrayList<Point> button_centers;
 	    
-	    private int chart_type = 0;
+	    
 	    
 		public ChartView(Context context) {
 			super(context);
@@ -655,8 +758,12 @@ public class HistoryFragment extends Fragment {
 			paint_pass.setColor(0xFFf39800);
 			paint_fail.setColor(0xFF5bdfbf);
 			paint_none.setColor(0xFFc9c9ca);
-			paint_highlight .setColor(0xAA00AAFF);
-			paint_highlight.setAlpha(0xAA);
+			
+			paint_pass_d.setColor(0xFFAF5400);
+			paint_fail_d.setColor(0xFF179B7B);
+			paint_none_d.setColor(0xFF858586);
+			
+			paint_highlight .setColor(0xFFAADDFF);
 			
 			circle_paint_stroke.setColor(0xFFFF0000);
 			circle_paint_stroke.setStyle(Style.STROKE);
@@ -722,29 +829,24 @@ public class HistoryFragment extends Fragment {
 	    	if (action == MotionEvent.ACTION_DOWN){
 	    		int x= (int)event.getX();
 	    		int y = (int) event.getY();
-	    		if (x < labelBmp.getWidth() && y < labelBmp.getHeight()){
-	    			chart_type = (chart_type+1)%4;
+	    	
+	    		boolean onButton = false;
+	    		int buttonNum = 0;
+	    		for (int i=0;i<button_centers.size();++i){
+	    			Point c = button_centers.get(i);
+	    			int distance_square = (c.x - x)*(c.x - x) + (c.y - y)*(c.y - y);
+	    			if (distance_square < BUTTON_RADIUS_SQUARE){
+	    				onButton = true;
+	    				buttonNum = i;
+	    				break;
+	    			}
 	    		}
-	    		else{
-	    			boolean onButton = false;
-	    			int buttonNum = 0;
-	    			for (int i=0;i<button_centers.size();++i){
-	    				Point c = button_centers.get(i);
-	    				int distance_square = (c.x - x)*(c.x - x) + (c.y - y)*(c.y - y);
-	    				if (distance_square < BUTTON_RADIUS_SQUARE){
-	    					onButton = true;
-	    					buttonNum = i;
-	    					break;
-	    				}
-	    			}
 	    		
-	    			if (onButton){
-	    				recordBox.showMsgBox(selected_dates.get(buttonNum),selected_idx.get(buttonNum));
-	    			}
-	    			else{
-	    				curX = (int) event.getX();  
-	    				curY = (int) event.getY();
-	    			}
+	    		if (onButton)
+	    			recordBox.showMsgBox(selected_dates.get(buttonNum),selected_idx.get(buttonNum));
+	    		else{
+	    			curX = (int) event.getX();  
+	    			curY = (int) event.getY();
 	    		}
 	    	}
 	    	invalidate();
@@ -763,44 +865,21 @@ public class HistoryFragment extends Fragment {
 			button_centers.clear();
 			selected_dates.clear();
 			
-			if (chart_type <3)
+			if (chart_type <3){
 				drawBarChart(canvas);
+				drawButtons(canvas);
+			}
 			else
 				drawLineChart(canvas);
+			
 			
 			drawBasis(canvas);
 		}
 		
 		private void drawBasis(Canvas canvas){
-			canvas.drawBitmap(labelBmp,0, 0, null);
-			int max_height = (chartHeight - bar_bottom)*5/10;
 			int _bottom = chartHeight - bar_bottom;
-			
-			if (chart_type == 0)
-				canvas.drawText("心情量尺", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
-			else if (chart_type == 1)
-				canvas.drawText("渴癮指數", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
-			else if (chart_type == 2)
-				canvas.drawText("酒測結果", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
-			else
-				canvas.drawText("綜合資料", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
-			
-			//Draw X-Y axis
+			//Draw Xaxis
 			canvas.drawLine(3*bar_width, _bottom, chart_width, _bottom, axis_paint);
-			canvas.drawLine(3*bar_width, _bottom, 3*bar_width, _bottom - max_height - bar_width, axis_paint);
-			
-			//Draw Y axis label
-			canvas.drawText("0", 3*bar_width/2, _bottom, text_paint_small);
-			String maxLabel;
-			if (chart_type == 0)
-				maxLabel = "5";
-			else if (chart_type == 1)
-				maxLabel = "10";
-			else if (chart_type == 2)
-				maxLabel = "0.5";
-			else
-				maxLabel = "MAX";
-			canvas.drawText(maxLabel, 3*bar_width/2, _bottom - max_height, text_paint_small);
 		}
 		
 		private void drawLineChart(Canvas canvas){
@@ -878,7 +957,6 @@ public class HistoryFragment extends Fragment {
 			for (int i=0;i<bars.size();++i){
 				
 				float height = 0;
-				
 				BarInfo bar = bars.get(i);
 				
 				boolean inRange = false;
@@ -906,6 +984,27 @@ public class HistoryFragment extends Fragment {
 				
 				//Draw bars & annotation_circles
 				Point center = new Point(left+circle_radius,_top - bar_gap - circle_radius);
+				/*
+				Paint p;
+				if (hasAudio.get(i)){
+					if (!bar.hasData)
+						p = paint_none_d;
+					else if (bar.brac > 0F)
+						p = paint_fail_d;
+					else
+						p = paint_pass_d;
+				}else{
+					if (!bar.hasData)
+						p = paint_none;
+					else if (bar.brac > 0F)
+						p = paint_fail;
+					else
+						p = paint_pass;
+				}
+				canvas.drawRect(left, _top, right, _bottom, p);
+				canvas.drawCircle(center.x,center.y, circle_radius, p);
+				*/
+				
 				if (!bar.hasData){
 					canvas.drawRect(left, _top, right, _bottom, paint_none);
 					canvas.drawCircle(center.x,center.y, circle_radius, paint_none);
@@ -932,7 +1031,9 @@ public class HistoryFragment extends Fragment {
 				}
 				left += (bar_width+bar_gap);
 			}
-			
+		}
+		
+		private void drawButtons(Canvas canvas){
 			//Draw buttons
 			if (curX>0 && curY > 0){
 				
@@ -952,17 +1053,14 @@ public class HistoryFragment extends Fragment {
 				}
 				
 				int bound = BUTTON_RADIUS*3/2;
-				int label_bound = labelBmp.getWidth() + bound;
-				int leftBound = scrollView.getScrollX() + bound;
+				int label_bound = scrollView.getScrollX() + labelBmp.getWidth() + bound;
 				int b_center_x = curX - (selected_centers.size()/2)*BUTTON_GAPS ;
-				if (b_center_x <  leftBound)
-					b_center_x =  leftBound;
+				if (b_center_x <  label_bound)
+					b_center_x =  label_bound;
 				int out_of_range = b_center_x + selected_centers.size()*BUTTON_GAPS -BUTTON_RADIUS - (scrollView.getScrollX() + screen.x);
 				if (out_of_range > 0){
 					b_center_x -= out_of_range;
 				}
-				if (b_center_x < label_bound)
-					b_center_x = label_bound;
 				
 				int b_center_y = BUTTON_RADIUS + bar_gap;
 				

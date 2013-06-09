@@ -70,6 +70,13 @@ public class StatisticMonthView extends StatisticPageView {
 	public void clear() {
 		Log.d("CLEAR","WEEK");
 		
+		if (circles!=null)
+			for (int i=0;i<circles.length;++i)
+				circles[i].setImageBitmap(null);
+		if (labelImgs !=null)
+			for (int i=0;i<labelImgs.length;++i)
+				labelImgs[i].setImageBitmap(null);
+		
 		if (circleBmps!=null){
 			for (int i=0;i<circleBmps.length;++i){
 				if (circleBmps[i]!=null && !circleBmps[i].isRecycled()){
@@ -262,7 +269,7 @@ public class StatisticMonthView extends StatisticPageView {
 			int idx = (i%nBlocks)*nDate + i/nBlocks;
 			if (!TimeBlock.hasBlock(i%4, timeblock_type)){
 				circles[idx].setImageBitmap(circleBmps[0]);
-				circles[idx].setAlpha(0.0F);
+				circles[idx].setAlpha(0.3F);
 				continue;
 			}
 			if (historys[i] == null){
@@ -271,7 +278,7 @@ public class StatisticMonthView extends StatisticPageView {
 				else
 					if (TimeBlock.isEmpty(i%nBlocks, cur_hour)){
 						circles[idx].setImageBitmap(circleBmps[0]);
-						circles[idx].setAlpha(0.1F);
+						circles[idx].setAlpha(0.3F);
 					}
 					else
 						circles[idx].setImageBitmap(circleBmps[0]);

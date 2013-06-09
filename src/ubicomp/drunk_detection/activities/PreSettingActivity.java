@@ -10,6 +10,8 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -63,10 +65,6 @@ public class PreSettingActivity extends Activity {
 	    mPickDate = (Button) findViewById(R.id.date_button);
 		
 		Calendar c = Calendar.getInstance();
-	    mYear = c.get(Calendar.YEAR);
-	    mMonth = c.get(Calendar.MONTH);
-	    mDay = c.get(Calendar.DAY_OF_MONTH);
-		
 	    mYear = sp.getInt("sYear", c.get(Calendar.YEAR));
 	    mMonth = sp.getInt("sMonth", c.get(Calendar.MONTH));
 	    mDay = sp.getInt("sDate", c.get(Calendar.DATE));
@@ -76,7 +74,18 @@ public class PreSettingActivity extends Activity {
 		
 		versionText = (TextView) this.findViewById(R.id.version);
 		
-		versionText.setText("Verstion: "+Version.VERSION);
+		PackageInfo pinfo;
+		try {
+			pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+			String versionName = pinfo.versionName;
+			versionText.setText("Verstion: "+versionName);
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
 		
 	    mPickDate.setOnClickListener(new View.OnClickListener() {
 	        @SuppressWarnings("deprecation")

@@ -39,6 +39,10 @@ public class AlarmService extends Service {
 		if (db.getIsDone(cal))
 			return Service.START_REDELIVER_INTENT;
 		
+		int cur_hour = cal.get(Calendar.HOUR_OF_DAY);
+		if (cur_hour < 8)
+			return Service.START_REDELIVER_INTENT;
+		
 		Intent mIntent = new Intent(this, FragmentTabs.class);
 		PendingIntent pIntent = PendingIntent.getActivity(this, 0,mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

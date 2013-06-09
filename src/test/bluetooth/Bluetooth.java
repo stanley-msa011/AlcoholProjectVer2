@@ -9,6 +9,7 @@ import java.util.UUID;
 
 
 import test.camera.CameraRunHandler;
+import test.file.BracValueDebugHandler;
 import test.file.BracValueFileHandler;
 import ubicomp.drunk_detection.activities.TestFragment;
 
@@ -75,17 +76,19 @@ public class Bluetooth {
 	
 	private CameraRunHandler cameraRunHandler;
 	private BracValueFileHandler bracFileHandler;
+	private BracValueDebugHandler bracDebugHandler;
 	
 	private TestFragment testFragment;
 	
 	private int count;
 	private float sum;
 	
-	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler){
+	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler, BracValueDebugHandler bracDebugHandler){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.cameraRunHandler = cameraRunHandler;
 		this.bracFileHandler = bracFileHandler;
+		this.bracDebugHandler = bracDebugHandler;
 		btAdapter =  BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null)
 			Log.e("BT","NOT SUPPORT BT");
@@ -207,11 +210,13 @@ public class Bluetooth {
 				for (int i=0;i<bytes;++i){
 					if ((char)temp[i]=='a'){
 						end = sendMsgToApp(msg);
+						sendDebugMsg(msg);
 						msg="a";
 						read_type = READ_ALCOHOL;
 					}
 					else if ((char)temp[i]=='m'){
 						end = sendMsgToApp(msg);
+						sendDebugMsg(msg);
 						msg="m";
 						read_type = READ_PRESSURE;
 					}
@@ -232,6 +237,30 @@ public class Bluetooth {
 			if(!success)
 				cameraRunHandler.sendEmptyMessage(1);
 		}
+	}
+	
+	private String debugMsg = "";
+	
+	private void sendDebugMsg(String msg){
+		if (msg == "")
+			return;
+		
+		if (msg.charAt(0) == 'm'){
+			String output = ","+msg.substring(1,msg.length()-1);
+			debugMsg = debugMsg+output+"\n";
+		}
+		else if (msg.charAt(0) == 'a'){
+			long timestamp = System.currentTimeMillis();
+			debugMsg = timestamp+","+msg.substring(1,msg.length()-1);
+			return;
+		}else
+			return;
+		
+		Message message = new Message();
+		Bundle data = new Bundle();
+		data.putString("ALCOHOL_DEBUG", debugMsg);
+		message.setData(data);
+		bracDebugHandler.sendMessage(message);
 	}
 	
 	private int sendMsgToApp(String msg){
@@ -369,6 +398,8 @@ public class Bluetooth {
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();
+		if (bracDebugHandler !=null)
+			bracDebugHandler.close();
 	}
 	
 	private void write_to_file(String str){

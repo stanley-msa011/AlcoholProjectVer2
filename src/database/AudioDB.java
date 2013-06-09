@@ -18,7 +18,20 @@ public class AudioDB {
     	if (dv == null)
     		return;
     	db = dbHelper.getWritableDatabase();
-    	String sql = "INSERT INTO RecDB (_YEAR,_MONTH,_DATE,_FILENAME) VALUES (" +
+    	
+    	String sql = "SELECT * FROM RecDB WHERE " +
+    			"_YEAR= " +dv.year+
+    			" AND _MONTH= " +dv.month+
+    			" AND _DATE= " + dv.date+
+    			" AND _FILENAME=" + "'"+dv.toFileString()+"'";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	if (cursor.getCount() > 0){
+    		cursor.close();
+    		db.close();
+    		return;
+    	}
+    	
+    	sql = "INSERT INTO RecDB (_YEAR,_MONTH,_DATE,_FILENAME) VALUES (" +
     					dv.year+", " +
     					dv.month+	"," +
     					dv.date+"," +

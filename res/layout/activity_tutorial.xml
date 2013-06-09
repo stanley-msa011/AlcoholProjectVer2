@@ -48,9 +48,10 @@
         android:id="@+id/tutorial_notify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_below="@+id/tutorial_step"
+        android:layout_centerHorizontal="true"
        	android:textColor="#FF7c7d7c"
-       	android:text="下一步"
+       	android:text="請點擊"
         />
      
      

@@ -1,5 +1,6 @@
 package statistic.ui;
 
+import database.QuestionDB;
 import ubicomp.drunk_detection.activities.AlarmReceiver;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.StatisticFragment;
@@ -124,6 +125,10 @@ public class QuestionMsgBox {
 	
 	private Bitmap iconDoneBmp;
 	
+	private String CLICK_SEQUENCE = "";
+	
+	private QuestionDB db;
+	
 	public QuestionMsgBox(StatisticFragment statisticFragment,RelativeLayout mainLayout){
 		Log.d("UIMSG","NEW");
 		this.statisticFragment = statisticFragment;
@@ -132,6 +137,7 @@ public class QuestionMsgBox {
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
 		screen = FragmentTabs.getSize();
+		db = new QuestionDB(context);
 		setting();
 	}
 	
@@ -277,6 +283,7 @@ public class QuestionMsgBox {
 			param.topMargin = param.bottomMargin = margin;
 		}
 		
+		CLICK_SEQUENCE = "Type=0,";
 		
 		boxLayout.setVisibility(View.VISIBLE);
 		
@@ -299,9 +306,9 @@ public class QuestionMsgBox {
 		int[] item = {0,2,1};
 		
 		OnClickListener[] listener = new OnClickListener[item.length];
-		listener[0] = new HelpOnClickListener(-1);
+		listener[0] = new HelpOnClickListener(0);
 		listener[1] = new EndOnClickListener();
-		listener[2] = new HelpOnClickListener(-1);
+		listener[2] = new HelpOnClickListener(1);
 		
 		for (int i=0;i<item.length;++i){
 			questionLayout.addView(createIconView(ICON_TEXT[item[i]],iconBmps[item[i]],listener[i]));
@@ -311,6 +318,8 @@ public class QuestionMsgBox {
 			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
 			param.topMargin = param.bottomMargin = margin;
 		}
+		
+		CLICK_SEQUENCE = "Type=1,";
 		
 		boxLayout.setVisibility(View.VISIBLE);
 		
@@ -327,15 +336,16 @@ public class QuestionMsgBox {
 		help.setTypeface(wordTypeface);
 		help.setTextColor(0xFF000000);
 		help.setText("您似乎有飲酒，" +
-				"\n請問您要?");
+				"\n請問您要?" +
+				"\n並啟用一小時的停酒提醒");
 		
 		questionLayout.addView(help);
 
 		int[] item = {4,0};
 		
 		OnClickListener[] listener = new OnClickListener[item.length];
-		listener[0] = new SelfOnClickListener(1);
-		listener[1] = new HelpOnClickListener(-1);
+		listener[0] = new SelfOnClickListener();
+		listener[1] = new HelpOnClickListener(0);
 
 		
 		for (int i=0;i<item.length;++i){
@@ -347,6 +357,23 @@ public class QuestionMsgBox {
 			param.topMargin = param.bottomMargin = margin;
 		}
 		
+		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		
+		Intent service_intent = new Intent();
+		service_intent.setClass(context, AlarmReceiver.class);
+		service_intent.setAction("Hourly_notification");
+		
+		PendingIntent pending = PendingIntent.getBroadcast(context, 0x9999, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		alarm.cancel(pending);
+		alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 1000L*60*60, pending);
+		
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = sp.edit();
+		editor.putBoolean("hourly_alarm", true);
+    	editor.commit();
+		
+    	CLICK_SEQUENCE = "Type=2,";
+    	
 		boxLayout.setVisibility(View.VISIBLE);
 		
 	}
@@ -367,8 +394,8 @@ public class QuestionMsgBox {
 		int[] item = {5,0,4};
 		OnClickListener[] listener = new OnClickListener[item.length];
 		listener[0] = new EndOnClickListener();
-		listener[1] = new HelpOnClickListener(-1);
-		listener[2] = new SelfOnClickListener(0);
+		listener[1] = new HelpOnClickListener(0);
+		listener[2] = new SelfOnClickListener();
 		
 		
 		for (int i=0;i<item.length;++i){
@@ -380,6 +407,8 @@ public class QuestionMsgBox {
 			param.topMargin = param.bottomMargin = margin;
 		}
 		
+		CLICK_SEQUENCE = "Type=3,";
+		
 		boxLayout.setVisibility(View.VISIBLE);
 		
 	}
@@ -387,6 +416,10 @@ public class QuestionMsgBox {
 	private class EndOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			//Write to DB
+			if (CLICK_SEQUENCE!=null && CLICK_SEQUENCE.length() > 0)
+				db.insertQuestionnaire(CLICK_SEQUENCE);
+			
 			boxLayout.setVisibility(View.INVISIBLE);
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 			SharedPreferences.Editor editor = sp.edit();
@@ -406,13 +439,7 @@ public class QuestionMsgBox {
 	
 	private class SelfOnClickListener implements View.OnClickListener{
 		
-		int type;
-		//type == 1 : clock
-		//type == 0 : no clock
 		
-		SelfOnClickListener(int type){
-			this.type = type;
-		}
 		@Override
 		public void onClick(View v) {
 			questionLayout.removeAllViews();
@@ -429,7 +456,7 @@ public class QuestionMsgBox {
 			OnClickListener[] listener = new OnClickListener[item.length];
 			
 			for (int i=0;i<listener.length;++i)
-				listener[i] = new SolverOnClickListener(i,type);
+				listener[i] = new SolverOnClickListener(i);
 			
 			for (int i=0;i<item.length;++i){
 				questionLayout.addView(createIconView(ICON2_TEXT[item[i]],icon2Bmps[item[i]],listener[i]));
@@ -439,6 +466,7 @@ public class QuestionMsgBox {
 				LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) view.getLayoutParams();
 				param.topMargin = param.bottomMargin = margin;
 			}
+			CLICK_SEQUENCE = CLICK_SEQUENCE + "Condition=";
 			
 			boxLayout.setVisibility(View.VISIBLE);
 		}
@@ -447,10 +475,8 @@ public class QuestionMsgBox {
 	private class SolverOnClickListener implements View.OnClickListener{
 		
 		private int result;
-		private int type;
-		SolverOnClickListener(int result,int type){
+		SolverOnClickListener(int result){
 			this.result = result;
-			this.type = type;
 		}
 		
 		@Override
@@ -468,11 +494,7 @@ public class QuestionMsgBox {
 			int[] item = {result};
 			
 			OnClickListener[] listener = new OnClickListener[item.length];
-			if (type == 0){
-				listener[0] = new EndOnClickListener();
-			}else {
-				listener[0] = new ClockOnClickListener(0);
-			}
+			listener[0] = new EndOnClickListener();
 			
 			for (int i=0;i<item.length;++i){
 				questionLayout.addView(createIconView(ICON3_TEXT[item[i]],icon3Bmps[item[i]],listener[i]));
@@ -483,13 +505,13 @@ public class QuestionMsgBox {
 				param.topMargin = param.bottomMargin = margin;
 			}
 			
+			CLICK_SEQUENCE = CLICK_SEQUENCE + result+",";
+			
 			boxLayout.setVisibility(View.VISIBLE);
 		}
 	}
 	
 	private class HelpOnClickListener implements View.OnClickListener{
-		
-		int type;
 		
 		String[] dummyTexts = {
 				"dummy: 0212345678",
@@ -501,13 +523,10 @@ public class QuestionMsgBox {
 				new EndOnClickListener(),
 				new EndOnClickListener()
 		};
-		OnClickListener[] dummyListeners2 = {
-				new ClockOnClickListener(1),
-				new ClockOnClickListener(1),
-				new ClockOnClickListener(1)
-		};
 		
-		HelpOnClickListener( int type){
+		private int type;
+		
+		HelpOnClickListener(int type){
 			this.type = type;
 		}
 		
@@ -525,10 +544,6 @@ public class QuestionMsgBox {
 
 			String[] texts = dummyTexts;
 			OnClickListener[] listeners = dummyListeners;
-			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-			int cond = sp.getInt("latest_result", 0);
-			if (cond == 2)
-				listeners = dummyListeners2;
 			
 			for (int i=0;i<texts.length;++i){
 				questionLayout.addView(createIconView(texts[i],iconDoneBmp,listeners[i]));
@@ -539,10 +554,12 @@ public class QuestionMsgBox {
 				param.topMargin = param.bottomMargin = margin;
 			}
 			
+			CLICK_SEQUENCE = CLICK_SEQUENCE + "ContactType="+type+",";
+			
 			boxLayout.setVisibility(View.VISIBLE);
 		}
 	}
-	
+	/*
 	private class ClockOnClickListener implements View.OnClickListener{
 		
 		int type;
@@ -607,7 +624,7 @@ public class QuestionMsgBox {
 	    	statisticFragment.setQuestionAnimation();
 		}
 	}
-	
+	*/
 	private class ItemOnTouchListener implements View.OnTouchListener{
 
 		@Override

@@ -42,16 +42,22 @@
     	        />
     	</LinearLayout>
     </RelativeLayout>
-    <HorizontalScrollView 
-       android:id  ="@+id/history_scroll_view"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       >
-    <RelativeLayout
-        android:id="@+id/history_content_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-    </HorizontalScrollView>
+    <RelativeLayout 
+        android:id  ="@+id/history_chart_area_layout"
+       	android:layout_width="match_parent"
+       	android:layout_height="wrap_content"
+        >
+    	<HorizontalScrollView 
+	       	android:id  ="@+id/history_scroll_view"
+       		android:layout_width="match_parent"
+       		android:layout_height="wrap_content"
+       		>
+    		<RelativeLayout
+	        	android:id="@+id/history_content_layout"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		/>
+    	</HorizontalScrollView>
+    </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>

@@ -8,7 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 2;
+	private static final int DB_VERSION = 3;
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -42,12 +42,14 @@ public class DBHelper extends SQLiteOpenHelper {
         				"_ID INTEGER PRIMARY KEY," +
         				"_TS INTEGER NOT NULL )"
         		);
+        //Change after ver3
         db.execSQL(
         		"CREATE TABLE EmotionDB ("+
         				"_ID INTEGER PRIMARY KEY," +
         				"_TS INTEGER NOT NULL," +
         				"_EMOTION INTEGER NOT NULL)"
         		);
+        //Change after ver3
         db.execSQL(
         		"CREATE TABLE EmotionManageDB ("+
         				"_ID INTEGER PRIMARY KEY," +
@@ -66,6 +68,35 @@ public class DBHelper extends SQLiteOpenHelper {
         				"_DATE INTEGER NOT NULL," +
         				"_FILENAME CHAR[255] NOT NULL)"
         		);
+        
+        //Change after ver3
+        db.execSQL(
+        		"CREATE TABLE EmotionDB ("+
+        				"_ID INTEGER PRIMARY KEY," +
+        				"_TS INTEGER NOT NULL," +
+        				"_EMOTION INTEGER NOT NULL," +
+        				"_UPLOAD INTEGER NOT NULL)"
+        		);
+        //Change after ver3
+        db.execSQL(
+        		"CREATE TABLE EmotionManageDB ("+
+        				"_ID INTEGER PRIMARY KEY," +
+        				"_TS INTEGER NOT NULL," +
+        				"_EMOTION INTEGER NOT NULL," +
+        				"_TYPE INTEGER NOT NULL," +
+        				"_REASON CHAR[255] NOT NULL," +
+        				"_UPLOAD INTEGER NOT NULL)"
+        		);
+        
+        //Add after ver3
+        db.execSQL(
+        		"CREATE TABLE QuestionnaireDB ("+
+        				"_ID INTEGER PRIMARY KEY," +
+        				"_TS INTEGER NOT NULL," +
+        				"_SEQUENCE CHAR[255] NOT NULL," +
+        				"_UPLOAD INTEGER NOT NULL)"
+        		);
+        
 	}
 
 	@Override
@@ -78,6 +109,36 @@ public class DBHelper extends SQLiteOpenHelper {
 	        				"_MONTH INTEGER NOT NULL," +
 	        				"_DATE INTEGER NOT NULL," +
 	        				"_FILENAME CHAR[255] NOT NULL)"
+	        		);
+		}
+		if (old_ver < 3){
+			db.execSQL("DROP TABLE IF EXISTS EmotionDB");
+			db.execSQL("DROP TABLE IF EXISTS EmotionManageDB");
+
+			db.execSQL(
+	        		"CREATE TABLE EmotionDB ("+
+	        				"_ID INTEGER PRIMARY KEY," +
+	        				"_TS INTEGER NOT NULL," +
+	        				"_EMOTION INTEGER NOT NULL," +
+	        				"_UPLOAD INTEGER NOT NULL)"
+	        		);
+	        
+	        db.execSQL(
+	        		"CREATE TABLE EmotionManageDB ("+
+	        				"_ID INTEGER PRIMARY KEY," +
+	        				"_TS INTEGER NOT NULL," +
+	        				"_EMOTION INTEGER NOT NULL," +
+	        				"_TYPE INTEGER NOT NULL," +
+	        				"_REASON CHAR[255] NOT NULL," +
+	        				"_UPLOAD INTEGER NOT NULL)"
+	        		);
+	        
+	        db.execSQL(
+	        		"CREATE TABLE QuestionnaireDB ("+
+	        				"_ID INTEGER PRIMARY KEY," +
+	        				"_TS INTEGER NOT NULL," +
+	        				"_SEQUENCE CHAR[255] NOT NULL," +
+	        				"_UPLOAD INTEGER NOT NULL)"
 	        		);
 		}
 		/*
