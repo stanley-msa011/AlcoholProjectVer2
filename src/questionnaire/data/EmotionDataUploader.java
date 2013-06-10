@@ -66,35 +66,32 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			Log.d("EMOTION_UPLOADER","start");
 			
 			EmotionData e_data[] = db.getNotUploadedEmotion();
-			if (e_data == null){
-				Log.d("EMOTION_UPLOADER","null");
-				return null;
+			if (e_data != null){
+				for (int i=0;i<e_data.length;++i){
+			       	int result = connectingToServer(e_data[i]);
+			        if (result == -1)
+			        	return null;
+				}
 			}
-			for (int i=0;i<e_data.length;++i){
-		       	int result = connectingToServer(e_data[i]);
-		        if (result == -1)
-		        	return null;
-			}
+
 			EmotionManageData[] em_data = db.getNotUploadedEmotionManage();
-			if (em_data == null){
-				Log.d("EMOTION_MANAGE_UPLOADER","null");
-				return null;
+			if (em_data != null){
+				for (int i=0;i<em_data.length;++i){
+			       	int result = connectingToServer(em_data[i]);
+			        if (result == -1)
+			        	return null;
+				}
 			}
-			for (int i=0;i<em_data.length;++i){
-		       	int result = connectingToServer(em_data[i]);
-		        if (result == -1)
-		        	return null;
-			}
+			
 			QuestionnaireData[] q_data = db.getNotUploadedQuestionnaire();
-			if (q_data == null){
-				Log.d("QUESTIONNAIRE_UPLOADER","null");
-				return null;
+			if (q_data != null){
+				for (int i=0;i<q_data.length;++i){
+			       	int result = connectingToServer(q_data[i]);
+			        if (result == -1)
+			        	return null;
+				}
 			}
-			for (int i=0;i<q_data.length;++i){
-		       	int result = connectingToServer(q_data[i]);
-		        if (result == -1)
-		        	return null;
-			}
+			
 			return null;
 		}
 		

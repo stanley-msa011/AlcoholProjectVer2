@@ -106,23 +106,33 @@ public class TutorialActivity extends Activity {
 
 	private ProgressDialog mDialog;
 	
-	@Override
-	protected void onResume(){
-		super.onResume();
+	protected void onStart(){
 		mDialog = new ProgressDialog(this);
         mDialog.setMessage("載入中");
         mDialog.setCancelable(false);
-        mDialog.show();
+        if (!mDialog.isShowing())
+        	mDialog.show();
+		super.onStart();
+	}
+	
+	@Override
+	protected void onResume(){
+		super.onResume();
 		loadingHandler.sendEmptyMessage(0);
 	}
 	
 	protected void onPause(){
 		super.onPause();
-		mDialog = new ProgressDialog(this);
-        mDialog.setMessage("載入中");
-        mDialog.setCancelable(false);
-        mDialog.show();
 		loadingHandler.removeMessages(0);
+		if (replay != null)
+			replay.setImageBitmap(null);
+		if (next != null)
+			next.setImageBitmap(null);
+		if (tab != null)
+			tab.setImageBitmap(null);
+		if (arrow != null)
+			arrow.setImageBitmap(null);
+		
 		if (layout!=null)
 			layout.setBackground(null);
 		if (bgBmp!=null && !bgBmp.isRecycled()){
@@ -213,8 +223,6 @@ public class TutorialActivity extends Activity {
 			settingState(0);
 			if (mDialog!=null && mDialog.isShowing())
 				mDialog.dismiss();
-			
-
 			
 		}
 	}

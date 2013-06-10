@@ -1,5 +1,7 @@
 package statistic.ui;
 
+import java.util.Calendar;
+
 import database.QuestionDB;
 import ubicomp.drunk_detection.activities.AlarmReceiver;
 import ubicomp.drunk_detection.activities.FragmentTabs;
@@ -15,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -365,7 +368,9 @@ public class QuestionMsgBox {
 		
 		PendingIntent pending = PendingIntent.getBroadcast(context, 0x9999, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarm.cancel(pending);
-		alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 1000L*60*60, pending);
+		
+		long trigger_time = 3600*1000L + System.currentTimeMillis();
+		alarm.set(AlarmManager.RTC_WAKEUP, trigger_time, pending);
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor editor = sp.edit();

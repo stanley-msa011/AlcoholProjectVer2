@@ -15,9 +15,6 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 
 	private static final int requestCode = 0x2013;
 	
-	static public final long DAYMILLIS = 60*60*24*1000;
-	static public final long HOURMILLIS = 60*60*1000*2;
-	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d("BrACReceiver",intent.getAction());
@@ -28,31 +25,34 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		service_intent.setClass(context, AlarmReceiver.class);
 		service_intent.setAction("Regular_notification");
 		
-		Calendar c_init = Calendar.getInstance();
 		Calendar c = Calendar.getInstance();
 
+		int cur_year = c.get(Calendar.YEAR);
+		int cur_month = c.get(Calendar.MONTH);
+		int cur_date = c.get(Calendar.DAY_OF_MONTH);
+		int cur_hour = c.get(Calendar.HOUR_OF_DAY);
+		int cur_min = c.get(Calendar.MINUTE);
 		
-		
-		c.set(Calendar.MINUTE, 30);
-		c.set(Calendar.SECOND,0);
-		c.set(Calendar.MILLISECOND, 0);
-		int add_hour;
-		if (c.get(Calendar.HOUR_OF_DAY)%2 == 1)
-			add_hour = 1;
-		else
-			add_hour = 2;
-		
-		if (c_init.get(Calendar.MINUTE )< 25){
-			add_hour -=1;
+		if (cur_min < 29){
+			if (cur_hour%2 == 0){
+				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+			}else{
+				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+				c.add(Calendar.HOUR_OF_DAY, 1);
+			}
+		}else{
+			if (cur_hour%2 == 0){
+				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+				c.add(Calendar.HOUR_OF_DAY, 2);
+			}else{
+				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+				c.add(Calendar.HOUR_OF_DAY, 1);
+			}
 		}
-		
-		c.add(Calendar.HOUR_OF_DAY, add_hour);
-		long time = c.getTimeInMillis()-c_init.getTimeInMillis();
 		
 		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarm.cancel(pending);
-		alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, time,HOURMILLIS,pending);
-		
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(),2*AlarmManager.INTERVAL_HOUR,pending);
 		
 	}
 

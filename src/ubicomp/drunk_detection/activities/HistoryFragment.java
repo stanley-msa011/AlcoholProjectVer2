@@ -15,6 +15,7 @@ import history.ui.DateValue;
 import history.ui.HistoryStorytelling;
 import history.ui.AudioRecordBox;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,16 +29,13 @@ import android.graphics.Paint.Align;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
@@ -80,6 +78,7 @@ public class HistoryFragment extends Fragment {
 	private ChartView chart;
 	private ChartTitleView  chartTitle;
 	private ChartYAxisView chartYAxis;
+	private ChartLabelView chartLabel;
 	
     private int bar_width;
     private int bar_gap;
@@ -123,6 +122,8 @@ public class HistoryFragment extends Fragment {
 	
 	private AudioRecordBox recordBox;
 	
+	private ProgressDialog dialog;
+	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	Log.d("History","createView start");
@@ -135,7 +136,10 @@ public class HistoryFragment extends Fragment {
     }
    
 	public void onResume(){
+		
 		super.onResume();
+		
+		
 		isAnimation = false;
 		screen = FragmentTabs.getSize();
 		
@@ -191,6 +195,9 @@ public class HistoryFragment extends Fragment {
     }
 	
     private void clear(){
+    	pageWidget.setBitmaps(null, null);
+    	prevImage.setImageBitmap(null);
+    	
     	if (loadHandler !=null)
     		loadHandler.removeMessages(0);
     	
@@ -348,6 +355,13 @@ public class HistoryFragment extends Fragment {
 		chartTitleParam.width = labelBmp.getWidth();
 		chartTitleParam.height = labelBmp.getHeight();
 		
+		chartLabel = new ChartLabelView(this.getActivity());
+		chartAreaLayout.addView(chartLabel);
+		RelativeLayout.LayoutParams chartLabelParam = (RelativeLayout.LayoutParams) chartLabel.getLayoutParams();
+		chartLabelParam.width = screen.x - labelBmp.getWidth();
+		chartLabelParam.height = screen.x * 120/1080;
+		chartLabelParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+		
 		pageWidget.setOnTouchListener(gtListener);
 		
     }
@@ -406,12 +420,25 @@ public class HistoryFragment extends Fragment {
     	Log.d("History","resetPage end");
     }
     
+    public void onStart(){
+    	super.onStart();
+    	dialog = new ProgressDialog(this.getActivity());
+		dialog.setMessage("載入中");
+		dialog.setCancelable(true);
+		if (!dialog.isShowing()){
+			dialog.show();
+		}
+    }
+    
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
 		
 		public void handleMessage(Message msg){
 			initView();
 			endAnimation();
+			
+			if (dialog!=null && dialog.isShowing())
+				dialog.dismiss();
 			LoadingBox.dismiss();
 			Log.d("PAGE_ANIMATION","END LOADING BOX");
 			startAnim();
@@ -654,6 +681,7 @@ public class HistoryFragment extends Fragment {
 				invalidate();
 				chart.invalidate();
 				chartYAxis.invalidate();
+				chartLabel.invalidate();
 			}
 			return true;
 		}
@@ -661,7 +689,8 @@ public class HistoryFragment extends Fragment {
 		@Override
 		protected void onDraw(Canvas canvas){
 			super.onDraw(canvas);
-			canvas.drawBitmap(labelBmp,0, 0, null);
+			if (labelBmp !=null && !labelBmp.isRecycled())
+				canvas.drawBitmap(labelBmp,0, 0, null);
 			if (chart_type == 0)
 				canvas.drawText("心情量尺", screen.x * 20F/1080F, screen.x * 70F/1080F,text_paint_large);
 			else if (chart_type == 1)
@@ -712,15 +741,58 @@ public class HistoryFragment extends Fragment {
 		}
 	}
 	
+	private class ChartLabelView extends View{
+
+		private Paint emotion_paint = new Paint();
+		private Paint desire_paint = new Paint();
+		private Paint brac_paint = new Paint();
+		private Paint text_paint_small = new Paint();
+		
+		
+		public ChartLabelView(Context context) {
+			super(context);
+			text_paint_small.setColor(0xFF000000);
+			text_paint_small.setTextAlign(Align.CENTER);
+			text_paint_small.setTextSize(screen.x * 48F/1080F);
+			
+			emotion_paint.setColor(0xFFFF0000);
+			emotion_paint.setStrokeWidth(screen.x * 10 / 1080);
+			desire_paint.setColor(0xFF00FF00);
+			desire_paint.setStrokeWidth(screen.x * 10 / 1080);
+			brac_paint.setColor(0xFFFFFFFF);
+			brac_paint.setStrokeWidth(screen.x * 10 / 1080);
+		}
+		
+		@Override
+		protected void onDraw(Canvas canvas){
+			super.onDraw(canvas);
+			
+			//canvas.drawColor(0xFF999999);
+			int base = screen.x * 30/1080;
+			int from = base;
+			int text_top = base * 3;
+			int line_top = base * 4;
+			int line_len = base * 6;
+			if (chart_type > 2 ){
+				canvas.drawText("心情量尺", from + line_len/2, text_top, text_paint_small);
+				canvas.drawLine(from, line_top, from + line_len, line_top, emotion_paint);
+				from += line_len + base + base;
+				
+				canvas.drawText("渴癮指數", from + line_len/2, text_top, text_paint_small);
+				canvas.drawLine(from, line_top, from + line_len, line_top, desire_paint);
+				from += line_len + base + base;
+				
+				canvas.drawText("酒測結果", from + line_len/2, text_top, text_paint_small);
+				canvas.drawLine(from, line_top, from + line_len, line_top, brac_paint);
+			}
+		}
+	}
+	
 	private class ChartView extends View{
 
 		private Paint paint_pass = new Paint();
 		private Paint paint_fail= new Paint();
 		private Paint paint_none = new Paint();
-		
-		private Paint paint_pass_d = new Paint();
-		private Paint paint_fail_d= new Paint();
-		private Paint paint_none_d = new Paint();
 		
 		private Paint paint_highlight = new Paint();
 		private Paint circle_paint_stroke = new Paint();
@@ -737,6 +809,7 @@ public class HistoryFragment extends Fragment {
 		private Paint emotion_paint = new Paint();
 		private Paint desire_paint = new Paint();
 		private Paint brac_paint = new Paint();
+		private Paint none_paint = new Paint();
 		
 	    private int RADIUS;
 	    private int RADIUS_SQUARE;
@@ -758,10 +831,6 @@ public class HistoryFragment extends Fragment {
 			paint_pass.setColor(0xFFf39800);
 			paint_fail.setColor(0xFF5bdfbf);
 			paint_none.setColor(0xFFc9c9ca);
-			
-			paint_pass_d.setColor(0xFFAF5400);
-			paint_fail_d.setColor(0xFF179B7B);
-			paint_none_d.setColor(0xFF858586);
 			
 			paint_highlight .setColor(0xFFAADDFF);
 			
@@ -798,8 +867,13 @@ public class HistoryFragment extends Fragment {
 			line_paint.setStrokeWidth(screen.x * 7 / 1080);
 			
 			emotion_paint.setColor(0xFFFF0000);
+			emotion_paint.setStrokeWidth(screen.x * 8 / 1080);
 			desire_paint.setColor(0xFF00FF00);
+			desire_paint.setStrokeWidth(screen.x * 8 / 1080);
 			brac_paint.setColor(0xFFFFFFFF);
+			brac_paint.setStrokeWidth(screen.x * 8 / 1080);
+			none_paint.setColor(0xFFFFFF00);
+			none_paint.setStrokeWidth(screen.x * 8 / 1080);
 			
 			selected_centers = new ArrayList<Point>();
 			circle_centers = new ArrayList<Point>();
@@ -923,20 +997,23 @@ public class HistoryFragment extends Fragment {
 				Point e_center = new Point(left+small_radius,e_top - bar_gap - small_radius);
 				Point d_center = new Point(left+small_radius,d_top - bar_gap - small_radius);
 				Point b_center = new Point(left+small_radius,b_top - bar_gap - small_radius);
-				canvas.drawCircle(e_center.x,e_center.y, small_radius, emotion_paint);
-				canvas.drawCircle(d_center.x,d_center.y, small_radius, desire_paint);
-				canvas.drawCircle(b_center.x,b_center.y, small_radius, brac_paint);
 				
-				if (prev_e_center!= null && prev_d_center!=null && prev_b_center!=null){
-					canvas.drawLine(prev_e_center.x, prev_e_center.y, e_center.x, e_center.y, emotion_paint);
-					canvas.drawLine(prev_d_center.x, prev_d_center.y, d_center.x, d_center.y, desire_paint);
-					canvas.drawLine(prev_b_center.x, prev_b_center.y, b_center.x, b_center.y, brac_paint);
+				if (bar.hasData){
+					if (prev_e_center!= null && prev_d_center!=null && prev_b_center!=null){
+						canvas.drawCircle(e_center.x,e_center.y, small_radius, emotion_paint);
+						canvas.drawCircle(d_center.x,d_center.y, small_radius, desire_paint);
+						canvas.drawCircle(b_center.x,b_center.y, small_radius, brac_paint); 
+						canvas.drawLine(prev_e_center.x, prev_e_center.y, e_center.x, e_center.y, emotion_paint);
+						canvas.drawLine(prev_d_center.x, prev_d_center.y, d_center.x, d_center.y, desire_paint);
+						canvas.drawLine(prev_b_center.x, prev_b_center.y, b_center.x, b_center.y, brac_paint);
+					}
+					prev_e_center = e_center;
+					prev_d_center = d_center;
+					prev_b_center = b_center;
 				}
-				
-				prev_e_center = e_center;
-				prev_d_center = d_center;
-				prev_b_center = b_center;
-				
+				else{
+					canvas.drawCircle(e_center.x,e_center.y, small_radius*3/2, none_paint);
+				}
 				//Draw X axis Label
 				if (i%7 == 0){
 					String str= bar.dv.month+"/"+bar.dv.date;
@@ -944,6 +1021,7 @@ public class HistoryFragment extends Fragment {
 				}
 				left += (bar_width+bar_gap);
 			}
+			
 		}
 		
 		private void drawBarChart(Canvas canvas){
@@ -984,26 +1062,6 @@ public class HistoryFragment extends Fragment {
 				
 				//Draw bars & annotation_circles
 				Point center = new Point(left+circle_radius,_top - bar_gap - circle_radius);
-				/*
-				Paint p;
-				if (hasAudio.get(i)){
-					if (!bar.hasData)
-						p = paint_none_d;
-					else if (bar.brac > 0F)
-						p = paint_fail_d;
-					else
-						p = paint_pass_d;
-				}else{
-					if (!bar.hasData)
-						p = paint_none;
-					else if (bar.brac > 0F)
-						p = paint_fail;
-					else
-						p = paint_pass;
-				}
-				canvas.drawRect(left, _top, right, _bottom, p);
-				canvas.drawCircle(center.x,center.y, circle_radius, p);
-				*/
 				
 				if (!bar.hasData){
 					canvas.drawRect(left, _top, right, _bottom, paint_none);

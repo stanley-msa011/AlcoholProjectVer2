@@ -67,7 +67,7 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private static boolean firstLoading = true;
 	
-	@SuppressWarnings({ "deprecation", "unused" })
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);

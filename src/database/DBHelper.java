@@ -42,22 +42,6 @@ public class DBHelper extends SQLiteOpenHelper {
         				"_ID INTEGER PRIMARY KEY," +
         				"_TS INTEGER NOT NULL )"
         		);
-        //Change after ver3
-        db.execSQL(
-        		"CREATE TABLE EmotionDB ("+
-        				"_ID INTEGER PRIMARY KEY," +
-        				"_TS INTEGER NOT NULL," +
-        				"_EMOTION INTEGER NOT NULL)"
-        		);
-        //Change after ver3
-        db.execSQL(
-        		"CREATE TABLE EmotionManageDB ("+
-        				"_ID INTEGER PRIMARY KEY," +
-        				"_TS INTEGER NOT NULL," +
-        				"_EMOTION INTEGER NOT NULL," +
-        				"_TYPE INTEGER NOT NULL," +
-        				"_REASON CHAR[255] NOT NULL)"
-        		);
         
         //Add after ver 2
         db.execSQL(

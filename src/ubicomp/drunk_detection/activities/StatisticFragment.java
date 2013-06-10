@@ -9,12 +9,12 @@ import statistic.statisticPageView.statistics.StatisticPagerAdapter;
 import statistic.ui.QuestionMsgBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -50,7 +50,6 @@ public class StatisticFragment extends Fragment {
 	private static Point statistic_px,analysis_px;
 	private ScrollView analysisView;
 	private Bitmap dot_on, dot_off;
-	private Bitmap bgBmp;
 	private LoadingHandler loadHandler;
 	private StatisticFragment statisticFragment;
 	
@@ -73,6 +72,8 @@ public class StatisticFragment extends Fragment {
 	// For Click Sequence Logging
 	private ClickLogger clickLogger;
 	
+	private ProgressDialog dialog;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +93,7 @@ public class StatisticFragment extends Fragment {
     public void onResume(){
     	super.onResume();
     	
+		
     	clickLogger = new ClickLogger();
     	
     	statisticFragment = this;
@@ -121,9 +123,23 @@ public class StatisticFragment extends Fragment {
     	super.onPause();
     }
     
+    public void onStart(){
+    	super.onStart();
+    	dialog = new ProgressDialog(this.getActivity());
+		dialog.setMessage("載入中");
+		dialog.setCancelable(true);
+		if (!dialog.isShowing()){
+			dialog.show();
+		}
+    }
+    
 	private void clear(){
-    	for (int i=0;i<dots.length;++i)
-    		dots[i].setImageBitmap(null);
+		if (dots !=null)
+			for (int i=0;i<dots.length;++i)
+				if (dots[i] != null)
+					dots[i].setImageBitmap(null);
+		if (questionButton !=null)
+			questionButton.setImageBitmap(null);
     	
     	if (dot_on!=null && !dot_on.isRecycled()){
     		dot_on.recycle();
@@ -177,13 +193,8 @@ public class StatisticFragment extends Fragment {
 			
 			clickLogger.click_logging(System.currentTimeMillis(), "RecordStatisticPage" + (arg0+1) + "_scrolled");
 			for (int i=0;i<3;++i)
-    			dots[i].setImageResource(R.drawable.statistic_dot_off);
-    		dots[arg0].setImageResource(R.drawable.statistic_dot_on);
-    		/*
-			for (int i=0;i<3;++i)
 				dots[i].setImageBitmap(dot_off);
 			dots[arg0].setImageBitmap(dot_on);
-			*/
 		}
     	
     }
@@ -233,16 +244,6 @@ public class StatisticFragment extends Fragment {
 	    	dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_dot_on);
 	    	dot_off = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_dot_off);
 			
-	    	/*view.setBackgroundDrawable(null);
-	    	if (bgBmp==null || bgBmp.isRecycled()){
-	    		BitmapFactory.Options opt = new BitmapFactory.Options();
-		    	opt.inSampleSize = 3;
-		    	Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.statistic_background_all,opt);
-		    	bgBmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.x * 1920/1080 -FragmentTabs.getTabSize().y, true);
-		    	tmp.recycle();
-	    	}
-	    	view.setBackgroundDrawable(new BitmapDrawable(bgBmp));
-	    	*/
 	    	RelativeLayout.LayoutParams dotsLayoutParam = (android.widget.RelativeLayout.LayoutParams) dots_layout.getLayoutParams();
 	    	dotsLayoutParam.topMargin = screen.x*920/1080;
 	    	
@@ -278,21 +279,15 @@ public class StatisticFragment extends Fragment {
     			analysisViews[i].onPostTask();
     		
 	    	statisticView.setCurrentItem(0);
-	    	/*
+	    	
 	    	if (dot_off!=null && !dot_off.isRecycled() && dot_on !=null && !dot_on.isRecycled()){
 	    		for (int i=0;i<3;++i)
-	    			dots[i].setImageResource(R.drawable.statistic_dot_off);
-	    		dots[0].setImageResource(R.drawable.statistic_dot_on);
-	    			//dots[i].setImageBitmap(dot_off);
-				//dots[0].setImageBitmap(dot_on);
-	    	}*/
-	    	for (int i=0;i<3;++i)
-    			dots[i].setImageResource(R.drawable.statistic_dot_off);
-    		dots[0].setImageResource(R.drawable.statistic_dot_on);
+	    			dots[i].setImageBitmap(dot_off);
+				dots[0].setImageBitmap(dot_on);
+	    	}
 			Bitmap tmp;
 			
 			if (questionButtonBmp==null ||questionButtonBmp.isRecycled()){
-				BitmapFactory.Options opt = new BitmapFactory.Options();
 				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button);
 				questionButtonBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
 				tmp.recycle();
@@ -303,11 +298,9 @@ public class StatisticFragment extends Fragment {
 			questionParam.topMargin =  screen.x * 107 / 1080;
 			questionParam.rightMargin =  screen.x * 58 / 1080;
 			
-			//if (questionButtonBmp!=null && !questionButtonBmp.isRecycled())
-			//	questionButton.setImageBitmap(questionButtonBmp);
+			if (questionButtonBmp!=null && !questionButtonBmp.isRecycled())
+				questionButton.setImageBitmap(questionButtonBmp);
 	
-			questionButton.setImageResource(R.drawable.statistic_question_button);
-			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			boolean tested = sp.getBoolean("tested", false);
 			int result = sp.getInt("latest_result", 0);
@@ -350,6 +343,8 @@ public class StatisticFragment extends Fragment {
 			
 			setQuestionAnimation();
 			
+			if (dialog!=null && dialog.isShowing())
+				dialog.dismiss();
 			LoadingBox.dismiss();
 		}
 	}

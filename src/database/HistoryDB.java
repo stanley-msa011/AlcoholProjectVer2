@@ -23,10 +23,18 @@ public class HistoryDB {
 	private SQLiteOpenHelper dbHelper = null;
     private SQLiteDatabase db = null;
 	
+    private Calendar start_date;
+    
 	public HistoryDB(Context context){
 		dbHelper = new DBHelper(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		timeblock_type = sp.getInt("timeblock_num", 3);
+		start_date = Calendar.getInstance();
+		int year = sp.getInt("sYear", start_date.get(Calendar.YEAR));
+		int month = sp.getInt("sMonth", start_date.get(Calendar.MONTH));
+		int date = sp.getInt("sDay", Calendar.DAY_OF_MONTH);
+		start_date.set(year, month, date, 0, 0,0);
+		start_date.set(Calendar.MILLISECOND, 0);
 	}
 	
 	public DateBracGameHistory[] getAllHistory(){
@@ -268,6 +276,7 @@ public class HistoryDB {
 	
     public BracGameHistory[] getMultiDayInfo(int n_days){
     	Log.d("DB","multi-day "+String.valueOf(n_days));
+    	
     	
     	
     	Calendar cal = Calendar.getInstance();

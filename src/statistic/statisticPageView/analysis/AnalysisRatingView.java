@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -37,6 +38,7 @@ public class AnalysisRatingView extends StatisticPageView {
 	private Bitmap barBmp, pointerBmp;
 	
 	private NetworkHandler netHandler;
+	private NetworkTask netTask;
 	
 	private RelativeLayout contentLayout;
 	private RelativeLayout contentLayout2;
@@ -48,9 +50,9 @@ public class AnalysisRatingView extends StatisticPageView {
 	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
 		db = new HistoryDB(context);
-		if (netHandler==null)
-			netHandler = new NetworkHandler();
-		netHandler.sendEmptyMessage(0);
+		//if (netHandler==null)
+		//	netHandler = new NetworkHandler();
+		//netHandler.sendEmptyMessage(0);
 	}
 
 	@Override
@@ -69,6 +71,10 @@ public class AnalysisRatingView extends StatisticPageView {
 		
 		if (netHandler!=null)
 			netHandler.removeMessages(0);
+		
+		if (netTask != null && !netTask.isCancelled()){
+			netTask.cancel(true);
+		}
 		if (titleBmp!=null && !titleBmp.isRecycled()){
 			titleBmp.recycle();
 			titleBmp = null;
@@ -247,7 +253,8 @@ public class AnalysisRatingView extends StatisticPageView {
 		help.setText("與其他戒酒朋友相比，您的排名為" );
 		help2.setText("與AA成員相比，您的排名為" );
 		setPointer();
-		
+		netTask = new NetworkTask();
+		netTask.execute();
 	}
 
 	@Override
@@ -273,7 +280,25 @@ public class AnalysisRatingView extends StatisticPageView {
 		}
 	}
 	
-	
+	private class NetworkTask extends AsyncTask<Void, Void, Void>{
+
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			levelCollector = new UserLevelCollector(view.getContext());
+			historys = levelCollector.update();
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void result){
+			if (historys == null)
+				return;
+			for (int i=0;i<historys.length;++i)
+				db.insertInteractionHistory(historys[i]);
+			setPointer();
+		}
+		
+	}
 	
 
 }

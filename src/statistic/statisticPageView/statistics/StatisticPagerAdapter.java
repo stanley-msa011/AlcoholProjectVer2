@@ -3,16 +3,10 @@ package statistic.statisticPageView.statistics;
 
 import java.util.ArrayList;
 
-import ubicomp.drunk_detection.activities.R;
-
 import statistic.statisticPageView.StatisticPageView;
-import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.StatisticFragment;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -23,7 +17,6 @@ public class StatisticPagerAdapter extends PagerAdapter {
 	private ArrayList<View> viewsList;
 	private StatisticPageView[] statisticViews;
 	
-	private StatisticFragment statisticFragment;
 	
 	public StatisticPagerAdapter(Context context,StatisticFragment statisticFragment){
 		viewsList = new ArrayList<View>();
@@ -35,8 +28,6 @@ public class StatisticPagerAdapter extends PagerAdapter {
 		viewsList.add(statisticViews[0].getView());
 		viewsList.add(statisticViews[1].getView());
 		viewsList.add(statisticViews[2].getView());
-		
-		this.statisticFragment = statisticFragment;
 		
 	}
 	
