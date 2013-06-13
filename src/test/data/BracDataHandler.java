@@ -34,6 +34,8 @@ import database.TimeBlock;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
@@ -268,6 +270,13 @@ public class BracDataHandler {
 		    
 		    mpEntity.addPart("userData[]", new StringBody(joinDate));
 			
+		    PackageInfo pinfo;
+			try {
+				pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+				String versionName = pinfo.versionName;
+				mpEntity.addPart("userData[]", new StringBody( versionName));
+			} catch (NameNotFoundException e) {	}
+		    
 			ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
 			mpEntity.addPart("userfile[]", cbFile);
 			if (geoFile.exists()){

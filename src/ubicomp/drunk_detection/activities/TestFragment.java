@@ -653,7 +653,6 @@ public class TestFragment extends Fragment {
 			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
 			helpText.setTextColor(0xFFc98123);
 			face.setImageBitmap(null);
-			FragmentTabs.detach_loading_page(0);
 			LoadingBox.dismiss();
 			
 		}

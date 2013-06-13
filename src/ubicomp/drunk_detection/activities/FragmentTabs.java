@@ -374,12 +374,4 @@ public class FragmentTabs extends FragmentActivity {
 			loadingPage.setVisibility(View.INVISIBLE);
 	}
 	
-	private static boolean[] pages = {false,false,false};
-	
-	static public void detach_loading_page(int page){
-		pages[page] = true;
-		if (pages[0]&&pages[1]&&pages[2])
-			detach_loading_page();
-	}
-	
 }

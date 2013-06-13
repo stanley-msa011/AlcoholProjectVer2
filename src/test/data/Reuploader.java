@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.Calendar;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -28,6 +29,8 @@ import database.HistoryDB;
 import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -111,7 +114,6 @@ public class Reuploader {
 		@Override
 		protected void onPostExecute(Void result ){
 			EmotionDataUploader.reuploader(context);
-			
 		}
 		
 		private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles, String ts){
@@ -140,7 +142,23 @@ public class Reuploader {
 				mpEntity.addPart("userData[]", new StringBody(ts));
 				mpEntity.addPart("userData[]", new StringBody(devId));
 				
+				Calendar c = Calendar.getInstance();
 				
+			    int mYear = sp.getInt("sYear", c.get(Calendar.YEAR));
+			    int mMonth = sp.getInt("sMonth", c.get(Calendar.MONTH));
+			    int mDay = sp.getInt("sDate", c.get(Calendar.DATE));
+			    
+			    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
+			    
+			    mpEntity.addPart("userData[]", new StringBody(joinDate));
+				
+			    PackageInfo pinfo;
+				try {
+					pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+					String versionName = pinfo.versionName;
+					mpEntity.addPart("userData[]", new StringBody( versionName));
+				} catch (NameNotFoundException e) {	}
+			    
 				ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
 				mpEntity.addPart("userfile[]", cbFile);
 				if (geoFile.exists()){

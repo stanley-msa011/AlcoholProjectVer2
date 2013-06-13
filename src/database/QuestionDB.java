@@ -79,6 +79,16 @@ public class QuestionDB {
 		db.close();
 	}
 	
+	public void insertEmotion(int emotion, String call){
+		Calendar cal = Calendar.getInstance();
+		long ts = cal.getTimeInMillis();
+		
+		db = dbHelper.getWritableDatabase();
+		String sql = "INSERT INTO EmotionDB (_TS,_EMOTION,_UPLOAD,_CALL) VALUES ("+ts+","+emotion+", 0 ,'"+call+"')";
+		db.execSQL(sql);
+		db.close();
+	}
+	
 	public void insertEmotionManage(int emotion, int type, String reason){
 		Calendar cal = Calendar.getInstance();
 		long ts = cal.getTimeInMillis();
@@ -107,13 +117,19 @@ public class QuestionDB {
 		data = new EmotionData[count];
 		int ts_idx = cursor.getColumnIndex("_TS");
 		int e_idx = cursor.getColumnIndex("_EMOTION");
+		int c_idx = cursor.getColumnIndex("_CALL");
 		long ts;
 		int emotion;
 		for (int i=0;i<count;++i){
 			cursor.moveToPosition(i);
 			ts = cursor.getLong(ts_idx);
 			emotion = cursor.getInt(e_idx);
-			data[i] = new EmotionData(ts,emotion);
+			if (emotion < 4)
+				data[i] = new EmotionData(ts,emotion);
+			else{
+				String call = cursor.getString(c_idx);
+				data[i] = new EmotionData(ts,emotion,call);
+			}
 		}
 		
 		cursor.close();

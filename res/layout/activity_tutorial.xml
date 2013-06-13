@@ -51,7 +51,7 @@
         android:layout_below="@+id/tutorial_step"
         android:layout_centerHorizontal="true"
        	android:textColor="#FF7c7d7c"
-       	android:text="請點擊"
+       	android:text="請點擊進入下一步"
         />
      
      

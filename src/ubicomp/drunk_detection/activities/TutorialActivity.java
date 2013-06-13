@@ -94,8 +94,11 @@ public class TutorialActivity extends Activity {
 		hParam.topMargin = size.x * 1150/1080;
 		
 		notify= (TextView) this.findViewById(R.id.tutorial_notify);
-		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 96/1080);
+		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 64/1080);
 		notify.setTypeface(wordTypefaceBold);
+		
+		RelativeLayout.LayoutParams nParam = (RelativeLayout.LayoutParams) notify.getLayoutParams();
+		nParam.topMargin = size.x * 40/1080;
 		
 		tab = (ImageView) this.findViewById(R.id.tutorial_tab);
 		

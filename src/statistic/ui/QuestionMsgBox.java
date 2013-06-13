@@ -1,6 +1,6 @@
 package statistic.ui;
 
-import java.util.Calendar;
+import java.util.ArrayList;
 
 import database.QuestionDB;
 import ubicomp.drunk_detection.activities.AlarmReceiver;
@@ -17,7 +17,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -33,6 +32,8 @@ import android.widget.TextView;
 
 public class QuestionMsgBox {
 
+	private ArrayList<String> clickSequence;
+	
 	private StatisticFragment statisticFragment;
 	private Context context;
 	private LayoutInflater inflater;
@@ -49,7 +50,6 @@ public class QuestionMsgBox {
 	
 	private ItemOnTouchListener onTouchListener;
 	
-	//private Typeface digitTypeface;
 	private Typeface wordTypeface;
 	
 	private int textSize;
@@ -128,8 +128,6 @@ public class QuestionMsgBox {
 	
 	private Bitmap iconDoneBmp;
 	
-	private String CLICK_SEQUENCE = "";
-	
 	private QuestionDB db;
 	
 	public QuestionMsgBox(StatisticFragment statisticFragment,RelativeLayout mainLayout){
@@ -141,12 +139,12 @@ public class QuestionMsgBox {
 		this.mainLayout = mainLayout;
 		screen = FragmentTabs.getSize();
 		db = new QuestionDB(context);
+		clickSequence = new ArrayList<String>();
 		setting();
 	}
 	
 	private void setting(){
 		
-		//digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		
 		onTouchListener = new ItemOnTouchListener();
@@ -263,7 +261,7 @@ public class QuestionMsgBox {
 	}
 	
 	public void generateType0Box(){
-		
+		clickSequence.clear();
 		questionLayout.removeAllViews();
 		
 		TextView help = new TextView(context);
@@ -277,7 +275,7 @@ public class QuestionMsgBox {
 		questionLayout.addView(help);
 
 		
-		View view = createIconView(ICON4_TEXT[0], icon4Bmps[0],new EndOnClickListener());
+		View view = createIconView(ICON4_TEXT[0], icon4Bmps[0],new EndSelectOnClickListener(1));
 		questionLayout.addView(view);
 		
 		for (int i=0;i<questionLayout.getChildCount();++i){
@@ -286,7 +284,7 @@ public class QuestionMsgBox {
 			param.topMargin = param.bottomMargin = margin;
 		}
 		
-		CLICK_SEQUENCE = "Type=0,";
+		clickSequence.add("1,1");
 		
 		boxLayout.setVisibility(View.VISIBLE);
 		
@@ -294,7 +292,7 @@ public class QuestionMsgBox {
 	
 	
 	public void generateType1Box(){
-		
+		clickSequence.clear();
 		questionLayout.removeAllViews();
 		
 		TextView help = new TextView(context);
@@ -310,7 +308,7 @@ public class QuestionMsgBox {
 		
 		OnClickListener[] listener = new OnClickListener[item.length];
 		listener[0] = new HelpOnClickListener(0);
-		listener[1] = new EndOnClickListener();
+		listener[1] = new EndSelectOnClickListener(1);
 		listener[2] = new HelpOnClickListener(1);
 		
 		for (int i=0;i<item.length;++i){
@@ -321,8 +319,8 @@ public class QuestionMsgBox {
 			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
 			param.topMargin = param.bottomMargin = margin;
 		}
-		
-		CLICK_SEQUENCE = "Type=1,";
+		clickSequence.add("2,2");
+		//CLICK_SEQUENCE = "2,2";
 		
 		boxLayout.setVisibility(View.VISIBLE);
 		
@@ -331,7 +329,7 @@ public class QuestionMsgBox {
 
 	
 	public void generateType2Box(){
-		
+		clickSequence.clear();
 		questionLayout.removeAllViews();
 		
 		TextView help = new TextView(context);
@@ -376,15 +374,14 @@ public class QuestionMsgBox {
 		SharedPreferences.Editor editor = sp.edit();
 		editor.putBoolean("hourly_alarm", true);
     	editor.commit();
-		
-    	CLICK_SEQUENCE = "Type=2,";
+    	clickSequence.add("3,3");
     	
 		boxLayout.setVisibility(View.VISIBLE);
 		
 	}
 	
 	public void generateType3Box(){
-		
+		clickSequence.clear();
 		questionLayout.removeAllViews();
 		
 		TextView help = new TextView(context);
@@ -398,7 +395,7 @@ public class QuestionMsgBox {
 		
 		int[] item = {5,0,4};
 		OnClickListener[] listener = new OnClickListener[item.length];
-		listener[0] = new EndOnClickListener();
+		listener[0] = new EndSelectOnClickListener(3);
 		listener[1] = new HelpOnClickListener(0);
 		listener[2] = new SelfOnClickListener();
 		
@@ -411,8 +408,7 @@ public class QuestionMsgBox {
 			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
 			param.topMargin = param.bottomMargin = margin;
 		}
-		
-		CLICK_SEQUENCE = "Type=3,";
+		clickSequence.add("4,4");
 		
 		boxLayout.setVisibility(View.VISIBLE);
 		
@@ -422,9 +418,7 @@ public class QuestionMsgBox {
 		@Override
 		public void onClick(View v) {
 			//Write to DB
-			if (CLICK_SEQUENCE!=null && CLICK_SEQUENCE.length() > 0)
-				db.insertQuestionnaire(CLICK_SEQUENCE);
-			
+			db.insertQuestionnaire(seq_toString());
 			boxLayout.setVisibility(View.INVISIBLE);
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 			SharedPreferences.Editor editor = sp.edit();
@@ -433,6 +427,50 @@ public class QuestionMsgBox {
 	    	statisticFragment.setQuestionAnimation();
 		}
 	}
+	
+	private class EndSelectOnClickListener implements View.OnClickListener{
+		
+		private int endNum;
+		public EndSelectOnClickListener(int endNum){
+			this.endNum = endNum;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			//Write to DB
+			clickSequence.add(","+endNum);
+			db.insertQuestionnaire(seq_toString());
+			boxLayout.setVisibility(View.INVISIBLE);
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences.Editor editor = sp.edit();
+			editor.putInt("latest_result", 0);
+	    	editor.commit();
+	    	statisticFragment.setQuestionAnimation();
+		}
+	}
+	
+	private class ContactEndOnClickListener implements View.OnClickListener{
+		
+		public String info;
+		
+		public ContactEndOnClickListener(String info){
+			this.info = info;
+		}
+		@Override
+		public void onClick(View v) {
+			//Write to DB
+			//clickSequence.add(","+info);
+			clickSequence.add(",-1");
+			db.insertQuestionnaire(seq_toString());
+			boxLayout.setVisibility(View.INVISIBLE);
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences.Editor editor = sp.edit();
+			editor.putInt("latest_result", 0);
+	    	editor.commit();
+	    	statisticFragment.setQuestionAnimation();
+		}
+	}
+	
 	
 	private class ExitOnClickListener implements View.OnClickListener{
 		@Override
@@ -471,7 +509,7 @@ public class QuestionMsgBox {
 				LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) view.getLayoutParams();
 				param.topMargin = param.bottomMargin = margin;
 			}
-			CLICK_SEQUENCE = CLICK_SEQUENCE + "Condition=";
+			clickSequence.add(",1,6");
 			
 			boxLayout.setVisibility(View.VISIBLE);
 		}
@@ -509,8 +547,7 @@ public class QuestionMsgBox {
 				LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) view.getLayoutParams();
 				param.topMargin = param.bottomMargin = margin;
 			}
-			
-			CLICK_SEQUENCE = CLICK_SEQUENCE + result+",";
+			clickSequence.add(","+(result+1));
 			
 			boxLayout.setVisibility(View.VISIBLE);
 		}
@@ -519,17 +556,14 @@ public class QuestionMsgBox {
 	private class HelpOnClickListener implements View.OnClickListener{
 		
 		String[] dummyTexts = {
-				"dummy: 0212345678",
-				"dummy: 0212345678",
-				"dummy: 0212345678"
+				"dummy:0212345678",
+				"dummy:0212345678",
+				"dummy:0212345678"
 				};
-		OnClickListener[] dummyListeners = {
-				new EndOnClickListener(),
-				new EndOnClickListener(),
-				new EndOnClickListener()
-		};
 		
 		private int type;
+		//type = 0 ? Family
+		//type =  1 ? Social
 		
 		HelpOnClickListener(int type){
 			this.type = type;
@@ -548,7 +582,9 @@ public class QuestionMsgBox {
 			questionLayout.addView(help);
 
 			String[] texts = dummyTexts;
-			OnClickListener[] listeners = dummyListeners;
+			OnClickListener[] listeners = new OnClickListener[dummyTexts.length];
+			for (int i=0;i<listeners.length;++i)
+				listeners[i] = new ContactEndOnClickListener(dummyTexts[i]);
 			
 			for (int i=0;i<texts.length;++i){
 				questionLayout.addView(createIconView(texts[i],iconDoneBmp,listeners[i]));
@@ -559,77 +595,17 @@ public class QuestionMsgBox {
 				param.topMargin = param.bottomMargin = margin;
 			}
 			
-			CLICK_SEQUENCE = CLICK_SEQUENCE + "ContactType="+type+",";
-			
-			boxLayout.setVisibility(View.VISIBLE);
-		}
-	}
-	/*
-	private class ClockOnClickListener implements View.OnClickListener{
-		
-		int type;
-		public ClockOnClickListener(int type){
-			this.type = type;
-		}
-		
-		@Override
-		public void onClick(View v) {
-			questionLayout.removeAllViews();
-			
-			TextView help = new TextView(context);
-			help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-			help.setTypeface(wordTypeface);
-			help.setTextColor(0xFF000000);
-			help.setText("將啟用每小時定期提醒:");
-			
-			questionLayout.addView(help);
-			
-			int[] item = {1,2};
-			OnClickListener[] listener = new OnClickListener[item.length];
-			listener[0] = new StartClockOnClickListener();
-			listener[1] = new EndOnClickListener();
-			
-			
-			for (int i=0;i<item.length;++i){
-				questionLayout.addView(createIconView(ICON4_TEXT[item[i]],icon4Bmps[item[i]],listener[i]));
+			if (type == 0){ // Family
+				clickSequence.add(",2");
+			}else if (type == 1){ //Social
+				clickSequence.add(",3");
 			}
-			for (int i=0;i<questionLayout.getChildCount();++i){
-				View view = questionLayout.getChildAt(i);
-				LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) view.getLayoutParams();
-				param.topMargin = param.bottomMargin = margin;
-			}
+			clickSequence.add(",5");
 			
 			boxLayout.setVisibility(View.VISIBLE);
 		}
 	}
 	
-	private class StartClockOnClickListener implements View.OnClickListener{
-		
-		static public final long HOURMILLIS = 60*60*1000;
-		
-		@Override
-		public void onClick(View v) {
-
-			AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-			
-			Intent service_intent = new Intent();
-			service_intent.setClass(context, AlarmReceiver.class);
-			service_intent.setAction("Hourly_notification");
-			
-			PendingIntent pending = PendingIntent.getBroadcast(context, 0x9999, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			alarm.cancel(pending);
-			alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,HOURMILLIS,HOURMILLIS,pending);
-			
-			boxLayout.setVisibility(View.INVISIBLE);
-			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-			SharedPreferences.Editor editor = sp.edit();
-			editor.putInt("latest_result", 0);
-			editor.putBoolean("hourly_alarm", true);
-	    	editor.commit();
-	    	statisticFragment.setQuestionAnimation();
-		}
-	}
-	*/
 	private class ItemOnTouchListener implements View.OnTouchListener{
 
 		@Override
@@ -678,6 +654,15 @@ public class QuestionMsgBox {
 		layout.setOnTouchListener(onTouchListener);
 		
 		return layout;
+	}
+	
+	private String seq_toString(){
+		int size = clickSequence.size();
+		StringBuilder sb = new StringBuilder();
+		for (int i=0;i<size;++i)
+			sb.append(clickSequence.get(i));
+		Log.d("Questionnaire",sb.toString());
+		return sb.toString();
 	}
 	
 }

@@ -144,7 +144,7 @@ public class EmotionManageActivity extends Activity {
 	private class EndOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			db.insertEmotionManage(emotion, r_type, reason);
+			db.insertEmotionManage(emotion+1, r_type+1, reason);
 			activity.finish();
 		}
 	}

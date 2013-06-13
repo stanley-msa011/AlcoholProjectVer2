@@ -269,7 +269,7 @@ public class StatisticMonthView extends StatisticPageView {
 			int idx = (i%nBlocks)*nDate + i/nBlocks;
 			if (!TimeBlock.hasBlock(i%4, timeblock_type)){
 				circles[idx].setImageBitmap(circleBmps[0]);
-				circles[idx].setAlpha(0.3F);
+				circles[idx].setAlpha(0.5F);
 				continue;
 			}
 			if (historys[i] == null){
@@ -278,7 +278,7 @@ public class StatisticMonthView extends StatisticPageView {
 				else
 					if (TimeBlock.isEmpty(i%nBlocks, cur_hour)){
 						circles[idx].setImageBitmap(circleBmps[0]);
-						circles[idx].setAlpha(0.3F);
+						circles[idx].setAlpha(0.5F);
 					}
 					else
 						circles[idx].setImageBitmap(circleBmps[0]);

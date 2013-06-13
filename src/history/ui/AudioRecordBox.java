@@ -1,5 +1,7 @@
 package history.ui;
 
+import history.data.AudioUploader;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -62,6 +64,8 @@ public class AudioRecordBox {
 	private EndRecListener endRecListener = new EndRecListener();
 	private PlayListener playListener = new PlayListener();
 	private EndPlayListener endPlayListener= new EndPlayListener();
+	
+	private final static int MAX_MEDIA_DURATION = 90000;
 	
 	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
 		Log.d("UIMSG","NEW");
@@ -150,6 +154,8 @@ public class AudioRecordBox {
 			mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
 			mediaRecorder.setOutputFile(file.getAbsolutePath());
 			mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+			mediaRecorder.setMaxDuration(MAX_MEDIA_DURATION);
+			mediaRecorder.setOnInfoListener(new RecorderListener());
 			try {
 				mediaRecorder.prepare();
 			} catch (IllegalStateException e) {
@@ -162,6 +168,18 @@ public class AudioRecordBox {
 			mediaRecorder.start();
 			setButtonState(STATE_ON_RECORD);
 		}
+	}
+	
+	private class RecorderListener implements MediaRecorder.OnInfoListener{
+
+		@Override
+		public void onInfo(MediaRecorder mr, int what, int extra) {
+			if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
+				setButtonState(STATE_INIT);
+			}
+			
+		}
+		
 	}
 	
 	private class EndRecListener implements View.OnClickListener{
@@ -177,6 +195,7 @@ public class AudioRecordBox {
 					Log.d("RECORDER",e.getMessage());
 				}
 			}
+			AudioUploader.upload(context);
 			setButtonState(STATE_INIT);
 		}
 	}

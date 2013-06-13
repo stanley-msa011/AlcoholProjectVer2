@@ -112,7 +112,7 @@ public class EmotionActivity extends Activity {
 		int in;
 		
 		EndOnClickListener(int in){
-			this.in = in;
+			this.in = in+1;
 		}
 		
 		@Override
@@ -122,14 +122,30 @@ public class EmotionActivity extends Activity {
 		}
 	}
 	
+	private class CallOnClickListener implements View.OnClickListener{
+		int in;
+		String call;
+		
+		CallOnClickListener(int in,String call){
+			this.in = in+1;
+			this.call = call;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			db.insertEmotion(in,call);
+			activity.finish();
+		}
+	}
+	
 	private class HelpOnClickListener implements View.OnClickListener{
 		
 		int type;
 		
 		String[] dummyTexts = {
-				"dummy: 0212345678",
-				"dummy: 0212345678",
-				"dummy: 0212345678"
+				"dummy:0212345678",
+				"dummy:0212345678",
+				"dummy:0212345678"
 				};
 
 		
@@ -147,9 +163,9 @@ public class EmotionActivity extends Activity {
 			String[] texts = dummyTexts;
 			
 			OnClickListener[] dummyListeners = {
-					new EndOnClickListener(type),
-					new EndOnClickListener(type),
-					new EndOnClickListener(type)
+					new CallOnClickListener(type,dummyTexts[0]),
+					new CallOnClickListener(type,dummyTexts[1]),
+					new CallOnClickListener(type,dummyTexts[2])
 			};
 			
 			OnClickListener[] listeners = dummyListeners;

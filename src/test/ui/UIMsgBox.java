@@ -206,8 +206,8 @@ public class UIMsgBox {
 	}
 	
 	public  void settingPostTask(){
-		emotionSeekBar.setProgress(emotionSeekBar.getMax()/2);
-		desireSeekBar.setProgress(desireSeekBar.getMax()/2);
+		//emotionSeekBar.setProgress(emotionSeekBar.getMax()/2);
+		//desireSeekBar.setProgress(desireSeekBar.getMax()/2);
 		
 		int textSize2 = screen.x * 40/1080;
 		

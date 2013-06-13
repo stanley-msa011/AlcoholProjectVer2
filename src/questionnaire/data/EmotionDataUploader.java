@@ -1,5 +1,7 @@
 package questionnaire.data;
 
+import history.data.AudioUploader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -52,13 +54,10 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 		private static final String SERVER_URL_EMOTION = "https://140.112.30.165/develop/drunk_detection/emotionDIY_upload.php";
 		private static final String SERVER_URL_EMOTION_MANAGE = "https://140.112.30.165/develop/drunk_detection/emotion_manage_upload.php";
 		private static final String SERVER_URL_QUESTIONNAIRE = "https://140.112.30.165/develop/drunk_detection/questionnaire_upload.php";
-		private String devId;
-		
 		
 		public EmotionDataUploader (Context context){
 			db = new QuestionDB(context);
 			this.context = context;
-			this.devId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 		}
 		
 		@Override
@@ -69,8 +68,10 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			if (e_data != null){
 				for (int i=0;i<e_data.length;++i){
 			       	int result = connectingToServer(e_data[i]);
-			        if (result == -1)
+			        if (result == -1){
+			        	Log.d("EMOTION_UPLOADER","fail");
 			        	return null;
+			        }
 				}
 			}
 
@@ -78,8 +79,10 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			if (em_data != null){
 				for (int i=0;i<em_data.length;++i){
 			       	int result = connectingToServer(em_data[i]);
-			        if (result == -1)
+			        if (result == -1){
+			        	Log.d("EMOTION_UPLOADER","fail2");
 			        	return null;
+			        }
 				}
 			}
 			
@@ -87,13 +90,21 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			if (q_data != null){
 				for (int i=0;i<q_data.length;++i){
 			       	int result = connectingToServer(q_data[i]);
-			        if (result == -1)
+			        if (result == -1){
+			        	Log.d("EMOTION_UPLOADER","fail3");
 			        	return null;
+			        }
 				}
 			}
 			
 			return null;
 		}
+		
+		@Override
+		protected void onPostExecute(Void result ){
+			AudioUploader.upload(context);
+		}
+		
 		
 		private int connectingToServer(EmotionData e_data){
 			try {
@@ -120,11 +131,15 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				mpEntity.addPart("emotionDIYData[]", new StringBody(uid));
 				mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.ts)));
 				mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.selection)));
+				if (e_data.call !=null)
+					mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.call)));
 				
 				httpPost.setEntity(mpEntity);
 				int result = uploader(httpClient, httpPost,context);
 				if (result == 1){
 					db.setEmotionUploaded(e_data.ts);
+				}else{
+					Log.d("EMOTION_UPLOADER","fail1");
 				}
 				
 			} catch (Exception e) {
@@ -165,6 +180,8 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				int result = uploader(httpClient, httpPost,context);
 				if (result == 1){
 					db.setEmotionManageUploaded(em_data.ts);
+				}else{
+					Log.d("EMOTION_UPLOADER","fail2");
 				}
 				
 			} catch (Exception e) {
@@ -203,6 +220,8 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				int result = uploader(httpClient, httpPost,context);
 				if (result == 1){
 					db.setQuestionnaireUploaded(q_data.ts);
+				}else{
+					Log.d("EMOTION_UPLOADER","fail3");
 				}
 				
 			} catch (Exception e) {

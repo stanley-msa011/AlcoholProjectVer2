@@ -124,13 +124,14 @@ public class StatisticFragment extends Fragment {
     }
     
     public void onStart(){
-    	super.onStart();
+    	
     	dialog = new ProgressDialog(this.getActivity());
 		dialog.setMessage("載入中");
 		dialog.setCancelable(true);
 		if (!dialog.isShowing()){
 			dialog.show();
 		}
+		super.onStart();
     }
     
 	private void clear(){

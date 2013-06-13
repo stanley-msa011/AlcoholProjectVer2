@@ -285,7 +285,7 @@ public class StatisticDayView extends StatisticPageView {
 				circleValues[i].setText("");
 				if (TimeBlock.isEmpty(i, cur_hour)){
 					circleImages[i].setImageBitmap(circleBmps[0] );
-					circleImages[i].setAlpha(0.1F);
+					circleImages[i].setAlpha(0.5F);
 				}
 				else
 					circleImages[i].setImageBitmap(circleBmps[0] );

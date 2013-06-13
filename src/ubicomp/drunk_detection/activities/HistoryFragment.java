@@ -421,13 +421,14 @@ public class HistoryFragment extends Fragment {
     }
     
     public void onStart(){
-    	super.onStart();
+    	
     	dialog = new ProgressDialog(this.getActivity());
 		dialog.setMessage("載入中");
 		dialog.setCancelable(true);
 		if (!dialog.isShowing()){
 			dialog.show();
 		}
+		super.onStart();
     }
     
 	@SuppressLint("HandlerLeak")
@@ -1017,6 +1018,7 @@ public class HistoryFragment extends Fragment {
 				//Draw X axis Label
 				if (i%7 == 0){
 					String str= bar.dv.month+"/"+bar.dv.date;
+					canvas.drawLine(left+circle_radius, _bottom, left+circle_radius, _bottom + circle_radius, axis_paint);
 					canvas.drawText(str, left+small_radius, _bottom + bar_width*2, text_paint_small);
 				}
 				left += (bar_width+bar_gap);
@@ -1085,6 +1087,7 @@ public class HistoryFragment extends Fragment {
 				//Draw X axis Label
 				if (i%7 == 0){
 					String str= bar.dv.month+"/"+bar.dv.date;
+					canvas.drawLine(left+circle_radius, _bottom, left+circle_radius, _bottom + circle_radius, axis_paint);
 					canvas.drawText(str, left+circle_radius, _bottom + bar_width*2, text_paint_small);
 				}
 				left += (bar_width+bar_gap);
