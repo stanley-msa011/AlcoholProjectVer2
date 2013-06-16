@@ -139,6 +139,8 @@ public class Bluetooth {
 		public void onReceive(Context context, Intent intent) {
 			if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+				if (device == null)
+					return;
 				if (device.getName().equals(DEVICE_NAME)||device.getName().equals(DEVICE_NAME2)){ // add DEVICE_NAME2?
 					btAdapter.cancelDiscovery();
 					sensor = device;
@@ -220,6 +222,9 @@ public class Bluetooth {
 						msg="m";
 						read_type = READ_PRESSURE;
 					}
+					else if ( (char)temp[i]=='b'){
+						throw new Exception("NO BETTARY");
+					}
 					else if (read_type!= READ_NULL){
 							msg += (char)temp[i];
 					}
@@ -234,8 +239,9 @@ public class Bluetooth {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
 			close();
 			testFragment.showDebug("Close by exception or timeout" );
-			if(!success)
-				cameraRunHandler.sendEmptyMessage(1);
+			if(!success){
+					cameraRunHandler.sendEmptyMessage(1);
+			}
 		}
 	}
 	

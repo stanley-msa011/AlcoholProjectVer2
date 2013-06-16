@@ -62,11 +62,14 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		
 		if  (type == 1){// cur to next ()
 			Log.d("PAGE_ANIMATION", "in UP");
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
+			BitmapFactory.Options opt = new BitmapFactory.Options();
+			opt.inSampleSize = 2;
+			
+			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC],opt);
 			cur = Bitmap.createScaledBitmap(tmp, width,height , true);
 			tmp.recycle();
 			
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1]);
+			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1],opt);
 			next = Bitmap.createScaledBitmap(tmp, width,height , true);
 			tmp.recycle();
 			
@@ -92,11 +95,14 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 			
 		}else{ //next to cur (DOWN)
 			Log.d("PAGE_ANIMATION", "in DOWN");
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
+			
+			BitmapFactory.Options opt = new BitmapFactory.Options();
+			opt.inSampleSize = 2;
+			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC],opt);
 			next = Bitmap.createScaledBitmap(tmp, width,height , true);
 			tmp.recycle();
 			
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
+			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1],opt);
 			cur = Bitmap.createScaledBitmap(tmp, width,height , true);
 			tmp.recycle();
 			

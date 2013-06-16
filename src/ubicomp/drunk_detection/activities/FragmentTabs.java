@@ -252,10 +252,11 @@ public class FragmentTabs extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
     	menu.add(0, 0, 0, "Debug");
     	menu.add(0, 1, 1, "Normal");
-    	menu.add(0, 2, 1, "Setting");
-    	menu.add(0, 3, 1,"DummyData");
-    	menu.add(1, 0, 1, "心情DIY");
-    	menu.add(1, 1, 1, "情緒管理");
+    	menu.add(0, 2, 2, "Setting");
+    	menu.add(0, 3, 3,"DummyData");
+    	menu.add(1, 0, 4, "心情DIY");
+    	menu.add(1, 1, 5, "情緒管理");
+    	menu.add(1, 2, 6, "關於");
     	return super.onCreateOptionsMenu(menu);
     }
 	
@@ -284,6 +285,9 @@ public class FragmentTabs extends FragmentActivity {
 				this.startActivity(newIntent);
 			}else if (id == 1){
 				Intent newIntent = new Intent(this, EmotionManageActivity.class);
+				this.startActivity(newIntent);
+			}else if (id == 2){
+				Intent newIntent = new Intent(this, AboutActivity.class);
 				this.startActivity(newIntent);
 			}
 		}

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="7"
-    android:versionName="1.12" >
+    android:versionCode="9"
+    android:versionName="1.20" >
 
     <uses-sdk
         android:maxSdkVersion="17"
@@ -26,6 +26,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <permission
         android:name="ubicomp.drunk_detection.activities.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
@@ -88,17 +89,20 @@
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionActivity"
-            android:screenOrientation="portrait" 
-            >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionManageActivity"
-            android:screenOrientation="portrait" 
-            >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.TutorialActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ubicomp.drunk_detection.activities.AboutActivity"
             android:screenOrientation="portrait" 
+            android:noHistory="true"
             >
         </activity>
     </application>

@@ -43,7 +43,7 @@ public class DummyData {
 		
 			
 			
-			long from = cal.getTimeInMillis() - mDAYMILLIS * 28;
+			long from = cal.getTimeInMillis() - mDAYMILLIS * 56;
 			
 			Log.d("CHART","cur cal = "+cal.getTimeInMillis());
 			Log.d("CHART","cur cal = "+cal.toString());
@@ -54,8 +54,8 @@ public class DummyData {
 			Log.d("CHART","- cal = "+cal.getTimeInMillis());
 			Log.d("CHART","- cal = "+cal.toString());
 
-			final int num_of_data = 4 * 28;
-			final long millis = mDAYMILLIS / num_of_data * 28;
+			final int num_of_data = 4 * 56;
+			final long millis = mDAYMILLIS / num_of_data * 56;
 			
 			HistoryDB hdb = new HistoryDB(context);
 			Random rand = new Random();

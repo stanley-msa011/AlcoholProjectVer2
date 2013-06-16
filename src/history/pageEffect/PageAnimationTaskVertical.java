@@ -72,15 +72,17 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 			if (c > endImageIdx)
 				break;
 			
+			BitmapFactory.Options opt = new BitmapFactory.Options();
+			opt.inSampleSize = 2;
 			if (prev_next!=null){
 				cur = prev_next;
 			}
 			else{
-				tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c]);
+				tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c],opt);
 				cur = Bitmap.createScaledBitmap(tmp, width,height , true);
 				tmp.recycle();
 			}
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c+1]);
+			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c+1],opt);
 			next = Bitmap.createScaledBitmap(tmp, width,height , true);
 			tmp.recycle();
 			

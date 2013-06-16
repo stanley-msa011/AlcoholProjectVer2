@@ -7,6 +7,7 @@ import statistic.statisticPageView.analysis.AnalysisRatingView;
 import statistic.statisticPageView.analysis.AnalysisSavingView;
 import statistic.statisticPageView.statistics.StatisticPagerAdapter;
 import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionMsgBox2;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -67,7 +68,7 @@ public class StatisticFragment extends Fragment {
 	
 	private AlphaAnimation questionAnimation;
 	
-	private QuestionMsgBox msgBox;
+	private QuestionMsgBox2 msgBox;
 	
 	// For Click Sequence Logging
 	private ClickLogger clickLogger;
@@ -105,7 +106,7 @@ public class StatisticFragment extends Fragment {
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
-		msgBox = new QuestionMsgBox(statisticFragment,(RelativeLayout) view);
+		msgBox = new QuestionMsgBox2(statisticFragment,(RelativeLayout) view);
 		
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();

@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
@@ -41,7 +42,7 @@ public class AudioRecordBox {
 	private RelativeLayout boxLayout = null;
 	
 	private TextView help;
-	private Button closeButton,recButton,playButton;
+	private ImageView closeButton,recButton,playButton;
 	
 	private RelativeLayout mainLayout;
 	
@@ -66,6 +67,8 @@ public class AudioRecordBox {
 	private EndPlayListener endPlayListener= new EndPlayListener();
 	
 	private final static int MAX_MEDIA_DURATION = 90000;
+	
+	private Bitmap playBmp, recBmp, stopBmp, bgBmp, closeBmp;
 	
 	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
 		Log.d("UIMSG","NEW");
@@ -105,24 +108,86 @@ public class AudioRecordBox {
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.rec_layout,null);
 		boxLayout.setVisibility(View.INVISIBLE);
+		
 		help = (TextView) boxLayout.findViewById(R.id.rec_help);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 64/1080);
 		help.setTypeface(wordTypeface);
+		RelativeLayout.LayoutParams hParam = (LayoutParams) help.getLayoutParams();
+		hParam.width = screen.x * 700/1080;
+		hParam.height = screen.x * 160/1080;
 		
 		mainLayout.addView(boxLayout);
 		
 		RelativeLayout.LayoutParams param = (LayoutParams) boxLayout.getLayoutParams();
-		param.width = screen.x * 2 / 3;
-		param.height = screen.x * 2 / 3;
+		param.width = screen.x * 830/1080;
+		param.height = screen.x * 345/1080;
 		param.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 		
-		closeButton = (Button) boxLayout.findViewById(R.id.rec_close_button);
+		closeButton = (ImageView) boxLayout.findViewById(R.id.rec_close_button);
 		closeButton.setOnClickListener(new EndListener());
+		RelativeLayout.LayoutParams cParam = (LayoutParams) closeButton.getLayoutParams();
+		cParam.width = screen.x * 77/1080;
+		cParam.height = screen.x * 77/1080;
 		
-		recButton = (Button) boxLayout.findViewById(R.id.rec_rec_button);
-		playButton = (Button) boxLayout.findViewById(R.id.rec_play_button);
+		recButton = (ImageView) boxLayout.findViewById(R.id.rec_rec_button);
+		RelativeLayout.LayoutParams rParam = (LayoutParams) recButton.getLayoutParams();
+		rParam.width = screen.x * 100/1080;
+		rParam.height = screen.x * 160/1080;
+		rParam.topMargin = screen.x * 20/1080;
+		rParam.rightMargin = screen.x * 200/1080; 
+		playButton = (ImageView) boxLayout.findViewById(R.id.rec_play_button);
+		RelativeLayout.LayoutParams pParam = (LayoutParams) playButton.getLayoutParams();
+		pParam.width = screen.x * 100/1080;
+		pParam.height = screen.x * 160/1080;
+		pParam.topMargin = screen.x * 20/1080;
+		pParam.leftMargin = screen.x * 200/1080; 
 		
 	}
 	
+	public void setImage(){
+		Bitmap tmp;
+		tmp=BitmapFactory.decodeResource(context.getResources(), R.drawable.record_bg);
+		bgBmp = Bitmap.createScaledBitmap(tmp, screen.x * 830/1080, screen.x * 345/1080, true);
+		tmp.recycle();
+		tmp=BitmapFactory.decodeResource(context.getResources(), R.drawable.record_rec);
+		recBmp = Bitmap.createScaledBitmap(tmp, screen.x * 49/1080, screen.x * 49/1080, true);
+		tmp.recycle();
+		tmp=BitmapFactory.decodeResource(context.getResources(), R.drawable.record_play);
+		playBmp = Bitmap.createScaledBitmap(tmp, screen.x * 56/1080, screen.x * 49/1080, true);
+		tmp.recycle();
+		tmp=BitmapFactory.decodeResource(context.getResources(), R.drawable.record_stop);
+		stopBmp = Bitmap.createScaledBitmap(tmp, screen.x * 49/1080, screen.x * 49/1080, true);
+		tmp.recycle();
+		tmp=BitmapFactory.decodeResource(context.getResources(), R.drawable.question_close);
+		closeBmp = Bitmap.createScaledBitmap(tmp, screen.x * 77/1080, screen.x * 77/1080, true);
+		tmp.recycle();
+		
+		boxLayout.setBackground(new BitmapDrawable(context.getResources(),bgBmp));
+		closeButton.setImageBitmap(closeBmp);
+	}
+	
+	public void clear(){
+		if (bgBmp!=null && !bgBmp.isRecycled()){
+			bgBmp.recycle();
+			bgBmp = null;
+		}
+		if (recBmp!=null && !recBmp.isRecycled()){
+			recBmp.recycle();
+			recBmp = null;
+		}
+		if (playBmp!=null && !playBmp.isRecycled()){
+			playBmp.recycle();
+			playBmp = null;
+		}
+		if (stopBmp!=null && !stopBmp.isRecycled()){
+			stopBmp.recycle();
+			stopBmp = null;
+		}
+		if (closeBmp!=null && !closeBmp.isRecycled()){
+			closeBmp.recycle();
+			closeBmp = null;
+		}
+	}
 	private class EndListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
@@ -136,7 +201,7 @@ public class AudioRecordBox {
 		this.curIdx = idx;
 		curDV = dv;
 		historyFragment.enablePage(false);
-		help.setText(dv.toString());
+		help.setText("您對於["+dv.toString()+"]\n的心情(90秒)");
 		setButtonState(STATE_INIT);
 		boxLayout.setVisibility(View.VISIBLE);
 	}
@@ -256,27 +321,27 @@ public class AudioRecordBox {
 	private void setButtonState(int state){
 		switch (state){
 		case STATE_INIT:
-			recButton.setText("錄音");
+			recButton.setImageBitmap(recBmp);
 			recButton.setOnClickListener(recListener);
 			if (db.hasAudio(curDV)){
-				playButton.setText("播放");
+				playButton.setImageBitmap(playBmp);
 				playButton.setOnClickListener(playListener);
 			}
 			else{
-				playButton.setText("-");
+				playButton.setImageBitmap(null);
 				playButton.setOnClickListener(null);
 			}
 			break;
 		case STATE_ON_PLAY:
-			recButton.setText("-");
+			recButton.setImageBitmap(null);
 			recButton.setOnClickListener(null);
-			playButton.setText("停止");
+			playButton.setImageBitmap(stopBmp);
 			playButton.setOnClickListener(endPlayListener);
 			break;
 		case STATE_ON_RECORD:
-			recButton.setText("停止");
+			recButton.setImageBitmap(stopBmp);
 			recButton.setOnClickListener(endRecListener);
-			playButton.setText("-");
+			playButton.setImageBitmap(null);
 			playButton.setOnClickListener(null);
 			break;
 		case STATE_PREPARING:

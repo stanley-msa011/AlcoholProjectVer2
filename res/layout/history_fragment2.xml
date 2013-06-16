@@ -12,6 +12,7 @@
     <RelativeLayout
         	android:layout_width="match_parent"
         	android:layout_height="wrap_content"
+        	android:background="#FF000000"
         	>
     	<RelativeLayout 
         	android:id="@+id/history_book_layout"
@@ -47,6 +48,7 @@
         android:id  ="@+id/history_chart_area_layout"
        	android:layout_width="match_parent"
        	android:layout_height="wrap_content"
+       	android:background="#FF8c8d8d"
         >
     	<HorizontalScrollView 
 	       	android:id  ="@+id/history_scroll_view"
