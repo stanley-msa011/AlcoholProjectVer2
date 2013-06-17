@@ -2,14 +2,18 @@ package ubicomp.drunk_detection.activities;
 
 import ubicomp.drunk_detection.activities.R;
 import database.QuestionDB;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,7 +24,8 @@ public class EmotionActivity extends Activity {
 	
 	private int textSize = 24;
 	private Typeface wordTypeface;
-
+	private Typeface wordTypefaceBold;
+	
 	private LinearLayout mainLayout;
 	
 	private Activity activity;
@@ -28,12 +33,13 @@ public class EmotionActivity extends Activity {
 	private ItemOnTouchListener onTouchListener;
 	
 	private static final int[] DRAWABLE_ID = {
-		R.drawable.question_icon3_breath,
-		R.drawable.question_icon3_jogging,
-		R.drawable.question_icon3_music,
-		R.drawable.question_icon_helper,
-		R.drawable.question_icon_neighbor
+		R.drawable.questionnaire_item_sol_1,
+		R.drawable.questionnaire_item_sol_2,
+		R.drawable.questionnaire_item_sol_3,
+		R.drawable.questionnaire_item_sol_4,
+		R.drawable.questionnaire_item_sol_5
 	};
+	
 	
 	private static final String[] texts = {
 		"閉眼專注觀察呼吸",
@@ -51,41 +57,87 @@ public class EmotionActivity extends Activity {
 			new HelpOnClickListener(4)
 	};
 	
-	private TextView text;
-	
 	QuestionDB db;
+	
+	private Point screen;
+	private int height;
+	private int icon_size; 
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_emotion);
-		setTitle("心情DIY");
-
+		View titleView = getWindow().findViewById(android.R.id.title);
+	    if (titleView != null) {
+	      ViewParent titleBar = titleView.getParent();
+	      if (titleBar != null) {
+	        View parentView = (View)titleBar;
+	        parentView.setBackgroundColor(0xFFf39800);
+	      }
+	    }
+		
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		if (Build.VERSION.SDK_INT<13){
+			@SuppressWarnings("deprecation")
+			int w = display.getWidth();
+			@SuppressWarnings("deprecation")
+			int h = display.getHeight();
+			screen = new Point(w,h);
+		}
+		else{
+			screen = new Point();
+			display.getSize(screen);
+		}
+		
 	}
 
+	
+	
 	@Override
 	protected void onResume(){
 		super.onResume();
 		this.activity = this;
 		mainLayout = (LinearLayout) this.findViewById(R.id.emotion_main_layout);
-		text = new TextView(activity);
 		inflater = LayoutInflater.from(activity);
 		wordTypeface = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w3.otf");
+		wordTypefaceBold = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w5.otf");
 		db = new QuestionDB(activity);
 		
 		mainLayout.removeAllViews();
 		onTouchListener = new ItemOnTouchListener();
 		
-		text.setText("若你想飲酒的話，你可以:");
-		text.setTextColor(0xFF000000);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
+		textSize = screen.x * 72/1080;
+		height =  screen.x * 202/1080;
+		icon_size = screen.x * 100/1080;
 		
-		mainLayout.addView(text);
+		View tv = createTextView("若你想要飲酒的話，你可以：");
+		mainLayout.addView(tv);
+		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+		tvparam.height = height;
 		
 		for (int i=0;i<texts.length;++i){
-			mainLayout.addView(createIconView(texts[i],DRAWABLE_ID[i],clickListeners[i]));
+			View v = createIconView(texts[i],DRAWABLE_ID[i],clickListeners[i]);
+			mainLayout.addView(v);
+			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
+			param.height = height;
 		}
+	}
+	
+	
+	private View createTextView(String textStr){
+		
+		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
+		TextView text = (TextView) layout.findViewById(R.id.question_description);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTypeface(wordTypefaceBold);
+		text.setTextColor(0xFF777777);
+		text.setText(textStr);
+		
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
+		
+		return layout;
 	}
 	
 	
@@ -93,17 +145,20 @@ public class EmotionActivity extends Activity {
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		text.setTypeface(wordTypeface);
-		text.setTextColor(0xFF000000);
+		text.setTextColor(0xFF5c5c5c);
 		text.setText(textStr);
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
 		icon.setImageResource(DrawableId);
+		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
+		iParam.width = iParam.height = icon_size;
+		iParam.rightMargin = icon_size;
 		
-		layout.setBackgroundColor(0xFFFFFFFF);
 		layout.setOnClickListener(listener);
 		layout.setOnTouchListener(onTouchListener);
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 		
 		return layout;
 	}
@@ -157,8 +212,10 @@ public class EmotionActivity extends Activity {
 		public void onClick(View v) {
 			mainLayout.removeAllViews();
 			
-			text.setText("請選擇聯絡對象:");
-			mainLayout.addView(text);
+			View tv = createTextView("請選擇聯絡對象");
+			mainLayout.addView(tv);
+			LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+			tvparam.height = height;
 
 			String[] texts = dummyTexts;
 			
@@ -171,7 +228,10 @@ public class EmotionActivity extends Activity {
 			OnClickListener[] listeners = dummyListeners;
 			
 			for (int i=0;i<texts.length;++i){
-				mainLayout.addView(createIconView(texts[i],R.drawable.question_done,listeners[i]));
+				View vv = createIconView(texts[i],R.drawable.questionnaire_item_call,listeners[i]);
+				mainLayout.addView(vv);
+				LinearLayout.LayoutParams vparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
+				vparam.height = height;
 			}
 		}
 	}
@@ -184,16 +244,16 @@ public class EmotionActivity extends Activity {
 			int e = event.getAction();
 			switch(e){
 				case MotionEvent.ACTION_OUTSIDE:
-					v.setBackgroundColor(0xFFFFFFFF);
+					v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 					break;
 				case MotionEvent.ACTION_MOVE:
-					v.setBackgroundColor(0xCC00CCFF);
+					v.setBackgroundResource(R.drawable.questionnaire_bar_selected);
 					break;
 				case MotionEvent.ACTION_UP:
-					v.setBackgroundColor(0xFFFFFFFF);
+					v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 					break;
 				case MotionEvent.ACTION_DOWN:
-					v.setBackgroundColor(0xCC00CCFF);
+					v.setBackgroundResource(R.drawable.questionnaire_bar_selected);
 					break;
 			}
 			return false;

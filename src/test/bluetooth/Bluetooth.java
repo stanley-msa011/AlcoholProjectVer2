@@ -39,7 +39,7 @@ public class Bluetooth {
 	private Context context;
 	
 	private float local_min;
-	private float local_max;
+	//private float local_max;
 	private float prev_prev_pressure;
 	private float prev_pressure;
 	private float now_pressure;
@@ -93,7 +93,7 @@ public class Bluetooth {
 		if (btAdapter == null)
 			Log.e("BT","NOT SUPPORT BT");
 		local_min = 0.f;
-		local_max = 0.f;
+		//local_max = 0.f;
 		prev_prev_pressure = 0.f;
 		prev_pressure = 0.f;
 		now_pressure = 0.f;
@@ -180,7 +180,7 @@ public class Bluetooth {
 		isPeak=false;
 		success = false;
 		local_min = 0;
-		local_max = 0;
+		//local_max = 0;
 		now_pressure = 0;
 		prev_prev_pressure = 0;
 		prev_pressure = 0;
@@ -311,7 +311,7 @@ public class Bluetooth {
 						Log.d("ERIC", "set local min = " + prev_pressure);
 					}
 					else if(prev_pressure > prev_prev_pressure && prev_pressure > now_pressure){
-						local_max = prev_pressure;
+						//local_max = prev_pressure;
 						Log.d("ERIC", "set local max = " + prev_pressure);
 					}
 					if(local_min > 1 && now_pressure > local_min + 1000 && !isPeak){

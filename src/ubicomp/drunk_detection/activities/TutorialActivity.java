@@ -174,7 +174,6 @@ public class TutorialActivity extends Activity {
 	
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
-		@SuppressWarnings("deprecation")
 		public void handleMessage(Message msg){
 			Bitmap tmp;
 			BitmapFactory.Options opt = new BitmapFactory.Options();
@@ -221,8 +220,7 @@ public class TutorialActivity extends Activity {
 			arrow.setAnimation(animation);
 			
 			if (bgBmp!=null && !bgBmp.isRecycled())
-				layout.setBackground(new BitmapDrawable(bgBmp));
-			//layout.setBackgroundResource(R.drawable.tutorial_bg);
+				layout.setBackground(new BitmapDrawable(layout.getResources(),bgBmp));
 			settingState(0);
 			if (mDialog!=null && mDialog.isShowing())
 				mDialog.dismiss();

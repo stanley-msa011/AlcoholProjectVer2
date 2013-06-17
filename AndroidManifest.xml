@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="9"
-    android:versionName="1.20" >
+    android:versionCode="11"
+    android:versionName="1.21" >
 
     <uses-sdk
         android:maxSdkVersion="17"
@@ -72,6 +72,7 @@
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </receiver>
+        
         <receiver android:name="ubicomp.drunk_detection.activities.AlarmReceiver" >
             <intent-filter>
                 <action android:name="com.android.alarmclock.ALARM_ALERT" />
@@ -85,19 +86,28 @@
 
         <activity
             android:name="ubicomp.drunk_detection.activities.PreSettingActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:noHistory="true"
+            >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:label="心情DIY"
+            android:noHistory="true"
+            >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionManageActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:label= "情緒管理"
+            android:noHistory="true"
+            >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.TutorialActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:noHistory="true">
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.AboutActivity"

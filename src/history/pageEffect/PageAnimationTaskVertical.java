@@ -73,7 +73,7 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 				break;
 			
 			BitmapFactory.Options opt = new BitmapFactory.Options();
-			opt.inSampleSize = 2;
+			opt.inSampleSize = 3;
 			if (prev_next!=null){
 				cur = prev_next;
 			}

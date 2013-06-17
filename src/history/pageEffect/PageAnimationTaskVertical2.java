@@ -63,7 +63,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		if  (type == 1){// cur to next ()
 			Log.d("PAGE_ANIMATION", "in UP");
 			BitmapFactory.Options opt = new BitmapFactory.Options();
-			opt.inSampleSize = 2;
+			opt.inSampleSize = 3;
 			
 			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC],opt);
 			cur = Bitmap.createScaledBitmap(tmp, width,height , true);
@@ -97,7 +97,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 			Log.d("PAGE_ANIMATION", "in DOWN");
 			
 			BitmapFactory.Options opt = new BitmapFactory.Options();
-			opt.inSampleSize = 2;
+			opt.inSampleSize = 3;
 			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC],opt);
 			next = Bitmap.createScaledBitmap(tmp, width,height , true);
 			tmp.recycle();

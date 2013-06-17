@@ -1,6 +1,5 @@
 package history.ui;
 
-import android.graphics.Point;
 import history.GameHistory;
 import ubicomp.drunk_detection.activities.R;
 

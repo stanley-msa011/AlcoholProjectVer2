@@ -188,7 +188,7 @@ public class QuestionDB {
 	
     public String[] getInsertedReason(int type){
     	db = dbHelper.getReadableDatabase();
-    	String sql = "SELECT _REASON FROM EmotionManageDB WHERE _TYPE = "+type+" ORDER BY _TS DESC LIMIT 5";
+    	String sql = "SELECT DISTINCT _REASON FROM EmotionManageDB WHERE _TYPE = "+type+" ORDER BY _TS DESC LIMIT 4";
     	String[] out = null;
     	
     	Cursor cursor = db.rawQuery(sql, null);

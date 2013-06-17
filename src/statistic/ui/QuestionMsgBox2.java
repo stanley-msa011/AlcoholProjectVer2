@@ -8,33 +8,24 @@ import statistic.ui.questionnaire.content.Type0Content;
 import statistic.ui.questionnaire.content.Type1Content;
 import statistic.ui.questionnaire.content.Type2Content;
 import statistic.ui.questionnaire.content.Type3Content;
-import ubicomp.drunk_detection.activities.AlarmReceiver;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.StatisticFragment;
 import ubicomp.drunk_detection.activities.R;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.TextView;
 
 public class QuestionMsgBox2 {
 
@@ -136,6 +127,13 @@ public class QuestionMsgBox2 {
 	}
 	
 	public void clear(){
+		top.setImageBitmap(null);
+		bottom.setImageBitmap(null);
+		exitView.setImageBitmap(null);
+		questionLayout.setBackground(null);
+		if (boxLayout !=null)
+			mainLayout.removeView(boxLayout);
+		
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;

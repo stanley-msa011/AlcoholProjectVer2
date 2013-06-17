@@ -14,7 +14,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -278,7 +277,10 @@ public class UIMsgBox {
 		LinearLayout.LayoutParams dParam = (LinearLayout.LayoutParams) desireShowText.getLayoutParams();
 		dParam.width = screen.x * 203/1080;
 		
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bg);
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+		opt.inSampleSize = 3;
+		
+		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bg, opt);
 		bgBmp = Bitmap.createScaledBitmap(tmp, box_width ,  boxParam.height, true);
 		tmp.recycle();
 		

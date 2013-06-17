@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.provider.Settings.Secure;
 import android.util.Log;
 
 public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {

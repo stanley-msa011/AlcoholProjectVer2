@@ -6,7 +6,6 @@ import statistic.statisticPageView.analysis.AnalysisProgressView;
 import statistic.statisticPageView.analysis.AnalysisRatingView;
 import statistic.statisticPageView.analysis.AnalysisSavingView;
 import statistic.statisticPageView.statistics.StatisticPagerAdapter;
-import statistic.ui.QuestionMsgBox;
 import statistic.ui.QuestionMsgBox2;
 import android.annotation.SuppressLint;
 import android.app.Activity;

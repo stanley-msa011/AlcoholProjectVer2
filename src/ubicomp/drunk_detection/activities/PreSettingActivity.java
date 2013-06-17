@@ -54,7 +54,7 @@ public class PreSettingActivity extends Activity {
 		uid.setText(sp.getString("uid", ""));
 		
 		target = (EditText) this.findViewById(R.id.target_money_edit);
-		target.setText(String.valueOf(sp.getInt("goal_money", 10000)));
+		target.setText(String.valueOf(sp.getInt("goal_money", 1)));
 		drink= (EditText) this.findViewById(R.id.target_drink_edit);
 		drink.setText(String.valueOf(sp.getInt("drink_cost", 200)));
 

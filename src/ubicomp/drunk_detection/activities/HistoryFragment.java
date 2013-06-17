@@ -23,7 +23,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
-import android.graphics.Path.FillType;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Typeface;
@@ -195,13 +194,28 @@ public class HistoryFragment extends Fragment {
     		recordBox.OnPause();
     		recordBox.clear();
     	}
+    	selected_dates.clear();
+    	selected_idx.clear();
+    	historys.clear();
+    	bars.clear();
+    	hasAudio.clear();
+    	
     	clear();
     	super.onPause();
     }
 	
     private void clear(){
+    	pageLayout.removeView(pageWidget);
+    	pageLayout.removeView(prevImage);
+    	chartLayout.removeView(chart);
+    	chartAreaLayout.removeView(chartYAxis);
+    	chartAreaLayout.removeView(chartTitle);
+    	chartAreaLayout.removeView(chartLabel);
+    	
     	pageWidget.setBitmaps(null, null);
     	prevImage.setImageBitmap(null);
+    	scrollView.setBackground(null);
+    	
     	
     	if (loadHandler !=null)
     		loadHandler.removeMessages(0);
@@ -308,7 +322,7 @@ public class HistoryFragment extends Fragment {
 		tmp.recycle();
 		
 		tmp = BitmapFactory.decodeResource(historyFragment.getResources(), R.drawable.chart_circle);
-		chartCircleBmp = Bitmap.createScaledBitmap(tmp, screen.x * 102/1080, screen.x * 102/1080, true);
+		chartCircleBmp = Bitmap.createScaledBitmap(tmp, screen.x * 122/1080, screen.x * 122/1080, true);
 		tmp.recycle();
 		
 		chartBg1 = new BitmapDrawable(historyFragment.getResources(),chartBg1Bmp);
@@ -389,7 +403,10 @@ public class HistoryFragment extends Fragment {
 		chartLabelParam.topMargin = screen.x * 90/1080;
 		chartLabelParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		
-		scrollView.setBackground(chartBg1);
+		if (chart_type < 3)
+			scrollView.setBackground(chartBg1);
+		else
+			scrollView.setBackground(chartBg2);
 		
 		pageWidget.setOnTouchListener(gtListener);
 		
@@ -441,7 +458,9 @@ public class HistoryFragment extends Fragment {
     	}
     	
     	Log.d("PAGE_ANIMATION", "reset level fix: "+level);
-    	Bitmap tmp = BitmapFactory.decodeResource(historyFragment.getResources(), HistoryStorytelling.getPage(level));
+    	BitmapFactory.Options opt = new BitmapFactory.Options();
+    	opt.inSampleSize = 2;
+    	Bitmap tmp = BitmapFactory.decodeResource(historyFragment.getResources(), HistoryStorytelling.getPage(level),opt);
 		cur_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
 		tmp.recycle();
     	pageWidget.setBitmaps(cur_bg_bmp, next_bg_bmp);
@@ -881,7 +900,7 @@ public class HistoryFragment extends Fragment {
 			record_paint.setColor(0xFFff6f61);
 			no_record_paint.setColor(0xFF858585);
 			
-			paint_highlight .setColor(0xAAAADDFF);
+			paint_highlight .setColor(0x99FFFFFF);
 			
 			circle_paint_stroke.setColor(0xFFFF0000);
 			circle_paint_stroke.setStyle(Style.STROKE);
@@ -931,9 +950,9 @@ public class HistoryFragment extends Fragment {
 		    
 		    RADIUS = bar_width*9/5;
 			RADIUS_SQUARE = RADIUS *RADIUS ;
-			BUTTON_RADIUS = screen.x * 51/1080;
+			BUTTON_RADIUS = screen.x * 61/1080;
 			BUTTON_RADIUS_SQUARE = BUTTON_RADIUS*BUTTON_RADIUS;
-			BUTTON_GAPS = BUTTON_RADIUS * 3;
+			BUTTON_GAPS = BUTTON_RADIUS * 8/3;
 		}
 		
 	    @Override  
@@ -975,7 +994,6 @@ public class HistoryFragment extends Fragment {
 		protected void onDraw(Canvas canvas){
 			super.onDraw(canvas);
 			
-			
 			circle_centers.clear();
 			selected_centers.clear();
 			selected_idx.clear();
@@ -997,7 +1015,6 @@ public class HistoryFragment extends Fragment {
 			int curPage = HistoryStorytelling.getPageNum(level);
 			int small_radius = circle_radius/2;
 			
-			int right = left+bar_width;
 			int _bottom = chartHeight - bar_bottom;
 			
 			canvas.drawLine(left, _bottom, chart_width, _bottom, emotion_paint);
@@ -1032,13 +1049,13 @@ public class HistoryFragment extends Fragment {
 				//Draw X axis Label
 				if (i%7 == 0){
 					String str= bar.dv.month+"/"+bar.dv.date;
-					canvas.drawLine(left+bar_width/2, _bottom, left+bar_width/2, _bottom-max_height, axis_paint);
+					canvas.drawLine(left, _bottom, left, _bottom-max_height, axis_paint);
 					canvas.drawText(str, left+small_radius, _bottom + bar_width*2, text_paint_small);
 				}
 				
 				// draw highlights
-				//if (inRange)
-				//	canvas.drawRect(left, _bottom-max_height - bar_width-circle_radius, right+bar_gap, _bottom, paint_highlight);
+				if (inRange)
+					canvas.drawRect(left, _bottom-max_height - bar_width-circle_radius,left + bar_width+bar_gap, _bottom, paint_highlight);
 				
 				//Draw bars & annotation_circles
 				Point e_center = new Point(left+small_radius,e_top - bar_gap - small_radius);
@@ -1092,6 +1109,9 @@ public class HistoryFragment extends Fragment {
 				}
 				left += (bar_width+bar_gap);
 			}
+			
+			if (curX>0 && curY > 0)
+				canvas.drawCircle(curX, curY, RADIUS, focus_paint_len);
 			
 		}
 		
@@ -1183,7 +1203,7 @@ public class HistoryFragment extends Fragment {
 					}
 				}
 				
-				int b_center_x = screen.x * 710/1080 + scrollView.getScrollX(); 
+				int b_center_x = screen.x * 690/1080 + scrollView.getScrollX(); 
 				
 				int b_center_y = screen.x * 100/1080;
 				

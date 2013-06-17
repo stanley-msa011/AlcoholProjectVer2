@@ -2,31 +2,32 @@ package ubicomp.drunk_detection.activities;
 
 import ubicomp.drunk_detection.activities.R;
 import database.QuestionDB;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
-import android.database.DataSetObserver;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class EmotionManageActivity extends Activity {
 
 	private LayoutInflater inflater;
 	
-	private int textSize = 24;
-	private Typeface wordTypeface;
+	private int textSize;
+	private int height;
+	private int icon_size;
+	private Point screen;
+	private Typeface wordTypeface, wordTypefaceBold;
 
 	private LinearLayout mainLayout;
 	
@@ -39,48 +40,30 @@ public class EmotionManageActivity extends Activity {
 	private EditText r_texts;
 	
 	private static final int[] EMOTION_DRAWABLE_ID = {
-		R.drawable.emotion_icon_1_e1,
-		R.drawable.emotion_icon_1_e2,
-		R.drawable.emotion_icon_1_e3,
-		R.drawable.emotion_icon_1_e4,
-		R.drawable.emotion_icon_1_e5,
-		R.drawable.emotion_icon_1_e6,
-		R.drawable.emotion_icon_1_e7,
+		R.drawable.questionnaire_item_e1,
+		R.drawable.questionnaire_item_e2,
+		R.drawable.questionnaire_item_e3,
+		R.drawable.questionnaire_item_e4,
+		R.drawable.questionnaire_item_e5,
+		R.drawable.questionnaire_item_e6,
+		R.drawable.questionnaire_item_e7,
 	};
 	
 	private static final String[] emotion_texts = {
 		"喜",	"怒",	"哀",	"傷",	"悲",	"恐",	"驚"
 	} ;
 	
-	private OnClickListener[] emotionClickListeners = {
-			new EmotionOnClickListener(0),
-			new EmotionOnClickListener(1),
-			new EmotionOnClickListener(2),
-			new EmotionOnClickListener(3),
-			new EmotionOnClickListener(4),
-			new EmotionOnClickListener(5),
-			new EmotionOnClickListener(6)
-	};
-	
 	private static final int[] RELATED_DRAWABLE_ID = {
-		R.drawable.emotion_icon_2_who,
-		R.drawable.emotion_icon_2_how,
-		R.drawable.emotion_icon_2_what,
-		R.drawable.emotion_icon_2_where
+		R.drawable.questionnaire_item_c1,
+		R.drawable.questionnaire_item_c2,
+		R.drawable.questionnaire_item_c3,
+		R.drawable.questionnaire_item_c4
 	};
 	
 	private static final String[] related_texts = {
 		"人",	"事",	"物",	"現在情境"
 	} ;
 	
-	private OnClickListener[] relatedClickListeners = {
-			new RelatedOnClickListener(0),
-			new RelatedOnClickListener(1),
-			new RelatedOnClickListener(2),
-			new RelatedOnClickListener(3)
-	};
-	
-	private TextView text;
 	QuestionDB db;
 	
 	
@@ -89,10 +72,22 @@ public class EmotionManageActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_emotion_manage);
-		setTitle("心情管理");
 		emotion =  r_type = -1;
 		reason = "";
 		r_texts = null;
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		if (Build.VERSION.SDK_INT<13){
+			@SuppressWarnings("deprecation")
+			int w = display.getWidth();
+			@SuppressWarnings("deprecation")
+			int h = display.getHeight();
+			screen = new Point(w,h);
+		}
+		else{
+			screen = new Point();
+			display.getSize(screen);
+		}
 		
 	}
 
@@ -102,41 +97,136 @@ public class EmotionManageActivity extends Activity {
 		this.activity = this;
 		db = new QuestionDB(activity);
 		mainLayout = (LinearLayout) this.findViewById(R.id.emotion_main_layout);
-		text = new TextView(activity);
 		inflater = LayoutInflater.from(activity);
 		wordTypeface = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w3.otf");
-
+		wordTypefaceBold = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w5.otf");
 		
 		mainLayout.removeAllViews();
 		onTouchListener = new ItemOnTouchListener();
 		
-		text.setText("您現在的情緒是:");
-		text.setTextColor(0xFF000000);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
+		textSize = screen.x * 72/1080;
+		height =  screen.x * 202/1080;
+		icon_size = screen.x * 100/1080;
 		
-		mainLayout.addView(text);
+		View tv = createTextView("您現在的情緒是：");
+		mainLayout.addView(tv);
+		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+		tvparam.height = height;
 		
 		for (int i=0;i<emotion_texts.length;++i){
-			mainLayout.addView(createIconView(emotion_texts[i],EMOTION_DRAWABLE_ID[i],emotionClickListeners[i]));
+			View v = createIconView(emotion_texts[i],EMOTION_DRAWABLE_ID[i],new EmotionOnClickListener(i+1));
+			mainLayout.addView(v);
+			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
+			param.height = height;
 		}
 	}
 	
+	private View createTextView(String textStr){
+		
+		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
+		TextView text = (TextView) layout.findViewById(R.id.question_description);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTypeface(wordTypefaceBold);
+		text.setTextColor(0xFF777777);
+		text.setText(textStr);
+		
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
+		
+		return layout;
+	}
+	
+	private View createEditView(int type){
+		
+		RelativeLayout layout = new RelativeLayout(mainLayout.getContext());
+		
+		EditText edit = new EditText(activity);
+		edit.setBackground(mainLayout.getContext().getResources().getDrawable(R.drawable.questionnaire_input));
+		edit.setTextColor(0xFF000000);
+		edit.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize *3/4);
+		edit.setTypeface(wordTypeface);
+		
+		layout.addView(edit);
+		RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams)edit.getLayoutParams();
+		param.width = screen.x * 963/1080;
+		param.height = screen.x * 112/1080;
+		param.addRule(RelativeLayout.CENTER_VERTICAL);
+		
+		ImageView icon = new ImageView(mainLayout.getContext());
+		layout.addView(icon);
+		icon.setImageResource(R.drawable.questionnaire_item_ok);
+		RelativeLayout.LayoutParams iParam =(RelativeLayout.LayoutParams) icon.getLayoutParams();
+		iParam.width = iParam.height = icon_size;
+		iParam.addRule(RelativeLayout.CENTER_VERTICAL);
+		iParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		icon.setOnClickListener(new ExtendOnClickListener(type));
+		
+		r_texts = edit;
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_normal);
+		
+		return layout;
+	}
+	
+	private class ExtendOnClickListener implements View.OnClickListener{
+
+		String[] select;
+		boolean extended = false;
+		public ExtendOnClickListener(int type){
+			select = db.getInsertedReason(type);
+		}
+		
+		@Override
+		public void onClick(View v) {
+			if (extended){
+				int min = 2;
+				int max = mainLayout.getChildCount()-4;
+				mainLayout.removeViews(min, max);
+				extended = false;
+				return;
+			}
+			if (select == null)
+				return;
+			for (int i=0;i<select.length;++i){
+				View vv = createIconView(select[i], R.drawable.questionnaire_item_ok,new ChangeTextOnClickListener(select[i]));
+				mainLayout.addView(vv, 2+i);
+				LinearLayout.LayoutParams vvParam =(LinearLayout.LayoutParams) vv.getLayoutParams();
+				vvParam.height = height;
+			}
+			extended = true;
+		}
+	}
+	
+	private class ChangeTextOnClickListener implements View.OnClickListener{
+
+		String str;
+		public ChangeTextOnClickListener(String str){
+			this.str = str;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			r_texts.setText(str);
+		}
+		
+	}
 	
 	private View createIconView(String textStr, int DrawableId ,OnClickListener listener){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		text.setTypeface(wordTypeface);
-		text.setTextColor(0xFF000000);
+		text.setTextColor(0xFF5c5c5c);
 		text.setText(textStr);
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
 		icon.setImageResource(DrawableId);
+		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
+		iParam.width = iParam.height = icon_size;
+		iParam.rightMargin = icon_size;
 		
-		layout.setBackgroundColor(0xFFFFFFFF);
 		layout.setOnClickListener(listener);
 		layout.setOnTouchListener(onTouchListener);
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 		
 		return layout;
 	}
@@ -144,7 +234,7 @@ public class EmotionManageActivity extends Activity {
 	private class EndOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			db.insertEmotionManage(emotion+1, r_type+1, reason);
+			db.insertEmotionManage(emotion, r_type, reason);
 			activity.finish();
 		}
 	}
@@ -161,13 +251,18 @@ public class EmotionManageActivity extends Activity {
 		public void onClick(View v) {
 			mainLayout.removeAllViews();
 			
-			text.setText("這個感覺跟什麼有關:");
-			mainLayout.addView(text);
-
+			View tv = createTextView("這個感覺跟什麼有關：");
+			mainLayout.addView(tv);
+			LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+			tvparam.height = height;
+			
 			emotion = r;
 			
 			for (int i=0;i<related_texts.length;++i){
-				mainLayout.addView(createIconView(related_texts[i],RELATED_DRAWABLE_ID[i],relatedClickListeners[i]));
+				View vv = createIconView(related_texts[i],RELATED_DRAWABLE_ID[i],new RelatedOnClickListener(i+1));
+				mainLayout.addView(vv);
+				LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) vv.getLayoutParams();
+				param.height = height;
 			}
 		}
 	}
@@ -187,41 +282,27 @@ public class EmotionManageActivity extends Activity {
 			
 			r_type = type;
 			
-			String str = "請寫下正在影響你的"+related_texts[type];
-			text.setText(str);
-			mainLayout.addView(text);
+			String str = "請寫下正在影響你的"+related_texts[type-1];
 
-			EditText edit = new EditText(activity);
-			edit.setTextSize(textSize);
-			edit.setBackgroundColor(0xCCDDDDDD);
-			edit.setTextColor(0xFF000000);
-			edit.setTypeface(wordTypeface);
+			View tv = createTextView(str);
+			mainLayout.addView(tv);
+			LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+			tvparam.height = height;
 			
-			mainLayout.addView(edit);
+			View edv = createEditView(type);
+			mainLayout.addView(edv);
+			LinearLayout.LayoutParams edvParam =(LinearLayout.LayoutParams) edv.getLayoutParams();
+			edvParam.height = height;
 			
-			r_texts = edit;
+			View ev = createTextView("這是影響您停酒的因素\n但您仍可堅持停酒");
+			mainLayout.addView(ev);
+			LinearLayout.LayoutParams evParam =(LinearLayout.LayoutParams) ev.getLayoutParams();
+			evParam.height = height;
 			
-			TextView helpText = new TextView(activity);
-			helpText.setText("參考選項:");
-			helpText.setTextColor(0xFF000000);
-			helpText.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
-			
-			mainLayout.addView(helpText);
-			
-			Spinner spinner = new Spinner(getBaseContext());
-			SpinnerAdapter adapter = new RSpinnerAdapter(type);
-			spinner.setAdapter(adapter);
-			spinner.setOnItemSelectedListener(new OnSpinnerItemSelectListener());
-			mainLayout.addView(spinner);
-			
-			TextView endText = new TextView(activity);
-			endText.setText("這是影響您此時停酒的因素\n但您仍可堅持停酒");
-			endText.setTextColor(0xFF000000);
-			endText.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
-			
-			mainLayout.addView(endText);
-			
-			mainLayout.addView(createIconView("確定",R.drawable.question_done,new EditedOnClickListener()));
+			View vv=createIconView("確定",R.drawable.questionnaire_item_ok,new EditedOnClickListener());
+			mainLayout.addView(vv);
+			LinearLayout.LayoutParams vvParam =(LinearLayout.LayoutParams) vv.getLayoutParams();
+			vvParam.height = height;
 		}
 	}
 	
@@ -236,10 +317,14 @@ public class EmotionManageActivity extends Activity {
 				reason = r_texts.getText().toString();
 			
 			String str = "請繼續加油!";
-			text.setText(str);
-			mainLayout.addView(text);
-			mainLayout.addView(createIconView("結束",R.drawable.question_done,new EndOnClickListener()));
-
+			View tv = createTextView(str);
+			mainLayout.addView(tv);
+			LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+			tvparam.height = height;
+			View vv = createIconView("結束",R.drawable.questionnaire_item_ok,new EndOnClickListener());
+			mainLayout.addView(vv);
+			LinearLayout.LayoutParams vvparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
+			vvparam.height = height;
 		}
 	}
 	
@@ -250,120 +335,19 @@ public class EmotionManageActivity extends Activity {
 			int e = event.getAction();
 			switch(e){
 				case MotionEvent.ACTION_OUTSIDE:
-					v.setBackgroundColor(0xFFFFFFFF);
+					v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 					break;
 				case MotionEvent.ACTION_MOVE:
-					v.setBackgroundColor(0xCC00CCFF);
+					v.setBackgroundResource(R.drawable.questionnaire_bar_selected);
 					break;
 				case MotionEvent.ACTION_UP:
-					v.setBackgroundColor(0xFFFFFFFF);
+					v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 					break;
 				case MotionEvent.ACTION_DOWN:
-					v.setBackgroundColor(0xCC00CCFF);
+					v.setBackgroundResource(R.drawable.questionnaire_bar_selected);
 					break;
 			}
 			return false;
-		}
-	}
-	
-	private class RSpinnerAdapter implements SpinnerAdapter{
-
-		private String[] select;
-		
-		RSpinnerAdapter(int type){
-			select = db.getInsertedReason(type);
-		}
-		
-		@Override
-		public int getCount() {
-			if (select == null)
-				return 0;
-			return select.length;
-		}
-
-		@Override
-		public Object getItem(int arg0) {
-			return select[arg0];
-		}
-
-		@Override
-		public long getItemId(int arg0) {
-			return arg0;
-		}
-
-		@Override
-		public int getItemViewType(int position) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			TextView t = new TextView(activity);
-			t.setText(String.valueOf(select[position]));
-			t.setTextSize(textSize);
-			t.setTypeface(wordTypeface);
-			t.setBackgroundColor(0xFFFFFFFF);
-			t.setTextColor(0xFF000000);
-			t.setPadding(0, 20, 0, 20);
-			return t;
-		}
-
-		@Override
-		public int getViewTypeCount() {
-			return 0;
-		}
-
-		@Override
-		public boolean hasStableIds() {
-			return false;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return (select==null || select.length == 0);
-		}
-
-		@Override
-		public void registerDataSetObserver(DataSetObserver observer) {
-		}
-
-		@Override
-		public void unregisterDataSetObserver(DataSetObserver observer) {
-		}
-
-		@Override
-		public View getDropDownView(int arg0, View arg1, ViewGroup arg2) {
-			TextView t = new TextView(activity);
-			t.setText(String.valueOf(select[arg0]));
-			t.setTextSize(textSize);
-			t.setTypeface(wordTypeface);
-			t.setBackgroundColor(0xFFFFFFFF);
-			t.setTextColor(0xFF000000);
-			t.setPadding(0, 20, 0, 20);
-			return t;
-		}
-		
-	}
-	
-	
-	private class OnSpinnerItemSelectListener implements OnItemSelectedListener{
-
-		@Override
-		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) {
-			if (r_texts !=null){
-				TextView t = (TextView) arg1;
-				r_texts.setText(t.getText().toString());
-			}
-		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> arg0) {
-			if (r_texts !=null){
-				r_texts.setText("");
-			}
-			
 		}
 	}
 	

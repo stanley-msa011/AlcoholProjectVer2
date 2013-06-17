@@ -5,21 +5,17 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.Face;
 import android.hardware.Camera.FaceDetectionListener;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 @SuppressLint("ViewConstructor")
 public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callback{
 
 	private CameraRecorder cameraRecorder;
-	private PreviewWindow previewWindow;
 	private SurfaceHolder surfaceHolder;
 	private FaceListener faceListener;
 	private Paint paint;
@@ -27,7 +23,6 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 	
 	public PreviewWindow(Context context,CameraRecorder cameraRecorder) {
 		super(context);
-		this.previewWindow = this;
 		this.surfaceHolder = this.getHolder();
 		this.cameraRecorder = cameraRecorder;
 		faceListener = new FaceListener();

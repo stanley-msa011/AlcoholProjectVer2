@@ -11,7 +11,6 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.HistoryFragment;
 import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -25,14 +24,11 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AudioRecordBox {
 
@@ -46,7 +42,6 @@ public class AudioRecordBox {
 	
 	private RelativeLayout mainLayout;
 	
-	private Typeface digitTypeface;
 	private Typeface wordTypeface;
 	
 	private Point screen;
@@ -66,7 +61,7 @@ public class AudioRecordBox {
 	private PlayListener playListener = new PlayListener();
 	private EndPlayListener endPlayListener= new EndPlayListener();
 	
-	private final static int MAX_MEDIA_DURATION = 90000;
+	private final static int MAX_MEDIA_DURATION = 120000;
 	
 	private Bitmap playBmp, recBmp, stopBmp, bgBmp, closeBmp;
 	
@@ -103,7 +98,6 @@ public class AudioRecordBox {
 	
 	private void setting(){
 		
-		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.rec_layout,null);
@@ -167,6 +161,14 @@ public class AudioRecordBox {
 	}
 	
 	public void clear(){
+		closeButton.setImageBitmap(null);
+		boxLayout.setBackground(null);
+		playButton.setImageBitmap(null);
+		recButton.setImageBitmap(null);
+		if (boxLayout!=null)
+			mainLayout.removeView(boxLayout);
+		historyFragment.enablePage(true);
+		
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;
@@ -201,7 +203,7 @@ public class AudioRecordBox {
 		this.curIdx = idx;
 		curDV = dv;
 		historyFragment.enablePage(false);
-		help.setText("您對於["+dv.toString()+"]\n的心情(90秒)");
+		help.setText("您對於["+dv.toString()+"]\n的心情(兩分鐘)");
 		setButtonState(STATE_INIT);
 		boxLayout.setVisibility(View.VISIBLE);
 	}
@@ -240,11 +242,11 @@ public class AudioRecordBox {
 		@Override
 		public void onInfo(MediaRecorder mr, int what, int extra) {
 			if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
+				mediaRecorder.release();
+				Toast.makeText(mainLayout.getContext(), "兩分鐘到了", Toast.LENGTH_LONG).show();
 				setButtonState(STATE_INIT);
 			}
-			
 		}
-		
 	}
 	
 	private class EndRecListener implements View.OnClickListener{
@@ -256,6 +258,7 @@ public class AudioRecordBox {
 					mediaRecorder.release();
 					mediaRecorder = null;
 					db.InsertAudio(curDV);
+					Toast.makeText(mainLayout.getContext(), "錄音完成", Toast.LENGTH_LONG).show();
 				} catch (IllegalStateException e) {
 					Log.d("RECORDER",e.getMessage());
 				}
@@ -359,6 +362,7 @@ public class AudioRecordBox {
 					mediaPlayer.stop();
 					mediaPlayer.release();
 					mediaPlayer = null;
+					Toast.makeText(mainLayout.getContext(), "結束播放", Toast.LENGTH_LONG).show();
 				} catch (IllegalStateException e) {
 					Log.d("PLAYER",e.getMessage());
 				}
