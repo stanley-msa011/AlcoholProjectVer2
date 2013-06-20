@@ -8,7 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 6;
+	private static final int DB_VERSION = 6; // need to be 7
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -19,7 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(
                 "CREATE TABLE HistoryGame (" +
                         " _ID INTEGER PRIMARY KEY, " +
-                        " _LEVEL INTEGER NOT NULL," +
+                       // " _LEVEL INTEGER NOT NULL," +
                         " _YEAR INTEGER NOT NULL," +
         				" _MONTH INTEGER NOT NULL," +
         				" _DATE INTEGER NOT NULL,"+
@@ -27,7 +27,25 @@ public class DBHelper extends SQLiteOpenHelper {
         				" _TIMEBLOCK INTEGER NOT NULL,"+
                         " _BRAC FLOAT NOT NULL,"+
                         " _EMOTION INTEGER NOT NULL,"+
-                        " _DESIRE INTEGER NOT NULL"+
+                        " _DESIRE INTEGER NOT NULL,"+
+                        //Add for the new version
+                        " _WEEK INTEGER NOT NULL,"+
+                        " _ACC_TEST_0 INTEGER NOT NULL, "+
+                        " _ACC_TEST_1 INTEGER NOT NULL, "+
+                        " _ACC_TEST_2 INTEGER NOT NULL, "+
+                        " _ACC_TEST_ALL INTEGER NOT NULL, "+
+                        " _ACC_PASS_0 INTEGER NOT NULL, "+
+                        " _ACC_PASS_1 INTEGER NOT NULL, "+
+                        " _ACC_PASS_2 INTEGER NOT NULL, "+
+                        " _ACC_PASS_ALL INTEGER NOT NULL, "+
+                        " _ACC_TEST_0_T INTEGER NOT NULL, "+
+                        " _ACC_TEST_1_T INTEGER NOT NULL, "+
+                        " _ACC_TEST_2_T INTEGER NOT NULL, "+
+                        " _ACC_TEST_ALL_T INTEGER NOT NULL, "+
+                        " _ACC_PASS_0_T INTEGER NOT NULL, "+
+                        " _ACC_PASS_1_T INTEGER NOT NULL, "+
+                        " _ACC_PASS_2_T INTEGER NOT NULL, "+
+                        " _ACC_PASS_ALL_T INTEGER NOT NULL, "+
                 ")"
         );
         db.execSQL(
@@ -60,19 +78,39 @@ public class DBHelper extends SQLiteOpenHelper {
         		"CREATE TABLE EmotionDB ("+
         				"_ID INTEGER PRIMARY KEY," +
         				"_TS INTEGER NOT NULL," +
+        				//Add for the new version
+        				" _TIMEBLOCK INTEGER NOT NULL,"+
+        				
         				"_EMOTION INTEGER NOT NULL," +
         				"_CALL CHAR[255]," +
-        				"_UPLOAD INTEGER NOT NULL)"
+        				"_UPLOAD INTEGER NOT NULL"+
+        				//Add for the new version
+                        " _WEEK INTEGER NOT NULL,"+
+                        " _ACC_MORNING INTEGER NOT NULL, "+
+                        " _ACC_NOON INTEGER NOT NULL, "+
+                        " _ACC_NOGHT INTEGER NOT NULL, "+
+                        " _ACC_ALL INTEGER NOT NULL, "+
+        				")"
         		);
         //Change after ver3, clean after ver 7
         db.execSQL(
         		"CREATE TABLE EmotionManageDB ("+
         				"_ID INTEGER PRIMARY KEY," +
         				"_TS INTEGER NOT NULL," +
+        				//Add for the new version
+        				" _TIMEBLOCK INTEGER NOT NULL,"+
+        				
         				"_EMOTION INTEGER NOT NULL," +
         				"_TYPE INTEGER NOT NULL," +
         				"_REASON CHAR[255] NOT NULL," +
-        				"_UPLOAD INTEGER NOT NULL)"
+        				"_UPLOAD INTEGER NOT NULL"+
+        				//Add for the new version
+                        " _WEEK INTEGER NOT NULL,"+
+                        " _ACC_MORNING INTEGER NOT NULL, "+
+                        " _ACC_NOON INTEGER NOT NULL, "+
+                        " _ACC_NOGHT INTEGER NOT NULL, "+
+                        " _ACC_ALL INTEGER NOT NULL, "+
+        				")"
         		);
         
         //Add after ver3, clean after ver 6
@@ -80,14 +118,35 @@ public class DBHelper extends SQLiteOpenHelper {
         		"CREATE TABLE QuestionnaireDB ("+
         				"_ID INTEGER PRIMARY KEY," +
         				"_TS INTEGER NOT NULL," +
+        				//Add for the new version
+        				" _TIMEBLOCK INTEGER NOT NULL,"+
         				"_SEQUENCE CHAR[255] NOT NULL," +
-        				"_UPLOAD INTEGER NOT NULL)"
+        				"_UPLOAD INTEGER NOT NULL"+
+        				//Add for the new version
+                        " _WEEK INTEGER NOT NULL,"+
+                        " _ACC_MORNING INTEGER NOT NULL, "+
+                        " _ACC_NOON INTEGER NOT NULL, "+
+                        " _ACC_NOGHT INTEGER NOT NULL, "+
+                        " _ACC_ALL INTEGER NOT NULL, "+
+        				")"
         		);
         
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int old_ver, int new_ver){
+		
+		if (old_ver < 7){
+			db.execSQL("DROP TABLE IF EXISTS HistoryGame");
+			db.execSQL("DROP TABLE IF EXISTS InteractionGame");
+			db.execSQL("DROP TABLE IF EXISTS NotUploadedTS");
+			db.execSQL("DROP TABLE IF EXISTS RecDB");
+			db.execSQL("DROP TABLE IF EXISTS EmotionDB");
+			db.execSQL("DROP TABLE IF EXISTS EmotionManageDB");
+			db.execSQL("DROP TABLE IF EXISTS QuestionnaireDB");
+			onCreate(db);
+		}
+		/*
 		if (old_ver < 2){
 	        db.execSQL(
 	        		"CREATE TABLE RecDB ("+
@@ -170,6 +229,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	        				"_UPLOAD INTEGER NOT NULL)"
 	        		);
 		}
+		*/
 		/*
 		else{
 			db.execSQL("DROP TABLE IF EXISTS HistoryGame");

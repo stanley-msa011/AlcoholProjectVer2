@@ -1,13 +1,13 @@
 package statistic.ui.questionnaire.listener;
 
 import android.view.View;
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 
 public class EndOnClickListener extends QuestionnaireOnClickListener {
 
 	private int aid;
 	
-	public EndOnClickListener(QuestionMsgBox2 msgBox, int aid) {
+	public EndOnClickListener(QuestionMsgBox msgBox, int aid) {
 		super(msgBox);
 		this.aid = aid;
 	}

@@ -1,12 +1,12 @@
 package statistic.ui.questionnaire.listener;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.content.SelfHelpContent;
 import android.view.View;
 
 public class SelfOnClickListener extends QuestionnaireOnClickListener {
 
-	public SelfOnClickListener(QuestionMsgBox2 msgBox) {
+	public SelfOnClickListener(QuestionMsgBox msgBox) {
 		super(msgBox);
 	}
 

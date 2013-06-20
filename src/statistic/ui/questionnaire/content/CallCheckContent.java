@@ -1,19 +1,19 @@
 package statistic.ui.questionnaire.content;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.CallOnClickListener;
 
 public class CallCheckContent extends QuestionnaireContent {
 
 	private String name,phone;
 	
-	public CallCheckContent(QuestionMsgBox2 msgBox,String name, String phone) {
+	public CallCheckContent(QuestionMsgBox msgBox,String name, String phone) {
 		super(msgBox);
 		this.name = name;
 		this.phone = phone;
 	}
 	private boolean isEmotion = false;
-	public CallCheckContent(QuestionMsgBox2 msgBox,String name, String phone,boolean isEmotion) {
+	public CallCheckContent(QuestionMsgBox msgBox,String name, String phone,boolean isEmotion) {
 		super(msgBox);
 		this.name = name;
 		this.phone = phone;

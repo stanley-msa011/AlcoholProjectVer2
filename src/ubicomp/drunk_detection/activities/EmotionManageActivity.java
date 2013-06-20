@@ -106,7 +106,7 @@ public class EmotionManageActivity extends Activity {
 		
 		textSize = screen.x * 72/1080;
 		height =  screen.x * 202/1080;
-		icon_size = screen.x * 100/1080;
+		icon_size = screen.x * 140/1080;
 		
 		View tv = createTextView("您現在的情緒是：");
 		mainLayout.addView(tv);

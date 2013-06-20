@@ -522,6 +522,26 @@ public class TestFragment extends Fragment {
 	
 	private void clear(){
 		Log.d("test","clear");
+		/*
+		bg.setImageBitmap(null);
+		if (bgBmp!=null && !bgBmp.isRecycled()){
+			bgBmp.recycle();
+			bgBmp = null;
+		}
+		startButton.setImageBitmap(null);
+		if (startButtonBmp !=null && !startButtonBmp.isRecycled()){
+			startButtonBmp.recycle();
+			startButtonBmp = null;
+		}
+		if (startStrokeBmp!=null && !startStrokeBmp.isRecycled()){
+			startStrokeBmp.recycle();
+			startStrokeBmp = null;
+		}
+		*/
+		if (helpButtonBmp!=null && !helpButtonBmp.isRecycled()){
+		}
+		
+		
 		cleanMsgBox();
 		cleanBlowBmp();
 	}

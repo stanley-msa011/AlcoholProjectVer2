@@ -1,6 +1,6 @@
 package statistic.ui.questionnaire.content;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.CallCheckOnClickListener;
 
 public class ConnectContent extends QuestionnaireContent {
@@ -19,7 +19,7 @@ public class ConnectContent extends QuestionnaireContent {
 	private int type;
 	public static final int TYPE_FAMILY = 2, TYPE_SOCIAL = 3;
 	
-	public ConnectContent(QuestionMsgBox2 msgBox,int type) {
+	public ConnectContent(QuestionMsgBox msgBox,int type) {
 		super(msgBox);
 		this.type = type;
 	}
@@ -27,7 +27,7 @@ public class ConnectContent extends QuestionnaireContent {
 	@Override
 	protected void setContent() {
 		seq.add(","+type+",5");
-		setHelp("請選擇連絡對象:");
+		setHelp("請選擇連絡對象：");
 		for (int i=0;i<dummyNames.length;++i){
 			setSelectItem(dummyNames[i]+":"+dummyPhones[i],new CallCheckOnClickListener(msgBox,dummyNames[i],dummyPhones[i]));
 		}

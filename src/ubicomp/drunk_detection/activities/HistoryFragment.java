@@ -893,7 +893,7 @@ public class HistoryFragment extends Fragment {
 		public ChartView(Context context) {
 			super(context);
 			
-			paint_pass.setColor(0xFFeb9300);
+			paint_pass.setColor(0xFF5bdebe);
 			paint_fail.setColor(0xFFe64802);
 			paint_none.setColor(0xFFc9c9ca);
 			

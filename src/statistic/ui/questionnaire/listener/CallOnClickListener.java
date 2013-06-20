@@ -1,11 +1,11 @@
 package statistic.ui.questionnaire.listener;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import android.view.View;
 
 public class CallOnClickListener extends QuestionnaireOnClickListener {
 
-	public CallOnClickListener(QuestionMsgBox2 msgBox) {
+	public CallOnClickListener(QuestionMsgBox msgBox) {
 		super(msgBox);
 	}
 

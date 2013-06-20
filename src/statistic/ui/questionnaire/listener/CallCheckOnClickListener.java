@@ -1,13 +1,13 @@
 package statistic.ui.questionnaire.listener;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.content.CallCheckContent;
 import android.view.View;
 
 public class CallCheckOnClickListener extends QuestionnaireOnClickListener {
 
 	private String name,phone;
-	public CallCheckOnClickListener(QuestionMsgBox2 msgBox,String name,String phone) {
+	public CallCheckOnClickListener(QuestionMsgBox msgBox,String name,String phone) {
 		super(msgBox);
 		this.name = name;
 		this.phone = phone;

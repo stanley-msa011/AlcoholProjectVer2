@@ -1,12 +1,12 @@
 package statistic.ui.questionnaire.listener;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.content.CallCheckContent;
 import android.view.View;
 
 public class EmotionCallOnClickListener extends QuestionnaireOnClickListener {
 
-	public EmotionCallOnClickListener(QuestionMsgBox2 msgBox) {
+	public EmotionCallOnClickListener(QuestionMsgBox msgBox) {
 		super(msgBox);
 	}
 

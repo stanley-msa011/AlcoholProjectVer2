@@ -20,9 +20,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class Bluetooth {
@@ -83,6 +85,9 @@ public class Bluetooth {
 	private int count;
 	private float sum;
 	
+	private SharedPreferences sp;
+	private SharedPreferences.Editor sp_editor;
+	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler, BracValueDebugHandler bracDebugHandler){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
@@ -102,6 +107,8 @@ public class Bluetooth {
 		start = false;
 		sum = 0;
 		count = 0;
+		sp= PreferenceManager.getDefaultSharedPreferences(context);
+		sp_editor = sp.edit();
 	}
 	
 	public void enableAdapter(){
@@ -153,13 +160,25 @@ public class Bluetooth {
 		if (sensor == null)
 			return -1;
 		try {
-			if (Build.VERSION.SDK_INT<11)
+			
+			if (Build.VERSION.SDK_INT<11){
 				socket = sensor.createRfcommSocketToServiceRecord(uuid);
-			else
-				socket = sensor.createInsecureRfcommSocketToServiceRecord(uuid);
+				Log.d("BT","createSocket (<11)");
+			}
+			else{
+				socket = sensor.createRfcommSocketToServiceRecord(uuid);
+				Log.d("BT","createSocket (>=11)");
+			}
+			btAdapter.cancelDiscovery();
 			socket.connect();
+			Log.d("BT","createSocket connect");
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CONNECT TO THE SENSOR");
+			Log.e("BT",e.toString());
+			String s = e.toString();
+			sp_editor.putString("BT_CONNECTION_ERROR", s);
+			sp_editor.putBoolean("HAS_BT_CONNECTION_ERROR", true);
+			sp_editor.commit();
 			close();
 			return -1;
 		}
@@ -321,17 +340,9 @@ public class Bluetooth {
 						start_time = time;
 					}
 					
-					//long time = System.currentTimeMillis();
 					testFragment.showDebug("P_diff: "+diff );
 					Log.d("ERIC", "P_diff: "+diff);
 					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
-						/*
-						testFragment.showDebug("P_PeakStart" );
-						Log.d("ERIC", "P_PeakStart");
-						isPeak = true;
-						change_speed(0);
-						start_time = time;
-						*/
 					}else if (diff > -PRESSURE_DIFF_MIN/2){
 						if (isPeak){
 							testFragment.showDebug("P_Peak" );

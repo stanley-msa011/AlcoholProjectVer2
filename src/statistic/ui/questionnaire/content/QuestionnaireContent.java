@@ -2,7 +2,7 @@ package statistic.ui.questionnaire.content;
 
 import java.util.ArrayList;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 
 import android.content.Context;
@@ -22,7 +22,7 @@ abstract public class QuestionnaireContent {
 	private Bitmap choiceBmp, choiceSelectedBmp;
 	protected ArrayList<String>seq;
 	protected ArrayList <QuestionnaireContent> contentSeq;
-	protected QuestionMsgBox2 msgBox;
+	protected QuestionMsgBox msgBox;
 	private int textSize;
 	private int contentSideMargin, contentMargin;
 	private Context context;
@@ -31,7 +31,7 @@ abstract public class QuestionnaireContent {
 	private int itemHeight;
 	
 	public QuestionnaireContent(
-			QuestionMsgBox2 msgBox
+			QuestionMsgBox msgBox
 			){
 		this.questionnaireLayout = msgBox.getQuestionnaireLayout();
 		this.seq = msgBox.getClickSequence();

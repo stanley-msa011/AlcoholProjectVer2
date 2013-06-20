@@ -138,6 +138,7 @@ public class TutorialActivity extends Activity {
 		
 		if (layout!=null)
 			layout.setBackground(null);
+		
 		if (bgBmp!=null && !bgBmp.isRecycled()){
 			bgBmp.recycle();
 			bgBmp = null;
@@ -169,7 +170,6 @@ public class TutorialActivity extends Activity {
 					arrowBmps[i] = null;
 				}
 		}
-		mDialog.dismiss();
 	}
 	
 	@SuppressLint("HandlerLeak")

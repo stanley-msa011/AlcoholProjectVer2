@@ -1,12 +1,12 @@
 package statistic.ui.questionnaire.listener;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.content.ConnectContent;
 import android.view.View;
 
 public class FamilyOnClickListener extends QuestionnaireOnClickListener {
 
-	public FamilyOnClickListener(QuestionMsgBox2 msgBox) {
+	public FamilyOnClickListener(QuestionMsgBox msgBox) {
 		super(msgBox);
 	}
 

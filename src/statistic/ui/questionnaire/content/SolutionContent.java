@@ -1,6 +1,6 @@
 package statistic.ui.questionnaire.content;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.EndOnClickListener;
 
 public class SolutionContent extends QuestionnaireContent {
@@ -14,7 +14,7 @@ public class SolutionContent extends QuestionnaireContent {
 	};
 	
 	private int aid;
-	public SolutionContent(QuestionMsgBox2 msgBox, int aid) {
+	public SolutionContent(QuestionMsgBox msgBox, int aid) {
 		super(msgBox);
 		this.aid = aid;
 	}

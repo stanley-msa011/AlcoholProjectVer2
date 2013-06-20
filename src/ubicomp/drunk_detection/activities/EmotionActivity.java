@@ -110,7 +110,7 @@ public class EmotionActivity extends Activity {
 		
 		textSize = screen.x * 72/1080;
 		height =  screen.x * 202/1080;
-		icon_size = screen.x * 100/1080;
+		icon_size = screen.x * 140/1080;
 		
 		View tv = createTextView("若你想要飲酒的話，你可以：");
 		mainLayout.addView(tv);

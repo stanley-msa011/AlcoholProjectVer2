@@ -6,14 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
 import statistic.ui.questionnaire.listener.SelfOnClickListener;
 import ubicomp.drunk_detection.activities.AlarmReceiver;
 
 public class Type2Content extends QuestionnaireContent {
 
-	public Type2Content(QuestionMsgBox2 msgBox) {
+	public Type2Content(QuestionMsgBox msgBox) {
 		super(msgBox);
 	}
 
@@ -39,9 +39,9 @@ public class Type2Content extends QuestionnaireContent {
 		seq.clear();
     	seq.add("3,3");
 		msgBox.openBox();
-		setHelp("您似乎有飲酒，\n請問您要?\n並啟用一小時停酒提醒");
+		setHelp("你似乎開始喝酒了，\n現在啟用一小時停酒提醒，\n同時建議你可以：");
 		setSelectItem("自行處理",new SelfOnClickListener(msgBox));
-		setSelectItem("尋求親友協助", new FamilyOnClickListener(msgBox));
+		setSelectItem("跟親友聊天", new FamilyOnClickListener(msgBox));
 	}
 
 	@Override

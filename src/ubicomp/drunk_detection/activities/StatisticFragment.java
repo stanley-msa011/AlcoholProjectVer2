@@ -6,7 +6,7 @@ import statistic.statisticPageView.analysis.AnalysisProgressView;
 import statistic.statisticPageView.analysis.AnalysisRatingView;
 import statistic.statisticPageView.analysis.AnalysisSavingView;
 import statistic.statisticPageView.statistics.StatisticPagerAdapter;
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -54,7 +54,7 @@ public class StatisticFragment extends Fragment {
 	private StatisticFragment statisticFragment;
 	
 	private ImageView questionButton;
-	private Bitmap questionButtonBmp;
+	private Bitmap questionButtonBmp, questionButtonPassBmp, questionButtonFailBmp;
 	
 	private ImageView showImage;
 	private TextView showText;
@@ -67,7 +67,7 @@ public class StatisticFragment extends Fragment {
 	
 	private AlphaAnimation questionAnimation;
 	
-	private QuestionMsgBox2 msgBox;
+	private QuestionMsgBox msgBox;
 	
 	// For Click Sequence Logging
 	private ClickLogger clickLogger;
@@ -92,7 +92,6 @@ public class StatisticFragment extends Fragment {
     
     public void onResume(){
     	super.onResume();
-    	
 		
     	clickLogger = new ClickLogger();
     	
@@ -105,7 +104,7 @@ public class StatisticFragment extends Fragment {
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
-		msgBox = new QuestionMsgBox2(statisticFragment,(RelativeLayout) view);
+		msgBox = new QuestionMsgBox(statisticFragment,(RelativeLayout) view);
 		
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
@@ -154,6 +153,14 @@ public class StatisticFragment extends Fragment {
     		questionButtonBmp.recycle();
     		questionButtonBmp = null;
     	}
+    	if (questionButtonFailBmp !=null && !questionButtonFailBmp.isRecycled()){
+    		questionButtonFailBmp.recycle();
+    		questionButtonBmp = null;
+    	}
+    	if (questionButtonBmp !=null && !questionButtonBmp.isRecycled()){
+    		questionButtonBmp.recycle();
+    		questionButtonBmp = null;
+    	}
     	statisticViewAdapter.clear();
     	for (int i=0;i<analysisViews.length;++i){
     		analysisViews[i].clear();
@@ -186,7 +193,6 @@ public class StatisticFragment extends Fragment {
 
 		@Override
 		public void onPageScrolled(int arg0, float arg1, int arg2) {
-			//Log.d("Eric", "Scrolled:" + arg0 + "," + arg1 + "," + arg2);
 		}
 
 		@Override
@@ -293,15 +299,22 @@ public class StatisticFragment extends Fragment {
 				questionButtonBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
 				tmp.recycle();
 			}
+			if (questionButtonPassBmp==null ||questionButtonPassBmp.isRecycled()){
+				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button_pass);
+				questionButtonPassBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
+				tmp.recycle();
+			}
+			if (questionButtonFailBmp==null ||questionButtonFailBmp.isRecycled()){
+				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button_fail);
+				questionButtonFailBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
+				tmp.recycle();
+			}
 			RelativeLayout.LayoutParams questionParam = (RelativeLayout.LayoutParams) questionButton.getLayoutParams();
 			questionParam.width =  screen.x * 153 / 1080;
 			questionParam.height =  screen.x * 153 / 1080;
 			questionParam.topMargin =  screen.x * 107 / 1080;
 			questionParam.rightMargin =  screen.x * 58 / 1080;
 			
-			if (questionButtonBmp!=null && !questionButtonBmp.isRecycled())
-				questionButton.setImageBitmap(questionButtonBmp);
-	
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			boolean tested = sp.getBoolean("tested", false);
 			int result = sp.getInt("latest_result", 0);
@@ -311,12 +324,11 @@ public class StatisticFragment extends Fragment {
 			showParam.height = screen.x * 160/1080;
 			
 			if (tested){
-				if (result <=1){
+				if (result <=1)
 					showImage.setImageResource(R.drawable.statistic_show_pass);
-				}
-				else{
+				else
 					showImage.setImageResource(R.drawable.statistic_show_fail);
-				}
+				
 				
 				showImage.setVisibility(View.VISIBLE);
 				SharedPreferences.Editor editor = sp.edit();
@@ -376,32 +388,40 @@ public class StatisticFragment extends Fragment {
 		@Override
 		public void onClick(View v) {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
-			int result = sp.getInt("latest_result", 0);
+			int result = sp.getInt("latest_result", -1);
 			if (msgBox == null)
 				return;
-			if (result == 0){
+			if (result == 0)
 				msgBox.generateType0Box();
-			}
-			else if (result == 1){
+			else if (result == 1)
 				msgBox.generateType1Box();
-			}else if (result == 2){
+			else if (result == 2)
 				msgBox.generateType2Box();
-			}else if (result == 3){
+			else if (result == 3)
 				msgBox.generateType3Box();
-			}
+			else
+				msgBox.generateType0Box();
 		}
 		
 	} 
 	
 	public void setQuestionAnimation(){
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
-		int result = sp.getInt("latest_result", 0);
-		if (result <=1){
+		int result = sp.getInt("latest_result", -1);
+		if (result  == -1){
+			if (questionButtonBmp!=null && !questionButtonBmp.isRecycled())
+				questionButton.setImageBitmap(questionButtonBmp);
 			questionAnimation.cancel();
 			questionButton.setAnimation(null);
 			questionButton.setAlpha(1.0F);
 		}
 		else{
+			if (result <=1)
+				if (questionButtonPassBmp!=null && !questionButtonPassBmp.isRecycled())
+					questionButton.setImageBitmap(questionButtonPassBmp);
+			else
+				if (questionButtonFailBmp!=null && !questionButtonFailBmp.isRecycled())
+					questionButton.setImageBitmap(questionButtonFailBmp);
 			questionButton.setAnimation(questionAnimation);
 			questionAnimation.start();
 		}

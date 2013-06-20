@@ -1,13 +1,13 @@
 package statistic.ui.questionnaire.content;
 
-import statistic.ui.QuestionMsgBox2;
+import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.EmotionCallOnClickListener;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
 import statistic.ui.questionnaire.listener.SocialCallOnClickListener;
 
 public class Type1Content extends QuestionnaireContent {
 
-	public Type1Content(QuestionMsgBox2 msgBox) {
+	public Type1Content(QuestionMsgBox msgBox) {
 		super(msgBox);
 	}
 
@@ -18,9 +18,9 @@ public class Type1Content extends QuestionnaireContent {
 		seq.add("2,2");
 		msgBox.openBox();
 		setHelp("您似乎想要喝酒，\n請問您要?");
-		setSelectItem("尋求親友協助", new FamilyOnClickListener(msgBox));
-		setSelectItem("心情專線", new EmotionCallOnClickListener(msgBox));
-		setSelectItem("社區心理諮商", new SocialCallOnClickListener(msgBox));
+		setSelectItem("跟親友聊天", new FamilyOnClickListener(msgBox));
+		setSelectItem("聯絡心情專線", new EmotionCallOnClickListener(msgBox));
+		setSelectItem("尋求社區心理諮商", new SocialCallOnClickListener(msgBox));
 	}
 
 	@Override

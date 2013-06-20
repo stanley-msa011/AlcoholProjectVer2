@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
-public class QuestionMsgBox2 {
+public class QuestionMsgBox {
 
 	private ArrayList<String> clickSequence;
 	private ArrayList<QuestionnaireContent> contentSequence;
@@ -52,7 +52,7 @@ public class QuestionMsgBox2 {
 	
 	private QuestionDB db;
 	
-	public QuestionMsgBox2(StatisticFragment statisticFragment,RelativeLayout mainLayout){
+	public QuestionMsgBox(StatisticFragment statisticFragment,RelativeLayout mainLayout){
 		this.statisticFragment = statisticFragment;
 		this.context = statisticFragment.getActivity();
 		this.r = context.getResources();
@@ -192,7 +192,7 @@ public class QuestionMsgBox2 {
 	public void closeBox(){
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor editor = sp.edit();
-		editor.putInt("latest_result", 0);
+		editor.putInt("latest_result", -1);
     	editor.commit();
 		boxLayout.setVisibility(View.INVISIBLE);
 		statisticFragment.setQuestionAnimation();
