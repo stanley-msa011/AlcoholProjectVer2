@@ -307,7 +307,8 @@ public class StatisticFragment extends Fragment {
 			if (questionButtonFailBmp==null ||questionButtonFailBmp.isRecycled()){
 				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button_fail);
 				questionButtonFailBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
-				tmp.recycle();
+				if (!tmp.equals(questionButtonFailBmp))
+					tmp.recycle();
 			}
 			RelativeLayout.LayoutParams questionParam = (RelativeLayout.LayoutParams) questionButton.getLayoutParams();
 			questionParam.width =  screen.x * 153 / 1080;
@@ -400,7 +401,7 @@ public class StatisticFragment extends Fragment {
 			else if (result == 3)
 				msgBox.generateType3Box();
 			else
-				msgBox.generateType0Box();
+				msgBox.generateNormalBox();
 		}
 		
 	} 
@@ -416,12 +417,8 @@ public class StatisticFragment extends Fragment {
 			questionButton.setAlpha(1.0F);
 		}
 		else{
-			if (result <=1)
-				if (questionButtonPassBmp!=null && !questionButtonPassBmp.isRecycled())
-					questionButton.setImageBitmap(questionButtonPassBmp);
-			else
-				if (questionButtonFailBmp!=null && !questionButtonFailBmp.isRecycled())
-					questionButton.setImageBitmap(questionButtonFailBmp);
+			if (questionButtonBmp!=null && !questionButtonBmp.isRecycled())
+				questionButton.setImageBitmap(questionButtonBmp);
 			questionButton.setAnimation(questionAnimation);
 			questionAnimation.start();
 		}

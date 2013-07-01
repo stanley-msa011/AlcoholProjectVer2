@@ -375,9 +375,9 @@ public class TestFragment extends Fragment {
 	}
 	
 	private String setTimeStamp(){
-		long time_in_sec = System.currentTimeMillis() / 1000L;
+		long time_in_sec = System.currentTimeMillis();
 		DecimalFormat d = new DecimalFormat("0");
-		return d.format(time_in_sec);
+		return d.format(time_in_sec/1000L);
 	}
 	
 	private void setStorage(){
@@ -522,25 +522,6 @@ public class TestFragment extends Fragment {
 	
 	private void clear(){
 		Log.d("test","clear");
-		/*
-		bg.setImageBitmap(null);
-		if (bgBmp!=null && !bgBmp.isRecycled()){
-			bgBmp.recycle();
-			bgBmp = null;
-		}
-		startButton.setImageBitmap(null);
-		if (startButtonBmp !=null && !startButtonBmp.isRecycled()){
-			startButtonBmp.recycle();
-			startButtonBmp = null;
-		}
-		if (startStrokeBmp!=null && !startStrokeBmp.isRecycled()){
-			startStrokeBmp.recycle();
-			startStrokeBmp = null;
-		}
-		*/
-		if (helpButtonBmp!=null && !helpButtonBmp.isRecycled()){
-		}
-		
 		
 		cleanMsgBox();
 		cleanBlowBmp();

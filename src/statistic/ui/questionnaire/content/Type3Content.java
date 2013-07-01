@@ -15,7 +15,7 @@ public class Type3Content extends QuestionnaireContent {
 	protected void setContent() {
 		contentSeq.clear();
 		seq.clear();
-		seq.add("4,4");
+		seq.add("4");
 		msgBox.openBox();
 		setHelp("您似乎喝了不少酒，\n建議你可以：");
 		setSelectItem("回家休息", new EndOnClickListener(msgBox,3));

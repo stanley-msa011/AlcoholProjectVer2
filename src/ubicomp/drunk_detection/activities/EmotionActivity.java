@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -67,15 +68,22 @@ public class EmotionActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_emotion);
 		View titleView = getWindow().findViewById(android.R.id.title);
 	    if (titleView != null) {
-	      ViewParent titleBar = titleView.getParent();
-	      if (titleBar != null) {
-	        View parentView = (View)titleBar;
-	        parentView.setBackgroundColor(0xFFf39800);
+	      ViewParent parent = titleView.getParent();
+	      if (parent != null && (parent instanceof View)) {
+	    	  Log.d("TITLE_BAR", "OK");
+	        View parentView = (View)parent;
+	        parentView.setBackgroundColor(0xFFFF0000);
+	      }else{
+	    	  Log.d("TITLE_BAR", "NULL 2");
 	      }
+	    }else{
+	    	Log.d("TITLE_BAR", "NULL 1");
 	    }
+		
+		setContentView(R.layout.activity_emotion);
+
 		
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -135,6 +143,9 @@ public class EmotionActivity extends Activity {
 		text.setTextColor(0xFF777777);
 		text.setText(textStr);
 		
+		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
+		tParam.leftMargin = textSize;
+		
 		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
 		
 		return layout;
@@ -149,6 +160,9 @@ public class EmotionActivity extends Activity {
 		text.setTypeface(wordTypeface);
 		text.setTextColor(0xFF5c5c5c);
 		text.setText(textStr);
+		
+		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
+		tParam.leftMargin = textSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
 		icon.setImageResource(DrawableId);
@@ -172,7 +186,7 @@ public class EmotionActivity extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			db.insertEmotion(in);
+			db.insertEmotion(in,null);
 			activity.finish();
 		}
 	}

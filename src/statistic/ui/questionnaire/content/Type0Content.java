@@ -13,7 +13,7 @@ public class Type0Content extends QuestionnaireContent {
 	protected void setContent() {
 		contentSeq.clear();
 		seq.clear();
-		seq.add("1,1");
+		seq.add("1");
 		msgBox.openBox();
 		setHelp("為了家人\n請繼續加油!");
 		setSelectItem("我做得到", new EndOnClickListener(msgBox,1));

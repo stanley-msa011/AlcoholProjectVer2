@@ -73,7 +73,7 @@
             </intent-filter>
         </receiver>
         
-        <receiver android:name="ubicomp.drunk_detection.activities.AlarmReceiver" >
+        <receiver android:name="ubicomp.drunk_data.recorda.activities.AlarmReceiver" >
             <intent-filter>
                 <action android:name="com.android.alarmclock.ALARM_ALERT" />
             </intent-filter>
@@ -81,7 +81,7 @@
 
         <service android:name="ubicomp.drunk_detection.activities.AlarmService" >
         </service>
-        <service android:name="ubicomp.drunk_detection.activities.HourlyAlarmService" >
+        <service android:name="ubicomp.drunk_data.recorda.activities.HourlyAlarmService" >
         </service>
 
         <activity

@@ -1,5 +1,6 @@
 package history.ui;
 
+
 import history.data.AudioUploader;
 
 import java.io.File;
@@ -165,6 +166,7 @@ public class AudioRecordBox {
 		boxLayout.setBackground(null);
 		playButton.setImageBitmap(null);
 		recButton.setImageBitmap(null);
+		
 		if (boxLayout!=null)
 			mainLayout.removeView(boxLayout);
 		historyFragment.enablePage(true);

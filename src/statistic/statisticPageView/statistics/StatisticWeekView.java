@@ -3,10 +3,11 @@ package statistic.statisticPageView.statistics;
 
 import java.util.Calendar;
 
+import data.history.BracDetectionState;
 import database.HistoryDB;
 import database.TimeBlock;
+import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.R;
-import history.BracGameHistory;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -25,7 +26,6 @@ import android.widget.RelativeLayout;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import statistic.statisticPageView.StatisticPageView;
-import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.StatisticFragment;
 
 public class StatisticWeekView extends StatisticPageView {
@@ -48,7 +48,7 @@ public class StatisticWeekView extends StatisticPageView {
 	
 	private TextView title;
 	
-	private static final int nBlocks = 4;
+	private static final int nBlocks = 3;
 	private static final int nDate = 7;
 	
 	private static final String[] blockHint = {"早","中","下","晚"};
@@ -118,8 +118,6 @@ public class StatisticWeekView extends StatisticPageView {
 				time_labels[i].setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
 			time_labels[i].setGravity(Gravity.CENTER);
 			timeLayout.addView(time_labels[i]);
-			if (!TimeBlock.hasBlock(i, timeblock_type))
-				time_labels[i].setAlpha(0.0F);
 		}
 
 		monthText = (TextView) view.findViewById(R.id.statistic_week_month);;
@@ -224,16 +222,12 @@ public class StatisticWeekView extends StatisticPageView {
 			LinearLayout.LayoutParams param = (LinearLayout.LayoutParams) time_labels[i].getLayoutParams();
 			param.width = c_width;
 			param.height = height;
-			if (!TimeBlock.hasBlock(i, timeblock_type))
-				param.width = param.height = 0;
 		}
 		
 		for (int i=0;i<nBlocks*nDate;++i){
 			GridLayout.LayoutParams cParam = (GridLayout.LayoutParams) circles[i].getLayoutParams();
 			cParam.width = c_width;
 			cParam.height = height;
-			if (!TimeBlock.hasBlock(i/nDate, timeblock_type))
-				cParam.width = cParam.height = 0;
 		}
 		
 		RelativeLayout.LayoutParams lParam = (RelativeLayout.LayoutParams) labelLayout.getLayoutParams();
@@ -252,17 +246,12 @@ public class StatisticWeekView extends StatisticPageView {
 	@Override
 	public void onPostTask() {
 		
-		BracGameHistory[] historys = db.getMultiDayInfo(nDate);
+		BracDetectionState[] historys = db.getMultiDayInfo(nDate);
 		
 		int cur_hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 		
 		for (int i=0;i<historys.length;++i){
 			int idx = (i%nBlocks)*nDate + i/nBlocks;
-			if (!TimeBlock.hasBlock(i%nBlocks, timeblock_type)){
-				circles[idx].setImageBitmap(circleBmps[0]);
-				circles[idx].setAlpha(0.5F);
-				continue;
-			}
 			if (historys[i] == null){
 				if (i < historys.length - nBlocks)
 					circles[idx].setImageBitmap(circleBmps[0]);

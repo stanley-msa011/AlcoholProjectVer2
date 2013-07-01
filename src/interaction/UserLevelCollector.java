@@ -1,6 +1,5 @@
 package interaction;
 
-import history.InteractionHistory;
 
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -19,6 +18,8 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
+import data.rank.RankHistory;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -34,7 +35,7 @@ public class UserLevelCollector {
 		responseHandler=new BasicResponseHandler();
 	}
 	
-	public InteractionHistory[] update(){
+	public RankHistory[] update(){
 		try{
 			
 			Log.d("level collector","start");
@@ -68,7 +69,7 @@ public class UserLevelCollector {
 				Log.d("user states", "xxx");
 			}
 			if (responseString != null){
-				InteractionHistory[] historys= parse(responseString);
+				RankHistory[] historys= parse(responseString);
 				return historys;
 			}
 			
@@ -77,7 +78,7 @@ public class UserLevelCollector {
 		return null;
 	}
 	
-	InteractionHistory[] parse(String response){
+	RankHistory[] parse(String response){
 		if (response == null)
 			return null;
 		response = response.substring(2, response.length()-2);
@@ -85,8 +86,8 @@ public class UserLevelCollector {
 		if (tmp.length==0)
 			return null;
 		
-		InteractionHistory[] historys;
-		historys = new InteractionHistory[tmp.length];
+		RankHistory[] historys;
+		historys = new RankHistory[tmp.length];
 		for (int i=0;i<tmp.length;++i){
 			if (tmp[i].charAt(0)=='[')
 				tmp[i]=tmp[i].substring(1,tmp[i].length());
@@ -97,7 +98,7 @@ public class UserLevelCollector {
 				level = 0;
 			else
 				level= Integer.valueOf(items[1].substring(1,items[1].length()-1));
-			historys[i] = new InteractionHistory(level,uid);
+			historys[i] = new RankHistory(level,uid);
 		}
 		
 		return historys;

@@ -22,6 +22,7 @@ import org.apache.http.params.CoreProtocolPNames;
 
 import ubicomp.drunk_detection.activities.R;
 
+import data.record.AudioInfo;
 import database.AudioDB;
 import android.content.Context;
 import android.content.SharedPreferences;

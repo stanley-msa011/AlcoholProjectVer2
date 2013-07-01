@@ -52,6 +52,8 @@ public class QuestionMsgBox {
 	
 	private QuestionDB db;
 	
+	private int type;
+	
 	public QuestionMsgBox(StatisticFragment statisticFragment,RelativeLayout mainLayout){
 		this.statisticFragment = statisticFragment;
 		this.context = statisticFragment.getActivity();
@@ -62,6 +64,7 @@ public class QuestionMsgBox {
 		db = new QuestionDB(context);
 		clickSequence = new ArrayList<String>();
 		contentSequence = new ArrayList<QuestionnaireContent>();
+		type = -1;
 		setting();
 	}
 	
@@ -161,26 +164,37 @@ public class QuestionMsgBox {
 	}
 	
 	public void generateType0Box(){
+		type = 0;
 		contentSequence.clear();
 		contentSequence.add(new Type0Content(this));
 		contentSequence.get(contentSequence.size()-1).onPush();
 	}
 	
 	public void generateType1Box(){
+		type = 1;
 		contentSequence.clear();
 		contentSequence.add(new Type1Content(this));
 		contentSequence.get(contentSequence.size()-1).onPush();
 	}
 	
 	public void generateType2Box(){
+		type = 2;
 		contentSequence.clear();
 		contentSequence.add(new Type2Content(this));
 		contentSequence.get(contentSequence.size()-1).onPush();
 	}
 	
 	public void generateType3Box(){
+		type = 3;
 		contentSequence.clear();
 		contentSequence.add(new Type3Content(this));
+		contentSequence.get(contentSequence.size()-1).onPush();
+	}
+	
+	public void generateNormalBox(){
+		type = -1;
+		contentSequence.clear();
+		contentSequence.add(new Type0Content(this));
 		contentSequence.get(contentSequence.size()-1).onPush();
 	}
 	
@@ -224,7 +238,7 @@ public class QuestionMsgBox {
 	}
 	
 	public void insertSeq(){
-		db.insertQuestionnaire(seq_toString());
+		db.insertQuestionnaire(seq_toString(),type);
 	}
 	
 

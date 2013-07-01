@@ -17,117 +17,137 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
         db.execSQL(
-                "CREATE TABLE HistoryGame (" +
-                        " _ID INTEGER PRIMARY KEY, " +
-                       // " _LEVEL INTEGER NOT NULL," +
-                        " _YEAR INTEGER NOT NULL," +
-        				" _MONTH INTEGER NOT NULL," +
-        				" _DATE INTEGER NOT NULL,"+
-        				" _TS INTEGER NOT NULL," +
-        				" _TIMEBLOCK INTEGER NOT NULL,"+
-                        " _BRAC FLOAT NOT NULL,"+
-                        " _EMOTION INTEGER NOT NULL,"+
-                        " _DESIRE INTEGER NOT NULL,"+
-                        //Add for the new version
-                        " _WEEK INTEGER NOT NULL,"+
-                        " _ACC_TEST_0 INTEGER NOT NULL, "+
-                        " _ACC_TEST_1 INTEGER NOT NULL, "+
-                        " _ACC_TEST_2 INTEGER NOT NULL, "+
-                        " _ACC_TEST_ALL INTEGER NOT NULL, "+
-                        " _ACC_PASS_0 INTEGER NOT NULL, "+
-                        " _ACC_PASS_1 INTEGER NOT NULL, "+
-                        " _ACC_PASS_2 INTEGER NOT NULL, "+
-                        " _ACC_PASS_ALL INTEGER NOT NULL, "+
-                        " _ACC_TEST_0_T INTEGER NOT NULL, "+
-                        " _ACC_TEST_1_T INTEGER NOT NULL, "+
-                        " _ACC_TEST_2_T INTEGER NOT NULL, "+
-                        " _ACC_TEST_ALL_T INTEGER NOT NULL, "+
-                        " _ACC_PASS_0_T INTEGER NOT NULL, "+
-                        " _ACC_PASS_1_T INTEGER NOT NULL, "+
-                        " _ACC_PASS_2_T INTEGER NOT NULL, "+
-                        " _ACC_PASS_ALL_T INTEGER NOT NULL, "+
-                ")"
+                "CREATE TABLE Detection (" +
+                        " id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        " year INTEGER NOT NULL," +
+        				" month INTEGER NOT NULL," +
+        				" day INTEGER NOT NULL," +
+        				" week INTEGER NOT NULL,"+
+        				" ts INTEGER NOT NULL," +
+        				" timeblock INTEGER NOT NULL,"+
+                        " brac FLOAT NOT NULL,"+
+                        " emotion INTEGER NOT NULL,"+
+                        " desire INTEGER NOT NULL," +
+                        " upload INTEGER NOT NULL DEFAULT 0"+
+                        ")"
         );
+        
         db.execSQL(
-        		"CREATE TABLE InteractionGame ("+
-        				"_ID INTEGER PRIMERY KEY," +
-        				"_UID CHAR[10] NOT NULL," +
-        				"_LEVEL INTEGER NOT NULL" +
+        		"CREATE TABLE AccDetection (" +
+        				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        				" detection_id INTEGER NOT NULL,"+
+        				" w_morning INTEGER NOT NULL," +
+        				" w_noon INTEGER NOT NULL," +
+        				" w_night INTEGER NOT NULL," +
+        				" w_morning_pass INTEGER NOT NULL," +
+        				" w_noon_pass INTEGER NOT NULL," +
+        				" w_night_pass INTEGER NOT NULL," +
+        				" morning INTEGER NOT NULL," +
+        				" noon INTEGER NOT NULL," +
+        				" night INTEGER NOT NULL," +
+        				" morning_pass INTEGER NOT NULL," +
+        				" noon_pass INTEGER NOT NULL," +
+        				" night_pass INTEGER NOT NULL," +
+        				" FOREIGN KEY(detection_id) REFERENCES Detection(id)"+
+        				")"
+        		);
+        
+        db.execSQL(
+        		"CREATE TABLE UsedDetection (" +
+        				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        				" ts INTEGER NOT NULL,"+
+        				" morning INTEGER NOT NULL," +
+        				" noon INTEGER NOT NULL," +
+        				" night INTEGER NOT NULL," +
+        				" morning_pass INTEGER NOT NULL," +
+        				" noon_pass INTEGER NOT NULL," +
+        				" night_pass INTEGER NOT NULL" +
+        				")"
+        		);
+        
+        db.execSQL(
+        		"CREATE TABLE Ranking ("+
+        				" user_id CHAR[255] PRIMERY KEY," +
+        				" score INTEGER NOT NULL" +
         				")"
         );
-        db.execSQL(
-        		"CREATE TABLE NotUploadedTS ("+
-        				"_ID INTEGER PRIMARY KEY," +
-        				"_TS INTEGER NOT NULL )"
-        		);
         
-        //Add after ver 2, Change after ver 4, ver 5
         db.execSQL(
-        		"CREATE TABLE RecDB ("+
-        				"_ID INTEGER PRIMARY KEY," +
-        				"_YEAR INTEGER NOT NULL," +
-        				"_MONTH INTEGER NOT NULL," +
-        				"_DATE INTEGER NOT NULL," +
-        				"_FILENAME CHAR[255] NOT NULL," +
-        				"_UPLOAD INTEGER NOT NULL DEFAULT 0," +
-        				"_TS INTEGER NOT NULL)"
-        		);
-        
-        //Change after ver3 ,ver 7
-        db.execSQL(
-        		"CREATE TABLE EmotionDB ("+
-        				"_ID INTEGER PRIMARY KEY," +
-        				"_TS INTEGER NOT NULL," +
-        				//Add for the new version
-        				" _TIMEBLOCK INTEGER NOT NULL,"+
-        				
-        				"_EMOTION INTEGER NOT NULL," +
-        				"_CALL CHAR[255]," +
-        				"_UPLOAD INTEGER NOT NULL"+
-        				//Add for the new version
-                        " _WEEK INTEGER NOT NULL,"+
-                        " _ACC_MORNING INTEGER NOT NULL, "+
-                        " _ACC_NOON INTEGER NOT NULL, "+
-                        " _ACC_NOGHT INTEGER NOT NULL, "+
-                        " _ACC_ALL INTEGER NOT NULL, "+
-        				")"
-        		);
-        //Change after ver3, clean after ver 7
-        db.execSQL(
-        		"CREATE TABLE EmotionManageDB ("+
-        				"_ID INTEGER PRIMARY KEY," +
-        				"_TS INTEGER NOT NULL," +
-        				//Add for the new version
-        				" _TIMEBLOCK INTEGER NOT NULL,"+
-        				
-        				"_EMOTION INTEGER NOT NULL," +
-        				"_TYPE INTEGER NOT NULL," +
-        				"_REASON CHAR[255] NOT NULL," +
-        				"_UPLOAD INTEGER NOT NULL"+
-        				//Add for the new version
-                        " _WEEK INTEGER NOT NULL,"+
-                        " _ACC_MORNING INTEGER NOT NULL, "+
-                        " _ACC_NOON INTEGER NOT NULL, "+
-                        " _ACC_NOGHT INTEGER NOT NULL, "+
-                        " _ACC_ALL INTEGER NOT NULL, "+
+        		"CREATE TABLE Record ("+
+        				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        				" year INTEGER NOT NULL," +
+        				" month INTEGER NOT NULL," +
+        				" day INTEGER NOT NULL," +
+        				" filename CHAR[255] NOT NULL," +
+        				" upload INTEGER NOT NULL DEFAULT 0," +
+        				" ts INTEGER NOT NULL" +
         				")"
         		);
         
-        //Add after ver3, clean after ver 6
         db.execSQL(
-        		"CREATE TABLE QuestionnaireDB ("+
-        				"_ID INTEGER PRIMARY KEY," +
-        				"_TS INTEGER NOT NULL," +
-        				//Add for the new version
-        				" _TIMEBLOCK INTEGER NOT NULL,"+
-        				"_SEQUENCE CHAR[255] NOT NULL," +
-        				"_UPLOAD INTEGER NOT NULL"+
-        				//Add for the new version
-                        " _WEEK INTEGER NOT NULL,"+
-                        " _ACC_MORNING INTEGER NOT NULL, "+
-                        " _ACC_NOON INTEGER NOT NULL, "+
-                        " _ACC_NOGHT INTEGER NOT NULL, "+
-                        " _ACC_ALL INTEGER NOT NULL, "+
+        		"CREATE TABLE Emotion ("+
+        				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        				" ts INTEGER NOT NULL," +
+        				" selection INTEGER NOT NULL," +
+        				" call CHAR[255]," +
+        				" upload INTEGER NOT NULL  DEFAULT 0,"+
+        				" acc_tb0 INTEGER NOT NULL,"+
+        				" acc_tb1 INTEGER NOT NULL,"+
+        				" acc_tb2 INTEGER NOT NULL,"+
+        				" used_tb0 INTEGER NOT NULL,"+
+        				" used_tb1 INTEGER NOT NULL,"+
+        				" used_tb2 INTEGER NOT NULL"+
+        				")"
+        		);
+        
+        db.execSQL(
+        		"CREATE TABLE EmotionManage ("+
+        				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        				" ts INTEGER NOT NULL," +
+        				" emotion INTEGER NOT NULL," +
+        				" type INTEGER NOT NULL," +
+        				" reason CHAR[255] NOT NULL," +
+        				" upload INTEGER NOT NULL  DEFAULT 0,"+
+        				" acc_tb0 INTEGER NOT NULL,"+
+        				" acc_tb1 INTEGER NOT NULL,"+
+        				" acc_tb2 INTEGER NOT NULL,"+
+        				" used_tb0 INTEGER NOT NULL,"+
+        				" used_tb1 INTEGER NOT NULL,"+
+        				" used_tb2 INTEGER NOT NULL"+
+        				")"
+        		);
+        
+        db.execSQL(
+        		"CREATE TABLE Questionnaire ("+
+        				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        				" ts INTEGER NOT NULL," +
+        				" type INTEGER NOT NULL,"+
+        				" sequence CHAR[255] NOT NULL," +
+        				" upload INTEGER NOT NULL  DEFAULT 0,"+
+        				" acc_tb0_0 INTEGER NOT NULL,"+
+        				" acc_tb1_0 INTEGER NOT NULL,"+
+        				" acc_tb2_0 INTEGER NOT NULL,"+
+        				" acc_tb0_1 INTEGER NOT NULL,"+
+        				" acc_tb1_1 INTEGER NOT NULL,"+
+        				" acc_tb2_1 INTEGER NOT NULL,"+
+        				" acc_tb0_2 INTEGER NOT NULL,"+
+        				" acc_tb1_2 INTEGER NOT NULL,"+
+        				" acc_tb2_2 INTEGER NOT NULL,"+
+        				" acc_tb0_3 INTEGER NOT NULL,"+
+        				" acc_tb1_3 INTEGER NOT NULL,"+
+        				" acc_tb2_3 INTEGER NOT NULL,"+
+        				" used_tb0_0 INTEGER NOT NULL,"+
+        				" used_tb1_0 INTEGER NOT NULL,"+
+        				" used_tb2_0 INTEGER NOT NULL,"+
+        				" used_tb0_1 INTEGER NOT NULL,"+
+        				" used_tb1_1 INTEGER NOT NULL,"+
+        				" used_tb2_1 INTEGER NOT NULL,"+
+        				" used_tb0_2 INTEGER NOT NULL,"+
+        				" used_tb1_2 INTEGER NOT NULL,"+
+        				" used_tb2_2 INTEGER NOT NULL,"+
+        				" used_tb0_3 INTEGER NOT NULL,"+
+        				" used_tb1_3 INTEGER NOT NULL,"+
+        				" used_tb2_3 INTEGER NOT NULL"+
         				")"
         		);
         
@@ -146,100 +166,6 @@ public class DBHelper extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS QuestionnaireDB");
 			onCreate(db);
 		}
-		/*
-		if (old_ver < 2){
-	        db.execSQL(
-	        		"CREATE TABLE RecDB ("+
-	        				"_ID INTEGER PRIMARY KEY," +
-	        				"_YEAR INTEGER NOT NULL," +
-	        				"_MONTH INTEGER NOT NULL," +
-	        				"_DATE INTEGER NOT NULL," +
-	        				"_FILENAME CHAR[255] NOT NULL)"
-	        		);
-		}
-		if (old_ver < 3){
-			db.execSQL("DROP TABLE IF EXISTS EmotionDB");
-			db.execSQL("DROP TABLE IF EXISTS EmotionManageDB");
-
-			db.execSQL(
-	        		"CREATE TABLE EmotionDB ("+
-	        				"_ID INTEGER PRIMARY KEY," +
-	        				"_TS INTEGER NOT NULL," +
-	        				"_EMOTION INTEGER NOT NULL," +
-	        				"_UPLOAD INTEGER NOT NULL)"
-	        		);
-	        
-	        db.execSQL(
-	        		"CREATE TABLE EmotionManageDB ("+
-	        				"_ID INTEGER PRIMARY KEY," +
-	        				"_TS INTEGER NOT NULL," +
-	        				"_EMOTION INTEGER NOT NULL," +
-	        				"_TYPE INTEGER NOT NULL," +
-	        				"_REASON CHAR[255] NOT NULL," +
-	        				"_UPLOAD INTEGER NOT NULL)"
-	        		);
-	        
-	        db.execSQL(
-	        		"CREATE TABLE QuestionnaireDB ("+
-	        				"_ID INTEGER PRIMARY KEY," +
-	        				"_TS INTEGER NOT NULL," +
-	        				"_SEQUENCE CHAR[255] NOT NULL," +
-	        				"_UPLOAD INTEGER NOT NULL)"
-	        		);
-		}
-		
-		if (old_ver < 4){
-	        db.execSQL(
-	        		"ALTER TABLE RecDB ADD _UPLOAD INTEGER NOT NULL DEFAULT 0"
-	        		);
-		}
-		if (old_ver < 5){
-			db.execSQL(
-	        		"ALTER TABLE RecDB ADD _TS INTEGER NOT NULL DEFAULT 0"
-	        		);
-		}
-		if (old_ver < 6){
-			db.execSQL("DROP TABLE IF EXISTS QuestionnaireDB");
-	        db.execSQL(
-	        		"CREATE TABLE QuestionnaireDB ("+
-	        				"_ID INTEGER PRIMARY KEY," +
-	        				"_TS INTEGER NOT NULL," +
-	        				"_SEQUENCE CHAR[255] NOT NULL," +
-	        				"_UPLOAD INTEGER NOT NULL)"
-	        		);
-		}
-		if (old_ver < 7){
-			db.execSQL("DROP TABLE IF EXISTS EmotionDB");
-			db.execSQL(
-	        		"CREATE TABLE EmotionDB ("+
-	        				"_ID INTEGER PRIMARY KEY," +
-	        				"_TS INTEGER NOT NULL," +
-	        				"_EMOTION INTEGER NOT NULL," +
-	        				"_CALL CHAR[255]," +
-	        				"_UPLOAD INTEGER NOT NULL)"
-	        		);
-			db.execSQL("DROP TABLE IF EXISTS EmotionManageDB");
-			db.execSQL(
-	        		"CREATE TABLE EmotionManageDB ("+
-	        				"_ID INTEGER PRIMARY KEY," +
-	        				"_TS INTEGER NOT NULL," +
-	        				"_EMOTION INTEGER NOT NULL," +
-	        				"_TYPE INTEGER NOT NULL," +
-	        				"_REASON CHAR[255] NOT NULL," +
-	        				"_UPLOAD INTEGER NOT NULL)"
-	        		);
-		}
-		*/
-		/*
-		else{
-			db.execSQL("DROP TABLE IF EXISTS HistoryGame");
-			db.execSQL("DROP TABLE IF EXISTS InteractionGame");
-			db.execSQL("DROP TABLE IF EXISTS NotUploadedTS");
-			db.execSQL("DROP TABLE IF EXISTS EmotionDB");
-			db.execSQL("DROP TABLE IF EXISTS EmotionManageDB");
-			onCreate(db);
-		}
-		*/
 	}
 	
 	public void onOpen(SQLiteDatabase db){

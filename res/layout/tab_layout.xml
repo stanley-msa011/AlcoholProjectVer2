@@ -34,14 +34,6 @@
          	       />
          </LinearLayout>
          
-         <ImageView 
-             android:id = "@+id/loading_page"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:adjustViewBounds="true"
-             android:background="#FFFFFFFF"
-             android:src="@+drawable/loading_page"
-             />
     </RelativeLayout>
 
 </TabHost>

@@ -10,10 +10,10 @@ public class DateValue {
 	}
 	
 	public String toString(){
-		return year+"/"+month+"/"+date;
+		return year+"/"+(month+1)+"/"+date;
 	}
 	
 	public String toFileString(){
-		return year+"_"+month+"_"+date;
+		return year+"_"+(month+1)+"_"+date;
 	}
 }

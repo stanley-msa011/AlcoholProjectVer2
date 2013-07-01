@@ -1,8 +1,8 @@
 package statistic.statisticPageView.analysis;
 
+import data.rank.RankHistory;
 import database.HistoryDB;
 import ubicomp.drunk_detection.activities.R;
-import history.InteractionHistory;
 import interaction.UserLevelCollector;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -50,9 +50,6 @@ public class AnalysisRatingView extends StatisticPageView {
 	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
 		db = new HistoryDB(context);
-		//if (netHandler==null)
-		//	netHandler = new NetworkHandler();
-		//netHandler.sendEmptyMessage(0);
 	}
 
 	@Override
@@ -97,7 +94,7 @@ public class AnalysisRatingView extends StatisticPageView {
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		String uid = sp.getString("uid", "");
 		
-		InteractionHistory[] historys = db.getAllUsersHistory();
+		RankHistory[] historys = db.getAllUsersHistory();
 		if (historys == null){
 			nPeople =0;
 			rank = 0;
@@ -106,10 +103,10 @@ public class AnalysisRatingView extends StatisticPageView {
 			rank = historys.length-1;
 			nPeople = historys.length-1;
 			int tmp_rank = 0, count = 0;
-			int prev_level = historys[0].level;
+			int prev_score = historys[0].score;
 			
 			for (int i=0;i<historys.length;++i){
-				if (historys[i].level < prev_level){
+				if (historys[i].score < prev_score){
 					tmp_rank = count;
 				}
 				if (historys[i].uid.equals(uid)){
@@ -117,7 +114,7 @@ public class AnalysisRatingView extends StatisticPageView {
 					break;
 				}
 				++count;
-				prev_level = historys[i].level;
+				prev_score = historys[i].score;
 			}
 		}
 		Log.d("rating",String.valueOf(rank)+"/"+String.valueOf(nPeople));
@@ -262,7 +259,7 @@ public class AnalysisRatingView extends StatisticPageView {
 		clear();
 	}
 	
-	private InteractionHistory[] historys;
+	private RankHistory[] historys;
 	private UserLevelCollector levelCollector;
 	
 	@SuppressLint("HandlerLeak")

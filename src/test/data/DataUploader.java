@@ -69,8 +69,8 @@ public class DataUploader extends AsyncTask<Void, Void, Integer> {
 			Log.d("UPLOADER","UPLOAD FAILED");
 			//put ts to the uploader
 			HistoryDB db = new HistoryDB(context);
-			long _ts =Long.valueOf(ts);
-			db.insertNotUploadedTS(_ts);
+			long _ts =Long.valueOf(ts)*1000L;
+			db.updateDetectionUploaded(_ts);
 		}
 		else{
 			Log.d("UPLOADER","UPLOAD SUCCESS");

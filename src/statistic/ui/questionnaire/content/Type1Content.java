@@ -15,7 +15,7 @@ public class Type1Content extends QuestionnaireContent {
 	protected void setContent() {
 		contentSeq.clear();
 		seq.clear();
-		seq.add("2,2");
+		seq.add("2");
 		msgBox.openBox();
 		setHelp("您似乎想要喝酒，\n請問您要?");
 		setSelectItem("跟親友聊天", new FamilyOnClickListener(msgBox));

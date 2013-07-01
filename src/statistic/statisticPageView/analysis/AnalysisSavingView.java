@@ -113,7 +113,7 @@ public class AnalysisSavingView extends StatisticPageView {
 	@Override
 	public void onInBackground() {
 		
-		int curDrink = db.getAllBracGameScore();
+		int curDrink = db.getAllBracDetectionScore();
 		currentMoney = curDrink*drinkCost;
 		
 		BitmapFactory.Options opt = new BitmapFactory.Options();

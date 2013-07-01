@@ -1,10 +1,11 @@
 package ubicomp.drunk_detection.activities;
 
-import history.BracGameHistory;
 
 import java.util.Calendar;
 import java.util.Random;
 
+import data.history.BracDetectionState;
+import data.history.DateBracDetectionState;
 import database.DBHelper;
 import database.HistoryDB;
 
@@ -21,7 +22,7 @@ public class DummyData {
 	
 	public static void generateDummyData(Context context){
 		
-		
+		/*
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 		boolean hasDummy = sp.getBoolean("Dummy", false);
 		
@@ -79,8 +80,7 @@ public class DummyData {
 				else{
 					++level;
 				}
-				BracGameHistory history = new BracGameHistory(level,from/1000,brac,emotion,desire);
-				
+				DateBracDetectionState history = new DateBracDetectionState(level,from/1000,brac,emotion,desire);
 				hdb.insertNewState(history);
 				from+=millis;
 			}
@@ -89,5 +89,6 @@ public class DummyData {
 			editor.putBoolean("Dummy", true);
 			editor.commit();
 		}
+		*/
 	}
 }

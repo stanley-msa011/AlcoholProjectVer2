@@ -2,57 +2,117 @@ package database;
 
 import java.util.Calendar;
 
-import questionnaire.data.EmotionData;
-import questionnaire.data.EmotionManageData;
-import questionnaire.data.QuestionnaireData;
+import data.questionnaire.EmotionData;
+import data.questionnaire.EmotionManageData;
+import data.questionnaire.QuestionnaireData;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class QuestionDB {
 
 	
 	private SQLiteOpenHelper dbHelper = null;
     private SQLiteDatabase db = null;
-	
+    
 	public QuestionDB(Context context){
 		dbHelper = new DBHelper(context);
 	}
 	
-	public void insertQuestionnaire(String seq){
+	public void insertQuestionnaire(String seq, int type){
 		Calendar cal = Calendar.getInstance();
 		long ts = cal.getTimeInMillis();
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH);
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int tb = TimeBlock.getTimeBlock(cal.get(Calendar.HOUR_OF_DAY));
+		
+		
+		String sql;
+		Cursor cursor;
 		db = dbHelper.getWritableDatabase();
-		Log.d("QuestionnaireDB","insert: " +seq);
-		String sql = "INSERT INTO QuestionnaireDB (_TS,_SEQUENCE,_UPLOAD) VALUES ("+ts+",'"+seq+"', 0 )";
+		
+		sql = "SELECT * FROM Questionnaire WHERE type <> -1 ORDER BY id DESC LIMIT 1";
+		cursor  = db.rawQuery(sql, null);
+		int[] acc = new int[12];
+		int[] used = new int[12];
+		long _ts = 0L;
+		if (cursor.getCount() > 0){
+			cursor.moveToFirst();
+			_ts = cursor.getLong(1);
+			for (int i=0;i<12;++i){
+				acc[i] = cursor.getInt(i+5);
+				used[i] = cursor.getInt(i+17);
+			}
+		}
+		Calendar cal2 = Calendar.getInstance();
+		cal2.setTimeInMillis(_ts);
+		int _year = cal2.get(Calendar.YEAR);
+		int _month = cal2.get(Calendar.MONTH);
+		int _day = cal2.get(Calendar.DAY_OF_MONTH);
+		int _tb = TimeBlock.getTimeBlock(cal2.get(Calendar.HOUR_OF_DAY));
+		
+		
+		
+		if (year!=_year || month != _month || day != _day || tb != _tb)
+			if (type >=0 && type < 4)
+				++acc[type*3 + tb];
+		
+		sql = "INSERT INTO Questionnaire (ts,type,sequence," +
+				"acc_tb0_0, acc_tb1_0, acc_tb2_0,used_tb0_0, used_tb1_0, used_tb2_0,"+
+				"acc_tb0_1, acc_tb1_1, acc_tb2_1,used_tb0_1, used_tb1_1, used_tb2_1,"+
+				"acc_tb0_2, acc_tb1_2, acc_tb2_2,used_tb0_2, used_tb1_2, used_tb2_2,"+
+				"acc_tb0_3, acc_tb1_3, acc_tb2_3,used_tb0_3, used_tb1_3, used_tb2_3"+
+				") VALUES ("+ts+","+type+","+"'"+seq+"'"+","+
+				acc[0]+","+acc[1]+","+acc[2]+","+used[0]+","+used[1]+","+used[2]+","+
+				acc[3]+","+acc[4]+","+acc[5]+","+used[3]+","+used[4]+","+used[5]+","+
+				acc[6]+","+acc[7]+","+acc[8]+","+used[6]+","+used[7]+","+used[8]+","+
+				acc[9]+","+acc[10]+","+acc[11]+","+used[9]+","+used[10]+","+used[11]+
+				")";
 		db.execSQL(sql);
+		
+		cursor.close();
 		db.close();
 	}
 	
 	public QuestionnaireData[] getNotUploadedQuestionnaire(){
 		QuestionnaireData[] data = null;
 		db =dbHelper.getReadableDatabase();
-		String sql = "SELECT * FROM QuestionnaireDB WHERE _UPLOAD = 0";
-		Cursor cursor = db.rawQuery(sql, null);
+		String sql;
+		Cursor cursor;
+		
+		sql = "SELECT * FROM Questionnaire WHERE upload = 0";
+		cursor = db.rawQuery(sql, null);
 		int count = cursor.getCount();
 		if (count == 0){
 			cursor.close();
 			db.close();
 			return null;
 		}
+		
 		data = new QuestionnaireData[count];
-		int ts_idx = cursor.getColumnIndex("_TS");
-		int s_idx = cursor.getColumnIndex("_SEQUENCE");
+		
 		long ts;
+		int type;
 		String seq;
+		int[] acc = new int[12];
+		int[] used = new int[12];
+		
 		for (int i=0;i<count;++i){
+			for (int j=0;j<12;++j)
+				acc[j] = used[j] = 0;
+			
 			cursor.moveToPosition(i);
-			ts = cursor.getLong(ts_idx);
-			seq = cursor.getString(s_idx);
-			data[i] = new QuestionnaireData(ts,seq);
+			ts = cursor.getLong(1);
+			type = cursor.getInt(2);
+			seq = cursor.getString(3);
+			for (int j=0; j<12;++j){
+				acc[j] = cursor.getInt(j+5);
+				used[j] = cursor.getInt(j+17);
+			}
+			data[i] = new QuestionnaireData(ts,type,seq,acc,used);
 		}
 		
 		cursor.close();
@@ -63,28 +123,59 @@ public class QuestionDB {
 	
 	public void setQuestionnaireUploaded(long ts){
 		db = dbHelper.getWritableDatabase();
-		String sql = "UPDATE QuestionnaireDB SET _UPLOAD = 1 WHERE _TS = "+ts;
+		String sql = "UPDATE Questionnaire SET upload = 1 WHERE ts = "+ts;
 		db.execSQL(sql);
 		db.close();
 	}
 	
 	
-	public void insertEmotion(int emotion){
+	public void insertEmotion(int selection, String call){
 		Calendar cal = Calendar.getInstance();
 		long ts = cal.getTimeInMillis();
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH);
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int tb = TimeBlock.getTimeBlock(cal.get(Calendar.HOUR_OF_DAY));
 		
+		String sql;
+		Cursor cursor;
 		db = dbHelper.getWritableDatabase();
-		String sql = "INSERT INTO EmotionDB (_TS,_EMOTION,_UPLOAD) VALUES ("+ts+","+emotion+", 0 )";
-		db.execSQL(sql);
-		db.close();
-	}
-	
-	public void insertEmotion(int emotion, String call){
-		Calendar cal = Calendar.getInstance();
-		long ts = cal.getTimeInMillis();
+		sql ="SELECT  * FROM Emotion ORDER BY id DESC LIMIT 1";
+		cursor  = db.rawQuery(sql, null);
+		int[] acc = new int[3];
+		int[] used = new int[3];
+		long _ts = 0L;
+		if (cursor.getCount() > 0){
+			cursor.moveToFirst();
+			_ts = cursor.getLong(1);
+			for (int i=0;i<3;++i){
+				acc[i] = cursor.getInt(i+5);
+				used[i] = cursor.getInt(i+8);
+			}
+		}
+		cursor.close();
+		Calendar cal2 = Calendar.getInstance();
+		cal2.setTimeInMillis(_ts);
+		int _year = cal2.get(Calendar.YEAR);
+		int _month = cal2.get(Calendar.MONTH);
+		int _day = cal2.get(Calendar.DAY_OF_MONTH);
+		int _tb = TimeBlock.getTimeBlock(cal2.get(Calendar.HOUR_OF_DAY));
 		
-		db = dbHelper.getWritableDatabase();
-		String sql = "INSERT INTO EmotionDB (_TS,_EMOTION,_UPLOAD,_CALL) VALUES ("+ts+","+emotion+", 0 ,'"+call+"')";
+		if (year!=_year || month != _month || day != _day || tb != _tb)
+			++acc[tb];
+		if (call != null)
+			sql = "INSERT INTO Emotion (ts,selection,call," +
+				"acc_tb0, acc_tb1, acc_tb2,used_tb0, used_tb1, used_tb2"+
+				") VALUES ("+ts+","+selection+","+"'"+call+"'"+","+
+				acc[0]+","+acc[1]+","+acc[2]+","+used[0]+","+used[1]+","+used[2]+
+				")";
+		else
+			sql = "INSERT INTO Emotion (ts,selection," +
+				"acc_tb0, acc_tb1, acc_tb2,used_tb0, used_tb1, used_tb2"+
+				") VALUES ("+ts+","+selection+","+
+				acc[0]+","+acc[1]+","+acc[2]+","+used[0]+","+used[1]+","+used[2]+
+				")";
+		
 		db.execSQL(sql);
 		db.close();
 	}
@@ -92,13 +183,42 @@ public class QuestionDB {
 	public void insertEmotionManage(int emotion, int type, String reason){
 		Calendar cal = Calendar.getInstance();
 		long ts = cal.getTimeInMillis();
-		int len = 255;
-		if (reason.length()<255)
-			len = reason.length();
-		String str = String.copyValueOf(reason.toCharArray(), 0, len);
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH);
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int tb = TimeBlock.getTimeBlock(cal.get(Calendar.HOUR_OF_DAY));
 		
+		String sql;
+		Cursor cursor;
 		db = dbHelper.getWritableDatabase();
-		String sql = "INSERT INTO EmotionManageDB (_TS,_EMOTION,_TYPE,_REASON,_UPLOAD) VALUES ("+ts+","+emotion+","+type+",'"+str+"' , 0 )";
+		sql ="SELECT  * FROM EmotionManage ORDER BY id DESC LIMIT 1";
+		cursor  = db.rawQuery(sql, null);
+		int[] acc = new int[3];
+		int[] used = new int[3];
+		long _ts = 0L;
+		if (cursor.getCount() > 0){
+			cursor.moveToFirst();
+			_ts = cursor.getLong(1);
+			for (int i=0;i<3;++i){
+				acc[i] = cursor.getInt(i+6);
+				used[i] = cursor.getInt(i+9);
+			}
+		}
+		cursor.close();
+		Calendar cal2 = Calendar.getInstance();
+		cal2.setTimeInMillis(_ts);
+		int _year = cal2.get(Calendar.YEAR);
+		int _month = cal2.get(Calendar.MONTH);
+		int _day = cal2.get(Calendar.DAY_OF_MONTH);
+		int _tb = TimeBlock.getTimeBlock(cal2.get(Calendar.HOUR_OF_DAY));
+		
+		if (year!=_year || month != _month || day != _day || tb != _tb)
+			++acc[tb];
+		sql = "INSERT INTO EmotionManage (ts,emotion,type,reason," +
+				"acc_tb0, acc_tb1, acc_tb2,used_tb0, used_tb1, used_tb2"+
+				") VALUES ("+ts+","+emotion+","+type+","+"'"+reason+"'"+","+
+				acc[0]+","+acc[1]+","+acc[2]+","+used[0]+","+used[1]+","+used[2]+
+				")";
 		db.execSQL(sql);
 		db.close();
 	}
@@ -106,29 +226,38 @@ public class QuestionDB {
 	public EmotionData[] getNotUploadedEmotion(){
 		EmotionData[] data = null;
 		db =dbHelper.getReadableDatabase();
-		String sql = "SELECT * FROM EmotionDB WHERE _UPLOAD = 0";
-		Cursor cursor = db.rawQuery(sql, null);
+		String sql;
+		Cursor cursor;
+
+		sql = "SELECT * FROM Emotion WHERE upload = 0";
+		cursor = db.rawQuery(sql, null);
 		int count = cursor.getCount();
 		if (count == 0){
 			cursor.close();
 			db.close();
 			return null;
 		}
+		
 		data = new EmotionData[count];
-		int ts_idx = cursor.getColumnIndex("_TS");
-		int e_idx = cursor.getColumnIndex("_EMOTION");
-		int c_idx = cursor.getColumnIndex("_CALL");
 		long ts;
-		int emotion;
+		int selection;
+		String call;
+		int[] acc = new int[3];
+		int[] used = new int[3];
 		for (int i=0;i<count;++i){
 			cursor.moveToPosition(i);
-			ts = cursor.getLong(ts_idx);
-			emotion = cursor.getInt(e_idx);
-			if (emotion < 4)
-				data[i] = new EmotionData(ts,emotion);
+			ts = cursor.getLong(1);
+			selection = cursor.getInt(2);
+			
+			for (int j=0;j<acc.length;++j){
+				acc[j] = cursor.getInt(j+5);
+				used[j] = cursor.getInt(j+8);
+			}
+			if (selection < 4)
+				data[i] = new EmotionData(ts,selection,null,acc,used);
 			else{
-				String call = cursor.getString(c_idx);
-				data[i] = new EmotionData(ts,emotion,call);
+				call = cursor.getString(3);
+				data[i] = new EmotionData(ts,selection,call,acc,used);
 			}
 		}
 		
@@ -140,7 +269,7 @@ public class QuestionDB {
 	
 	public void setEmotionUploaded(long ts){
 		db = dbHelper.getWritableDatabase();
-		String sql = "UPDATE EmotionDB SET _UPLOAD = 1 WHERE _TS = "+ts;
+		String sql = "UPDATE Emotion SET upload = 1 WHERE ts = "+ts;
 		db.execSQL(sql);
 		db.close();
 	}
@@ -148,29 +277,38 @@ public class QuestionDB {
 	public EmotionManageData[] getNotUploadedEmotionManage(){
 		EmotionManageData[] data = null;
 		db =dbHelper.getReadableDatabase();
-		String sql = "SELECT * FROM EmotionManageDB WHERE _UPLOAD = 0";
-		Cursor cursor = db.rawQuery(sql, null);
+		String sql;
+		Cursor cursor;
+
+		sql = "SELECT * FROM EmotionManage WHERE upload = 0";
+		cursor = db.rawQuery(sql, null);
 		int count = cursor.getCount();
 		if (count == 0){
 			cursor.close();
 			db.close();
 			return null;
 		}
+		
 		data = new EmotionManageData[count];
-		int ts_idx = cursor.getColumnIndex("_TS");
-		int e_idx = cursor.getColumnIndex("_EMOTION");
-		int t_idx =cursor.getColumnIndex("_TYPE");
-		int r_idx = cursor.getColumnIndex("_REASON");
 		long ts;
-		int emotion, type;
+		int emotion;
+		int type;
 		String reason;
+		int[] acc = new int[3];
+		int[] used = new int[3];
+		cursor.moveToFirst();
 		for (int i=0;i<count;++i){
 			cursor.moveToPosition(i);
-			ts = cursor.getLong(ts_idx);
-			emotion = cursor.getInt(e_idx);
-			type = cursor.getInt(t_idx);
-			reason = cursor.getString(r_idx);
-			data[i] = new EmotionManageData(ts,emotion,type,reason);
+			ts = cursor.getLong(1);
+			emotion = cursor.getInt(2);
+			type = cursor.getInt(3);
+			reason = cursor.getString(4);
+			
+			for (int j=0;j<acc.length;++j){
+				acc[j] = cursor.getInt(j+6);
+				used[j] = cursor.getInt(j+9);
+			}
+			data[i] = new EmotionManageData(ts,emotion,type,reason,acc,used);
 		}
 		
 		cursor.close();
@@ -181,14 +319,14 @@ public class QuestionDB {
 	
 	public void setEmotionManageUploaded(long ts){
 		db = dbHelper.getWritableDatabase();
-		String sql = "UPDATE EmotionManageDB SET _UPLOAD = 1 WHERE _TS = "+ts;
+		String sql = "UPDATE EmotionManage SET upload = 1 WHERE ts = "+ts;
 		db.execSQL(sql);
 		db.close();
 	}
 	
     public String[] getInsertedReason(int type){
     	db = dbHelper.getReadableDatabase();
-    	String sql = "SELECT DISTINCT _REASON FROM EmotionManageDB WHERE _TYPE = "+type+" ORDER BY _TS DESC LIMIT 4";
+    	String sql = "SELECT DISTINCT reason FROM EmotionManage WHERE type = "+type+" ORDER BY id DESC LIMIT 4";
     	String[] out = null;
     	
     	Cursor cursor = db.rawQuery(sql, null);
@@ -198,14 +336,11 @@ public class QuestionDB {
     		return null;
     	}
     	out = new String[cursor.getCount()];
-    	int idx = cursor.getColumnIndex("_REASON");
-    	Log.d("QuestionDB","idx: "+idx);
     	
-    	for (int i=0;i<out.length;++i){
-    		if (cursor.moveToPosition(i)){
-    			out[i] = cursor.getString(idx);
-    		}
-    	}
+    	for (int i=0;i<out.length;++i)
+    		if (cursor.moveToPosition(i))
+    			out[i] = cursor.getString(0);
+    	
     	int exist = 0;
     	for (int i=0;i<out.length;++i){
     		if (out[i].length() > 0){
@@ -220,7 +355,6 @@ public class QuestionDB {
     			++c;
     		}
     	}
-    	
     	
     	cursor.close();
     	db.close();

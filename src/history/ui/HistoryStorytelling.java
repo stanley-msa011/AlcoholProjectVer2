@@ -1,102 +1,134 @@
 package history.ui;
 
-import history.GameHistory;
+import data.history.AccumulatedHistoryState;
 import ubicomp.drunk_detection.activities.R;
 
 public class HistoryStorytelling {
 
-	public static final int[] PAGE= 
+	public static final int[][] PAGE= 
 		{
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03,
-		R.drawable.history_page01,R.drawable.history_page02,R.drawable.history_page03
+			{	R.drawable.history_page001,R.drawable.history_page001,R.drawable.history_page001,
+				R.drawable.history_page001,R.drawable.history_page001,R.drawable.history_page001,
+				R.drawable.history_page001,R.drawable.history_page001,R.drawable.history_page001,
+				R.drawable.history_page001,R.drawable.history_page001,R.drawable.history_page001,
+				R.drawable.history_page001,R.drawable.history_page001,R.drawable.history_page001,
+				}, // 1
+			{	R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
+					R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
+					R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
+					R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
+					R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
+				}, // 2
+			{	R.drawable.history_page031,R.drawable.history_page031,R.drawable.history_page031,
+					R.drawable.history_page031,R.drawable.history_page031,R.drawable.history_page031,
+					R.drawable.history_page031,R.drawable.history_page031,R.drawable.history_page031,
+					R.drawable.history_page031,R.drawable.history_page031,R.drawable.history_page031,
+					R.drawable.history_page031,R.drawable.history_page031,R.drawable.history_page031,
+				}, // 3			
+			{	R.drawable.history_page046,R.drawable.history_page046,R.drawable.history_page046,
+					R.drawable.history_page046,R.drawable.history_page046,R.drawable.history_page046,
+					R.drawable.history_page046,R.drawable.history_page046,R.drawable.history_page046,
+					R.drawable.history_page046,R.drawable.history_page046,R.drawable.history_page046,
+					R.drawable.history_page046,R.drawable.history_page046,R.drawable.history_page046,
+				}, // 4
+			{	R.drawable.history_page061,R.drawable.history_page061,R.drawable.history_page061,
+					R.drawable.history_page061,R.drawable.history_page061,R.drawable.history_page061,
+					R.drawable.history_page061,R.drawable.history_page061,R.drawable.history_page061,
+					R.drawable.history_page061,R.drawable.history_page061,R.drawable.history_page061,
+					R.drawable.history_page061,R.drawable.history_page061,R.drawable.history_page061,
+				}, // 5
+			{	R.drawable.history_page076,R.drawable.history_page076,R.drawable.history_page076,
+					R.drawable.history_page076,R.drawable.history_page076,R.drawable.history_page076,
+					R.drawable.history_page076,R.drawable.history_page076,R.drawable.history_page076,
+					R.drawable.history_page076,R.drawable.history_page076,R.drawable.history_page076,
+					R.drawable.history_page076,R.drawable.history_page076,R.drawable.history_page076,
+				}, // 6
+			{	R.drawable.history_page091,R.drawable.history_page091,R.drawable.history_page091,
+					R.drawable.history_page091,R.drawable.history_page091,R.drawable.history_page091,
+					R.drawable.history_page091,R.drawable.history_page091,R.drawable.history_page091,
+					R.drawable.history_page091,R.drawable.history_page091,R.drawable.history_page091,
+					R.drawable.history_page091,R.drawable.history_page091,R.drawable.history_page091,
+				}, // 7			
+			{	R.drawable.history_page106,R.drawable.history_page106,R.drawable.history_page106,
+					R.drawable.history_page106,R.drawable.history_page106,R.drawable.history_page106,
+					R.drawable.history_page106,R.drawable.history_page106,R.drawable.history_page106,
+					R.drawable.history_page106,R.drawable.history_page106,R.drawable.history_page106,
+					R.drawable.history_page106,R.drawable.history_page106,R.drawable.history_page106,
+				}, // 8
+			{	R.drawable.history_page121,R.drawable.history_page121,R.drawable.history_page121,
+					R.drawable.history_page121,R.drawable.history_page121,R.drawable.history_page121,
+					R.drawable.history_page121,R.drawable.history_page121,R.drawable.history_page121,
+					R.drawable.history_page121,R.drawable.history_page121,R.drawable.history_page121,
+					R.drawable.history_page121,R.drawable.history_page121,R.drawable.history_page121,
+				}, // 9
+			{	R.drawable.history_page136,R.drawable.history_page136,R.drawable.history_page136,
+					R.drawable.history_page136,R.drawable.history_page136,R.drawable.history_page136,
+					R.drawable.history_page136,R.drawable.history_page136,R.drawable.history_page136,
+					R.drawable.history_page136,R.drawable.history_page136,R.drawable.history_page136,
+					R.drawable.history_page136,R.drawable.history_page136,R.drawable.history_page136,
+				}, // A
+			{	R.drawable.history_page151,R.drawable.history_page151,R.drawable.history_page151,
+					R.drawable.history_page151,R.drawable.history_page151,R.drawable.history_page151,
+					R.drawable.history_page151,R.drawable.history_page151,R.drawable.history_page151,
+					R.drawable.history_page151,R.drawable.history_page151,R.drawable.history_page151,
+					R.drawable.history_page151,R.drawable.history_page151,R.drawable.history_page151,
+				}, // B			
+			{	R.drawable.history_page166,R.drawable.history_page166,R.drawable.history_page166,
+					R.drawable.history_page166,R.drawable.history_page166,R.drawable.history_page166,
+					R.drawable.history_page166,R.drawable.history_page166,R.drawable.history_page166,
+					R.drawable.history_page166,R.drawable.history_page166,R.drawable.history_page166,
+					R.drawable.history_page166,R.drawable.history_page166,R.drawable.history_page166,
+				}, // C
 		};
 	
-	public static int[] PAGE_FULL_NUM = {
-		2,5,8,11,14,17,20,23,26,29
-	};
 	
-	public static int[] PAGE_START_NUM = {
-		0,3,6,9,12,15,18,21,24,27
-	};
-	
-	public static final int MAX_PAGE = 10;
-	
-	public static final int MIN_LEVEL = GameHistory.MIN_LEVEL;
-	public static final int MAX_LEVEL = GameHistory.MAX_LEVEL;
+	public static final int MAX_PAGE = 11;
+	public static final int MAX_SCORE = 14;
 	
 	public static final int[] PAGE_FULL= 
 		{
-		R.drawable.history_page03,
-		R.drawable.history_page03,
-		R.drawable.history_page03,
-		R.drawable.history_page03,
-		R.drawable.history_page03,
-		R.drawable.history_page03,
-		R.drawable.history_page03,
-		R.drawable.history_page03,
-		R.drawable.history_page03,
-		R.drawable.history_page03
+		R.drawable.history_page001, // 1
+		R.drawable.history_page016, // 2
+		R.drawable.history_page031, // 3
+		R.drawable.history_page046, // 4
+		R.drawable.history_page061, // 5
+		R.drawable.history_page076, // 6
+		R.drawable.history_page091, // 7
+		R.drawable.history_page106, // 8
+		R.drawable.history_page121, // 9
+		R.drawable.history_page136, // 10
+		R.drawable.history_page151, // 11
+		R.drawable.history_page166  // 12
 		 };
 	
-	public static int getPage(int level){
-		if (level <0 || level >=PAGE.length)
-			return 0;
-		else
-			return PAGE[level];
+	public static int getPage(int score, int week){
+		if (week < 0)
+			week = 0;
+		else if (week > MAX_PAGE)
+			week = MAX_PAGE;
+		if (score <0)
+			score = 0;
+		else if (score > MAX_SCORE)
+			score = MAX_SCORE;
+		return PAGE[week][score];
 	}
 
-	public static boolean isChangePage(int level){
-		for (int i=0;i<PAGE_START_NUM.length;++i){
-			if (level == PAGE_START_NUM[i])
-				return true;
-		}
-		return false;
+
+	public static boolean isChangePage(AccumulatedHistoryState prev,AccumulatedHistoryState cur){
+		if (prev == null || cur == null)
+			return false;
+		return prev.week < cur.week;
 	}
 	
 	
-	public static int getPageNum(int level){
-		for (int i=0;i<PAGE_FULL_NUM.length;++i){
-			if (level <= PAGE_FULL_NUM[i])
-				return (i+1);
-		}
-		return PAGE_FULL_NUM.length;
-	}
-	
-	public static int[] getAnimationBgs(int level){
-		int[] pages = PAGE_FULL.clone();
-		int pageNum = getPageNum(level)-1;
-		pages[pageNum] = getPage(level);
+	public static int[] getAnimationBgs(AccumulatedHistoryState[] states){
+		if (states == null)
+			return null;
+		int [] pages = new int[states.length];
+		for (int i=0;i<pages.length;++i)
+			pages[i] = getPage(states[i].getScore(),states[i].week);
+		
 		return pages;
-	}
-	
-	public static int getNextPageLevel(int level){
-		for (int i=0; i<PAGE_FULL_NUM.length; ++i){
-			if (level < PAGE_FULL_NUM[i])
-				return PAGE_FULL_NUM[i];
-		}
-		return MAX_LEVEL;
-	}
-	
-	public static int getPrevPageLevel(int level){
-		for (int i=PAGE_FULL_NUM.length-1; i>=0; --i){
-			if (level > PAGE_FULL_NUM[i])
-				return PAGE_FULL_NUM[i];
-		}
-		return PAGE_FULL_NUM[0];
-	}
-
-	public static boolean isInRange(int curLevel, int targetLevel){
-		int curPage = getPageNum(curLevel);
-		int targetPage = getPageNum(targetLevel);
-		return curPage == targetPage;
 	}
 	
 }

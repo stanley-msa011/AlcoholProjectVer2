@@ -1,6 +1,5 @@
 package test.data;
 
-import history.DateBracGameHistory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,8 +28,10 @@ import org.apache.http.params.CoreProtocolPNames;
 
 import ubicomp.drunk_detection.activities.TestFragment;
 
+import data.history.AccumulatedHistoryState;
+import data.history.DateBracDetectionState;
 import database.HistoryDB;
-import database.TimeBlock;
+import database.WeekNum;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -48,6 +49,7 @@ public class BracDataHandler {
 	private double avg_result = 0;
 	private HistoryDB db;
 	
+	
 	public BracDataHandler(String timestamp_string, TestFragment fragment){
 		ts = timestamp_string;
 		context = fragment.getActivity();
@@ -61,7 +63,7 @@ public class BracDataHandler {
 	public static final double THRESHOLD = 0.01;
 	public static final double THRESHOLD2 = 0.25;
 	
-	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload.php";
+	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload_2.php";
 	
 	public int start(){
 		
@@ -89,54 +91,32 @@ public class BracDataHandler {
         int emotion = q_result/100;
         int desire = q_result%100;
         
-        DateBracGameHistory history= db.getLatestBracGameHistory();
+       
+        AccumulatedHistoryState a_history = db.getLatestAccumulatedHistoryState();
         
-        history.brac = (float)avg_result;
-        history.timestamp = Long.parseLong(ts);
-        history.emotion = emotion;
-        history.desire = desire;
+        float brac = (float)avg_result;
+        long timestamp = Long.parseLong(ts) * 1000L;
+        int week = WeekNum.getWeek(context, timestamp);
         
-        DateBracGameHistory prevHistory = db.getLatestBracGameHistory();
-        int year,month,date,timeblock,hour;
+        DateBracDetectionState detection= new DateBracDetectionState(week,timestamp,brac,emotion,desire);
         
-    	Calendar cal = Calendar.getInstance();
-    	cal.setTimeInMillis(history.timestamp*1000);
-    	year = cal.get(Calendar.YEAR);
-    	month = cal.get(Calendar.MONTH)+1;
-    	date = cal.get(Calendar.DATE);
-    	hour = cal.get(Calendar.HOUR_OF_DAY);
-    	
-    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		int timeblock_type = sp.getInt("timeblock_num", 3);
-    	timeblock = TimeBlock.getTimeBlock(hour,timeblock_type);
+        DateBracDetectionState prevDetection = db.getLatestBracDetection();
+        
     
-    	//check time block
-    	boolean check_time_block =true;
-    	if (check_time_block){
-    		if (timeblock==-1 || timeblock == 2);
-    		else if (year == prevHistory.year && month == prevHistory.month && date == prevHistory.date && timeblock == prevHistory.timeblock);
+    	if (detection.year != prevDetection.year || detection.month != prevDetection.month || detection.day != prevDetection.day || detection.timeblock != prevDetection.timeblock){
+    		Log.d("BracDataHandler","UPDATE HISTORY");
+    		if (avg_result >=0 && avg_result < THRESHOLD)
+    				a_history.changeAcc(true, week, detection.timeblock);
+    		else if (avg_result < 0)
+    			result = ERROR;
     		else{
-    			if (avg_result != ERROR){
-    				if (avg_result >= THRESHOLD)
-    					history.changeLevel(0);
-    				else
-    					history.changeLevel(+1);
-    			}
-    			else{
-    				result = ERROR;
-    			}
+    			a_history.changeAcc(false, week, detection.timeblock);
     		}
-    	}else{
-			if (avg_result != ERROR){
-				if (avg_result >= THRESHOLD)
-					history.changeLevel(0);
-				else
-					history.changeLevel(+1);
-			}
     	}
     	
-    	db.insertNewState(history);
+    	db.insertNewState(detection,a_history);
     	
+    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor editor = sp.edit();
     	if (avg_result  < THRESHOLD){
     		if (emotion <=3)
@@ -155,20 +135,22 @@ public class BracDataHandler {
        	stateFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "state.txt");
        	try {
        		BufferedWriter state_writer = new BufferedWriter(new FileWriter(stateFile));
-       		state_writer.write(String.valueOf(history.level));
+       		String state_str = a_history.toString();
+       		String used_str = db.getLatestUsedState().toString();
+       		String output_str = state_str + used_str;
+       		Log.d("BracHandler","write: "+output_str);
+       		state_writer.write(output_str);
        		state_writer.flush();
        		state_writer.close();
 		} catch (Exception e) {	
-			e.printStackTrace();	
+			Log.d("BracHandler","fail to write");
 		}
        	
        	/*Connection to server*/
        	int server_connect = connectingToServer(textFile,geoFile,stateFile,questionFile,imageFiles);
-		if (server_connect == ERROR) // error happens when preparing files
+		if (server_connect == ERROR){ // error happens when preparing files
 			result = ERROR;
-		if (result == ERROR){
-			long _ts = Long.valueOf(ts);
-			db.insertNotUploadedTS(_ts);
+			Log.d("BracHandler","Prepare file");
 		}
 		return result;
 	}

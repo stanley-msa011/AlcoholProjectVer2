@@ -34,6 +34,7 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 import clicklog.ClickLogUploader;
 import clicklog.ClickLogger;
+import data.questionnaire.EmotionDataUploader;
 import debuglog.DebugLoggingThread;
 
 public class FragmentTabs extends FragmentActivity {
@@ -57,11 +58,11 @@ public class FragmentTabs extends FragmentActivity {
 	private android.support.v4.app.FragmentManager fm;
 	TabChangeListener tabChangeListener;
 	
-	private static  ImageView loadingPage;
+	//private static  ImageView loadingPage;
 	
 	private FragmentTabs fragmentTabs; 
 	
-	private LoadingPageHandler loadingPageHandler;
+	//private LoadingPageHandler loadingPageHandler;
 	
 	private Bitmap tabBmp;
 	
@@ -78,10 +79,10 @@ public class FragmentTabs extends FragmentActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.tab_layout);
 		
-		loadingPage = (ImageView) this.findViewById(R.id.loading_page);
+		//loadingPage = (ImageView) this.findViewById(R.id.loading_page);
 		
-		if (loadingPageHandler == null)
-			loadingPageHandler = new LoadingPageHandler();
+		//if (loadingPageHandler == null)
+		//	loadingPageHandler = new LoadingPageHandler();
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
@@ -96,10 +97,10 @@ public class FragmentTabs extends FragmentActivity {
 
 		tab_px = new Point(screen_px.x,screen_px.x*211/1080);
 		
-		if (firstLoading){
-			Thread t = new Thread (new TimerRunnable());
-			t.start();
-		}
+		//if (firstLoading){
+		//	Thread t = new Thread (new TimerRunnable());
+		//	t.start();
+		//}
 		
 		tabHost = (TabHost) this.findViewById(android.R.id.tabhost);
 		tabHost.setup();
@@ -150,15 +151,15 @@ public class FragmentTabs extends FragmentActivity {
 		
 	}
 	
-	@SuppressLint("HandlerLeak")
+	/*@SuppressLint("HandlerLeak")
 	private class LoadingPageHandler extends Handler{
 		public void handleMessage(Message msg){
 			detach_loading_page();
 			firstLoading = false;
 		}
-	}
+	}*/
 	
-	
+	/*
 	private class TimerRunnable implements Runnable{
 		@Override
 		public void run() {
@@ -168,8 +169,7 @@ public class FragmentTabs extends FragmentActivity {
 			
 			loadingPageHandler.sendEmptyMessage(0);
 		}
-		
-	}
+	}*/
 	
 	protected void onResume(){
 		super.onResume();
@@ -373,9 +373,9 @@ public class FragmentTabs extends FragmentActivity {
 		return null;
 	}
 	
-	static public void detach_loading_page(){
-		if (loadingPage!=null)
-			loadingPage.setVisibility(View.INVISIBLE);
-	}
+//	static public void detach_loading_page(){
+//		if (loadingPage!=null)
+//			loadingPage.setVisibility(View.INVISIBLE);
+//	}
 	
 }

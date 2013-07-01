@@ -2,7 +2,8 @@ package database;
 
 import java.util.Calendar;
 
-import history.data.AudioInfo;
+import data.record.AudioInfo;
+
 import history.ui.DateValue;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,7 +20,7 @@ public class AudioDB {
     
     public AudioInfo[] getNotUploadedInfo(){
     	db = dbHelper.getReadableDatabase();
-    	String sql = "SELECT * FROM RecDB WHERE _UPLOAD = 0";
+    	String sql = "SELECT * FROM Record WHERE upload = 0";
     	Cursor cursor = db.rawQuery(sql, null);
     	int count = cursor.getCount();
     	if (count == 0){
@@ -29,11 +30,11 @@ public class AudioDB {
     	}
     	
     	AudioInfo[] info = new AudioInfo[count];
-    	int y_idx = cursor.getColumnIndex("_YEAR");
-    	int m_idx = cursor.getColumnIndex("_MONTH");
-    	int d_idx = cursor.getColumnIndex("_DATE");
-    	int f_idx = cursor.getColumnIndex("_FILENAME");
-    	int t_idx = cursor.getColumnIndex("_TS");
+    	int y_idx = cursor.getColumnIndex("year");
+    	int m_idx = cursor.getColumnIndex("month");
+    	int d_idx = cursor.getColumnIndex("day");
+    	int f_idx = cursor.getColumnIndex("filename");
+    	int t_idx = cursor.getColumnIndex("ts");
     	for (int i=0;i<count;++i){
     		cursor.moveToPosition(i);
     		int y = cursor.getInt(y_idx);
@@ -54,11 +55,11 @@ public class AudioDB {
     		return;
     	db = dbHelper.getWritableDatabase();
     	
-    	String sql = "UPDATE RecDB SET _UPLOAD = 1 WHERE " +
-    			"_YEAR= " +ai.year+
-    			" AND _MONTH= " +ai.month+
-    			" AND _DATE= " + ai.date+
-    			" AND _FILENAME=" + "'"+ai.filename+"'";
+    	String sql = "update Record SET upload = 1 WHERE " +
+    			"year= " +ai.year+
+    			" AND month= " +ai.month+
+    			" AND day= " + ai.date+
+    			" AND filename=" + "'"+ai.filename+"'";
     	
     	db.execSQL(sql);
     	db.close();
@@ -69,26 +70,26 @@ public class AudioDB {
     		return;
     	db = dbHelper.getWritableDatabase();
     	
-    	String sql = "SELECT * FROM RecDB WHERE " +
-    			"_YEAR= " +dv.year+
-    			" AND _MONTH= " +dv.month+
-    			" AND _DATE= " + dv.date+
-    			" AND _FILENAME=" + "'"+dv.toFileString()+"'";
+    	String sql = "SELECT * FROM Record WHERE " +
+    			"yeaer= " +dv.year+
+    			" AND month= " +dv.month+
+    			" AND day= " + dv.date+
+    			" AND filename=" + "'"+dv.toFileString()+"'";
     	Cursor cursor = db.rawQuery(sql, null);
     	long ts = Calendar.getInstance().getTimeInMillis();
     	if (cursor.getCount() > 0){
-    		sql = "UPDATE RecDB SET _UPLOAD = 0, _TS = "+ts+"WHERE " +
-    			"_YEAR= " +dv.year+
-    			" AND _MONTH= " +dv.month+
-    			" AND _DATE= " + dv.date+
-    			" AND _FILENAME=" + "'"+dv.toFileString()+"'";
+    		sql = "UPDATE Record SET upload = 0, ts = "+ts+"WHERE " +
+    			"year= " +dv.year+
+    			" AND month= " +dv.month+
+    			" AND day= " + dv.date+
+    			" AND filename=" + "'"+dv.toFileString()+"'";
     		cursor.close();
     		db.close();
     		return;
     	}
     	
     	
-    	sql = "INSERT INTO RecDB (_YEAR,_MONTH,_DATE,_FILENAME,_TS) VALUES (" +
+    	sql = "INSERT INTO Record (year,month,day,filename,ts) VALUES (" +
     					dv.year+", " +
     					dv.month+	"," +
     					dv.date+"," +
@@ -102,11 +103,11 @@ public class AudioDB {
     	if (dv == null)
     		return false;
     	db = dbHelper.getReadableDatabase();
-    	String sql = "SELECT * FROM RecDB WHERE " +
-    			"_YEAR= " +dv.year+
-    			" AND _MONTH= " +dv.month+
-    			" AND _DATE= " + dv.date+
-    			" AND _FILENAME=" + "'"+dv.toFileString()+"'";
+    	String sql = "SELECT * FROM Record WHERE " +
+    			"year= " +dv.year+
+    			" AND month= " +dv.month+
+    			" AND day= " + dv.date+
+    			" AND filename=" + "'"+dv.toFileString()+"'";
     	Cursor cursor = db.rawQuery(sql, null);
     	boolean result = false;
     	if (cursor.getCount()>0)

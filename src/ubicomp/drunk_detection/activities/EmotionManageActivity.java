@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -66,7 +67,7 @@ public class EmotionManageActivity extends Activity {
 	
 	QuestionDB db;
 	
-	
+	private int state = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +109,11 @@ public class EmotionManageActivity extends Activity {
 		height =  screen.x * 202/1080;
 		icon_size = screen.x * 140/1080;
 		
+		setQuestionEmotion();
+	}
+	
+	private void setQuestionEmotion(){
+		mainLayout.removeAllViews();
 		View tv = createTextView("您現在的情緒是：");
 		mainLayout.addView(tv);
 		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
@@ -121,6 +127,62 @@ public class EmotionManageActivity extends Activity {
 		}
 	}
 	
+	private void setQuestionType(){
+		mainLayout.removeAllViews();
+		View tv = createTextView("這個感覺跟什麼有關：");
+		mainLayout.addView(tv);
+		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+		tvparam.height = height;
+		
+		for (int i=0;i<related_texts.length;++i){
+			View vv = createIconView(related_texts[i],RELATED_DRAWABLE_ID[i],new RelatedOnClickListener(i+1));
+			mainLayout.addView(vv);
+			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) vv.getLayoutParams();
+			param.height = height;
+		}
+	}
+	
+	private void setQuestionEdit(){
+		mainLayout.removeAllViews();
+		String str = "請寫下正在影響你的"+related_texts[r_type-1];
+
+		View tv = createTextView(str);
+		mainLayout.addView(tv);
+		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+		tvparam.height = height;
+		
+		View edv = createEditView(r_type);
+		mainLayout.addView(edv);
+		LinearLayout.LayoutParams edvParam =(LinearLayout.LayoutParams) edv.getLayoutParams();
+		edvParam.height = height;
+		
+		View ev = createTextView("這是影響您停酒的因素\n但您仍可堅持停酒");
+		mainLayout.addView(ev);
+		LinearLayout.LayoutParams evParam =(LinearLayout.LayoutParams) ev.getLayoutParams();
+		evParam.height = height;
+		
+		View vv=createIconView("確定",R.drawable.questionnaire_item_ok,new EditedOnClickListener());
+		mainLayout.addView(vv);
+		LinearLayout.LayoutParams vvParam =(LinearLayout.LayoutParams) vv.getLayoutParams();
+		vvParam.height = height;
+	}
+	
+	private void setQuestionEnd(){
+		mainLayout.removeAllViews();
+		if (r_texts!=null)
+			reason = r_texts.getText().toString();
+		
+		String str = "請繼續加油!";
+		View tv = createTextView(str);
+		mainLayout.addView(tv);
+		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+		tvparam.height = height;
+		View vv = createIconView("結束",R.drawable.questionnaire_item_ok,new EndOnClickListener());
+		mainLayout.addView(vv);
+		LinearLayout.LayoutParams vvparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
+		vvparam.height = height;
+	}
+	
 	private View createTextView(String textStr){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
@@ -129,6 +191,9 @@ public class EmotionManageActivity extends Activity {
 		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF777777);
 		text.setText(textStr);
+		
+		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
+		tParam.leftMargin = textSize;
 		
 		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
 		
@@ -218,6 +283,9 @@ public class EmotionManageActivity extends Activity {
 		text.setTextColor(0xFF5c5c5c);
 		text.setText(textStr);
 		
+		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
+		tParam.leftMargin = textSize;
+		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
 		icon.setImageResource(DrawableId);
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
@@ -241,36 +309,21 @@ public class EmotionManageActivity extends Activity {
 	
 	private class EmotionOnClickListener implements View.OnClickListener{
 		
-		int r;
-		EmotionOnClickListener(int r){
-			this.r = r;
+		int _emotion;
+		EmotionOnClickListener(int _emotion){
+			this._emotion = _emotion;
 		}
-		
-		
 		@Override
 		public void onClick(View v) {
-			mainLayout.removeAllViews();
-			
-			View tv = createTextView("這個感覺跟什麼有關：");
-			mainLayout.addView(tv);
-			LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
-			tvparam.height = height;
-			
-			emotion = r;
-			
-			for (int i=0;i<related_texts.length;++i){
-				View vv = createIconView(related_texts[i],RELATED_DRAWABLE_ID[i],new RelatedOnClickListener(i+1));
-				mainLayout.addView(vv);
-				LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) vv.getLayoutParams();
-				param.height = height;
-			}
+			++state;
+			emotion = _emotion;
+			setQuestionType();
 		}
 	}
 	
 	private class RelatedOnClickListener implements View.OnClickListener{
 		
 		private int type;
-		
 				
 		public RelatedOnClickListener(int type){
 			this.type = type;
@@ -278,53 +331,17 @@ public class EmotionManageActivity extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			mainLayout.removeAllViews();
-			
+			++state;
 			r_type = type;
-			
-			String str = "請寫下正在影響你的"+related_texts[type-1];
-
-			View tv = createTextView(str);
-			mainLayout.addView(tv);
-			LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
-			tvparam.height = height;
-			
-			View edv = createEditView(type);
-			mainLayout.addView(edv);
-			LinearLayout.LayoutParams edvParam =(LinearLayout.LayoutParams) edv.getLayoutParams();
-			edvParam.height = height;
-			
-			View ev = createTextView("這是影響您停酒的因素\n但您仍可堅持停酒");
-			mainLayout.addView(ev);
-			LinearLayout.LayoutParams evParam =(LinearLayout.LayoutParams) ev.getLayoutParams();
-			evParam.height = height;
-			
-			View vv=createIconView("確定",R.drawable.questionnaire_item_ok,new EditedOnClickListener());
-			mainLayout.addView(vv);
-			LinearLayout.LayoutParams vvParam =(LinearLayout.LayoutParams) vv.getLayoutParams();
-			vvParam.height = height;
+			setQuestionEdit();
 		}
 	}
 	
 	private class EditedOnClickListener implements View.OnClickListener{
-		
-		
 		@Override
 		public void onClick(View v) {
-			mainLayout.removeAllViews();
-
-			if (r_texts!=null)
-				reason = r_texts.getText().toString();
-			
-			String str = "請繼續加油!";
-			View tv = createTextView(str);
-			mainLayout.addView(tv);
-			LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
-			tvparam.height = height;
-			View vv = createIconView("結束",R.drawable.questionnaire_item_ok,new EndOnClickListener());
-			mainLayout.addView(vv);
-			LinearLayout.LayoutParams vvparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
-			vvparam.height = height;
+			++state;
+			setQuestionEnd();
 		}
 	}
 	
@@ -351,4 +368,26 @@ public class EmotionManageActivity extends Activity {
 		}
 	}
 	
+	
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		if (keyCode == KeyEvent.KEYCODE_BACK){
+			if (state == 0)
+				return super.onKeyDown(keyCode, event);
+			else{
+				--state;
+				if (state == 0)
+					setQuestionEmotion();
+				else if (state == 1)
+					setQuestionType();
+				else if (state == 2)
+					setQuestionEdit();
+				else if (state == 3)
+					setQuestionEnd();
+			}
+		}
+		
+		return false;
+	}
 }

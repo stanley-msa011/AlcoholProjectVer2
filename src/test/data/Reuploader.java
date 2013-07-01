@@ -22,8 +22,10 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
-import questionnaire.data.EmotionDataUploader;
 
+
+import data.history.BracDetectionState;
+import data.questionnaire.EmotionDataUploader;
 import database.HistoryDB;
 
 import ubicomp.drunk_detection.activities.R;
@@ -65,7 +67,7 @@ public class Reuploader {
 		public static final int Nothing = 0; 
 		public static final int ERROR = -1;
 		public static final int SUCCESS = 1;
-		private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload.php";
+		private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload_2.php";
 		private String devId;
 		
 		
@@ -84,13 +86,13 @@ public class Reuploader {
 		        	mainStorageDir = new File(context.getFilesDir(),"drunk_detection");
 			
 			
-			long ts[] = db.getAllNotUploadedTS();
-			if (ts == null){
+			BracDetectionState state[] = db.getAllNotUploadedDetection();
+			if (state == null){
 				Log.d("reuploader","null");
 				return null;
 			}
-			for (int i=0;i<ts.length;++i){
-				String _ts = String.valueOf(ts[i]);
+			for (int i=0;i<state.length;++i){
+				String _ts =String.valueOf(state[i].timestamp/1000L);
 				File[]  imageFiles;
 				File textFile, geoFile,stateFile;
 				imageFiles = new File[3];
@@ -180,7 +182,7 @@ public class Reuploader {
 				httpPost.setEntity(mpEntity);
 				int result = uploader(httpClient, httpPost,ts,context);
 				if (result == 1){
-					db.removeNotUploadedTimeStamp(Long.valueOf(ts));
+					db.updateDetectionUploaded(Long.valueOf(ts));
 				}
 				
 			} catch (Exception e) {

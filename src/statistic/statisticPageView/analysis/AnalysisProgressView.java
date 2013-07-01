@@ -20,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import database.HistoryDB;
 
 public class AnalysisProgressView extends StatisticPageView {
 
@@ -28,7 +27,6 @@ public class AnalysisProgressView extends StatisticPageView {
 	private ImageView title_bg;
 	private Bitmap titleBmp;
 	private TextView help;
-	private HistoryDB db;
 	//private RelativeLayout contentLayout;
 	private Calendar fromCal;
 	
@@ -40,12 +38,9 @@ public class AnalysisProgressView extends StatisticPageView {
 	
 	public AnalysisProgressView(Context context,StatisticFragment statisticFragment){
 		super(context, R.layout.analysis_progress_view,statisticFragment);
-		db = new HistoryDB(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		
-		fromCal = db.getFirstTestDate();
-		if (fromCal == null)
-			fromCal = Calendar.getInstance();
+		fromCal = Calendar.getInstance();
 		int year = sp.getInt("sYear", fromCal.get(Calendar.YEAR));
 		int month = sp.getInt("sMonth", fromCal.get(Calendar.MONTH));
 		int date = sp.getInt("sDate", fromCal.get(Calendar.DATE));

@@ -1,4 +1,5 @@
-package questionnaire.data;
+package data.questionnaire;
+
 
 import history.data.AudioUploader;
 
@@ -11,17 +12,20 @@ import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
 import ubicomp.drunk_detection.activities.R;
 
 import database.QuestionDB;
+import database.WeekNum;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -47,16 +51,17 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 		}
 	}
 	
-	
+		private ResponseHandler< String> responseHandler;
 		private QuestionDB db;
 		private Context context;
-		private static final String SERVER_URL_EMOTION = "https://140.112.30.165/develop/drunk_detection/emotionDIY_upload.php";
-		private static final String SERVER_URL_EMOTION_MANAGE = "https://140.112.30.165/develop/drunk_detection/emotion_manage_upload.php";
-		private static final String SERVER_URL_QUESTIONNAIRE = "https://140.112.30.165/develop/drunk_detection/questionnaire_upload.php";
+		private static final String SERVER_URL_EMOTION = "https://140.112.30.165/develop/drunk_detection/emotionDIY_upload_2.php";
+		private static final String SERVER_URL_EMOTION_MANAGE = "https://140.112.30.165/develop/drunk_detection/emotion_manage_upload_2.php";
+		private static final String SERVER_URL_QUESTIONNAIRE = "https://140.112.30.165/develop/drunk_detection/questionnaire_upload_2.php";
 		
 		public EmotionDataUploader (Context context){
 			db = new QuestionDB(context);
 			this.context = context;
+			responseHandler=new BasicResponseHandler();
 		}
 		
 		@Override
@@ -66,6 +71,7 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			EmotionData e_data[] = db.getNotUploadedEmotion();
 			if (e_data != null){
 				for (int i=0;i<e_data.length;++i){
+					Log.d("Q_UPLOADER", "Emotion: "+e_data[i].toString());
 			       	int result = connectingToServer(e_data[i]);
 			        if (result == -1){
 			        	Log.d("EMOTION_UPLOADER","fail");
@@ -77,6 +83,7 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			EmotionManageData[] em_data = db.getNotUploadedEmotionManage();
 			if (em_data != null){
 				for (int i=0;i<em_data.length;++i){
+					Log.d("Q_UPLOADER",  "EmotionManage: "+em_data[i].toString());
 			       	int result = connectingToServer(em_data[i]);
 			        if (result == -1){
 			        	Log.d("EMOTION_UPLOADER","fail2");
@@ -84,15 +91,16 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			        }
 				}
 			}
-			
 			QuestionnaireData[] q_data = db.getNotUploadedQuestionnaire();
 			if (q_data != null){
 				for (int i=0;i<q_data.length;++i){
+					Log.d("Q_UPLOADER",  "Questionnaire: "+q_data[i].toString());
 			       	int result = connectingToServer(q_data[i]);
 			        if (result == -1){
 			        	Log.d("EMOTION_UPLOADER","fail3");
 			        	return null;
 			        }
+			        
 				}
 			}
 			
@@ -130,8 +138,14 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				mpEntity.addPart("emotionDIYData[]", new StringBody(uid));
 				mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.ts)));
 				mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.selection)));
+				int week = WeekNum.getWeek(context, e_data.ts);
+				mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(week)));
 				if (e_data.call !=null)
 					mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.call)));
+				for (int i=0;i<e_data.acc.length;++i){
+					mpEntity.addPart("emotionDIYAcc[]", new StringBody(String.valueOf(e_data.acc[i])));
+					mpEntity.addPart("emotionDIYUsed[]", new StringBody(String.valueOf(e_data.used[i])));
+				}
 				
 				httpPost.setEntity(mpEntity);
 				int result = uploader(httpClient, httpPost,context);
@@ -174,6 +188,13 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				mpEntity.addPart("emotionManageData[]", new StringBody(String.valueOf(em_data.emotion)));
 				mpEntity.addPart("emotionManageData[]", new StringBody(String.valueOf(em_data.type)));
 				mpEntity.addPart("emotionManageData[]", new StringBody(em_data.reason));
+				int week = WeekNum.getWeek(context, em_data.ts);
+				mpEntity.addPart("emotionManageData[]", new StringBody(String.valueOf(week)));
+				for (int i=0;i<em_data.acc.length;++i){
+					mpEntity.addPart("emotionManageAcc[]", new StringBody(String.valueOf(em_data.acc[i])));
+					mpEntity.addPart("emotionManageUsed[]", new StringBody(String.valueOf(em_data.used[i])));
+				}
+				
 				
 				httpPost.setEntity(mpEntity);
 				int result = uploader(httpClient, httpPost,context);
@@ -212,13 +233,21 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
 				mpEntity.addPart("questionnaireData[]", new StringBody(uid));
-				mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.ts)));
+				mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.ts/1000L)));
 				mpEntity.addPart("questionnaireData[]", new StringBody(q_data.seq));
+				int week = WeekNum.getWeek(context, q_data.ts);
+				mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(week)));
+				mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.type)));
+				for (int i=0;i<q_data.acc.length;++i){
+					mpEntity.addPart("questionnaireAcc[]", new StringBody(String.valueOf(q_data.acc[i])));
+					mpEntity.addPart("questionnaireUsed[]", new StringBody(String.valueOf(q_data.used[i])));
+				}
 				
 				httpPost.setEntity(mpEntity);
 				int result = uploader(httpClient, httpPost,context);
 				if (result == 1){
 					db.setQuestionnaireUploaded(q_data.ts);
+					Log.d("EMOTION_UPLOADER","success3");
 				}else{
 					Log.d("EMOTION_UPLOADER","fail3");
 				}
@@ -236,6 +265,8 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			try {
 				httpResponse = httpClient.execute(httpPost);
 				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
+				String responseString = responseHandler.handleResponse(httpResponse);
+				Log.d("EMOTION_UPLOADER", responseString);
 				if (httpStatusCode == HttpStatus.SC_OK)
 					result = 1;
 				else
