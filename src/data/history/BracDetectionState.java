@@ -7,7 +7,7 @@ public class BracDetectionState extends HistoryState {
 	public int emotion, desire;
 	
 	static final public int MAX_EMOTION = 5, MAX_DESIRE = 10;
-	static final public int MIN_EMOTION = 1, MIN_DESIRE = 1;
+	static final public int MIN_EMOTION = -1, MIN_DESIRE = -1;
 	
 	public BracDetectionState(int week, long timestamp, float brac, int emotion, int desire) {
 		super(week);

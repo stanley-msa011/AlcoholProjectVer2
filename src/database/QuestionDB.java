@@ -77,6 +77,30 @@ public class QuestionDB {
 		db.close();
 	}
 	
+	public QuestionnaireData getLatestQuestionnaire(){
+		db =dbHelper.getReadableDatabase();
+		String sql;
+		Cursor cursor;
+		sql = "SELECT * FROM Questionnaire ORDER BY id DESC LIMIT 1";
+		cursor = db.rawQuery(sql, null);
+		int count = cursor.getCount();
+		if (count == 0){
+			cursor.close();
+			db.close();
+			return new QuestionnaireData(0,0,null,null,null);
+		}
+		cursor.moveToFirst();
+		int[] acc = new int[12];
+		int[] used = new int[12];
+		for (int j=0; j<12;++j){
+			acc[j] = cursor.getInt(j+5);
+			used[j] = cursor.getInt(j+17);
+		}
+		cursor.close();
+		db.close();
+		return new QuestionnaireData(0,0,null,acc,used);
+	}
+	
 	public QuestionnaireData[] getNotUploadedQuestionnaire(){
 		QuestionnaireData[] data = null;
 		db =dbHelper.getReadableDatabase();
@@ -223,6 +247,31 @@ public class QuestionDB {
 		db.close();
 	}
 	
+	public EmotionData getLatestEmotion(){
+		db =dbHelper.getReadableDatabase();
+		String sql;
+		Cursor cursor;
+		sql = "SELECT * FROM Emotion ORDER BY id DESC LIMIT 1";
+		cursor = db.rawQuery(sql, null);
+		int count = cursor.getCount();
+		if (count == 0){
+			cursor.close();
+			db.close();
+			return new EmotionData(0,0,null,null,null);
+		}
+		cursor.moveToFirst();
+		int[] acc = new int[3];
+		int[] used = new int[3];
+		for (int j=0; j<3;++j){
+			acc[j] = cursor.getInt(j+5);
+			used[j] = cursor.getInt(j+8);
+		}
+		cursor.close();
+		db.close();
+		return new EmotionData(0,0,null,acc,used);
+	}
+	
+	
 	public EmotionData[] getNotUploadedEmotion(){
 		EmotionData[] data = null;
 		db =dbHelper.getReadableDatabase();
@@ -273,6 +322,31 @@ public class QuestionDB {
 		db.execSQL(sql);
 		db.close();
 	}
+	
+	public EmotionManageData getLatestEmotionManage(){
+		db =dbHelper.getReadableDatabase();
+		String sql;
+		Cursor cursor;
+		sql = "SELECT * FROM EmotionManage ORDER BY id DESC LIMIT 1";
+		cursor = db.rawQuery(sql, null);
+		int count = cursor.getCount();
+		if (count == 0){
+			cursor.close();
+			db.close();
+			return new EmotionManageData(0,0,0,null,null,null);
+		}
+		cursor.moveToFirst();
+		int[] acc = new int[3];
+		int[] used = new int[3];
+		for (int j=0; j<3;++j){
+			acc[j] = cursor.getInt(j+5);
+			used[j] = cursor.getInt(j+8);
+		}
+		cursor.close();
+		db.close();
+		return new EmotionManageData(0,0,0,null,acc,used);
+	}
+	
 	
 	public EmotionManageData[] getNotUploadedEmotionManage(){
 		EmotionManageData[] data = null;

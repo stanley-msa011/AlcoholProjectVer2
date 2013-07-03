@@ -11,6 +11,7 @@ import data.history.BarInfo;
 import data.history.DateBracDetectionState;
 import database.AudioDB;
 import database.HistoryDB;
+import database.QuestionDB;
 import database.WeekNum;
 import history.pageEffect.PageAnimationTaskVertical;
 import history.pageEffect.PageAnimationTaskVertical2;
@@ -61,10 +62,13 @@ public class HistoryFragment extends Fragment {
 	private View  view;
 	
 	private ImageView prevImage;
+	private RelativeLayout selfCounterLayout;
+	private TextView selfCounterMessage;
 	private RelativeLayout pageLayout;
 	private RelativeLayout chartLayout;
 	private RelativeLayout chartAreaLayout;
 	private HistoryDB hdb;
+	private QuestionDB qdb;
 	private AudioDB adb;
 	private PageWidgetVertical pageWidget;
 	private PageAnimationTaskVertical pageAnimationTask;
@@ -157,12 +161,15 @@ public class HistoryFragment extends Fragment {
 	
 	private static final int MAX_PAGE_WEEK = 11;
 	
+	public static final int COUPON_COUNTER = 10;
+	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	this.historyFragment = this;
     	view = inflater.inflate(R.layout.history_fragment2, container,false);
     	hdb = new HistoryDB(this.getActivity());
     	adb = new AudioDB(this.getActivity());
+    	qdb = new QuestionDB(this.getActivity());
     	from_cal = Calendar.getInstance();
     	SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 	    int mYear = sp.getInt("sYear", from_cal.get(Calendar.YEAR));
@@ -301,6 +308,7 @@ public class HistoryFragment extends Fragment {
     
     
     private void initView(){
+    	selfCounterLayout = (RelativeLayout) view.findViewById(R.id.history_self_help_layout);
     	pageLayout = (RelativeLayout) view.findViewById(R.id.history_book_layout);
     	chartLayout = (RelativeLayout) view.findViewById(R.id.history_content_layout);
     	scrollView = (HorizontalScrollView) view.findViewById(R.id.history_scroll_view);
@@ -345,6 +353,10 @@ public class HistoryFragment extends Fragment {
 		format.setMinimumFractionDigits(1);
 		format.setMaximumFractionDigits(1);
     	
+		selfCounterMessage = (TextView) view.findViewById(R.id.history_self_help);
+		selfCounterMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*64/1080);
+		selfCounterMessage.setTypeface(stageTypeface);
+		
     	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     	
     	Bitmap tmp;
@@ -354,7 +366,6 @@ public class HistoryFragment extends Fragment {
 		
     	AccumulatedHistoryState curAH = page_states[page_week];
     	
-		//tmp = BitmapFactory.decodeResource(historyFragment.getResources(), HistoryStorytelling.getPage(page_week),opt);\
 		tmp = BitmapFactory.decodeResource(r, HistoryStorytelling.getPage(curAH.getScore(), curAH.week), opt);
 		cur_bg_bmp = Bitmap.createScaledBitmap(tmp, width, height, true);
 		tmp.recycle();
@@ -396,9 +407,12 @@ public class HistoryFragment extends Fragment {
 		chartBg4 = new BitmapDrawable(historyFragment.getResources(),chartBg4Bmp);
 		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		
+		LinearLayout.LayoutParams sclParam = (LinearLayout.LayoutParams) selfCounterLayout.getLayoutParams();
+		sclParam.height = bg_x * 110/1080;
+		
     	LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
     	sParam.leftMargin = bg_x*30/1080;
-    	sParam.topMargin = bg_x * 190/1080;
+    	sParam.topMargin = bg_x * 90/1080;
     	
     	LayoutParams prParam = (LayoutParams) progressText.getLayoutParams();
     	prParam.leftMargin = bg_x*30/1080;
@@ -411,8 +425,8 @@ public class HistoryFragment extends Fragment {
     	qParam.leftMargin = bg_x*30/1080;
     	qParam.topMargin = bg_x * 135/1080;
     	
-    	LayoutParams plParam = (LayoutParams) pageLayout.getLayoutParams();
-    	plParam.topMargin = screen.x * 110/1080;
+    	//LayoutParams plParam = (LayoutParams) pageLayout.getLayoutParams();
+    	//plParam.topMargin = screen.x * 110/1080;
     	
     	pageLayout.addView(pageWidget);
     	LayoutParams param = (LayoutParams) pageWidget.getLayoutParams();
@@ -434,6 +448,19 @@ public class HistoryFragment extends Fragment {
     		prevImage.setAnimation(prevAnimation);
     		aaEndHandler = new AlphaAnimationEndHandler(); 
     	}
+    	
+    	int total_counter = 
+    			hdb.getLatestAccumulatedHistoryState().getSelfHelpCounter()
+    			- hdb.getLatestUsedState().getSelfHelpCounter() 
+    			+ qdb.getLatestEmotion().getSelfHelpCounter() 
+    			+ qdb.getLatestEmotionManage().getSelfHelpCounter() 
+    			+ qdb.getLatestQuestionnaire().getSelfHelpCounter();
+    	int coupon = total_counter/COUPON_COUNTER;
+    	int counter = total_counter - coupon*COUPON_COUNTER;
+    	
+    	String sc_message = "已累積 "+counter+" 枚代幣及 "+coupon+" 張禮卷";
+    	selfCounterMessage.setText(sc_message);
+    	
     	
     	setStorytellingTexts();
     	
@@ -498,7 +525,7 @@ public class HistoryFragment extends Fragment {
     private void setStorytellingTexts(){
     	AccumulatedHistoryState curAH = page_states[page_week];
     	stageNum.setText((page_week+1)+"/"+(HistoryStorytelling.MAX_PAGE+1));
-    	float progress = curAH.getScore()/curAH.MAX_SCORE*100;
+    	float progress = (float)curAH.getScore()*100F/(float)curAH.MAX_SCORE;
     	String progress_str = format.format(progress)+" %";
     	progressText.setText(progress_str);
 
@@ -1163,6 +1190,8 @@ public class HistoryFragment extends Fragment {
 				int e_top = _bottom - (int)e_height;
 				int d_top = _bottom - (int)d_height;
 				int b_top = _bottom - (int)b_height;
+				if (!bar.hasData)
+					e_top = d_top = b_top = _bottom;
 				
 				
 				//Draw X axis Label
@@ -1177,7 +1206,7 @@ public class HistoryFragment extends Fragment {
 				Point d_center = new Point(left+small_radius,d_top - bar_gap - small_radius);
 				Point b_center = new Point(left+small_radius,b_top - bar_gap - small_radius);
 				
-				if (bar.hasData){
+				//if (bar.hasData){
 					if (prev_e_center!= null && prev_d_center!=null && prev_b_center!=null){
 						
 						Path path_e = new Path();
@@ -1216,7 +1245,7 @@ public class HistoryFragment extends Fragment {
 					prev_e_center = e_center;
 					prev_d_center = d_center;
 					prev_b_center = b_center;
-				}
+				//}
 				
 				// draw highlights
 				if (bar.week == page_week)

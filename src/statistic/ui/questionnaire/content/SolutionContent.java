@@ -6,10 +6,10 @@ import statistic.ui.questionnaire.listener.EndOnClickListener;
 public class SolutionContent extends QuestionnaireContent {
 
 	private static final String[] TEXT = {
-		"離開有酒的場所",
-		"請少喝酒",
-		"請專心健走30分鐘",
-		"請數息15次",
+		"立即離開有酒的地方",
+		"少喝酒才能維持戒酒",
+		"請健走10~30分鐘",
+		"請專注於呼吸15次",
 		"請休息或就診"
 	};
 	
@@ -22,7 +22,7 @@ public class SolutionContent extends QuestionnaireContent {
 	@Override
 	protected void setContent() {
 		seq.add(","+aid);
-		setHelp("請依照以下指示:");
+		setHelp("請依照以下指示：");
 		setSelectItem(TEXT[aid-1],new EndOnClickListener(msgBox,-1));
 
 	}

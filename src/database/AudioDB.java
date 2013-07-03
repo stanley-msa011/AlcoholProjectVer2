@@ -71,7 +71,7 @@ public class AudioDB {
     	db = dbHelper.getWritableDatabase();
     	
     	String sql = "SELECT * FROM Record WHERE " +
-    			"yeaer= " +dv.year+
+    			"year= " +dv.year+
     			" AND month= " +dv.month+
     			" AND day= " + dv.date+
     			" AND filename=" + "'"+dv.toFileString()+"'";

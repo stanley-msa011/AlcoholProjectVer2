@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -75,6 +76,8 @@ public class UIMsgBox {
 	private TextView send,notSend;
 	
 	private RelativeLayout.LayoutParams eP, dP;
+	
+	private boolean done;
 	
 	public UIMsgBox(TestFragment testFragment,RelativeLayout mainLayout){
 		Log.d("UIMSG","NEW");
@@ -257,7 +260,7 @@ public class UIMsgBox {
 		tmp.recycle();
 		
 		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bar_button);
-		seekBarThumbBmp = Bitmap.createScaledBitmap(tmp, screen.x * 79 / 1080,  screen.x * 78/1080, true);
+		seekBarThumbBmp = Bitmap.createScaledBitmap(tmp, screen.x * 100 / 1080,  screen.x * 100/1080, true);
 		tmp.recycle();
 		
 		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bar_value);
@@ -266,11 +269,11 @@ public class UIMsgBox {
 		
 		RelativeLayout.LayoutParams emoParam = (RelativeLayout.LayoutParams)emotionSeekBar.getLayoutParams();
 		emoParam.width = screen.x * 584 / 1080;
-		emoParam.height = screen.x * 79 / 1080;
+		emoParam.height = screen.x * 100 / 1080;
 		
 		RelativeLayout.LayoutParams desParam = (RelativeLayout.LayoutParams)desireSeekBar.getLayoutParams();
 		desParam.width = screen.x * 584 / 1080;
-		desParam.height = screen.x * 79 / 1080;
+		desParam.height = screen.x * 100 / 1080;
 		
 		LinearLayout.LayoutParams eParam = (LinearLayout.LayoutParams) emotionShowText.getLayoutParams();
 		eParam.width = screen.x * 203/1080;
@@ -291,15 +294,11 @@ public class UIMsgBox {
 		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_switch_button);
 		switchThumbBmp = Bitmap.createScaledBitmap(tmp, screen.x * 117/1080, screen.x * 75/1080, true);
 		tmp.recycle();
-		thumb_size = screen.x * 79 / 1080;
 		
 		LinearLayout.LayoutParams gParam = (LinearLayout.LayoutParams) gpsSwitch.getLayoutParams();
-		//gParam.width = screen.x * 300/1080;
 		gParam.height = screen.x * 200/1080;
 		
 	}
-	
-	int thumb_size;
 	
 	public  void settingPostTask(){
 		
@@ -315,6 +314,10 @@ public class UIMsgBox {
 		
 		gpsSwitch.setTrackDrawable(new BitmapDrawable(r,switchBmp));
 		gpsSwitch.setThumbDrawable(new BitmapDrawable(r,switchThumbBmp));
+		gpsSwitch.setOnClickListener(
+				new View.OnClickListener(){
+					@Override
+					public void onClick(View v) {enableSend(true);}});
 	}
 	
 	public void clear(){
@@ -365,8 +368,16 @@ public class UIMsgBox {
 		}
 	}
 	
+	private void enableSend(boolean enable){
+		if (enable)
+			send.setTextColor(0xFFf39800);
+		else
+			send.setTextColor(0x55f39800);
+		done = enable;
+	}
+	
 	public void generateGPSCheckBox(){
-		
+		enableSend(false);
 		help.setText("");
 		questionLayout.setVisibility(View.VISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
@@ -378,6 +389,12 @@ public class UIMsgBox {
 
 		@Override
 		public void onClick(View v) {
+			if (!done){
+				Toast.makeText(mainLayout.getContext(), "確定已完成？", Toast.LENGTH_LONG).show();
+				enableSend(true);
+				return;
+			}
+			
 			boxLayout.setVisibility(View.INVISIBLE);
 			boolean enableGPS = gpsSwitch.isChecked();
 			int desire = desireSeekBar.getProgress()+1;
@@ -424,6 +441,7 @@ public class UIMsgBox {
 			emotionShowText.setText(emotionStr[progress]);
 			eNum.setText(String.valueOf(progress+1));
 			eP.leftMargin = emotionSeekBar.getWidth() *  progress/5;
+			enableSend(true);
 		}
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -439,6 +457,7 @@ public class UIMsgBox {
 			desireShowText.setText(desireStr[progress]);
 			dNum.setText(String.valueOf(progress+1));
 			dP.leftMargin = desireSeekBar.getWidth() * progress/10;
+			enableSend(true);
 		}
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {}

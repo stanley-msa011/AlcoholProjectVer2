@@ -23,4 +23,9 @@ public class UsedDetection {
 		}
 		return sb.toString();
 	}
+	
+	public int getSelfHelpCounter(){
+		int score = test[0] + test[1] + test[2] +pass[0] + pass[1] + pass[2]; 
+		return score;
+	}
 }

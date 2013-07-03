@@ -20,7 +20,7 @@ public class Type3Content extends QuestionnaireContent {
 		setHelp("您似乎喝了不少酒，\n建議你可以：");
 		setSelectItem("回家休息", new EndOnClickListener(msgBox,3));
 		setSelectItem("跟親友聊天", new FamilyOnClickListener(msgBox));
-		setSelectItem("自行處理",new SelfOnClickListener(msgBox));
+		setSelectItem("自行處理與面對",new SelfOnClickListener(msgBox));
 		
 	}
 

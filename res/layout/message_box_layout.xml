@@ -18,7 +18,7 @@
             android:id="@+id/msg_title"
         	android:layout_width="match_parent"
     		android:layout_height="wrap_content"
-    		android:text="問卷調查" 
+    		android:text="自我了解" 
     		android:textColor="#FF898989"
             />
         
@@ -175,7 +175,6 @@
     	        android:layout_height="wrap_content"
     	        android:gravity="center"
     	        android:text="寄送"
-    	        android:textColor="#FFf39800"
     	        android:layout_weight="1"
     	        />
 

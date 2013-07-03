@@ -90,8 +90,11 @@ public class BracDataHandler {
         int q_result = getQuestionResult(questionFile);
         int emotion = q_result/100;
         int desire = q_result%100;
-        
-       
+        if (q_result == -1){
+        	emotion = -1;
+        	desire = -1;
+        }
+      
         AccumulatedHistoryState a_history = db.getLatestAccumulatedHistoryState();
         
         float brac = (float)avg_result;
@@ -104,7 +107,6 @@ public class BracDataHandler {
         
     
     	if (detection.year != prevDetection.year || detection.month != prevDetection.month || detection.day != prevDetection.day || detection.timeblock != prevDetection.timeblock){
-    		Log.d("BracDataHandler","UPDATE HISTORY");
     		if (avg_result >=0 && avg_result < THRESHOLD)
     				a_history.changeAcc(true, week, detection.timeblock);
     		else if (avg_result < 0)
@@ -119,7 +121,7 @@ public class BracDataHandler {
     	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor editor = sp.edit();
     	if (avg_result  < THRESHOLD){
-    		if (emotion <=3)
+    		if (emotion <=3 || desire >= 5)
     			editor.putInt("latest_result", 1);
     		else
     			editor.putInt("latest_result", 0);
@@ -196,6 +198,11 @@ public class BracDataHandler {
 				emotion = s.nextInt();
 			if(s.hasNextInt())
 				desire = s.nextInt();
+			
+			Log.d("Question parse",emotion+"/"+desire);
+			
+			if (emotion == -1 || desire == -1)
+				return -1;
 			
 			result = emotion * 100 + desire;
 			Log.d("Question parse",String.valueOf(result));

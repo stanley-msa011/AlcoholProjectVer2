@@ -45,7 +45,7 @@ public class TutorialActivity extends Activity {
 	private Typeface wordTypeface;
 	private Typeface wordTypefaceBold;
 	
-	private static final String[] STEP_STR = {"步驟 1","步驟 2","步驟 3"};
+	private static final String[] STEP_STR = {"1","2","3"};
 	private static final String[] HELP_STR = {"按下開關，使指示燈亮起","進入測試頁面按下開始按鈕","對準吹氣口持續吹氣五秒鐘"};
 	
 	private AlphaAnimation animation;
@@ -136,13 +136,6 @@ public class TutorialActivity extends Activity {
 		if (arrow != null)
 			arrow.setImageBitmap(null);
 		
-		if (layout!=null)
-			layout.setBackground(null);
-		
-		if (bgBmp!=null && !bgBmp.isRecycled()){
-			bgBmp.recycle();
-			bgBmp = null;
-		}
 		if (replayBmp!=null && !replayBmp.isRecycled()){
 			replayBmp.recycle();
 			replayBmp = null;
@@ -170,6 +163,15 @@ public class TutorialActivity extends Activity {
 					arrowBmps[i] = null;
 				}
 		}
+		
+		if (layout!=null)
+			layout.setBackground(null);
+		
+		if (bgBmp!=null && !bgBmp.isRecycled()){
+			bgBmp.recycle();
+			bgBmp = null;
+		}
+
 	}
 	
 	@SuppressLint("HandlerLeak")

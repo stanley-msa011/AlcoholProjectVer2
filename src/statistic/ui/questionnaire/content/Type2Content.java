@@ -40,7 +40,7 @@ public class Type2Content extends QuestionnaireContent {
     	seq.add("3");
 		msgBox.openBox();
 		setHelp("你似乎開始喝酒了，\n現在啟用一小時停酒提醒，\n同時建議你可以：");
-		setSelectItem("自行處理",new SelfOnClickListener(msgBox));
+		setSelectItem("自行處理與面對",new SelfOnClickListener(msgBox));
 		setSelectItem("跟親友聊天", new FamilyOnClickListener(msgBox));
 	}
 

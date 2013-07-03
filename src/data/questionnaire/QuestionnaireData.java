@@ -41,4 +41,11 @@ public class QuestionnaireData {
 		sb.append(')');
 		return sb.toString();
 	}
+	
+	public int getSelfHelpCounter(){
+		int score = 0;
+		for (int i=0;i<12;++i)
+			score += (acc[i] - used[i]);
+		return score;
+	}
 }

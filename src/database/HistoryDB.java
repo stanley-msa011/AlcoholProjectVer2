@@ -124,11 +124,11 @@ public class HistoryDB {
     public AccumulatedHistoryState getLatestAccumulatedHistoryState(){
     	db = dbHelper.getReadableDatabase();
     	Cursor cursor = db.rawQuery("SELECT " +
-    			" w_morning,w_noon,w_night," +
-    			" morning,noon,night," +
-    			" w_morning_pass,w_noon_pass,w_night_pass," +
-    			" morning_pass,noon_pass,night_pass" +
-    			" FROM AccDetection ORDER BY id DESC LIMIT 1",null);
+    			" a.w_morning,a.w_noon,a.w_night," +
+    			" a.morning,a.noon,a.night," +
+    			" a.w_morning_pass, a.w_noon_pass, a.w_night_pass," +
+    			" a.morning_pass,a.noon_pass, a.night_pass, d.week " +
+    			" FROM AccDetection AS a, Detection AS d WHERE a.detection_id = d.id ORDER BY a.id DESC LIMIT 1",null);
 
     	if (cursor.getCount()==0){
     		cursor.close();
@@ -137,7 +137,6 @@ public class HistoryDB {
     	}
     	
     	cursor.moveToFirst();
-    	
     	int[] accTest = new int[3];
     	int[] accPass = new int[3];
     	int[] w_accTest = new int[3];
@@ -150,9 +149,12 @@ public class HistoryDB {
     		accPass[i] = cursor.getInt(i+9);
     	}
     	
+    	int week = cursor.getInt(12);
+    	
     	cursor.close();
     	db.close();
-    	return new AccumulatedHistoryState(0,w_accTest,w_accPass,accTest,accPass);
+    	AccumulatedHistoryState a = new AccumulatedHistoryState(week,w_accTest,w_accPass,accTest,accPass);
+    	return a;
     }
     
     public AccumulatedHistoryState[] getAccumulatedHistoryStateByWeek(){
@@ -162,12 +164,14 @@ public class HistoryDB {
     	AccumulatedHistoryState[] historys;
     	historys = new AccumulatedHistoryState[curWeek + 1];
     	
-    	Cursor cursor = db.rawQuery("SELECT " +
-    			" MAX(a.w_morning),MAX(a.w_noon),MAX(a.w_night)," +
-    			" MAX(a.w_morning_pass),MAX(a.w_noon_pass),MAX(a.w_night_pass)," +
+    	String sql = "SELECT " +
+    			" a.w_morning,a.w_noon,a.w_night," +
+    			" a.w_morning_pass,a.w_noon_pass,a.w_night_pass," +
     			" d.week " +
     			" FROM AccDetection AS a, Detection AS d WHERE a.detection_id = d.id AND week <=" +curWeek+
-    			" GROUP BY d.week",null);
+    			" GROUP BY d.week";
+    	
+    	Cursor cursor = db.rawQuery(sql,null);
     	
     	int count = cursor.getCount();
     	
@@ -176,7 +180,6 @@ public class HistoryDB {
     	int[] w_accTest = new int[3];
     	int[] w_accPass = new int[3];
     	int week;
-    	
     	
     	for (int i=0;i<historys.length;++i){
     		while (cursor_pos < count){
@@ -191,6 +194,7 @@ public class HistoryDB {
         			w_accTest[j] = cursor.getInt(j);
         			w_accPass[j] = cursor.getInt(j+3);
         		}
+    			//Log.d("AccHistory",week+">>"+w_accTest[0]+"/"+w_accTest[1]+"/"+w_accTest[2]+"  "+w_accPass[0]+"/"+w_accPass[1]+"/"+w_accPass[2]);
     			historys[i] = new AccumulatedHistoryState(week,w_accTest,w_accPass,null,null);
     			break;
     		}
@@ -274,6 +278,7 @@ public class HistoryDB {
     			accPass[0]+","+accPass[1]+","+accPass[2]+","+
     			t_accPass[0]+","+t_accPass[1]+","+t_accPass[2]+
     			")";
+    	
     	db.execSQL(sql);
     	
     	db.close();
@@ -419,6 +424,12 @@ public class HistoryDB {
     	db.close();
     }
     
+    public void updateAllDetectionUploaded(){//Used for dummy
+    	db = dbHelper.getWritableDatabase();
+    	String sql = "UPDATE Detection SET upload = 1 WHERE id >= 0";
+    	db.execSQL( sql);
+    	db.close();
+    }
     
     public BracDetectionState[] getAllNotUploadedDetection(){
     	db = dbHelper.getReadableDatabase();

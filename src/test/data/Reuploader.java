@@ -192,7 +192,6 @@ public class Reuploader {
 		}
 		
 		private int uploader(HttpClient httpClient, HttpPost httpPost,String ts,Context context){
-			Log.d("ReDataUploader","start reupload");
 			HttpResponse httpResponse;
 			int  result = -1;
 			try {

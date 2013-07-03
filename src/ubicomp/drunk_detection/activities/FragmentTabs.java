@@ -3,7 +3,6 @@ package ubicomp.drunk_detection.activities;
 import ubicomp.drunk_detection.activities.R;
 import tabControl.CustomTab;
 import test.data.Reuploader;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,8 +13,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -28,13 +25,11 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 import clicklog.ClickLogUploader;
 import clicklog.ClickLogger;
-import data.questionnaire.EmotionDataUploader;
 import debuglog.DebugLoggingThread;
 
 public class FragmentTabs extends FragmentActivity {
@@ -58,11 +53,7 @@ public class FragmentTabs extends FragmentActivity {
 	private android.support.v4.app.FragmentManager fm;
 	TabChangeListener tabChangeListener;
 	
-	//private static  ImageView loadingPage;
-	
 	private FragmentTabs fragmentTabs; 
-	
-	//private LoadingPageHandler loadingPageHandler;
 	
 	private Bitmap tabBmp;
 	
@@ -79,11 +70,6 @@ public class FragmentTabs extends FragmentActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.tab_layout);
 		
-		//loadingPage = (ImageView) this.findViewById(R.id.loading_page);
-		
-		//if (loadingPageHandler == null)
-		//	loadingPageHandler = new LoadingPageHandler();
-		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
 			int w = display.getWidth();
@@ -96,11 +82,6 @@ public class FragmentTabs extends FragmentActivity {
 		}
 
 		tab_px = new Point(screen_px.x,screen_px.x*211/1080);
-		
-		//if (firstLoading){
-		//	Thread t = new Thread (new TimerRunnable());
-		//	t.start();
-		//}
 		
 		tabHost = (TabHost) this.findViewById(android.R.id.tabhost);
 		tabHost.setup();
@@ -136,7 +117,6 @@ public class FragmentTabs extends FragmentActivity {
 			tmp.recycle();
 		}
 		Drawable d = new BitmapDrawable(tabBmp);
-		//tabWidget.setBackgroundResource(R.drawable.tabs_background);
 		tabWidget.setBackgroundDrawable(d);
 		
 		int count  = tabWidget.getChildCount();
@@ -150,26 +130,6 @@ public class FragmentTabs extends FragmentActivity {
 		
 		
 	}
-	
-	/*@SuppressLint("HandlerLeak")
-	private class LoadingPageHandler extends Handler{
-		public void handleMessage(Message msg){
-			detach_loading_page();
-			firstLoading = false;
-		}
-	}*/
-	
-	/*
-	private class TimerRunnable implements Runnable{
-		@Override
-		public void run() {
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {}
-			
-			loadingPageHandler.sendEmptyMessage(0);
-		}
-	}*/
 	
 	protected void onResume(){
 		super.onResume();
@@ -372,10 +332,5 @@ public class FragmentTabs extends FragmentActivity {
 			return context;
 		return null;
 	}
-	
-//	static public void detach_loading_page(){
-//		if (loadingPage!=null)
-//			loadingPage.setVisibility(View.INVISIBLE);
-//	}
 	
 }

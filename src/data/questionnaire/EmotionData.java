@@ -35,4 +35,9 @@ public class EmotionData {
 		sb.append(')');
 		return sb.toString();
 	}
+	
+	public int getSelfHelpCounter(){
+		int score = (acc[0]+acc[1]+acc[2]) - (used[0] +used[1]+used[2]);
+		return score;
+	}
 }

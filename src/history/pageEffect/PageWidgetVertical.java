@@ -144,7 +144,8 @@ public class PageWidgetVertical extends View {
 			return;
 		canvas.save();
 		canvas.clipPath(path, Region.Op.XOR);
-		canvas.drawBitmap(bitmap, 0, 0, null);
+		if (bitmap != null && !bitmap.isRecycled())
+			canvas.drawBitmap(bitmap, 0, 0, null);
 		canvas.restore();
 	}
 	
@@ -242,7 +243,8 @@ public class PageWidgetVertical extends View {
 		canvas.save();
 		canvas.clipPath(path0);
 		canvas.clipPath(path1, Region.Op.INTERSECT);
-		canvas.drawBitmap(bitmap, 0, 0, null);
+		if (bitmap != null && !bitmap.isRecycled())
+			canvas.drawBitmap(bitmap, 0, 0, null);
 		canvas.rotate(degrees, BezierStart1.x, BezierStart1.y);
 		//backShadowDrawable.setBounds(leftx, (int) BezierStart1.y, rightx,	(int) (maxLength + BezierStart1.y));
 		//backShadowDrawable.draw(canvas);
