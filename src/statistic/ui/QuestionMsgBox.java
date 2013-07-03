@@ -22,6 +22,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -38,6 +39,8 @@ public class QuestionMsgBox {
 	private RelativeLayout boxLayout = null;
 	
 	private RelativeLayout mainLayout;
+	
+	private FrameLayout backgroundLayout;
 	
 	private LinearLayout questionLayout, questionAllLayout;
 	
@@ -60,6 +63,8 @@ public class QuestionMsgBox {
 		this.r = context.getResources();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
+		backgroundLayout = new FrameLayout(context);
+		backgroundLayout.setBackgroundColor(0x99000000);
 		screen = FragmentTabs.getSize();
 		db = new QuestionDB(context);
 		clickSequence = new ArrayList<String>();
@@ -69,6 +74,8 @@ public class QuestionMsgBox {
 	}
 	
 	private void setting(){
+		
+		backgroundLayout.setVisibility(View.INVISIBLE);
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.question_box_layout2,null);
 		boxLayout.setVisibility(View.INVISIBLE);
@@ -81,7 +88,12 @@ public class QuestionMsgBox {
 	}
 	
 	public void settingPreTask(){
+		mainLayout.addView(backgroundLayout);
 		mainLayout.addView(boxLayout);
+		
+		RelativeLayout.LayoutParams bgParam = (LayoutParams) backgroundLayout.getLayoutParams();
+		bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
+		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
 		boxParam.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
 		boxParam.width = screen.x * 810/1080;
@@ -134,6 +146,9 @@ public class QuestionMsgBox {
 		bottom.setImageBitmap(null);
 		exitView.setImageBitmap(null);
 		questionLayout.setBackground(null);
+		if (backgroundLayout != null)
+			mainLayout.removeView(backgroundLayout);
+		
 		if (boxLayout !=null)
 			mainLayout.removeView(boxLayout);
 		
@@ -199,6 +214,8 @@ public class QuestionMsgBox {
 	}
 	
 	public void openBox(){
+		statisticFragment.enablePage(false);
+		backgroundLayout.setVisibility(View.VISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
 		return;
 }
@@ -208,6 +225,8 @@ public class QuestionMsgBox {
 		SharedPreferences.Editor editor = sp.edit();
 		editor.putInt("latest_result", -1);
     	editor.commit();
+    	statisticFragment.enablePage(true);
+    	backgroundLayout.setVisibility(View.INVISIBLE);
 		boxLayout.setVisibility(View.INVISIBLE);
 		statisticFragment.setQuestionAnimation();
 		return;
@@ -257,6 +276,8 @@ public class QuestionMsgBox {
 		public void onClick(View v) {
 			clickSequence.clear();
 			contentSequence.clear();
+			statisticFragment.enablePage(true);
+			backgroundLayout.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
 		}
 		

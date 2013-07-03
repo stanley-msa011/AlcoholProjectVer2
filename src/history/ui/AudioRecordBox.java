@@ -25,6 +25,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -37,7 +38,7 @@ public class AudioRecordBox {
 	private Context context;
 	private LayoutInflater inflater;
 	private RelativeLayout boxLayout = null;
-	
+	private FrameLayout backgroundLayout;
 	private TextView help;
 	private ImageView closeButton,recButton,playButton;
 	
@@ -72,6 +73,8 @@ public class AudioRecordBox {
 		this.context = historyFragment.getActivity();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
+		backgroundLayout = new FrameLayout(context);
+		backgroundLayout.setBackgroundColor(0x99000000);
 		screen = FragmentTabs.getSize();
 		mediaRecorder = null;
 		mediaPlayer = null;
@@ -99,6 +102,8 @@ public class AudioRecordBox {
 	
 	private void setting(){
 		
+		backgroundLayout.setVisibility(View.INVISIBLE);
+		
 		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.rec_layout,null);
@@ -111,7 +116,11 @@ public class AudioRecordBox {
 		hParam.width = screen.x * 700/1080;
 		hParam.height = screen.x * 160/1080;
 		
+		mainLayout.addView(backgroundLayout);
 		mainLayout.addView(boxLayout);
+		
+		RelativeLayout.LayoutParams bgParam = (LayoutParams) backgroundLayout.getLayoutParams();
+		bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
 		
 		RelativeLayout.LayoutParams param = (LayoutParams) boxLayout.getLayoutParams();
 		param.width = screen.x * 830/1080;
@@ -167,8 +176,12 @@ public class AudioRecordBox {
 		playButton.setImageBitmap(null);
 		recButton.setImageBitmap(null);
 		
+		if (backgroundLayout != null)
+			mainLayout.removeView(backgroundLayout);
+		
 		if (boxLayout!=null)
 			mainLayout.removeView(boxLayout);
+		
 		historyFragment.enablePage(true);
 		
 		if (bgBmp!=null && !bgBmp.isRecycled()){
@@ -195,6 +208,7 @@ public class AudioRecordBox {
 	private class EndListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			backgroundLayout.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
 			historyFragment.updateHasRecorder(curIdx);
 			historyFragment.enablePage(true);
@@ -205,8 +219,9 @@ public class AudioRecordBox {
 		this.curIdx = idx;
 		curDV = dv;
 		historyFragment.enablePage(false);
-		help.setText("您對於["+dv.toString()+"]\n的心情(兩分鐘)");
+		help.setText("您對於["+dv.toString()+"的心情\n(最長可達兩分鐘)");
 		setButtonState(STATE_INIT);
+		backgroundLayout.setVisibility(View.VISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
 	}
 	

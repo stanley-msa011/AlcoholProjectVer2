@@ -7,17 +7,20 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
-import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class EmotionActivity extends Activity {
 
@@ -51,9 +54,9 @@ public class EmotionActivity extends Activity {
 	} ;
 	
 	private OnClickListener[] clickListeners = {
-			new EndOnClickListener(0),
-			new EndOnClickListener(1),
-			new EndOnClickListener(2),
+			new NormalSelectionOnClickListener(0),
+			new NormalSelectionOnClickListener(1),
+			new NormalSelectionOnClickListener(2),
 			new HelpOnClickListener(3),
 			new HelpOnClickListener(4)
 	};
@@ -64,27 +67,15 @@ public class EmotionActivity extends Activity {
 	private int height;
 	private int icon_size; 
 	
+	private int state = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		View titleView = getWindow().findViewById(android.R.id.title);
-	    if (titleView != null) {
-	      ViewParent parent = titleView.getParent();
-	      if (parent != null && (parent instanceof View)) {
-	    	  Log.d("TITLE_BAR", "OK");
-	        View parentView = (View)parent;
-	        parentView.setBackgroundColor(0xFFFF0000);
-	      }else{
-	    	  Log.d("TITLE_BAR", "NULL 2");
-	      }
-	    }else{
-	    	Log.d("TITLE_BAR", "NULL 1");
-	    }
-		
-		setContentView(R.layout.activity_emotion);
 
-		
+	    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	    requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.activity_emotion);
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
@@ -98,7 +89,6 @@ public class EmotionActivity extends Activity {
 			screen = new Point();
 			display.getSize(screen);
 		}
-		
 	}
 
 	
@@ -112,6 +102,12 @@ public class EmotionActivity extends Activity {
 		wordTypeface = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w3.otf");
 		wordTypefaceBold = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w5.otf");
 		db = new QuestionDB(activity);
+		setQuestionStart();
+
+	}
+	
+	private void setQuestionStart(){
+		state = 0;
 		
 		mainLayout.removeAllViews();
 		onTouchListener = new ItemOnTouchListener();
@@ -119,6 +115,11 @@ public class EmotionActivity extends Activity {
 		textSize = screen.x * 72/1080;
 		height =  screen.x * 202/1080;
 		icon_size = screen.x * 140/1080;
+		
+		View title = createTitleView();
+		mainLayout.addView(title);
+		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
+		titleparam.height = screen.x*244/1080;
 		
 		View tv = createTextView("照顧情緒，我可以：");
 		mainLayout.addView(tv);
@@ -131,8 +132,90 @@ public class EmotionActivity extends Activity {
 			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
 			param.height = height;
 		}
+		
+		int rest_block = 10 - mainLayout.getChildCount();
+		for (int i=0;i<rest_block;++i){
+			View v = createBlankView();
+			mainLayout.addView(v);
+			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
+			param.height = height;
+		}
 	}
 	
+	private static final String[] dummyTexts = {
+			"dummy:0212345678",
+			"dummy:0212345678",
+			"dummy:0212345678"
+			};
+	
+	private void setQuestionCall(int type){
+		state = 1;
+		
+		mainLayout.removeAllViews();
+		
+		View title = createTitleView();
+		mainLayout.addView(title);
+		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
+		titleparam.height = screen.x*244/1080;
+		
+		View tv = createTextView("請選擇聯絡對象：");
+		mainLayout.addView(tv);
+		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+		tvparam.height = height;
+
+		String[] texts = dummyTexts;
+		
+		OnClickListener[] dummyListeners = {
+				new CallOnClickListener(type,dummyTexts[0]),
+				new CallOnClickListener(type,dummyTexts[1]),
+				new CallOnClickListener(type,dummyTexts[2])
+		};
+		
+		OnClickListener[] listeners = dummyListeners;
+		
+		for (int i=0;i<texts.length;++i){
+			View vv = createIconView(texts[i],R.drawable.questionnaire_item_call,listeners[i]);
+			mainLayout.addView(vv);
+			LinearLayout.LayoutParams vparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
+			vparam.height = height;
+		}
+		
+		int rest_block = 10 - mainLayout.getChildCount();
+		for (int i=0;i<rest_block;++i){
+			View vv = createBlankView();
+			mainLayout.addView(vv);
+			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) vv.getLayoutParams();
+			param.height = height;
+		}
+	}
+	
+	private void setQuestionEnd(int selection){
+		state = 1;
+		
+		mainLayout.removeAllViews();
+		View title = createTitleView();
+		mainLayout.addView(title);
+		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
+		titleparam.height = screen.x*244/1080;
+		
+		String str = "請繼續加油!";
+		View tv = createTextView(str);
+		mainLayout.addView(tv);
+		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
+		tvparam.height = height;
+		View vv = createIconView("完成",R.drawable.questionnaire_item_ok,new EndOnClickListener(selection));
+		mainLayout.addView(vv);
+		LinearLayout.LayoutParams vvparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
+		vvparam.height = height;
+		
+		int rest_block = 10 - mainLayout.getChildCount();
+		for (int i=0;i<rest_block;++i){
+			View v = createBlankView();
+			mainLayout.addView(v);
+			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
+			param.height = height;
+		}
+	}
 	
 	private View createTextView(String textStr){
 		
@@ -177,6 +260,34 @@ public class EmotionActivity extends Activity {
 		return layout;
 	}
 	
+	private View createTitleView(){
+		
+		RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.titlebar, null);
+		TextView text = (TextView) layout.findViewById(R.id.titlebar_text);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTypeface(wordTypefaceBold);
+		text.setText("心情DIY");
+		
+		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams)text.getLayoutParams();
+		tParam.leftMargin = textSize;
+		tParam.bottomMargin = textSize/2;
+		
+		ImageView icon = (ImageView) layout.findViewById(R.id.titlebar_icon);
+		RelativeLayout.LayoutParams iParam =(RelativeLayout.LayoutParams) icon.getLayoutParams();
+		iParam.width = iParam.height = screen.x * 84/1080;
+		iParam.leftMargin = textSize;
+		iParam.bottomMargin = textSize/2;
+		
+		return layout;
+	}
+	
+	private View createBlankView(){
+		
+		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_normal);
+		return layout;
+	}
+	
 	private class EndOnClickListener implements View.OnClickListener{
 		int in;
 		
@@ -207,46 +318,27 @@ public class EmotionActivity extends Activity {
 		}
 	}
 	
+	private class NormalSelectionOnClickListener implements View.OnClickListener{
+		int in;
+		NormalSelectionOnClickListener( int in){
+			this.in = in;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			setQuestionEnd(in);
+		}
+	}
+	
 	private class HelpOnClickListener implements View.OnClickListener{
-		
 		int type;
-		
-		String[] dummyTexts = {
-				"dummy:0212345678",
-				"dummy:0212345678",
-				"dummy:0212345678"
-				};
-
-		
 		HelpOnClickListener( int type){
 			this.type = type;
 		}
 		
 		@Override
 		public void onClick(View v) {
-			mainLayout.removeAllViews();
-			
-			View tv = createTextView("請選擇聯絡對象");
-			mainLayout.addView(tv);
-			LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
-			tvparam.height = height;
-
-			String[] texts = dummyTexts;
-			
-			OnClickListener[] dummyListeners = {
-					new CallOnClickListener(type,dummyTexts[0]),
-					new CallOnClickListener(type,dummyTexts[1]),
-					new CallOnClickListener(type,dummyTexts[2])
-			};
-			
-			OnClickListener[] listeners = dummyListeners;
-			
-			for (int i=0;i<texts.length;++i){
-				View vv = createIconView(texts[i],R.drawable.questionnaire_item_call,listeners[i]);
-				mainLayout.addView(vv);
-				LinearLayout.LayoutParams vparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
-				vparam.height = height;
-			}
+			setQuestionCall(type);
 		}
 	}
 	
@@ -272,5 +364,23 @@ public class EmotionActivity extends Activity {
 			}
 			return false;
 		}
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		if (keyCode == KeyEvent.KEYCODE_BACK){
+			if (state == 0){
+				Toast.makeText(mainLayout.getContext(), "確定放棄填答心情DIY？", Toast.LENGTH_LONG).show();
+				--state;
+			}else if (state == -1)
+				return super.onKeyDown(keyCode, event);
+			else{
+				--state;
+				if (state == 0)
+					setQuestionStart();
+			}
+		}
+		
+		return false;
 	}
 }

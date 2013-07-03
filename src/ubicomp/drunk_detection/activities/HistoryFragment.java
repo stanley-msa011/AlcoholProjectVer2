@@ -31,6 +31,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.graphics.Path.FillType;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Typeface;
@@ -49,6 +50,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -122,12 +124,11 @@ public class HistoryFragment extends Fragment {
 	private PointF curPageTouch;
 	private LoadingHandler loadHandler;
 	
-	private LinearLayout stageLayout;
-	private TextView stage,stageNum;
 	private Typeface stageTypeface;
 	
 	private DecimalFormat format;
-	private TextView progressText, dateText, quoteText;
+	private TextView quoteText;
+	private TextView stageMessageText;
 	
 	private Calendar from_cal;
 	private Calendar to_cal;
@@ -314,6 +315,7 @@ public class HistoryFragment extends Fragment {
     	scrollView = (HorizontalScrollView) view.findViewById(R.id.history_scroll_view);
     	chartAreaLayout = (RelativeLayout) view.findViewById(R.id.history_chart_area_layout);
     	
+    	
     	/*Setting the play*/
     	bg_x = screen.x;
     	width = bg_x;
@@ -326,32 +328,20 @@ public class HistoryFragment extends Fragment {
     	pageWidget= new PageWidgetVertical(pageLayout.getContext(),width,height);
     	
     	curPageTouch = touchPoint;
+
+    	stageMessageText = (TextView) view.findViewById(R.id.history_stage_message);
+    	stageMessageText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*64/1080);
+    	stageMessageText.setTypeface(stageTypeface);
     	
-    	stageLayout = (LinearLayout) view.findViewById(R.id.history_stage_layout);
-    	stageTypeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/dinpromedium.ttf");
-    	stage = (TextView) view.findViewById(R.id.history_stage);
-    	stage.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*64/1080);
-    	stage.setTypeface(stageTypeface);
-    	stageNum = (TextView) view.findViewById(R.id.history_stage_num);
-    	stageNum.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*80/1080);
-    	stageNum.setTypeface(stageTypeface);
-    	
-    	
-    	progressText = (TextView) view.findViewById(R.id.history_progress);
-    	progressText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*64/1080);
-    	progressText.setTypeface(stageTypeface);
-    	dateText = (TextView) view.findViewById(R.id.history_date);
-    	dateText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*64/1080);
-    	dateText.setTypeface(stageTypeface);
     	quoteText = (TextView) view.findViewById(R.id.history_quote);
     	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*48/1080);
     	quoteText.setTypeface(stageTypeface);
     	
     	format = new DecimalFormat();
-		format.setMaximumIntegerDigits(2);
-		format.setMinimumIntegerDigits(2);
-		format.setMinimumFractionDigits(1);
-		format.setMaximumFractionDigits(1);
+		format.setMaximumIntegerDigits(3);
+		format.setMinimumIntegerDigits(1);
+		format.setMinimumFractionDigits(0);
+		format.setMaximumFractionDigits(0);
     	
 		selfCounterMessage = (TextView) view.findViewById(R.id.history_self_help);
 		selfCounterMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*64/1080);
@@ -410,23 +400,14 @@ public class HistoryFragment extends Fragment {
 		LinearLayout.LayoutParams sclParam = (LinearLayout.LayoutParams) selfCounterLayout.getLayoutParams();
 		sclParam.height = bg_x * 110/1080;
 		
-    	LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
+		
+    	LayoutParams sParam = (LayoutParams) stageMessageText.getLayoutParams();
     	sParam.leftMargin = bg_x*30/1080;
     	sParam.topMargin = bg_x * 90/1080;
     	
-    	LayoutParams prParam = (LayoutParams) progressText.getLayoutParams();
-    	prParam.leftMargin = bg_x*30/1080;
-    	
-    	LayoutParams dParam = (LayoutParams) dateText.getLayoutParams();
-    	dParam.leftMargin = bg_x*10/1080;
-    	dParam.topMargin = bg_x * 135/1080;
-    	
     	LayoutParams qParam = (LayoutParams) quoteText.getLayoutParams();
     	qParam.leftMargin = bg_x*30/1080;
-    	qParam.topMargin = bg_x * 135/1080;
-    	
-    	//LayoutParams plParam = (LayoutParams) pageLayout.getLayoutParams();
-    	//plParam.topMargin = screen.x * 110/1080;
+    	qParam.topMargin = bg_x * 865/1080;
     	
     	pageLayout.addView(pageWidget);
     	LayoutParams param = (LayoutParams) pageWidget.getLayoutParams();
@@ -461,7 +442,18 @@ public class HistoryFragment extends Fragment {
     	String sc_message = "已累積 "+counter+" 枚代幣及 "+coupon+" 張禮卷";
     	selfCounterMessage.setText(sc_message);
     	
+    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(view.getContext());
+    	int prev_counter = sp.getInt("self_help_counter", 0);
+    	int prev_coupon = sp.getInt("self_help_coupon", 0);
     	
+    	if (prev_coupon < coupon || prev_counter < counter){
+    		selfCounterLayout.setBackgroundColor(0xCCf39800);
+    	}
+    	SharedPreferences.Editor editor = sp.edit();
+		editor.putInt("self_help_counter", counter);
+		editor.putInt("self_help_coupon", coupon);
+		editor.commit();
+		
     	setStorytellingTexts();
     	
     	//Set chart
@@ -523,22 +515,32 @@ public class HistoryFragment extends Fragment {
     }
     
     private void setStorytellingTexts(){
+    	StringBuilder sb = new StringBuilder();
+    	
+    	
+    	
     	AccumulatedHistoryState curAH = page_states[page_week];
-    	stageNum.setText((page_week+1)+"/"+(HistoryStorytelling.MAX_PAGE+1));
     	float progress = (float)curAH.getScore()*100F/(float)curAH.MAX_SCORE;
-    	String progress_str = format.format(progress)+" %";
-    	progressText.setText(progress_str);
+    	String progress_str = format.format(progress)+"%";
 
     	Calendar date_cal = Calendar.getInstance();
     	date_cal.setTime(from_cal.getTime());
     	date_cal.add(Calendar.DATE, page_week * 7);
-    	String from_date_str = (date_cal.get(Calendar.MONTH) +1)+ " / " +date_cal.get(Calendar.DAY_OF_MONTH);
+    	String from_date_str = (date_cal.get(Calendar.MONTH) +1)+ "/" +date_cal.get(Calendar.DAY_OF_MONTH);
     	date_cal.add(Calendar.DATE, 6);
-    	String to_date_str = (date_cal.get(Calendar.MONTH) +1)+ " / " +date_cal.get(Calendar.DAY_OF_MONTH);
-    	String date_str = from_date_str + "\n|\n" + to_date_str;
-    	dateText.setText(date_str);
+    	String to_date_str = (date_cal.get(Calendar.MONTH) +1)+ "/" +date_cal.get(Calendar.DAY_OF_MONTH);
+
+    	sb.append("頁數: "+(page_week+1)+" ");
+    	sb.append(from_date_str);
+    	sb.append("~");
+    	sb.append(to_date_str);
+    	sb.append(" 完成: ");
+    	sb.append(progress_str);
+    	
+    	stageMessageText.setText(sb.toString());
     	
     	quoteText.setText(QUOTE_STR[page_week]);
+    	
     }
     
     
@@ -691,15 +693,11 @@ public class HistoryFragment extends Fragment {
 	
 	public void setStageVisible(boolean t){
 		if (t){
-			stageLayout.setVisibility(View.VISIBLE);
-			progressText.setVisibility(View.VISIBLE);
-			dateText.setVisibility(View.VISIBLE);
+			stageMessageText.setVisibility(View.VISIBLE);
 			quoteText.setVisibility(View.VISIBLE);
 		}
 		else{
-			stageLayout.setVisibility(View.INVISIBLE);
-			progressText.setVisibility(View.INVISIBLE);
-			dateText.setVisibility(View.INVISIBLE);
+			stageMessageText.setVisibility(View.INVISIBLE);
 			quoteText.setVisibility(View.INVISIBLE);
 		}
 	}
@@ -727,12 +725,6 @@ public class HistoryFragment extends Fragment {
 			
 			float y1 = e1.getY();
 			float y2 = e2.getY();
-			float x1 = e1.getX();
-			float x2 = e2.getX();
-			float y_change = Math.abs(y2- y1);
-			float x_change = Math.abs(x2 - x1);
-			if (x_change >= y_change)
-				return true;
 			if (y1 - y2 > 0){//UP
 				Log.d("PAGE_ANIMATION", "UP");
 				pageWidget.setOnTouchListener(null);
@@ -1039,6 +1031,7 @@ public class HistoryFragment extends Fragment {
 	    private ArrayList<Point> selected_centers;
 	    private ArrayList<Point> button_centers;
 	    
+	    private Path playPath;
 	    
 	    
 		public ChartView(Context context) {
@@ -1104,6 +1097,12 @@ public class HistoryFragment extends Fragment {
 			BUTTON_RADIUS = screen.x * 61/1080;
 			BUTTON_RADIUS_SQUARE = BUTTON_RADIUS*BUTTON_RADIUS;
 			BUTTON_GAPS = BUTTON_RADIUS * 8/3;
+			
+			playPath = new Path();
+			playPath.lineTo(2*circle_radius, circle_radius);
+			playPath.lineTo(0, 2*circle_radius);
+			playPath.lineTo(0, 0);
+			playPath.setFillType(FillType.EVEN_ODD);
 		}
 		
 	    @Override  
@@ -1206,7 +1205,6 @@ public class HistoryFragment extends Fragment {
 				Point d_center = new Point(left+small_radius,d_top - bar_gap - small_radius);
 				Point b_center = new Point(left+small_radius,b_top - bar_gap - small_radius);
 				
-				//if (bar.hasData){
 					if (prev_e_center!= null && prev_d_center!=null && prev_b_center!=null){
 						
 						Path path_e = new Path();
@@ -1245,7 +1243,6 @@ public class HistoryFragment extends Fragment {
 					prev_e_center = e_center;
 					prev_d_center = d_center;
 					prev_b_center = b_center;
-				//}
 				
 				// draw highlights
 				if (bar.week == page_week)
@@ -1296,22 +1293,38 @@ public class HistoryFragment extends Fragment {
 				//Draw bars & annotation_circles
 				Point center = new Point(left+bar_half,_top - bar_gap - circle_radius);
 				
-				Paint dot_paint;
-				if (hasAudio.get(i))
+				//Paint dot_paint;
+				boolean recorded = hasAudio.get(i);
+				/*if (hasAudio.get(i))
 					dot_paint = record_paint;
 				else
-					dot_paint = no_record_paint;
+					dot_paint = no_record_paint;*/
+				
+				Path pPath = new Path(playPath);
+				//pPath.moveTo(center.x-circle_radius, center.y-circle_radius);
 				if (!bar.hasData){
 					canvas.drawRect(left, _top, right, _bottom, paint_none);
-					canvas.drawCircle(center.x,center.y, circle_radius, dot_paint);
+					if (recorded)
+						canvas.drawPath(pPath, record_paint);
+					else
+						canvas.drawCircle(center.x,center.y, circle_radius, no_record_paint);
+					//canvas.drawCircle(center.x,center.y, circle_radius, dot_paint);
 				}
 				else if (bar.brac > 0F){
 					canvas.drawRect(left, _top, right, _bottom, paint_fail);
-					canvas.drawCircle(center.x,center.y, circle_radius, dot_paint);
+					if (recorded)
+						canvas.drawPath(pPath, record_paint);
+					else
+						canvas.drawCircle(center.x,center.y, circle_radius, no_record_paint);
+					//canvas.drawCircle(center.x,center.y, circle_radius, dot_paint);
 				}
 				else{
 					canvas.drawRect(left, _top, right, _bottom, paint_pass);
-					canvas.drawCircle(center.x,center.y, circle_radius, dot_paint);
+					if (recorded)
+						canvas.drawPath(pPath, record_paint);
+					else
+						canvas.drawCircle(center.x,center.y, circle_radius, no_record_paint);
+					//canvas.drawCircle(center.x,center.y, circle_radius, dot_paint);
 				}
 				
 				circle_centers.add(center);
@@ -1369,7 +1382,7 @@ public class HistoryFragment extends Fragment {
 					
 					canvas.drawBitmap(chartCircleBmp, to.x - BUTTON_RADIUS, to.y - BUTTON_RADIUS, null);
 					DateValue d = selected_dates.get(i);
-					String str = d.month + "/" + d.date;
+					String str = (d.month+1) + "/" + d.date;
 					canvas.drawText(str, to.x, to.y+BUTTON_RADIUS/3, text_paint_button);
 					b_center_x+=BUTTON_GAPS;
 				}

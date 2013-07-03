@@ -423,4 +423,10 @@ public class StatisticFragment extends Fragment {
 			questionAnimation.start();
 		}
 	}
+	
+	public void enablePage(boolean enable){
+		statisticView.setEnabled(enable);
+		analysisView.setEnabled(enable);
+		FragmentTabs.enableTab(enable);
+	}
 }

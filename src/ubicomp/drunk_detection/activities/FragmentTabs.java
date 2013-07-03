@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TabHost;
+import android.widget.Toast;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 import clicklog.ClickLogUploader;
@@ -157,6 +159,7 @@ public class FragmentTabs extends FragmentActivity {
 	
 	
 	protected void onPause(){
+		resetState();
 		Reuploader.cancel();
 		Log.d("tabs","onPause");
 		super.onPause();
@@ -268,6 +271,7 @@ public class FragmentTabs extends FragmentActivity {
 			if (lastTabId.equals(tabId))
 				return;
 			
+			resetState();
 			Log.d("Eric", tabId);
 			ClickLogger logger = new ClickLogger();
 			logger.click_logging(System.currentTimeMillis(), tabId + "_click");
@@ -333,4 +337,23 @@ public class FragmentTabs extends FragmentActivity {
 		return null;
 	}
 	
+	public void resetState(){
+		state = 0;
+	}
+	
+	private int state;
+	/*
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		if (keyCode == KeyEvent.KEYCODE_BACK){
+			if (state == 0){
+					Toast.makeText(this, "確定離開？", Toast.LENGTH_LONG).show();
+					--state;
+			}else if (state == -1)
+				return super.onKeyDown(keyCode, event);
+		}
+		
+		return false;
+	}
+	*/
 }

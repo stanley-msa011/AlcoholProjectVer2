@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="13"
-    android:versionName="2.01" >
+    android:versionCode="14"
+    android:versionName="2.02" >
 
     <uses-sdk
         android:maxSdkVersion="17"
@@ -93,15 +93,11 @@
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionActivity"
             android:screenOrientation="portrait" 
-            android:label="心情DIY"
-            android:noHistory="true"
             >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionManageActivity"
             android:screenOrientation="portrait" 
-            android:label= "情緒管理"
-            android:noHistory="true"
             >
         </activity>
         <activity
