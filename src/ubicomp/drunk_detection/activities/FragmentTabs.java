@@ -19,7 +19,6 @@ import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +26,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TabHost;
-import android.widget.Toast;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 import clicklog.ClickLogUploader;
@@ -59,13 +57,10 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private Bitmap tabBmp;
 	
-	private static boolean firstLoading = true;
-	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		firstLoading = true;
 		context = this;
 		fragmentTabs = this;
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -83,7 +78,7 @@ public class FragmentTabs extends FragmentActivity {
 			display.getSize(screen_px);
 		}
 
-		tab_px = new Point(screen_px.x,screen_px.x*211/1080);
+		tab_px = new Point(screen_px.x,screen_px.x*209/1080);
 		
 		tabHost = (TabHost) this.findViewById(android.R.id.tabhost);
 		tabHost.setup();
@@ -133,6 +128,15 @@ public class FragmentTabs extends FragmentActivity {
 		
 	}
 	
+	
+	protected void onStart(){
+		Log.d("Uploader","onStart");
+		Reuploader.reuploader(this);
+		ClickLogUploader.upload(this);
+		DebugLoggingThread debug_thread = new DebugLoggingThread();
+		debug_thread.execute();
+		super.onStart();
+	}
 	protected void onResume(){
 		super.onResume();
 		enableTab(true);
@@ -144,11 +148,6 @@ public class FragmentTabs extends FragmentActivity {
 			this.startActivity(newIntent);
 			return;
 		}
-		Reuploader.reuploader(this);
-		ClickLogUploader.upload(this);
-		DebugLoggingThread debug_thread = new DebugLoggingThread();
-		debug_thread.execute();
-		
 	}
 	
 	protected void onStop(){
@@ -272,12 +271,14 @@ public class FragmentTabs extends FragmentActivity {
 				return;
 			
 			resetState();
+			//if (!firstLoading)
+			LoadingBox.show(fragmentTabs);
+			
 			Log.d("Eric", tabId);
 			ClickLogger logger = new ClickLogger();
 			logger.click_logging(System.currentTimeMillis(), tabId + "_click");
 			
-			if (!firstLoading)
-				LoadingBox.show(fragmentTabs);
+			
 			
 			ft = fm.beginTransaction();
 			

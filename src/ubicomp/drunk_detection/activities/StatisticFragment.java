@@ -9,7 +9,6 @@ import statistic.statisticPageView.statistics.StatisticPagerAdapter;
 import statistic.ui.QuestionMsgBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -72,8 +71,6 @@ public class StatisticFragment extends Fragment {
 	// For Click Sequence Logging
 	private ClickLogger clickLogger;
 	
-	private ProgressDialog dialog;
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,17 +117,6 @@ public class StatisticFragment extends Fragment {
     		loadHandler.removeMessages(0);
     	clear();
     	super.onPause();
-    }
-    
-    public void onStart(){
-    	
-    	dialog = new ProgressDialog(this.getActivity());
-		dialog.setMessage("載入中");
-		dialog.setCancelable(true);
-		if (!dialog.isShowing()){
-			dialog.show();
-		}
-		super.onStart();
     }
     
 	private void clear(){
@@ -357,8 +343,6 @@ public class StatisticFragment extends Fragment {
 			
 			setQuestionAnimation();
 			
-			if (dialog!=null && dialog.isShowing())
-				dialog.dismiss();
 			LoadingBox.dismiss();
 		}
 	}

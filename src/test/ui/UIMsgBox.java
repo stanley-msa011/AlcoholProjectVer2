@@ -255,25 +255,22 @@ public class UIMsgBox {
 		desireBmps[9] = Bitmap.createScaledBitmap(tmp, size, size, true);
 		tmp.recycle();
 		
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bar);
-		seekBarBmp = Bitmap.createScaledBitmap(tmp, screen.x * 584 / 1080,  screen.x * 35/1080, true);
-		tmp.recycle();
-		
 		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bar_button);
-		seekBarThumbBmp = Bitmap.createScaledBitmap(tmp, screen.x * 100 / 1080,  screen.x * 100/1080, true);
+		seekBarThumbBmp = Bitmap.createScaledBitmap(tmp, screen.x * 90 / 1080,  screen.x * 90/1080, true);
 		tmp.recycle();
 		
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bar_value);
-		seekBarProgressBmp = Bitmap.createScaledBitmap(tmp, screen.x * 485 / 1080,  screen.x * 19/1080, true);
-		tmp.recycle();
+		int padding_ver = screen.x * 10/1080;
+		int padding_hor = screen.x * 50/1080;
 		
 		RelativeLayout.LayoutParams emoParam = (RelativeLayout.LayoutParams)emotionSeekBar.getLayoutParams();
 		emoParam.width = screen.x * 584 / 1080;
 		emoParam.height = screen.x * 100 / 1080;
+		emotionSeekBar.setPadding(padding_hor, padding_ver, padding_hor, padding_ver);
 		
 		RelativeLayout.LayoutParams desParam = (RelativeLayout.LayoutParams)desireSeekBar.getLayoutParams();
 		desParam.width = screen.x * 584 / 1080;
 		desParam.height = screen.x * 100 / 1080;
+		desireSeekBar.setPadding(padding_hor, padding_ver, padding_hor, padding_ver);
 		
 		LinearLayout.LayoutParams eParam = (LinearLayout.LayoutParams) emotionShowText.getLayoutParams();
 		eParam.width = screen.x * 203/1080;

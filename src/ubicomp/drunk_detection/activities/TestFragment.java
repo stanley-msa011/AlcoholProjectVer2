@@ -656,13 +656,6 @@ public class TestFragment extends Fragment {
 			face.setImageBitmap(null);
 			LoadingBox.dismiss();
 			
-			/*
-			startButton.setOnClickListener(null);
-			msgBox.settingPreTask();
-			msgBox.settingInBackground();
-			msgBox.settingPostTask();
-			msgBox.generateGPSCheckBox();
-			*/
 		}
 	}
     

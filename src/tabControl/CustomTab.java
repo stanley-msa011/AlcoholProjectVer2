@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,8 +23,10 @@ public class CustomTab {
 	private LayoutInflater inflater;
 	
 	private ImageView bg,icon;
-	private Bitmap iconBmp,iconOnBmp;
-	static private Bitmap onBmp, offBmp;
+	//private Bitmap iconBmp,iconOnBmp;
+	//static private Bitmap onBmp, offBmp;
+	private static Drawable onDrawable, offDrawable;
+	private Drawable iconDrawable, iconOnDrawable;
 	//private TextView textView;
 	
 	public CustomTab(Context context, int id, int onId, String text){
@@ -40,26 +43,32 @@ public class CustomTab {
 		bg = (ImageView) view.findViewById(R.id.tab_icon_bg);
 		icon = (ImageView) view.findViewById(R.id.tab_icon_icon);
 		
-		if (onBmp == null || onBmp.isRecycled())
-			onBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.tabs_down);
+		//if (onBmp == null || onBmp.isRecycled())
+		//	onBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.tabs_down);
+		onDrawable = context.getResources().getDrawable(R.drawable.tabs_down);
+		offDrawable = null;
 		
-		offBmp = null;
+		//offBmp = null;
 		
-		iconBmp = BitmapFactory.decodeResource(context.getResources(), iconId);
-		iconOnBmp = BitmapFactory.decodeResource(context.getResources(), iconOnId);
+		//iconBmp = BitmapFactory.decodeResource(context.getResources(), iconId);
+		//iconOnBmp = BitmapFactory.decodeResource(context.getResources(), iconOnId);
 		
-		Point tab =FragmentTabs.getTabSize();
+		iconDrawable = context.getResources().getDrawable(iconId);
+		iconOnDrawable = context.getResources().getDrawable(iconOnId);
 		
-		int tabWidth = tab.x / 3;
-		RelativeLayout.LayoutParams bgParam = (LayoutParams) bg.getLayoutParams();
-		bgParam.width = tab.x / 3;
-		bgParam.height = tab.y;
+		//Point tab =FragmentTabs.getTabSize();
 		
-		RelativeLayout.LayoutParams iconParam = (LayoutParams) icon.getLayoutParams();
+		//int tabWidth = tab.x / 3;
+		//RelativeLayout.LayoutParams bgParam = (LayoutParams) bg.getLayoutParams();
+		//bgParam.width = tabWidth;
+		//bgParam.height = tab.y;
+		
+		/*RelativeLayout.LayoutParams iconParam = (LayoutParams) icon.getLayoutParams();
 		iconParam.width = tabWidth * 77/360;
-		iconParam.height =tab.y *57/211;
+		iconParam.height =tab.y *57/211;*/
 		
-		icon.setImageBitmap(iconBmp);
+		//icon.setImageBitmap(iconBmp);
+		icon.setImageDrawable(iconDrawable);
 		
 	}
 	
@@ -69,16 +78,24 @@ public class CustomTab {
 	
 	public void changeState(boolean selected){
 		if (selected){
-			bg.setImageBitmap(onBmp);
-			icon.setImageBitmap(iconOnBmp);
+			//bg.setImageBitmap(onBmp);
+			//icon.setImageBitmap(iconOnBmp);
+			bg.setImageDrawable(onDrawable);
+			icon.setImageDrawable(iconOnDrawable);
 		}else{
-			bg.setImageBitmap(offBmp);
-			icon.setImageBitmap(iconBmp);
+			//bg.setImageBitmap(offBmp);
+			//icon.setImageBitmap(iconBmp);
+			bg.setImageDrawable(offDrawable);
+			icon.setImageDrawable(iconDrawable);
 		}
 	}
 	
 	public void clear(){
-		bg.setImageBitmap(null);
+		
+		bg.setImageDrawable(null);
+		icon.setImageDrawable(null);
+		
+		/*bg.setImageBitmap(null);
 		if (onBmp != null && !onBmp.isRecycled()){
 			onBmp.recycle();
 			onBmp = null;
@@ -96,7 +113,7 @@ public class CustomTab {
 		if (iconOnBmp!=null && !iconOnBmp.isRecycled()){
 			iconOnBmp.recycle();
 			iconOnBmp = null;
-		}
+		}*/
 	}
 	
 	

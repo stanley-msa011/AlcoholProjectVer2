@@ -21,7 +21,6 @@ import history.ui.HistoryStorytelling;
 import history.ui.AudioRecordBox;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -50,7 +49,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -137,8 +135,6 @@ public class HistoryFragment extends Fragment {
 	private boolean chartTouchable = true;
 	
 	private AudioRecordBox recordBox;
-	
-	private ProgressDialog dialog;
 	
 	private Bitmap chartBg1Bmp, chartBg2Bmp, chartBg3Bmp, chartBg4Bmp, chartCircleBmp;
 	private BitmapDrawable chartBg1, chartBg2, chartBg3, chartBg4;
@@ -600,17 +596,6 @@ public class HistoryFragment extends Fragment {
     	Log.d("History","resetPage end");
     }
     
-    public void onStart(){
-    	
-    	dialog = new ProgressDialog(this.getActivity());
-		dialog.setMessage("載入中");
-		dialog.setCancelable(true);
-		if (!dialog.isShowing()){
-			dialog.show();
-		}
-		super.onStart();
-    }
-    
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
 		
@@ -619,8 +604,6 @@ public class HistoryFragment extends Fragment {
 			recordBox.setImage();
 			endAnimation();
 			
-			if (dialog!=null && dialog.isShowing())
-				dialog.dismiss();
 			LoadingBox.dismiss();
 			Log.d("PAGE_ANIMATION","END LOADING BOX");
 			startAnim();
@@ -800,8 +783,8 @@ public class HistoryFragment extends Fragment {
 			for (int j=pos; j<historys.size();++j){
 				DateBracDetectionState h = historys.get(j);
 				if (h.timestamp >= from_t && h.timestamp < from_t + DAY_MILLIS){
-					e_sum += h.emotion;
-					d_sum += h.desire;
+					e_sum += (h.emotion > 0)?h.emotion:0;
+					d_sum += (h.desire >0)?h.desire:0;
 					b_sum += h.brac;
 					++count;
 					bar_week = h.week;
@@ -1182,7 +1165,7 @@ public class HistoryFragment extends Fragment {
 				float e_height,d_height,b_height;
 				e_height = bar.emotion/5 * max_height;
 				d_height = bar.desire/10 * max_height;
-				b_height = bar.brac/0.5F * max_height;
+				b_height = bar.brac/0.3F * max_height;
 				if (b_height > max_height)
 					b_height = max_height;
 				
@@ -1279,7 +1262,7 @@ public class HistoryFragment extends Fragment {
 				else if (chart_type == 1)
 					height =bar.desire/10 * max_height;
 				else if (chart_type == 2){
-					height = bar.brac / 0.5F * max_height;
+					height = bar.brac / 0.3F * max_height;
 					if (height > max_height)
 						height = max_height;
 				}
