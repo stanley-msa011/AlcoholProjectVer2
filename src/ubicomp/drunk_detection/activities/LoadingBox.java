@@ -13,7 +13,7 @@ public class LoadingBox {
 	}
 	
 	public static void show(Context context){
-		if (dialog == null || dialog.getContext() == null)
+		if (dialog == null || dialog.getContext() == null ||  !dialog.getContext().equals(context))
 			dialog = new ProgressDialog(context);
 		dialog.setMessage("載入中");
 		dialog.setCancelable(true);

@@ -55,8 +55,6 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private FragmentTabs fragmentTabs; 
 	
-	private Bitmap tabBmp;
-	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -98,7 +96,7 @@ public class FragmentTabs extends FragmentActivity {
 		fragments = new Fragment[3];
 		tabHost.setOnTabChangedListener(new TabChangeListener());
 		
-		tabHost.setCurrentTab(1);
+		tabHost.setCurrentTab(2);
 		tabHost.setCurrentTab(0);
 		
 		DisplayMetrics dm = new DisplayMetrics();
@@ -108,13 +106,7 @@ public class FragmentTabs extends FragmentActivity {
 		
 		TabWidget tabWidget = tabHost.getTabWidget();
 		
-		if (tabBmp == null || tabBmp.isRecycled()){
-			Bitmap tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tabs_background);
-			tabBmp = Bitmap.createScaledBitmap(tmp, tab_px.x, tab_px.y, true);
-			tmp.recycle();
-		}
-		Drawable d = new BitmapDrawable(tabBmp);
-		tabWidget.setBackgroundDrawable(d);
+		tabWidget.setBackgroundResource(R.drawable.tabs_background);
 		
 		int count  = tabWidget.getChildCount();
 		for (int i=0;i<count;++i)

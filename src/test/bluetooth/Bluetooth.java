@@ -58,6 +58,8 @@ public class Bluetooth {
 	private final static long MILLIS_4 = 4000;
 	private final static long MILLIS_5 = 5000;
 	
+	private final static long START_MILLIS = 2500;
+	
 	private long start_time;
 	private long end_time;
 	private long first_start_time;
@@ -88,6 +90,8 @@ public class Bluetooth {
 	private SharedPreferences sp;
 	private SharedPreferences.Editor sp_editor;
 	
+	private boolean start_recorder = false;
+	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler, BracValueDebugHandler bracDebugHandler){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
@@ -107,6 +111,7 @@ public class Bluetooth {
 		start = false;
 		sum = 0;
 		count = 0;
+		start_recorder = false;
 		sp= PreferenceManager.getDefaultSharedPreferences(context);
 		sp_editor = sp.edit();
 	}
@@ -209,6 +214,7 @@ public class Bluetooth {
 		image_count  =0;
 		sum = 0;
 		count = 0;
+		start_recorder = false;
 		try {
 			in = socket.getInputStream();
 			bytes =in.read(temp);
@@ -219,15 +225,17 @@ public class Bluetooth {
 				}
 				//Log.d("BT","READ");
 				long time = System.currentTimeMillis();
+				long time_gap = time - first_start_time;
 				if (first_start_time == -1){
 					first_start_time = time;
 					Log.d("ERIC", "start");
 				}
-				else if (time - first_start_time > 15000){
+				else if (time_gap > 15000){
 					Log.d("BT","TIME OUT");
 					end =-1; 
 					throw new Exception("time out");
 				}
+				
 				for (int i=0;i<bytes;++i){
 					if ((char)temp[i]=='a'){
 						end = sendMsgToApp(msg);
@@ -300,11 +308,12 @@ public class Bluetooth {
 					String output = timeStamp+"\t"+alcohol+"\n";
 					testFragment.showDebug("time: "+timeStamp);
 					testFragment.showDebug("alcohol: "+alcohol);
-					
-					sum+=alcohol;
-					++count;
-					/*write to the file*/
-					write_to_file(output);
+					if (start_recorder){
+						sum+=alcohol;
+						++count;
+						/*write to the file*/
+						write_to_file(output);
+					}
 				}
 			}
 			else if (msg.charAt(0)=='m'){
@@ -370,6 +379,9 @@ public class Bluetooth {
 							}else if (duration > MILLIS_1){
 								show_in_UI(value,1);
 							}
+							
+							if (duration >= START_MILLIS)
+								start_recorder = true;
 							
 							if (image_count == 0 && duration > IMAGE_MILLIS_0){
 								cameraRunHandler.sendEmptyMessage(0);
