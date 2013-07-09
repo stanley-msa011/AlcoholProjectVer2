@@ -9,19 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
+
         <ImageView
-        	android:id ="@+id/analysis_rating_title_bg"
-        	android:layout_width="match_parent"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-        	/>
+            android:id="@+id/analysis_rating_title_bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/analysis_title_bar" />
+
    		<TextView
         	android:id ="@+id/analysis_rating_title"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
-        	android:text="你的排名" 
-        	android:layout_centerVertical="true"
+        	android:text="您的排名" 
         	android:gravity="center"
         	android:textAlignment="center"
         	android:textColor="#FFFFFFFF"
@@ -30,7 +29,7 @@
 
     <TextView
         android:id ="@+id/analysis_rating_help"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FF000000"
         android:textAlignment="center"
@@ -44,21 +43,19 @@
         >
 
 	    <ImageView
-    	    android:id="@+id/analysis_rating_bar"
-       		android:layout_width="wrap_content"
+	        android:id="@+id/analysis_rating_bar"
+	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-        	android:layout_centerHorizontal="true"
-        	/>
+	        android:layout_centerHorizontal="true"
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/analysis_rating_bar" />
         
         <ImageView
             android:id="@+id/analysis_rating_pointer"
-       		android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-	        />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/analysis_rating_pointer" />
         
         <TextView
             android:id = "@+id/analysis_rating_low"
@@ -88,7 +85,7 @@
        
     <TextView
         android:id ="@+id/analysis_rating_help2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FF000000"
         android:textAlignment="center"
@@ -101,21 +98,19 @@
         >
 
 	    <ImageView
-    	    android:id="@+id/analysis_rating_bar2"
-       		android:layout_width="wrap_content"
+	        android:id="@+id/analysis_rating_bar2"
+	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-        	android:layout_centerHorizontal="true"
-        	/>
+	        android:layout_centerHorizontal="true"
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/analysis_rating_bar" />
         
         <ImageView
             android:id="@+id/analysis_rating_pointer2"
-       		android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-	        />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/analysis_rating_pointer" />
         
         <TextView
             android:id = "@+id/analysis_rating_low2"

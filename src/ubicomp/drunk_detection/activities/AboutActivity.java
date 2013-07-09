@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.text.Html;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
@@ -16,36 +17,37 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 public class AboutActivity extends Activity {
 
-	private TextView titleText,aboutText, copyrightText;
+	private TextView titleText,aboutText, copyrightText, about;
 	private LinearLayout logoLayout;
 	private ImageView logo,logo0,logo1,logo2;
+	private RelativeLayout titleLayout;
 	private Point screen;
-	private Typeface wordTypeface,wordTypefaceBold;
+	private Typeface wordTypefaceBold,digitTypeface;
 	
 	private static final String COPYRIGHT  = "\u00a9 2013 National Taiwan University,\n Academia Sinica, Taipei City Hospital";
 	
 	private int hidden_state;
 	private Activity activity;
 	
+	private int textSize;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.tab_layout);
 		setContentView(R.layout.activity_about);
 		activity = this;
 		
-		wordTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dfheistd-w3.otf");
-		wordTypefaceBold = Typeface.createFromAsset(this.getAssets(), "fonts/dfheistd-w5.otf");
-		
+		wordTypefaceBold = Typeface.createFromAsset(this.getAssets(), "fonts/DFLiHeiStd-W5.otf");
+		digitTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dinproregular.ttf");
+		titleLayout = (RelativeLayout) this.findViewById(R.id.about_title_layout );
 		titleText = (TextView) this.findViewById(R.id.about_title);
+		about = (TextView) this.findViewById(R.id.about_about);
 		aboutText = (TextView) this.findViewById(R.id.about_content);
 		logoLayout = (LinearLayout) this.findViewById(R.id.about_logos);
 		logo = (ImageView) this.findViewById(R.id.about_logo);
@@ -66,57 +68,55 @@ public class AboutActivity extends Activity {
 			screen = new Point();
 			display.getSize(screen);
 		}
+		int titleSize = screen.x * 24/480;
+		textSize =  screen.x * 21/480;
 		
-		int icon_size = screen.x * 200/1080;
-		int icon_gap = screen.x * 50/1080;
+		int icon_size = screen.x * 104/480;
 		
-		RelativeLayout.LayoutParams logoParam = (LayoutParams) logo.getLayoutParams();
-		logoParam.width = screen.x * 900/1080;
-		logoParam.topMargin = icon_gap*3;
-		logoParam.leftMargin = screen.x * 90/1080;;
-		logoParam.width = logoParam.height = icon_size;
+		RelativeLayout.LayoutParams logoParam = (RelativeLayout.LayoutParams) logo.getLayoutParams();
+		logoParam.leftMargin =  screen.x * 26/480;
 		
-		RelativeLayout.LayoutParams tParam = (LayoutParams) titleText.getLayoutParams();
-		tParam.width = screen.x * 900/1080;
-		tParam.topMargin = icon_gap * 3;
-		tParam.leftMargin = icon_gap;
-		tParam.height = icon_size;
-		titleText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 96/1080);
+		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams) titleText.getLayoutParams();
+		tParam.leftMargin =  screen.x * 26/480;
+		titleText.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleSize);
 		titleText.setTypeface(wordTypefaceBold);
 		titleText.setText("戒酒小幫手");
 		
-		RelativeLayout.LayoutParams aParam = (LayoutParams) aboutText.getLayoutParams();
-		aParam.width = screen.x * 900/1080;
-		aParam.topMargin = icon_size;
-		aboutText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 64/1080);
-		aboutText.setTypeface(wordTypeface);
+		LinearLayout.LayoutParams ttParam = (LinearLayout.LayoutParams) titleLayout.getLayoutParams();
+		ttParam.height = screen.x*230/1080;
 		
-		RelativeLayout.LayoutParams lParam = (LayoutParams) logoLayout.getLayoutParams();
-		lParam.width = screen.x * 900/1080;
-		lParam.height = icon_size;
-		lParam.topMargin = icon_size;
+		RelativeLayout.LayoutParams aaParam = (RelativeLayout.LayoutParams) about.getLayoutParams();
+		aaParam.leftMargin = screen.x * 26/480;
+		about.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		about.setTypeface(wordTypefaceBold);
 		
+		RelativeLayout.LayoutParams aParam = (RelativeLayout.LayoutParams) aboutText.getLayoutParams();
+		aParam.leftMargin = aParam.rightMargin = screen.x * 26/480;
+		aParam.topMargin = screen.x * 38/480;
+		aboutText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		aboutText.setTypeface(wordTypefaceBold);
+		aboutText.setLineSpacing(0, 1.2F);
+		
+		RelativeLayout.LayoutParams lParam = (RelativeLayout.LayoutParams) logoLayout.getLayoutParams();
+		lParam.topMargin = screen.x * 60/480; 
+		
+		int gap = screen.x * 18/480;
 		LinearLayout.LayoutParams l0Param = (LinearLayout.LayoutParams) logo0.getLayoutParams();
-		l0Param.width = icon_size;
-		l0Param.leftMargin = l0Param.rightMargin = icon_gap;
+		l0Param.height = icon_size;
+		l0Param.leftMargin = l0Param.rightMargin = gap; 
 		LinearLayout.LayoutParams l1Param = (LinearLayout.LayoutParams) logo1.getLayoutParams();
-		l1Param.width = icon_size;
-		l1Param.leftMargin = l1Param.rightMargin = icon_gap;
+		l1Param.height = icon_size;
+		l1Param.leftMargin = l1Param.rightMargin = gap; 
 		LinearLayout.LayoutParams l2Param = (LinearLayout.LayoutParams) logo2.getLayoutParams();
-		l2Param.width = icon_size;
-		l2Param.leftMargin = l2Param.rightMargin = icon_gap;
+		l2Param.height = icon_size;
 		
-		RelativeLayout.LayoutParams cParam = (LayoutParams) copyrightText.getLayoutParams();
-		cParam.width = screen.x * 900/1080;
-		cParam.bottomMargin = icon_gap*3;
-		copyrightText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 48/1080);
-		copyrightText.setTypeface(wordTypeface);
+		RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) copyrightText.getLayoutParams();
+		cParam.leftMargin = screen.x * 26/480;
+		cParam.topMargin = screen.x *100/480;
+		copyrightText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 16/480);
+		copyrightText.setTypeface(digitTypeface);
 		copyrightText.setText(COPYRIGHT);
 		
-		logo.setImageResource(R.drawable.icon);
-		logo0.setImageResource(R.drawable.logo0);
-		logo1.setImageResource(R.drawable.logo1);
-		logo2.setImageResource(R.drawable.logo2);
 		
 		
 		
@@ -169,19 +169,19 @@ public class AboutActivity extends Activity {
 				});
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("此應用程式由國立台灣大學、中央研究院、臺北市立聯合醫院合作開發。\n" +
-				"開發目為協助酗酒患者戒酒並自我控制使用。\n" +
+		sb.append("此應用程式由<br/><strong>國立台灣大學、</strong><br/><strong>中央研究院、</strong><br/><strong>臺北市立聯合醫院</strong>合作開發。<br/><br/>" +
+				"開發目為協助酗酒患者戒酒並自我控制使用。<br/>" +
 				"此應用程式需搭配專用酒測器方可使用。");
 		
 		PackageInfo pinfo;
 		try {
 			pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 			String versionName = pinfo.versionName;
-			sb.append("\n\n目前版本：");
+			sb.append("<br/><br/>目前版本：");
 			sb.append(versionName);
 		} catch (NameNotFoundException e) {
 		}
-		aboutText.setText(sb.toString());
+		aboutText.setText(Html.fromHtml(sb.toString()));
 		
 	}
 

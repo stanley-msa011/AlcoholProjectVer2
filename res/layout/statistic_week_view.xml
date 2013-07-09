@@ -32,21 +32,12 @@
 		 />
 	
 	
-	 <TextView
-            android:id="@+id/statistic_week_month"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/statistic_week_block_layout"
-            android:gravity="center_vertical|right"
-            android:textAlignment="textEnd"
-            android:textColor="#FF000000" />
-    
     <LinearLayout
         android:id="@+id/statistic_week_date_label_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_toRightOf="@+id/statistic_week_month"
+        android:layout_toRightOf="@+id/statistic_week_timeblock_label_layout"
         android:layout_below="@+id/statistic_week_block_layout"
         />
     
@@ -55,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_centerHorizontal="true"
+        android:layout_toRightOf="@+id/statistic_week_timeblock_label_layout"
         android:layout_below="@+id/statistic_week_date_label_layout"
         />
     

@@ -103,8 +103,7 @@ public class TestFragment extends Fragment {
 	private ChangeTabsHandler changeTabsHandler;
 	
 	private RelativeLayout startLayout;
-	private ImageView bg, startButton, startStroke;
-	private Drawable bgDrawable, startButtonDrawable, startStrokeDrawable;
+	private ImageView bg, startButton;
 	private TextView bracText;
 	private TextView brac;
 	private TextView startText;
@@ -114,7 +113,6 @@ public class TestFragment extends Fragment {
 	
 	private RelativeLayout helpLayout;
 	private ImageView helpButton;
-	private Drawable helpButtonDrawable;
 	
 	private ImageView testCircle;
 	
@@ -128,11 +126,9 @@ public class TestFragment extends Fragment {
 	private Drawable[] blowDrawables;
 	
 	private ImageView face;
-	private Drawable faceDrawable;
 	
 	private QuestionFile questionFile;
 	
-	private Typeface wordTypeface;
 	private Typeface digitTypeface;
 	private Typeface wordTypefaceBold;
 	
@@ -190,13 +186,11 @@ public class TestFragment extends Fragment {
 		clickLogger = new ClickLogger();
 		
 		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
-		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W3.otf");
 		wordTypefaceBold  = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		
 		bg = (ImageView) view.findViewById(R.id.test_background);
 		startLayout = (RelativeLayout) view.findViewById(R.id.test_start_layout);
 		startButton = (ImageView) view.findViewById(R.id.test_start_button);
-		startStroke = (ImageView) view.findViewById(R.id.test_start_stroke);
 		bracText =(TextView) view.findViewById(R.id.test_brac_value_text);
 		brac = (TextView) view.findViewById(R.id.test_brac_text);
 		startText = (TextView) view.findViewById(R.id.test_start_button_text);
@@ -212,7 +206,7 @@ public class TestFragment extends Fragment {
 		
 		main_layout = (RelativeLayout) view.findViewById(R.id.test_fragment_main_layout);
 		
-		bracText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 74/480);
+		bracText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 75/480);
 		bracText.setTypeface(digitTypeface);
 		
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 42/480);
@@ -223,7 +217,7 @@ public class TestFragment extends Fragment {
 		
 		messageView = (TextView) view.findViewById(R.id.test_message);
 		messageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 22/480);
-		messageView.setTypeface(wordTypeface);
+		messageView.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams mParam = (LayoutParams) messageView.getLayoutParams();
 		mParam.topMargin = screen.x * 40/480;
@@ -531,24 +525,12 @@ public class TestFragment extends Fragment {
 			
     		Point screen = FragmentTabs.getSize();
 			
-			if (bgDrawable == null)
-				bgDrawable = context.getResources().getDrawable(R.drawable.test_background);
-			
 			RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams)bg.getLayoutParams();
 			bParam.width = screen.x;
 			bParam.height = bParam.width*1709/1080;
 			
-			if (startButtonDrawable == null)
-				startButtonDrawable = context.getResources().getDrawable(R.drawable.test_start_button);
-			
-			if (startStrokeDrawable == null)
-				startStrokeDrawable = context.getResources().getDrawable(R.drawable.test_button_stroke);
-			
-			if (helpButtonDrawable == null)
-				helpButtonDrawable = context.getResources().getDrawable(R.drawable.test_tutorial_button);
-			
 			RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
-			startLayoutParam.topMargin = screen.x * 180/480;
+			startLayoutParam.topMargin = screen.x * 190/480;
 			
 			RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
 			previewParam.width =screen.x *254/480;
@@ -559,24 +541,11 @@ public class TestFragment extends Fragment {
 			helpLayoutParam.topMargin =screen.x * 26/480;
 			helpLayoutParam.rightMargin = screen.x * 26/480;
 			
-			RelativeLayout.LayoutParams testCircleParam = (LayoutParams) testCircle.getLayoutParams();
-			testCircleParam.width = screen.x * 593/1080;
-			testCircleParam.height =screen.x * 591/1080;
-			
 			RelativeLayout.LayoutParams bracVParam = (LayoutParams) bracText.getLayoutParams();
-			bracVParam.topMargin =screen.x * 150/1080;
+			bracVParam.topMargin =screen.x * 95/480;
 			
 			RelativeLayout.LayoutParams bracParam = (LayoutParams) brac.getLayoutParams();
-			bracParam.topMargin =screen.x * 20/1080;
-			
-			if (bgDrawable != null)
-				bg.setImageDrawable(bgDrawable);
-			if (startButtonDrawable != null)
-				startButton.setImageDrawable(startButtonDrawable);
-			if (startStrokeDrawable != null)
-				startStroke.setImageDrawable(startStrokeDrawable);
-			if (helpButtonDrawable != null)
-				helpButton.setImageDrawable(helpButtonDrawable);
+			bracParam.topMargin =screen.x * 18/480;
 			
 			testCircle.setImageDrawable(null);
 
@@ -590,9 +559,14 @@ public class TestFragment extends Fragment {
 			startText.setVisibility(View.VISIBLE);
 			helpButton.setOnClickListener(new TutorialOnClickListener());
 			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
-			face.setImageBitmap(null);
+			face.setVisibility(View.INVISIBLE);
 			LoadingBox.dismiss();
-			
+			/*
+			if (msgLoadingHandler == null)
+				msgLoadingHandler = new MsgLoadingHandler();
+			msgLoadingHandler.sendEmptyMessage(0);
+			msgBox.generateInitializingBox();
+			*/
 		}
 	}
     
@@ -630,9 +604,10 @@ public class TestFragment extends Fragment {
 			}
 			this.msgStr = msg.getData().getString("msg");
 
+			
 			startButton.setOnClickListener(new EndTestOnClickListener());
 			startButton.setVisibility(View.VISIBLE);
-			
+			face.setVisibility(View.INVISIBLE);
 			msgStr = msgStr.concat("\n請點選按鈕以結束");
 			
 			messageView.setText(msgStr);
@@ -649,10 +624,8 @@ public class TestFragment extends Fragment {
 				for (int i=1;i<blowDrawables.length;++i)
 					blowDrawables[i] = context.getResources().getDrawable(BLOW_RESOURCE[i]);
 			}
-			if (faceDrawable == null)
-				faceDrawable = context.getResources().getDrawable(R.drawable.test_face);
 			
-			face.setImageDrawable(faceDrawable);
+			face.setVisibility(View.VISIBLE);
 			
 			messageView.setText("請將臉對於螢幕中央，\n並開始吹氣");
 			if (bt!=null && cameraRecorder!=null){

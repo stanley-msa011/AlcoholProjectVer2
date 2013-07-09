@@ -2,10 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/msg_box_layout"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" 
-    android:background="#CCFFFFFF"
-    android:orientation="vertical"
-    >
+    android:layout_height="wrap_content"
+    android:background="@drawable/msg_bg" >
     
     <LinearLayout 
         android:id="@+id/msg_question_layout"
@@ -19,34 +17,52 @@
         	android:layout_width="match_parent"
     		android:layout_height="wrap_content"
     		android:text="自我了解" 
-    		android:textColor="#FF898989"
+    		android:textColor="#FF000000"
             />
         
-    	<TextView
-        	android:id="@+id/msg_emotion_text"
-        	android:layout_width="match_parent"
-    		android:layout_height="wrap_content"
-    		android:text="你的心情量尺:" 
-    		android:textColor="#FF898989"
-        	/>
-
-    	<LinearLayout 
+    	<RelativeLayout 
     	    android:id="@+id/msg_emotion_layout"
     	    android:layout_width= "match_parent"
     	    android:layout_height="wrap_content"
     	    android:orientation="horizontal"
     	    >
+    	    <TextView
+        		android:id="@+id/msg_emotion_text"
+        		android:layout_width="wrap_content"
+    			android:layout_height="wrap_content"
+    			android:maxLines="1"
+    			android:text="你的心情量尺：" 
+    			android:textColor="#FF898989"
+        		/>
+    	    
     	    <RelativeLayout
     	        android:layout_width="wrap_content"
     	        android:layout_height="wrap_content"
+    	        android:layout_below="@+id/msg_emotion_text"
     	        >
+
     	    	<SeekBar
-        			android:id="@+id/msg_emotion_seek_bar"
-        			android:layout_width="wrap_content"
-        			android:layout_height="wrap_content" 
-        			android:progressDrawable="@+drawable/msg_bar_progress" 
-        			android:max="4"
-        		/>
+    	    	    android:id="@+id/msg_emotion_seek_bar"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:max="4"
+    	    	    android:progressDrawable="@drawable/msg_bar_progress"
+    	    	    android:thumb="@drawable/msg_bar_button" />
+				<ImageView 
+				    android:id ="@+id/msg_emotion_seek_start"
+    			    android:layout_width="wrap_content"
+    			    android:layout_height="wrap_content"
+    			    android:layout_toLeftOf="@+id/msg_emotion_seek_bar"
+    			    />
+
+    	    	<ImageView
+    	    	    android:id ="@+id/msg_emotion_seek_end"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:layout_toRightOf="@+id/msg_emotion_seek_bar"
+    	    	    android:baselineAlignBottom="true"
+    	    	     />
+
     	    	<TextView 
     	    	    android:id="@+id/msg_emotion_num"
     	    	    android:layout_width="wrap_content"
@@ -60,6 +76,7 @@
     	        android:id="@+id/msg_emotion_show_layout"
     	    	android:layout_width= "wrap_content"
     	    	android:layout_height="wrap_content"
+    	    	android:layout_alignParentRight="true"
     	    	android:orientation="vertical"
     	        >
     	        <ImageView 
@@ -77,34 +94,48 @@
         			android:gravity="center"
     		    	/>
     	    </LinearLayout>
-    	</LinearLayout>
+    	</RelativeLayout>
     	
 
-    	<TextView
-	        android:id="@+id/msg_desire_text"
-        	android:layout_width="match_parent"
-    		android:layout_height="wrap_content"
-    		android:text="你的渴癮程度:" 
-    		android:textColor="#FF898989"
-        	/>
+    	
 
-    	<LinearLayout 
+    	<RelativeLayout 
     	    android:id="@+id/msg_desire_layout"
     	    android:layout_width= "match_parent"
     	    android:layout_height="wrap_content"
-    	    android:orientation="horizontal"
     	    >
+    	    <TextView
+	        	android:id="@+id/msg_desire_text"
+        		android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:text="你的渴癮程度：" 
+    			android:textColor="#FF898989"
+        		/>
+    	    
     	    <RelativeLayout
     	        android:layout_width="wrap_content"
     	        android:layout_height="wrap_content"
+    	        android:layout_below="@+id/msg_desire_text"
     	        >
     	    	<SeekBar
-        			android:id="@+id/msg_desire_seek_bar"
-        			android:layout_width="wrap_content"
-        			android:layout_height="wrap_content"
-        			android:progressDrawable="@+drawable/msg_bar_progress" 
-        			android:max="9"
-        			/>
+    	    	    android:id="@+id/msg_desire_seek_bar"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:max="9"
+    	    	    android:progressDrawable="@drawable/msg_bar_progress"
+    	    	    android:thumb="@drawable/msg_bar_button" />
+    	    	<ImageView
+    	    	    android:id ="@+id/msg_desire_seek_start" 
+    			    android:layout_width="wrap_content"
+    			    android:layout_height="wrap_content"
+    			    android:layout_toLeftOf="@+id/msg_desire_seek_bar"
+    			    />
+    	    	<ImageView 
+    	    	    android:id ="@+id/msg_desire_seek_end" 
+    			    android:layout_width="wrap_content"
+    			    android:layout_height="wrap_content"
+    			    android:layout_toRightOf="@+id/msg_desire_seek_bar"
+    			    />
     	    	<TextView 
     	    	    android:id="@+id/msg_desire_num"
     	    	    android:layout_width="wrap_content"
@@ -113,31 +144,31 @@
     	    	    android:textColor="#FF898989"
     	    	    android:layout_below="@+id/msg_desire_seek_bar"
     	    	    />
-    	    </RelativeLayout>
-    	    <LinearLayout
-    	        android:id="@+id/msg_desire_show_layout"
-	        	android:layout_width="wrap_content"
-    			android:layout_height="wrap_content"
-    			android:orientation="vertical"
-        		>
+    	    	</RelativeLayout>
+    	    	<LinearLayout
+    	        	android:id="@+id/msg_desire_show_layout"
+	        		android:layout_width="wrap_content"
+    				android:layout_height="wrap_content"
+    				android:orientation="vertical"
+    				android:layout_alignParentRight="true"
+        			>
 
-    			<ImageView 
-	    	    	android:id="@+id/msg_desire_show"
-        			android:layout_width="wrap_content"
-        			android:layout_height="wrap_content"
-        			android:layout_gravity="center"
-    	    		/>
-    			<TextView
-	    		    android:id = "@+id/msg_desire_show_text"
-    		    	android:layout_width="wrap_content"
-        			android:layout_height="wrap_content"
-        			android:textColor="#FF898989"
-        			android:layout_gravity="center"
-        			android:gravity="center"
-    		    	/>
-		</LinearLayout>
-    	    
-    	</LinearLayout>
+    				<ImageView 
+	    	    		android:id="@+id/msg_desire_show"
+        				android:layout_width="wrap_content"
+        				android:layout_height="wrap_content"
+        				android:layout_gravity="center"
+    	    			/>
+    				<TextView
+		    		    android:id = "@+id/msg_desire_show_text"
+    		    		android:layout_width="wrap_content"
+        				android:layout_height="wrap_content"
+        				android:textColor="#FF898989"
+        				android:layout_gravity="center"
+        				android:gravity="center"
+    		    		/>
+			</LinearLayout>
+    	</RelativeLayout >
     	
 
 
@@ -148,14 +179,42 @@
     		android:text="是否回報現在位置?" 
     		android:textColor="#FF898989"
         	/>
-    	
-    	<Switch
-        	android:id="@+id/msg_gps_switch"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:textColor="#FF898989"
-        	/>
-    	
+    	<LinearLayout 
+    	    android:layout_width="match_parent"
+    		android:layout_height="wrap_content"
+    		android:orientation="horizontal"
+    	    >
+    	    <TextView 
+    	        android:id="@+id/msg_gps_no"
+    	        android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:textColor="#FF898989"
+        		android:text="否"
+        		android:gravity="center"
+    	        />
+
+    		<Switch
+    		    android:id="@+id/msg_gps_switch"
+    		    android:layout_width="wrap_content"
+    		    android:layout_height="wrap_content"
+    		    android:layout_gravity="center"
+    		    android:checked="false"
+    		    android:textColor="#FF898989"
+    		    android:thumb="@drawable/msg_switch_button"
+    		    android:track="@drawable/msg_switch" 
+    		    android:textOn=" "
+    		    android:textOff=" "
+    		    />
+
+    		<TextView 
+    	        android:id="@+id/msg_gps_yes"
+    	        android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:textColor="#FF898989"
+        		android:text="是"
+        		android:gravity="center"
+    	        />
+    	</LinearLayout>
     	<LinearLayout 
     	    android:layout_width="match_parent"
     	    android:layout_height="wrap_content"
@@ -175,6 +234,7 @@
     	        android:layout_height="wrap_content"
     	        android:gravity="center"
     	        android:text="寄送"
+    	        android:textColor="#FF898989"
     	        android:layout_weight="1"
     	        />
 
@@ -185,7 +245,7 @@
 	    android:id="@+id/msg_help"
 	    android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FF000000"
+        android:textColor="#FF898989"
 		android:layout_centerInParent="true"        
 	    />
 </RelativeLayout>

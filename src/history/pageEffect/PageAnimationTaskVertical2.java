@@ -20,9 +20,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 	private int[] bgs;
 	private HistoryFragment historyFragment;
 	
-	private PointF endTouch;
 	private int startImageIdx;
-	private int endImageIdx;
 	
 	private Bitmap cur=null,next=null,tmp=null;
 	private Bitmap prev_cur=null,prev_next=null;
@@ -33,7 +31,6 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		this.pageWidget = pageWidget;
 		this.from = from;
 		this.to = to;
-		this.endTouch = endTouch;
 		this.startImageIdx = startImageIdx;
 		
 		this.historyFragment = historyFragment;
@@ -47,9 +44,6 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 	@Override
 	protected Void doInBackground(Void... arg0) {
 		Log.d("PageAnimation","Start animation");
-		int width = pageWidget.getWidth2();
-		int height = pageWidget.getHeight2();
-		
 		
 		cur=null;next=null;tmp=null;
 		prev_cur=null;prev_next=null;
@@ -58,20 +52,12 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		
 		int curC = startImageIdx;
 		
-		Bitmap pCur,pNext;
-		
 		if  (type == 1){// cur to next ()
 			Log.d("PAGE_ANIMATION", "in UP");
-			BitmapFactory.Options opt = new BitmapFactory.Options();
-			opt.inSampleSize = 3;
 			
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC],opt);
-			cur = Bitmap.createScaledBitmap(tmp, width,height , true);
-			tmp.recycle();
+			cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
 			
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1],opt);
-			next = Bitmap.createScaledBitmap(tmp, width,height , true);
-			tmp.recycle();
+			next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1]);
 			
 			pageWidget.setBitmaps(cur, next);
 			pageWidget.setTouchPosition(from);
@@ -96,15 +82,9 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		}else{ //next to cur (DOWN)
 			Log.d("PAGE_ANIMATION", "in DOWN");
 			
-			BitmapFactory.Options opt = new BitmapFactory.Options();
-			opt.inSampleSize = 3;
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC],opt);
-			next = Bitmap.createScaledBitmap(tmp, width,height , true);
-			tmp.recycle();
+			next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
 			
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1],opt);
-			cur = Bitmap.createScaledBitmap(tmp, width,height , true);
-			tmp.recycle();
+			cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
 			
 			pageWidget.setBitmaps(cur, next);
 			pageWidget.setTouchPosition(to);

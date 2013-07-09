@@ -2,6 +2,7 @@ package ubicomp.drunk_detection.activities;
 
 import ubicomp.drunk_detection.activities.R;
 import statistic.statisticPageView.StatisticPageView;
+import statistic.statisticPageView.analysis.AnalysisCounterView;
 import statistic.statisticPageView.analysis.AnalysisProgressView;
 import statistic.statisticPageView.analysis.AnalysisRatingView;
 import statistic.statisticPageView.analysis.AnalysisSavingView;
@@ -10,10 +11,9 @@ import statistic.ui.QuestionMsgBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,8 +29,8 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -44,21 +44,18 @@ public class StatisticFragment extends Fragment {
 	private StatisticPagerAdapter statisticViewAdapter;
 	private RelativeLayout statisticLayout,dots_layout;
 	private ImageView[] dots;
+	private Drawable dot_on,dot_off;
 	private LinearLayout analysisLayout;
 	private StatisticPageView[] analysisViews;
 	private static Point statistic_px,analysis_px;
 	private ScrollView analysisView;
-	private Bitmap dot_on, dot_off;
 	private LoadingHandler loadHandler;
 	private StatisticFragment statisticFragment;
 	
 	private ImageView questionButton;
-	private Bitmap questionButtonBmp, questionButtonPassBmp, questionButtonFailBmp;
+	private FrameLayout shadow;
 	
 	private ImageView showImage;
-	private TextView showText;
-	
-	private Typeface wordTypeface;
 	
 	private ShowDismissHandler showDismissHandler;
 	
@@ -94,10 +91,11 @@ public class StatisticFragment extends Fragment {
     	
     	statisticFragment = this;
     	
-    	analysisViews = new StatisticPageView[3];
+    	analysisViews = new StatisticPageView[4];
     	analysisViews[0] = new AnalysisProgressView(activity, statisticFragment);
-    	analysisViews[1] = new AnalysisSavingView(activity, statisticFragment);
-		analysisViews[2] = new AnalysisRatingView(activity,statisticFragment);
+    	analysisViews[1] = new AnalysisCounterView(activity, statisticFragment);
+    	analysisViews[2] = new AnalysisSavingView(activity, statisticFragment);
+		analysisViews[3] = new AnalysisRatingView(activity,statisticFragment);
     	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		
@@ -120,33 +118,7 @@ public class StatisticFragment extends Fragment {
     }
     
 	private void clear(){
-		if (dots !=null)
-			for (int i=0;i<dots.length;++i)
-				if (dots[i] != null)
-					dots[i].setImageBitmap(null);
-		if (questionButton !=null)
-			questionButton.setImageBitmap(null);
     	
-    	if (dot_on!=null && !dot_on.isRecycled()){
-    		dot_on.recycle();
-    		dot_on=null;
-    	}
-    	if (dot_off!=null && !dot_off.isRecycled()){
-    		dot_off.recycle();
-    		dot_off=null;
-    	}
-    	if (questionButtonBmp !=null && !questionButtonBmp.isRecycled()){
-    		questionButtonBmp.recycle();
-    		questionButtonBmp = null;
-    	}
-    	if (questionButtonFailBmp !=null && !questionButtonFailBmp.isRecycled()){
-    		questionButtonFailBmp.recycle();
-    		questionButtonBmp = null;
-    	}
-    	if (questionButtonBmp !=null && !questionButtonBmp.isRecycled()){
-    		questionButtonBmp.recycle();
-    		questionButtonBmp = null;
-    	}
     	statisticViewAdapter.clear();
     	for (int i=0;i<analysisViews.length;++i){
     		analysisViews[i].clear();
@@ -186,8 +158,8 @@ public class StatisticFragment extends Fragment {
 			
 			clickLogger.click_logging(System.currentTimeMillis(), "RecordStatisticPage" + (arg0+1) + "_scrolled");
 			for (int i=0;i<3;++i)
-				dots[i].setImageBitmap(dot_off);
-			dots[arg0].setImageBitmap(dot_on);
+				dots[i].setImageDrawable(dot_off);
+			dots[arg0].setImageDrawable(dot_on);
 		}
     	
     }
@@ -198,7 +170,8 @@ public class StatisticFragment extends Fragment {
 			FragmentTabs.enableTab(false);
 			
         	Point screen = FragmentTabs.getSize();
-        	statistic_px = new Point(screen.x,screen.x*1011/1080);
+        	statistic_px = new Point(screen.x,screen.x*380/480);
+        	
         	
         	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
         	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
@@ -210,16 +183,11 @@ public class StatisticFragment extends Fragment {
         	analysisView = (ScrollView) view.findViewById(R.id.brac_analysis);
         	dots_layout = (RelativeLayout) view.findViewById(R.id.brac_statistics_dots);
         	
-        	wordTypeface = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w3.otf");
-        	
     		questionButton = (ImageView) view.findViewById(R.id.question_background);
         	questionButton.setOnClickListener(new QuestionOnClickListener());
     		
-    		
+        	shadow = (FrameLayout) view.findViewById(R.id.statistic_shadow);
     		showImage = (ImageView) view.findViewById(R.id.statistic_picture);
-    		showText = (TextView) view.findViewById(R.id.statistic_text);
-    		showText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int)(screen.x * 42.0/720.0));
-    		showText.setTypeface(wordTypeface);
     		
         	for (int i=0;i<analysisViews.length;++i)
     			analysisLayout.addView(analysisViews[i].getView());
@@ -234,27 +202,22 @@ public class StatisticFragment extends Fragment {
         	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
         	analysisViewLayoutParam.height = screen.x * 1920/1080 - statistic_px.y - FragmentTabs.getTabSize().y;
         	
-	    	dot_on = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_dot_on);
-	    	dot_off = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_dot_off);
+	    	dot_on = getResources().getDrawable(R.drawable.statistic_dot_on);
+	    	dot_off = getResources().getDrawable(R.drawable.statistic_dot_off);
 			
 	    	RelativeLayout.LayoutParams dotsLayoutParam = (android.widget.RelativeLayout.LayoutParams) dots_layout.getLayoutParams();
-	    	dotsLayoutParam.topMargin = screen.x*920/1080;
+	    	dotsLayoutParam.topMargin = screen.x*350/480;
 	    	
 			statisticViewAdapter.onInBackground();
     		for (int i=0;i<analysisViews.length;++i)
     			analysisViews[i].onInBackground();
 			
-			int dot_size = screen.x*27/1080;
-	    	int dot_gap =dot_size;
+	    	int dot_gap =screen.x * 10/480;
 			
 	    	dots = new ImageView[3];
 	    	for (int i=0;i<3;++i){
 	    		dots[i] = new ImageView(dots_layout.getContext());
-	    		dots[i].setScaleType(ScaleType.FIT_XY);
 	    		dots_layout.addView(dots[i]);
-	    		RelativeLayout.LayoutParams dotParam = (android.widget.RelativeLayout.LayoutParams) dots[i].getLayoutParams();
-	    		dotParam.width = dot_size;
-	    		dotParam.height = dot_size;
 	    		dots[i].setId(DOT_ID[i]);
 	    	}
 	    	
@@ -272,43 +235,18 @@ public class StatisticFragment extends Fragment {
     			analysisViews[i].onPostTask();
     		
 	    	statisticView.setCurrentItem(0);
-	    	
-	    	if (dot_off!=null && !dot_off.isRecycled() && dot_on !=null && !dot_on.isRecycled()){
-	    		for (int i=0;i<3;++i)
-	    			dots[i].setImageBitmap(dot_off);
-				dots[0].setImageBitmap(dot_on);
-	    	}
-			Bitmap tmp;
+	    
+    		for (int i=0;i<3;++i)
+    			dots[i].setImageDrawable(dot_off);
+			dots[0].setImageDrawable(dot_on);
 			
-			if (questionButtonBmp==null ||questionButtonBmp.isRecycled()){
-				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button);
-				questionButtonBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
-				tmp.recycle();
-			}
-			if (questionButtonPassBmp==null ||questionButtonPassBmp.isRecycled()){
-				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button_pass);
-				questionButtonPassBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
-				tmp.recycle();
-			}
-			if (questionButtonFailBmp==null ||questionButtonFailBmp.isRecycled()){
-				tmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.statistic_question_button_fail);
-				questionButtonFailBmp = Bitmap.createScaledBitmap(tmp, screen.x * 70 / 1080, screen.x * 70 / 1080, true);
-				if (!tmp.equals(questionButtonFailBmp))
-					tmp.recycle();
-			}
 			RelativeLayout.LayoutParams questionParam = (RelativeLayout.LayoutParams) questionButton.getLayoutParams();
-			questionParam.width =  screen.x * 153 / 1080;
-			questionParam.height =  screen.x * 153 / 1080;
-			questionParam.topMargin =  screen.x * 107 / 1080;
-			questionParam.rightMargin =  screen.x * 58 / 1080;
+			questionParam.topMargin =  screen.x * 23 / 480;
+			questionParam.rightMargin =  screen.x * 23 / 480;
 			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			boolean tested = sp.getBoolean("tested", false);
 			int result = sp.getInt("latest_result", 0);
-			
-			RelativeLayout.LayoutParams showParam = (RelativeLayout.LayoutParams) showImage.getLayoutParams();
-			showParam.width = screen.x * 563/1080;
-			showParam.height = screen.x * 160/1080;
 			
 			if (tested){
 				if (result <=1)
@@ -316,7 +254,7 @@ public class StatisticFragment extends Fragment {
 				else
 					showImage.setImageResource(R.drawable.statistic_show_fail);
 				
-				
+				shadow.setVisibility(View.VISIBLE);
 				showImage.setVisibility(View.VISIBLE);
 				SharedPreferences.Editor editor = sp.edit();
 		    	editor.putBoolean("tested", false);
@@ -326,7 +264,7 @@ public class StatisticFragment extends Fragment {
 			}
 			else{
 				showImage.setVisibility(View.INVISIBLE);
-				showText.setVisibility(View.INVISIBLE);
+				shadow.setVisibility(View.INVISIBLE);
 				FragmentTabs.enableTab(true);
 			}
 			
@@ -351,7 +289,7 @@ public class StatisticFragment extends Fragment {
 	private class ShowDismissHandler extends Handler{
 		public void handleMessage(Message msg){
 			showImage.setVisibility(View.INVISIBLE);
-			showText.setVisibility(View.INVISIBLE);
+			shadow.setVisibility(View.INVISIBLE);
 			FragmentTabs.enableTab(true);
 		}
 	}
@@ -394,15 +332,11 @@ public class StatisticFragment extends Fragment {
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 		int result = sp.getInt("latest_result", -1);
 		if (result  == -1){
-			if (questionButtonBmp!=null && !questionButtonBmp.isRecycled())
-				questionButton.setImageBitmap(questionButtonBmp);
 			questionAnimation.cancel();
 			questionButton.setAnimation(null);
 			questionButton.setAlpha(1.0F);
 		}
 		else{
-			if (questionButtonBmp!=null && !questionButtonBmp.isRecycled())
-				questionButton.setImageBitmap(questionButtonBmp);
 			questionButton.setAnimation(questionAnimation);
 			questionAnimation.start();
 		}

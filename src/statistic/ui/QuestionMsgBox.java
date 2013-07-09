@@ -14,10 +14,8 @@ import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,8 +44,7 @@ public class QuestionMsgBox {
 	
 	private ImageView exitView;
 	
-	private Bitmap choiceBmp, choiceSelectedBmp;
-	private Bitmap bgBmp, bgTopBmp, bgBottomBmp,exitBmp;
+	private Drawable choiceDrawable, choiceSelectedDrawable;
 	private ImageView top,bottom;
 	
 	private Resources r;
@@ -96,48 +93,18 @@ public class QuestionMsgBox {
 		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
 		boxParam.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
-		boxParam.width = screen.x * 810/1080;
+		boxParam.width = screen.x * 358/480;
 		RelativeLayout.LayoutParams qParam = (LayoutParams) questionAllLayout.getLayoutParams();
-		qParam.width = screen.x * 771/1080;
-		qParam.topMargin = screen.x * 39/1080;
-		LinearLayout.LayoutParams topParam = (LinearLayout.LayoutParams) top.getLayoutParams();
-		topParam.width = screen.x * 771/1080;
-		topParam.height = screen.x * 50/1080;
-		LinearLayout.LayoutParams bottomParam = (LinearLayout.LayoutParams) bottom.getLayoutParams();
-		bottomParam.width = screen.x * 771/1080;
-		bottomParam.height = screen.x * 69/1080;
-		RelativeLayout.LayoutParams eParam = (LayoutParams) exitView.getLayoutParams();
-		eParam.width = eParam.height = screen.x * 77/1080;
+		qParam.topMargin = screen.x * 12/480;
 	}
 	
 	
 	public void settingInBackground(){
-		Bitmap tmp;
-		tmp = BitmapFactory.decodeResource(r, R.drawable.question_bg_top);
-		bgTopBmp = Bitmap.createScaledBitmap(tmp,screen.x *771/1080, screen.x * 50 / 1080, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.question_bg_bottom);
-		bgBottomBmp = Bitmap.createScaledBitmap(tmp,screen.x *771/1080, screen.x * 69 / 1080, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.question_bg_content);
-		bgBmp = Bitmap.createScaledBitmap(tmp,screen.x *771/1080, screen.x * 305 / 1080, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.question_close);
-		exitBmp = Bitmap.createScaledBitmap(tmp,screen.x *77/1080, screen.x * 77 / 1080, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.question_choice);
-		choiceBmp = Bitmap.createScaledBitmap(tmp,screen.x *48/1080, screen.x * 48/ 1080, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.question_choice_selection);
-		choiceSelectedBmp = Bitmap.createScaledBitmap(tmp,screen.x *48/1080, screen.x * 48/ 1080, true);
-		tmp.recycle();
+		choiceDrawable = r.getDrawable(R.drawable.question_choice);
+		choiceSelectedDrawable = r.getDrawable(R.drawable.question_choice_selection);
 	}
 	
 	public  void settingPostTask(){
-		exitView.setImageBitmap(exitBmp);
-		top.setImageBitmap(bgTopBmp);
-		bottom.setImageBitmap(bgBottomBmp);
-		questionLayout.setBackground(new BitmapDrawable(r,bgBmp));
 		exitView.setOnClickListener(new ExitListener());
 	}
 	
@@ -151,31 +118,6 @@ public class QuestionMsgBox {
 		
 		if (boxLayout !=null)
 			mainLayout.removeView(boxLayout);
-		
-		if (bgBmp!=null && !bgBmp.isRecycled()){
-			bgBmp.recycle();
-			bgBmp = null;
-		}
-		if (bgTopBmp!=null && !bgTopBmp.isRecycled()){
-			bgTopBmp.recycle();
-			bgTopBmp = null;
-		}
-		if (bgBottomBmp!=null && !bgBottomBmp.isRecycled()){
-			bgBottomBmp.recycle();
-			bgBottomBmp = null;
-		}
-		if (exitBmp!=null && !exitBmp.isRecycled()){
-			exitBmp.recycle();
-			exitBmp = null;
-		}
-		if (choiceBmp!=null && !choiceBmp.isRecycled()){
-			choiceBmp.recycle();
-			choiceBmp = null;
-		}
-		if (choiceSelectedBmp!=null && !choiceSelectedBmp.isRecycled()){
-			choiceSelectedBmp.recycle();
-			choiceSelectedBmp = null;
-		}
 	}
 	
 	public void generateType0Box(){
@@ -236,12 +178,12 @@ public class QuestionMsgBox {
 		return context;
 	}
 	
-	public Bitmap getChoiceBmp(){
-		return choiceBmp;
+	public Drawable getChoiceDrawable(){
+		return choiceDrawable;
 	}
 	
-	public Bitmap getChoiceSelectedBmp(){
-		return choiceSelectedBmp;
+	public Drawable getChoiceSelectedDrawable(){
+		return choiceSelectedDrawable;
 	}
 	
 	public LinearLayout getQuestionnaireLayout(){

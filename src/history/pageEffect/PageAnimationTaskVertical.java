@@ -12,10 +12,10 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 
 	private PageWidgetVertical pageWidget;
 	private PointF from;
-	private float width_gap_1,width_gap_2,width_gap_3,width_gap_4;
-	private float height_gap_1,height_gap_2,height_gap_3,height_gap_4;
-	public static final int gaps = 100;
-	private static final int clip_time = 1000;
+	private float width_gap_1;
+	private float height_gap_1;
+	public static final int gaps = 30;
+	private static final int clip_time = 300;
 	private static final int sleep_time = clip_time/gaps;
 	private int[] bgs;
 	private HistoryFragment historyFragment;
@@ -61,9 +61,6 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	@Override
 	protected Void doInBackground(Void... arg0) {
 		Log.d("PageAnimation","Start animation");
-		int width = pageWidget.getWidth2();
-		int height = pageWidget.getHeight2();
-		
 		
 		cur=null;next=null;tmp=null;
 		prev_cur=null;prev_next=null;
@@ -72,19 +69,13 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 			if (c > endImageIdx)
 				break;
 			
-			BitmapFactory.Options opt = new BitmapFactory.Options();
-			opt.inSampleSize = 3;
 			if (prev_next!=null){
 				cur = prev_next;
 			}
 			else{
-				tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c],opt);
-				cur = Bitmap.createScaledBitmap(tmp, width,height , true);
-				tmp.recycle();
+				cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c]);
 			}
-			tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c+1],opt);
-			next = Bitmap.createScaledBitmap(tmp, width,height , true);
-			tmp.recycle();
+			next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c+1]);
 			
 			pageWidget.setBitmaps(cur, next);
 			pageWidget.setTouchPosition(from);

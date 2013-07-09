@@ -1,8 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tutorial_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/tutorial_layout"
+    android:background="@drawable/tutorial_bg"
     tools:context=".TutorialActivity" >
 
     <TextView 
@@ -13,37 +14,6 @@
         android:layout_centerHorizontal="true"
         />
     
-    <TextView 
-        android:id="@+id/tutorial_help"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FF7c7d7c"
-        android:layout_below="@+id/tutorial_step"
-        android:layout_centerHorizontal="true"
-        />
-    
-    <ImageView 
-        android:id="@+id/tutorial_reply"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        />
-    
-     <ImageView 
-        android:id="@+id/tutorial_next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        />
-     
-     <ImageView 
-        android:id="@+id/tutorial_tab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-         android:layout_alignParentBottom="true"
-        />
      <TextView 
         android:id="@+id/tutorial_notify"
         android:layout_width="wrap_content"
@@ -51,15 +21,37 @@
         android:layout_below="@+id/tutorial_step"
         android:layout_centerHorizontal="true"
        	android:textColor="#FF7c7d7c"
-       	android:text="請點擊進入下一步"
+       	android:text="點擊進入下一步"
         />
+    
+    <TextView 
+        android:id="@+id/tutorial_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF7c7d7c"
+        android:layout_below="@+id/tutorial_notify"
+        android:layout_centerHorizontal="true"
+        />
+    
+    <ImageView
+        android:id="@+id/tutorial_reply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/tutorial_replay" />
      
+     <ImageView
+         android:id="@+id/tutorial_tab"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:src="@drawable/tutorial_tab" />
      
      <ImageView 
         android:id="@+id/tutorial_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleType="fitXY"
         />
      
 

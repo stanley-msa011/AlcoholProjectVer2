@@ -9,19 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
+
         <ImageView
-        	android:id ="@+id/analysis_saving_title_bg"
-        	android:layout_width="match_parent"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-        	/>
+            android:id="@+id/analysis_saving_title_bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/analysis_title_bar" />
+
    		<TextView
         	android:id ="@+id/analysis_saving_title"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:text="已節省金錢" 
-        	android:layout_centerVertical="true"
         	android:gravity="center"
         	android:textAlignment="center"
         	android:textColor="#FFFFFFFF"
@@ -30,7 +29,7 @@
 
     <TextView
         android:id ="@+id/analysis_saving_help"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FF000000"
         android:textAlignment="center"
@@ -44,38 +43,36 @@
         >
 
 	    <ImageView
-    	    android:id="@+id/analysis_saving_bar"
-       		android:layout_width="wrap_content"
+	        android:id="@+id/analysis_saving_bar"
+	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-        	/>
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/analysis_money_bar" />
         
 	    <ImageView
-            android:id="@+id/analysis_saving_cur_bar_start"
-       		android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-	        />
+	        android:id="@+id/analysis_saving_cur_bar_start"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/analysis_money_cur_bar_start" />
 	    
         <ImageView
             android:id="@+id/analysis_saving_cur_bar"
-       		android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-        	android:layout_toRightOf="@+id/analysis_saving_cur_bar_start"
-	        />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:layout_toRightOf="@+id/analysis_saving_cur_bar_start"
+            android:src="@drawable/analysis_money_cur_bar_internal" />
         
         <ImageView
             android:id="@+id/analysis_saving_cur_bar_end"
-       		android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-        	android:layout_toRightOf="@+id/analysis_saving_cur_bar"
-	        />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/analysis_saving_cur_bar"
+            android:src="@drawable/analysis_money_cur_bar_end" />
         
        </RelativeLayout>
 

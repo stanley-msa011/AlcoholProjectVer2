@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/titlebar_icon" 
-        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
         />
     <TextView 
         android:id="@+id/titlebar_text"
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:textColor="#FFFFFFFF"
         android:layout_toRightOf="@+id/titlebar_icon"
-        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
         />
 
 </RelativeLayout>

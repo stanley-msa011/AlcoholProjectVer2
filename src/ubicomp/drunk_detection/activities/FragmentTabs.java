@@ -3,16 +3,15 @@ package ubicomp.drunk_detection.activities;
 import ubicomp.drunk_detection.activities.R;
 import tabControl.CustomTab;
 import test.data.Reuploader;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -25,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
@@ -55,6 +55,10 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private FragmentTabs fragmentTabs; 
 	
+	private LoadingPageHandler loadingPageHandler;
+	
+	private Thread t;
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -64,6 +68,9 @@ public class FragmentTabs extends FragmentActivity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.tab_layout);
+		
+		loading_page = (ImageView) this.findViewById(R.id.loading_page);
+		
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
@@ -96,8 +103,12 @@ public class FragmentTabs extends FragmentActivity {
 		fragments = new Fragment[3];
 		tabHost.setOnTabChangedListener(new TabChangeListener());
 		
-		tabHost.setCurrentTab(2);
+		tabHost.setCurrentTab(1);
 		tabHost.setCurrentTab(0);
+		
+		loadingPageHandler = new LoadingPageHandler();
+		t = new Thread(new TimerRunnable());
+		t.start();
 		
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -136,6 +147,7 @@ public class FragmentTabs extends FragmentActivity {
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){
+			loading_page.setVisibility(View.INVISIBLE);
 			Intent newIntent = new Intent(this, PreSettingActivity.class);
 			this.startActivity(newIntent);
 			return;
@@ -263,7 +275,6 @@ public class FragmentTabs extends FragmentActivity {
 				return;
 			
 			resetState();
-			//if (!firstLoading)
 			LoadingBox.show(fragmentTabs);
 			
 			Log.d("Eric", tabId);
@@ -333,6 +344,30 @@ public class FragmentTabs extends FragmentActivity {
 	public void resetState(){
 		state = 0;
 	}
+	
+	private ImageView loading_page;
+	
+	private class TimerRunnable implements Runnable{
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(5000);
+				loadingPageHandler.sendEmptyMessage(0);
+			} catch (InterruptedException e) {}
+		}
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class LoadingPageHandler extends Handler{
+		public void handleMessage(Message msg){
+			if(msg.what == 0){
+				loading_page.setVisibility(View.INVISIBLE);
+			}
+			else
+				loading_page.setVisibility(View.VISIBLE);
+		}
+	}
+	
 	
 	private int state;
 	/*

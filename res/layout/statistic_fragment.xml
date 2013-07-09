@@ -3,8 +3,7 @@
     android:id="@+id/statistic_fragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFFFF"
-   >
+    android:background="@drawable/statistic_background_all" >
 
 <LinearLayout 
     android:layout_width="match_parent"
@@ -14,9 +13,9 @@
 
     <RelativeLayout
         android:id="@+id/brac_statistics_layout"
-        android:layout_height="1dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        > <!-- Eric:0dp 0->1dp -->
+        >
     	<android.support.v4.view.ViewPager
         	android:id="@+id/brac_statistics"
         	android:layout_height="match_parent"
@@ -48,27 +47,26 @@
 
 </LinearLayout>
 
+<FrameLayout 
+    android:id="@+id/statistic_shadow"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#AA000000"
+    android:visibility="invisible"
+    />
+
+
 <ImageView
     android:id = "@+id/statistic_picture"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
     />
-<TextView
-    android:id = "@+id/statistic_text"
+<ImageView
+    android:id="@+id/question_background"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_centerHorizontal="true"
-    android:layout_below="@+id/statistic_picture"
-    android:textColor="#FF000000"
-    />
-
-		<ImageView
-        	android:id = "@+id/question_background"
-        	android:layout_width ="match_parent"
-        	android:layout_height ="match_parent"
-        	android:layout_alignParentRight="true"
-        	android:scaleType="fitXY"
-       />
+    android:layout_alignParentRight="true"
+    android:src="@drawable/statistic_question_button" />
 
 </RelativeLayout>

@@ -22,9 +22,12 @@ public class CallCheckContent extends QuestionnaireContent {
 
 	@Override
 	protected void setContent() {
-		if (isEmotion)
+		if (isEmotion){
 			seq.add(",1");
-		setHelp("確定要撥給 "+name +" ?");
+			setHelp("確定撥打心情專線？");
+		}
+		else
+			setHelp("確定要撥給 "+name +" ?");
 		setSelectItem("確定",new CallOnClickListener(msgBox));
 	}
 

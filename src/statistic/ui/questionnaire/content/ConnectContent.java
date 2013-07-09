@@ -27,7 +27,7 @@ public class ConnectContent extends QuestionnaireContent {
 	@Override
 	protected void setContent() {
 		seq.add(","+type+",5");
-		setHelp("請選擇連絡對象：");
+		setHelp("要打給誰？");
 		for (int i=0;i<dummyNames.length;++i){
 			setSelectItem(dummyNames[i]+":"+dummyPhones[i],new CallCheckOnClickListener(msgBox,dummyNames[i],dummyPhones[i]));
 		}

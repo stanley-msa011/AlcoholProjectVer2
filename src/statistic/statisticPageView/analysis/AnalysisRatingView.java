@@ -4,16 +4,11 @@ import data.rank.RankHistory;
 import database.HistoryDB;
 import ubicomp.drunk_detection.activities.R;
 import interaction.UserLevelCollector;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -27,17 +22,13 @@ import ubicomp.drunk_detection.activities.StatisticFragment;
 public class AnalysisRatingView extends StatisticPageView {
 
 	private TextView title;
-	private ImageView title_bg;
-	private Bitmap titleBmp;
 	
 	private TextView help, help2;
 	private TextView low,high, low2 , high2;
 	private HistoryDB db;
 	
-	private ImageView bar, pointer, bar2 , pointer2;
-	private Bitmap barBmp, pointerBmp;
+	private ImageView pointer, pointer2;
 	
-	private NetworkHandler netHandler;
 	private NetworkTask netTask;
 	
 	private RelativeLayout contentLayout;
@@ -54,37 +45,9 @@ public class AnalysisRatingView extends StatisticPageView {
 
 	@Override
 	public void clear() {
-		if (title_bg!=null)
-			title_bg.setImageBitmap(null);
-		
-		if (bar !=null)
-			bar.setImageBitmap(null);
-		if (pointer !=null)
-			pointer.setImageBitmap(null);
-		if (bar2!=null)
-			bar2.setImageBitmap(null);
-		if (pointer !=null)
-			pointer.setImageBitmap(null);
-		
-		if (netHandler!=null)
-			netHandler.removeMessages(0);
-		
 		if (netTask != null && !netTask.isCancelled()){
 			netTask.cancel(true);
 		}
-		if (titleBmp!=null && !titleBmp.isRecycled()){
-			titleBmp.recycle();
-			titleBmp = null;
-		}
-		if (barBmp!=null && !barBmp.isRecycled()){
-			barBmp.recycle();
-			barBmp = null;
-		}
-		if (pointerBmp!=null && !pointerBmp.isRecycled()){
-			pointerBmp.recycle();
-			pointerBmp = null;
-		}
-		
 	}
 
 	private void setPointer(){
@@ -145,17 +108,15 @@ public class AnalysisRatingView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		
-		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		wordTypeface = Typeface.createFromAsset(context.getAssets(),"fonts/DFLiHeiStd-W3.otf");
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
-		int textSize = screen.x * 54/1080;
+		int textSize = screen.x * 21/480;
 		
 		title = (TextView) view.findViewById(R.id.analysis_rating_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		title.setTypeface(wordTypeface);
-		
-		title_bg = (ImageView) view.findViewById(R.id.analysis_rating_title_bg);
 		
 		help = (TextView) view.findViewById(R.id.analysis_rating_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
@@ -164,9 +125,7 @@ public class AnalysisRatingView extends StatisticPageView {
 		help2.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		help2.setTypeface(wordTypeface);
 		
-		bar = (ImageView) view.findViewById(R.id.analysis_rating_bar);
 		pointer  = (ImageView) view.findViewById(R.id.analysis_rating_pointer);
-		bar2 = (ImageView) view.findViewById(R.id.analysis_rating_bar2);
 		pointer2  = (ImageView) view.findViewById(R.id.analysis_rating_pointer2);
 		
 		low = (TextView) view.findViewById(R.id.analysis_rating_low);
@@ -192,63 +151,29 @@ public class AnalysisRatingView extends StatisticPageView {
 	public void onInBackground() {
 		Point screen = StatisticFragment.getStatisticPx();
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
-		titleParam.leftMargin = screen.x * 135/1080;
+		titleParam.leftMargin = screen.x * 40/480;
 		
-		RelativeLayout.LayoutParams titleBgParam = (RelativeLayout.LayoutParams)title_bg.getLayoutParams();
-		titleBgParam.width = screen.x;
-		titleBgParam.height = screen.x * 59/1080;
-		
-		BitmapFactory.Options opt = new BitmapFactory.Options();
-    	opt.inSampleSize = 2;
-		Bitmap tmp;
-    	
-		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_title_bar,opt);
-		titleBmp = Bitmap.createScaledBitmap(tmp, screen.x,screen.x * 59/1080,true);
-		tmp.recycle();
 		
 		LinearLayout.LayoutParams helpParam = (LinearLayout.LayoutParams)help.getLayoutParams();
-		helpParam.topMargin = helpParam.bottomMargin =  screen.x * 24/1080;
+		helpParam.topMargin = helpParam.bottomMargin =  screen.x * 11/480;
+		helpParam.leftMargin = screen.x * 40/480;
 		LinearLayout.LayoutParams helpParam2 = (LinearLayout.LayoutParams)help2.getLayoutParams();
-		helpParam2.topMargin = helpParam2.bottomMargin =  screen.x * 24/1080;
+		helpParam2.topMargin = helpParam2.bottomMargin =  screen.x * 11/480;
+		helpParam2.leftMargin = screen.x * 40/480;
 		
-		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)bar.getLayoutParams();
-		barParam.width = screen.x * 901/1080;
-		barParam.height = screen.x * 65/1080;
-		RelativeLayout.LayoutParams barParam2 = (RelativeLayout.LayoutParams)bar2.getLayoutParams();
-		barParam2.width =screen.x * 901/1080;
-		barParam2.height = screen.x * 65/1080;
-		
-		minLeftPointer  = screen.x * 117/1080;
-		tmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_rating_bar,opt);
-		barBmp = Bitmap.createScaledBitmap(tmp, barParam.width,barParam.height,true);
-		maxLeftPointer = minLeftPointer +  screen.x * 850/1080;
-		
-		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
-		pointerParam.width =screen.x * 6/1080;
-		pointerParam.height = screen.x * 65/1080;
-		RelativeLayout.LayoutParams pointerParam2 = (RelativeLayout.LayoutParams)pointer2.getLayoutParams();
-		pointerParam2.width = screen.x * 6/1080;
-		pointerParam2.height = screen.x * 65/1080;
-		
-		pointerBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.analysis_rating_pointer);
-		
+		minLeftPointer  = screen.x * 181/1080;
+		maxLeftPointer = minLeftPointer +  screen.x * 898/1080;
 		
 		LinearLayout.LayoutParams contentParam = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
-		contentParam.bottomMargin = screen.x * 30/1080;
+		contentParam.bottomMargin = screen.x * 11/480;
 		LinearLayout.LayoutParams contentParam2 = (LinearLayout.LayoutParams)contentLayout2.getLayoutParams();
-		contentParam2.bottomMargin =  screen.x * 30/1080;
+		contentParam2.bottomMargin =  screen.x * 11/480;
 	}
 
 	@Override
 	public void onPostTask() {
-		title_bg.setImageBitmap(titleBmp);
-		bar.setImageBitmap(barBmp);
-		pointer.setImageBitmap(pointerBmp);
-		bar2.setImageBitmap(barBmp);
-		pointer2.setImageBitmap(pointerBmp);
-		
 		help.setText("與其他戒酒朋友相比，您的排名為" );
-		help2.setText("與AA成員相比，您的排名為" );
+		help2.setText("與表現較佳的成員相比，您的排名為" );
 		setPointer();
 		netTask = new NetworkTask();
 		netTask.execute();
@@ -261,21 +186,6 @@ public class AnalysisRatingView extends StatisticPageView {
 	
 	private RankHistory[] historys;
 	private UserLevelCollector levelCollector;
-	
-	@SuppressLint("HandlerLeak")
-	private class NetworkHandler extends Handler{
-		public void handleMessage(Message msg){
-			Log.d("NetworkLoadingTask","StartLoading");
-			levelCollector = new UserLevelCollector(view.getContext());
-			historys = levelCollector.update();
-			
-			if (historys == null)
-				return;
-			for (int i=0;i<historys.length;++i)
-				db.insertInteractionHistory(historys[i]);
-			setPointer();
-		}
-	}
 	
 	private class NetworkTask extends AsyncTask<Void, Void, Void>{
 

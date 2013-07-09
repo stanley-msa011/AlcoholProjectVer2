@@ -26,8 +26,8 @@ public class EmotionActivity extends Activity {
 
 	private LayoutInflater inflater;
 	
-	private int textSize = 24;
-	private Typeface wordTypeface;
+	private int textSize;
+	private int iconMargin;
 	private Typeface wordTypefaceBold;
 	
 	private LinearLayout mainLayout;
@@ -64,8 +64,6 @@ public class EmotionActivity extends Activity {
 	QuestionDB db;
 	
 	private Point screen;
-	private int height;
-	private int icon_size; 
 	
 	private int state = 0;
 	
@@ -99,8 +97,7 @@ public class EmotionActivity extends Activity {
 		this.activity = this;
 		mainLayout = (LinearLayout) this.findViewById(R.id.emotion_main_layout);
 		inflater = LayoutInflater.from(activity);
-		wordTypeface = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w3.otf");
-		wordTypefaceBold = Typeface.createFromAsset(activity.getAssets(), "fonts/dfheistd-w5.otf");
+		wordTypefaceBold = Typeface.createFromAsset(activity.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		db = new QuestionDB(activity);
 		setQuestionStart();
 
@@ -112,33 +109,25 @@ public class EmotionActivity extends Activity {
 		mainLayout.removeAllViews();
 		onTouchListener = new ItemOnTouchListener();
 		
-		textSize = screen.x * 72/1080;
-		height =  screen.x * 202/1080;
-		icon_size = screen.x * 140/1080;
-		
+		textSize = screen.x * 24/480;
+		iconMargin = screen.x * 33/480;
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*244/1080;
+		titleparam.height = screen.x*230/1080;
 		
 		View tv = createTextView("照顧情緒，我可以：");
 		mainLayout.addView(tv);
-		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
-		tvparam.height = height;
 		
 		for (int i=0;i<texts.length;++i){
 			View v = createIconView(texts[i],DRAWABLE_ID[i],clickListeners[i]);
 			mainLayout.addView(v);
-			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
-			param.height = height;
 		}
 		
 		int rest_block = 10 - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
-			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
-			param.height = height;
 		}
 	}
 	
@@ -156,12 +145,10 @@ public class EmotionActivity extends Activity {
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*244/1080;
+		titleparam.height = screen.x*230/1080;
 		
 		View tv = createTextView("請選擇聯絡對象：");
 		mainLayout.addView(tv);
-		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
-		tvparam.height = height;
 
 		String[] texts = dummyTexts;
 		
@@ -176,16 +163,12 @@ public class EmotionActivity extends Activity {
 		for (int i=0;i<texts.length;++i){
 			View vv = createIconView(texts[i],R.drawable.questionnaire_item_call,listeners[i]);
 			mainLayout.addView(vv);
-			LinearLayout.LayoutParams vparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
-			vparam.height = height;
 		}
 		
 		int rest_block = 10 - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View vv = createBlankView();
 			mainLayout.addView(vv);
-			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) vv.getLayoutParams();
-			param.height = height;
 		}
 	}
 	
@@ -201,19 +184,13 @@ public class EmotionActivity extends Activity {
 		String str = "請繼續加油!";
 		View tv = createTextView(str);
 		mainLayout.addView(tv);
-		LinearLayout.LayoutParams tvparam =(LinearLayout.LayoutParams) tv.getLayoutParams();
-		tvparam.height = height;
 		View vv = createIconView("完成",R.drawable.questionnaire_item_ok,new EndOnClickListener(selection));
 		mainLayout.addView(vv);
-		LinearLayout.LayoutParams vvparam =(LinearLayout.LayoutParams) vv.getLayoutParams();
-		vvparam.height = height;
 		
 		int rest_block = 10 - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
-			LinearLayout.LayoutParams param =(LinearLayout.LayoutParams) v.getLayoutParams();
-			param.height = height;
 		}
 	}
 	
@@ -240,7 +217,7 @@ public class EmotionActivity extends Activity {
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
 		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-		text.setTypeface(wordTypeface);
+		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF5c5c5c);
 		text.setText(textStr);
 		
@@ -250,8 +227,7 @@ public class EmotionActivity extends Activity {
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
 		icon.setImageResource(DrawableId);
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
-		iParam.width = iParam.height = icon_size;
-		iParam.rightMargin = icon_size;
+		iParam.rightMargin = iconMargin;
 		
 		layout.setOnClickListener(listener);
 		layout.setOnTouchListener(onTouchListener);
@@ -270,13 +246,10 @@ public class EmotionActivity extends Activity {
 		
 		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams)text.getLayoutParams();
 		tParam.leftMargin = textSize;
-		tParam.bottomMargin = textSize/2;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.titlebar_icon);
 		RelativeLayout.LayoutParams iParam =(RelativeLayout.LayoutParams) icon.getLayoutParams();
-		iParam.width = iParam.height = screen.x * 84/1080;
 		iParam.leftMargin = textSize;
-		iParam.bottomMargin = textSize/2;
 		
 		return layout;
 	}

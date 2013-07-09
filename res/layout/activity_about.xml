@@ -1,68 +1,104 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/about_bg"
+    android:orientation="vertical"
     tools:context=".AboutActivity" >
+	<RelativeLayout 
+	    android:id="@+id/about_title_layout"
+    	android:layout_width="match_parent"
+ 		android:layout_height="wrap_content"
+ 		android:background="#FFf39800"
+ 		>
+    	<ImageView
+	        android:id="@+id/about_logo"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:src="@drawable/titlebar_icon" 
+        	android:layout_centerVertical="true"
+        	/>
+    	<TextView 
+	        android:id="@+id/about_title"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:textColor="#FFFFFFFF"
+        	android:layout_toRightOf="@+id/about_logo"
+        	android:layout_centerVertical="true"
+        	android:text="戒酒小幫手"
+        	/>
+	</RelativeLayout>
+    
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/questionnaire_bar_question" >
+	    <TextView 
+	        android:id="@+id/about_about"
+	        android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:textColor="#FF777777"
+	    	android:layout_centerVertical="true"
+	    	android:text="關於："
+	        />
+	</RelativeLayout>
+	    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/about_bg" >
 
-    <ImageView
-        android:id="@+id/about_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-    
-    <TextView
-        android:id="@+id/about_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/about_logo"
-        android:gravity="center_vertical|left"
-        android:textColor="#FF898989" />
-    
-    <TextView
-        android:id="@+id/about_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:gravity="left|center_vertical"
-		android:textColor="#FF898989"
-		android:layout_below="@+id/about_logo"
-		/>
-    <LinearLayout 
-        android:id="@+id/about_logos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/about_content"
-        >
-        <ImageView 
-            android:id="@+id/about_logo0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            />
-        <ImageView 
-            android:id="@+id/about_logo1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            />
-        <ImageView 
-            android:id="@+id/about_logo2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            />
-    </LinearLayout>
-    
-    <TextView
-        android:id="@+id/about_copyright"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:gravity="left"
-        android:textColor="#FF898989" />
+	    
+    	<TextView
+	        android:id="@+id/about_content"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_centerHorizontal="true"
+        	android:gravity="left|center_vertical"
+			android:textColor="#FF727171"
+			/>
+    	<LinearLayout 
+	        android:id="@+id/about_logos"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:orientation="horizontal"
+        	android:layout_centerHorizontal="true"
+        	android:layout_below="@+id/about_content"
+        	>
 
-</RelativeLayout>
+        	<ImageView
+        	    android:id="@+id/about_logo0"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:layout_weight="1"
+        	    android:adjustViewBounds="true"
+        	    android:scaleType="centerCrop"
+        	    android:src="@drawable/logo0" />
+
+        	<ImageView
+        	    android:id="@+id/about_logo1"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:layout_weight="1"
+        	    android:adjustViewBounds="true"
+        	    android:scaleType="centerCrop"
+        	    android:src="@drawable/logo1" />
+
+        	<ImageView
+        	    android:id="@+id/about_logo2"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:layout_weight="1"
+        	    android:adjustViewBounds="true"
+        	    android:scaleType="centerCrop"
+        	    android:src="@drawable/logo2" />
+
+    	</LinearLayout>
+    
+    	<TextView
+	        android:id="@+id/about_copyright"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_below="@+id/about_logos"
+        	android:textColor="#FF727171" />
+		</RelativeLayout>
+</LinearLayout>

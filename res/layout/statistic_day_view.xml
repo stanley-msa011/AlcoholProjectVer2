@@ -5,13 +5,6 @@
     android:id="@+id/statistic_day_layout"
     >
 
-    <ImageView
-        android:id="@+id/statistic_day_brac_bg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-     />
-    
     <TextView
         android:id="@+id/statistic_day_title"
         android:layout_width="wrap_content"
@@ -25,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/statistic_day_title"
-        android:textColor="#FF000000"
+        android:textColor="#FF727171"
         />
     
     <ImageView 
@@ -47,7 +40,7 @@
         android:id = "@+id/statistic_day_value_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/statistic_day_title">
+        android:layout_alignParentRight="true">
     
     	<ImageView 
         	android:id = "@+id/statistic_day_value_circle"
@@ -70,7 +63,6 @@
     	    android:id="@+id/statistic_day_brac"
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
-    	    android:layout_below="@+id/statistic_day_brac_value"
     	    android:layout_centerHorizontal="true"
     	    android:text="酒精濃度"
     	    android:textAlignment="textStart"

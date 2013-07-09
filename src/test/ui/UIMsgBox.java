@@ -5,11 +5,9 @@ import ubicomp.drunk_detection.activities.TestFragment;
 import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -38,12 +36,14 @@ public class UIMsgBox {
 	
 	private ImageView emotionShow;
 	private ImageView desireShow;
+	//private ImageView eStart,eEnd,dStart,dEnd;
 	private TextView emotionShowText;
 	private TextView desireShowText;
+	private TextView gpsNo,gpsYes;
 	
 	private TextView eNum,dNum;
 	
-	private static final String[] emotionStr = {"沮喪","低落","普通", "愉快","快樂"};
+	private static final String[] emotionStr = {"　沮喪　","　低落　","　普通　", "　愉快　","　快樂　"};
 	private static final String[] desireStr = {"無\n　",
 																				"輕度\n尚未行動","輕度\n尚未行動","輕度\n尚未行動",
 																				"中~強度\n等下去買","中~強度\n等下去買","中~強度\n等下去買",
@@ -61,17 +61,14 @@ public class UIMsgBox {
 	private Typeface wordTypeface;
 	private Typeface wordTypefaceBold;
 	
-	private int textSize;
+	private int textSize, textSizeLarge;
 	
-	private Bitmap[] emotionBmps;
-	private Bitmap[] desireBmps;
-	
-	private Bitmap seekBarBmp, seekBarThumbBmp, seekBarProgressBmp;
-	private Bitmap switchBmp, switchThumbBmp;
-	private Bitmap bgBmp;
+	private Drawable[] emotionDrawables;
+	private Drawable[] desireDrawables;
 	
 	private TextView title;
-	private LinearLayout emotionLayout,desireLayout;
+	private RelativeLayout emotionLayout;
+	private RelativeLayout  desireLayout;
 	
 	private TextView send,notSend;
 	
@@ -93,8 +90,8 @@ public class UIMsgBox {
 	private void setting(){
 		
 		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
-		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
-		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w5.otf");
+		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W3.otf");
+		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		
 		endListener = new EndOnClickListener();
 		cancelListener = new CancelOnClickListener();
@@ -103,77 +100,83 @@ public class UIMsgBox {
 		
 		questionLayout = (LinearLayout) boxLayout.findViewById(R.id.msg_question_layout);
 		
-		textSize = screen.x * 63/1080;
-		int gap = screen.x * 60/1080;
-		int textSizeLarge = screen.x * 108/1080;
+		textSize = screen.x * 21/480;
+		textSizeLarge = screen.x * 32/480;
 		title = (TextView)boxLayout.findViewById(R.id.msg_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSizeLarge);
 		title.setTypeface(wordTypefaceBold);
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)title.getLayoutParams();
-		tParam.topMargin = tParam.bottomMargin =  gap;
-		
+		tParam.topMargin = screen.x*53/480;
+		tParam.bottomMargin = screen.x*74/480;
 		
 		help = (TextView) boxLayout.findViewById(R.id.msg_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-		help.setTypeface(wordTypeface);
+		help.setTypeface(wordTypefaceBold);
 		
 		emotionText = (TextView) boxLayout.findViewById(R.id.msg_emotion_text);
 		emotionText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-		emotionText.setTypeface(wordTypeface);
+		emotionText.setTypeface(wordTypefaceBold);
 		
 		desireText = (TextView) boxLayout.findViewById(R.id.msg_desire_text);
 		desireText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-		desireText.setTypeface(wordTypeface);
+		desireText.setTypeface(wordTypefaceBold);
 		
 		gpsText = (TextView) boxLayout.findViewById(R.id.msg_gps_text);
 		gpsText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-		gpsText.setTypeface(wordTypeface);
+		gpsText.setTypeface(wordTypefaceBold);
+		
+		gpsNo = (TextView) boxLayout.findViewById(R.id.msg_gps_no);
+		gpsNo.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		gpsNo.setTypeface(wordTypefaceBold);
+		
+		gpsYes = (TextView) boxLayout.findViewById(R.id.msg_gps_yes);
+		gpsYes.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		gpsYes.setTypeface(wordTypefaceBold);
 		
 		emotionSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_emotion_seek_bar);
 		desireSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_desire_seek_bar);
 		gpsSwitch = (Switch) boxLayout.findViewById(R.id.msg_gps_switch);
-		
-		gpsSwitch.setTextOff("否");
-		gpsSwitch.setTextOn("是");
-		gpsSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
-		gpsSwitch.setTypeface(wordTypeface);
-		
+		gpsSwitch.setHeight(screen.x * 40/480);
+		gpsSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 40/480 );
 		
 		emotionShow = (ImageView) boxLayout.findViewById(R.id.msg_emotion_show);
 		desireShow = (ImageView) boxLayout.findViewById(R.id.msg_desire_show);
 		
 		emotionSeekBar.setOnSeekBarChangeListener(new EmotionListener());
 		desireSeekBar.setOnSeekBarChangeListener(new DesireListener());
-		
-		int textSize2 = screen.x * 40/1080;
-		
+		/*
+		eStart = (ImageView) boxLayout.findViewById(R.id.msg_emotion_seek_start);
+		eEnd = (ImageView) boxLayout.findViewById(R.id.msg_emotion_seek_end);
+		dStart = (ImageView) boxLayout.findViewById(R.id.msg_desire_seek_start);
+		dEnd = (ImageView) boxLayout.findViewById(R.id.msg_desire_seek_end);
+		*/
 		emotionShowText = (TextView) boxLayout.findViewById(R.id.msg_emotion_show_text);
-		emotionShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize2);
-		emotionShowText.setTypeface(digitTypeface);
+		emotionShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+		emotionShowText.setTypeface(wordTypeface);
 		
 		desireShowText = (TextView) boxLayout.findViewById(R.id.msg_desire_show_text);
-		desireShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize2);
-		desireShowText.setTypeface(digitTypeface);
+		desireShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+		desireShowText.setTypeface(wordTypeface);
 		
 		eNum = (TextView) boxLayout.findViewById(R.id.msg_emotion_num);
-		eNum.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize2);
+		eNum.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		eNum.setTypeface(digitTypeface);
 		dNum = (TextView) boxLayout.findViewById(R.id.msg_desire_num);
-		dNum.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize2);
+		dNum.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		dNum.setTypeface(digitTypeface);
 		
 		eP = (LayoutParams) eNum.getLayoutParams();
 		dP = (LayoutParams) dNum.getLayoutParams();
 		
-		emotionLayout = (LinearLayout) boxLayout.findViewById(R.id.msg_emotion_layout);
+		emotionLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_layout);
 		LinearLayout.LayoutParams eParam =  (LinearLayout.LayoutParams)emotionLayout.getLayoutParams();
-		eParam.bottomMargin = gap;
-		desireLayout = (LinearLayout) boxLayout.findViewById(R.id.msg_desire_layout);
+		eParam.bottomMargin = screen.x * 50/480;
+		desireLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_desire_layout);
 		LinearLayout.LayoutParams dParam =  (LinearLayout.LayoutParams)desireLayout.getLayoutParams();
-		dParam.bottomMargin = gap;
+		dParam.bottomMargin = screen.x * 50/480;
 		
 		LinearLayout.LayoutParams sParam =  (LinearLayout.LayoutParams)gpsSwitch.getLayoutParams();
-		sParam.bottomMargin = gap;
+		sParam.bottomMargin = screen.x * 0/480;
 		
 		send = (TextView) boxLayout.findViewById(R.id.msg_send);
 		send.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSizeLarge);
@@ -187,130 +190,81 @@ public class UIMsgBox {
 		mainLayout.addView(boxLayout);
 	}
 	
-	private int box_width;
-	
 	public void settingInBackground(){
 		
 		Point screen = FragmentTabs.getSize();
 		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
 		boxParam.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
-		boxParam.width = box_width = screen.x * 987/1080;
-		boxParam.height =  screen.x * 1400/1080;
-		boxParam.topMargin = screen.x * 200/1080;
-		
-		int size = screen.x*120/1080;
+		boxParam.topMargin = screen.x * 80/480;
 		
 		
 		RelativeLayout.LayoutParams qParam = (RelativeLayout.LayoutParams) questionLayout.getLayoutParams();
-		qParam.width = screen.x * 787/1080;
+		qParam.leftMargin = qParam.rightMargin = screen.x * 44/480;
+		qParam.width = screen.x * 392/480;
 		
-		emotionBmps = new Bitmap[5];
-		Bitmap tmp;
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_1);
-		emotionBmps[0] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_2);
-		emotionBmps[1] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_3);
-		emotionBmps[2] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_4);
-		emotionBmps[3] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_emotion_5);
-		emotionBmps[4] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
+		emotionDrawables = new Drawable[5];
+		emotionDrawables[0]  = r.getDrawable(R.drawable.msg_emotion_1);
+		emotionDrawables[1]  = r.getDrawable(R.drawable.msg_emotion_2);
+		emotionDrawables[2]  = r.getDrawable(R.drawable.msg_emotion_3);
+		emotionDrawables[3]  = r.getDrawable(R.drawable.msg_emotion_4);
+		emotionDrawables[4]  = r.getDrawable(R.drawable.msg_emotion_5);
 		
-		desireBmps = new Bitmap[10];
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_1);
-		desireBmps[0] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_2);
-		desireBmps[1] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_3);
-		desireBmps[2] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_4);
-		desireBmps[3] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_5);
-		desireBmps[4] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_6);
-		desireBmps[5] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_7);
-		desireBmps[6] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_8);
-		desireBmps[7] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_9);
-		desireBmps[8] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_desire_10);
-		desireBmps[9] = Bitmap.createScaledBitmap(tmp, size, size, true);
-		tmp.recycle();
+		desireDrawables = new Drawable[10];
+		desireDrawables[0]  = r.getDrawable(R.drawable.msg_desire_1);
+		desireDrawables[1]  = r.getDrawable(R.drawable.msg_desire_2);
+		desireDrawables[2]  = r.getDrawable(R.drawable.msg_desire_3);
+		desireDrawables[3]  = r.getDrawable(R.drawable.msg_desire_4);
+		desireDrawables[4]  = r.getDrawable(R.drawable.msg_desire_5);
+		desireDrawables[5]  = r.getDrawable(R.drawable.msg_desire_6);
+		desireDrawables[6]  = r.getDrawable(R.drawable.msg_desire_7);
+		desireDrawables[7]  = r.getDrawable(R.drawable.msg_desire_8);
+		desireDrawables[8]  = r.getDrawable(R.drawable.msg_desire_9);
+		desireDrawables[9]  = r.getDrawable(R.drawable.msg_desire_10);
 		
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bar_button);
-		seekBarThumbBmp = Bitmap.createScaledBitmap(tmp, screen.x * 90 / 1080,  screen.x * 90/1080, true);
-		tmp.recycle();
 		
-		int padding_ver = screen.x * 10/1080;
-		int padding_hor = screen.x * 50/1080;
+		int padding_ver = screen.x * 2/480;
+		int padding_hor = screen.x * 0/480;
 		
-		RelativeLayout.LayoutParams emoParam = (RelativeLayout.LayoutParams)emotionSeekBar.getLayoutParams();
-		emoParam.width = screen.x * 584 / 1080;
-		emoParam.height = screen.x * 100 / 1080;
-		emotionSeekBar.setPadding(padding_hor, padding_ver, padding_hor, padding_ver);
+		emotionSeekBar.setPadding(padding_hor , padding_ver,padding_hor , padding_ver);
+		desireSeekBar.setPadding(padding_hor , padding_ver, padding_hor , padding_ver);
+		/*eStart.setPadding(0, padding_ver, 0, padding_ver);
+		eEnd.setPadding(0, padding_ver, 0, padding_ver);
+		dStart.setPadding(0, padding_ver, 0, padding_ver);
+		dEnd.setPadding(0, padding_ver, 0, padding_ver);
+		*/
+		emotionSeekBar.bringToFront();
+		desireSeekBar.bringToFront();
 		
-		RelativeLayout.LayoutParams desParam = (RelativeLayout.LayoutParams)desireSeekBar.getLayoutParams();
-		desParam.width = screen.x * 584 / 1080;
-		desParam.height = screen.x * 100 / 1080;
-		desireSeekBar.setPadding(padding_hor, padding_ver, padding_hor, padding_ver);
+		RelativeLayout.LayoutParams esParam = (LayoutParams) emotionSeekBar.getLayoutParams();
+		esParam.width = screen.x * 240/480;
+		esParam.topMargin = screen.x * 16/480;
+		RelativeLayout.LayoutParams dsParam = (LayoutParams) desireSeekBar.getLayoutParams();
+		dsParam.width = screen.x * 240/480;
+		dsParam.topMargin = screen.x * 16/480;
 		
 		LinearLayout.LayoutParams eParam = (LinearLayout.LayoutParams) emotionShowText.getLayoutParams();
-		eParam.width = screen.x * 203/1080;
+		eParam.width = screen.x * 90/480;
+		eParam.topMargin = screen.x *8/480;
 		LinearLayout.LayoutParams dParam = (LinearLayout.LayoutParams) desireShowText.getLayoutParams();
-		dParam.width = screen.x * 203/1080;
-		
-		BitmapFactory.Options opt = new BitmapFactory.Options();
-		opt.inSampleSize = 3;
-		
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_bg, opt);
-		bgBmp = Bitmap.createScaledBitmap(tmp, box_width ,  boxParam.height, true);
-		tmp.recycle();
-		
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_switch);
-		switchBmp = Bitmap.createScaledBitmap(tmp, screen.x * 166/1080, screen.x * 75/1080, true);
-		tmp.recycle();
-		
-		tmp = BitmapFactory.decodeResource(r, R.drawable.msg_switch_button);
-		switchThumbBmp = Bitmap.createScaledBitmap(tmp, screen.x * 117/1080, screen.x * 75/1080, true);
-		tmp.recycle();
+		dParam.width = screen.x * 90/480;
+		dParam.topMargin = screen.x *8/480;
 		
 		LinearLayout.LayoutParams gParam = (LinearLayout.LayoutParams) gpsSwitch.getLayoutParams();
-		gParam.height = screen.x * 200/1080;
-		
+		gParam.height = screen.x * 80/480;
+		gParam = (LinearLayout.LayoutParams) gpsNo.getLayoutParams();
+		gParam.height = screen.x * 80/480;
+		gParam = (LinearLayout.LayoutParams) gpsYes.getLayoutParams();
+		gParam.height = screen.x * 80/480;
 	}
 	
 	public  void settingPostTask(){
-		
-		boxLayout.setBackground(new BitmapDrawable(r,bgBmp));
 		
 		emotionSeekBar.setProgress(1);
 		desireSeekBar.setProgress(1);
 		emotionSeekBar.setProgress(0);
 		desireSeekBar.setProgress(0);
 		
-		emotionSeekBar.setThumb(new BitmapDrawable(r,seekBarThumbBmp));
-		desireSeekBar.setThumb(new BitmapDrawable(r,seekBarThumbBmp));
-		
-		gpsSwitch.setTrackDrawable(new BitmapDrawable(r,switchBmp));
-		gpsSwitch.setThumbDrawable(new BitmapDrawable(r,switchThumbBmp));
 		gpsSwitch.setOnClickListener(
 				new View.OnClickListener(){
 					@Override
@@ -320,56 +274,17 @@ public class UIMsgBox {
 	public void clear(){
 		Log.d("UIMSG","CLEAR");
 		mainLayout.removeView(boxLayout);
-		if (emotionBmps!=null){
-			for (int i=0;i<emotionBmps.length;++i){
-				if (emotionBmps[i]!=null && !emotionBmps[i].isRecycled()){
-					emotionBmps[i].recycle();
-					emotionBmps[i] = null;
-				}
-			}
-			emotionBmps = null;
-		}
-		if (desireBmps!=null){
-			for (int i=0;i<desireBmps.length;++i){
-				if (desireBmps[i]!=null && !desireBmps[i].isRecycled()){
-					desireBmps[i].recycle();
-					desireBmps[i] = null;
-				}
-			}
-			desireBmps = null;
-		}
-		
-		if (seekBarBmp !=null && !seekBarBmp.isRecycled()){
-			seekBarBmp.recycle();
-			seekBarBmp = null;
-		}
-		if (seekBarThumbBmp !=null && !seekBarThumbBmp.isRecycled()){
-			seekBarThumbBmp.recycle();
-			seekBarThumbBmp = null;
-		}
-		if (seekBarProgressBmp !=null && !seekBarProgressBmp.isRecycled()){
-			seekBarProgressBmp.recycle();
-			seekBarProgressBmp = null;
-		}
-		if (bgBmp != null && !bgBmp.isRecycled()){
-			bgBmp.recycle();
-			bgBmp = null;
-		}
-		if (switchThumbBmp != null && !switchThumbBmp.isRecycled()){
-			switchThumbBmp.recycle();
-			switchThumbBmp = null;
-		}
-		if (switchBmp != null && !switchBmp.isRecycled()){
-			switchBmp.recycle();
-			switchBmp = null;
-		}
 	}
 	
 	private void enableSend(boolean enable){
-		if (enable)
+		if (enable){
 			send.setTextColor(0xFFf39800);
-		else
-			send.setTextColor(0x55f39800);
+			notSend.setTextColor(0xFFf39800);
+		}
+		else{
+			send.setTextColor(0xFF898989);
+			notSend.setTextColor(0xFF898989);
+		}
 		done = enable;
 	}
 	
@@ -408,6 +323,11 @@ public class UIMsgBox {
 
 		@Override
 		public void onClick(View v) {
+			if (!done){
+				Toast.makeText(mainLayout.getContext(), "確定不填寫？", Toast.LENGTH_LONG).show();
+				enableSend(true);
+				return;
+			}
 			boxLayout.setVisibility(View.INVISIBLE);
 			boolean enableGPS = false;
 			int desire = -1;
@@ -434,7 +354,7 @@ public class UIMsgBox {
 	private class EmotionListener implements SeekBar.OnSeekBarChangeListener{
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, 	boolean fromUser) {
-			emotionShow.setImageBitmap(emotionBmps[progress]);
+			emotionShow.setImageDrawable(emotionDrawables[progress]);
 			emotionShowText.setText(emotionStr[progress]);
 			eNum.setText(String.valueOf(progress+1));
 			eP.leftMargin = emotionSeekBar.getWidth() *  progress/5;
@@ -450,7 +370,7 @@ public class UIMsgBox {
 	private class DesireListener implements SeekBar.OnSeekBarChangeListener{
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, 	boolean fromUser) {
-			desireShow.setImageBitmap(desireBmps[progress]);
+			desireShow.setImageDrawable(desireDrawables[progress]);
 			desireShowText.setText(desireStr[progress]);
 			dNum.setText(String.valueOf(progress+1));
 			dP.leftMargin = desireSeekBar.getWidth() * progress/10;

@@ -15,7 +15,7 @@ public class Type0Content extends QuestionnaireContent {
 		seq.clear();
 		seq.add("1");
 		msgBox.openBox();
-		setHelp("為了家人和自己，\n請繼續加油，\n堅持下去");
+		setHelp("為了家人和不一樣的\n自己，請繼續加油，\n堅持下去");
 		setSelectItem("我相信我做得到的", new EndOnClickListener(msgBox,1));
 	}
 

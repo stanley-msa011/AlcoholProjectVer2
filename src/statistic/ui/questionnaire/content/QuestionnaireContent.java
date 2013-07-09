@@ -6,8 +6,8 @@ import statistic.ui.QuestionMsgBox;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,7 +19,7 @@ import android.widget.TextView;
 abstract public class QuestionnaireContent {
 	
 	protected LinearLayout questionnaireLayout;
-	private Bitmap choiceBmp, choiceSelectedBmp;
+	private Drawable choiceDrawable, choiceSelectedDrawable;
 	protected ArrayList<String>seq;
 	protected ArrayList <QuestionnaireContent> contentSeq;
 	protected QuestionMsgBox msgBox;
@@ -27,7 +27,7 @@ abstract public class QuestionnaireContent {
 	private int contentSideMargin, contentMargin;
 	private Context context;
 	private ItemOnTouchListener itemOnTouchListener;
-	private Typeface wordTypeface;
+	private Typeface wordTypefaceBold;
 	private int itemHeight;
 	
 	public QuestionnaireContent(
@@ -36,17 +36,17 @@ abstract public class QuestionnaireContent {
 		this.questionnaireLayout = msgBox.getQuestionnaireLayout();
 		this.seq = msgBox.getClickSequence();
 		this.contentSeq = msgBox.getQuestionSequence();
-		this.choiceBmp = msgBox.getChoiceBmp();
-		this.choiceSelectedBmp = msgBox.getChoiceSelectedBmp();
+		this.choiceDrawable = msgBox.getChoiceDrawable();
+		this.choiceSelectedDrawable = msgBox.getChoiceSelectedDrawable();
 		this.msgBox = msgBox;
 		this.context = msgBox.getContext();
 		int x = FragmentTabs.getScreenWidth();	
-		textSize = x * 63/1080;
-		contentSideMargin = x * 80/1080;
-		contentMargin = x * 40/1080;
-		itemHeight = x * 150/1080;
+		textSize = x * 21/480;
+		contentSideMargin = x * 40/480;
+		contentMargin = x * 10/480;
+		itemHeight = x * 60/480;
 		this.itemOnTouchListener = new ItemOnTouchListener();
-		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dfheistd-w3.otf");
+		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 	}
 	
 	public void onPush(){
@@ -65,7 +65,7 @@ abstract public class QuestionnaireContent {
 		text.setText(str);
 		text.setTextColor(0xFF573b3b);
 		text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-		text.setTypeface(wordTypeface);
+		text.setTypeface(wordTypefaceBold);
 		
 		v.addView(text);
 		
@@ -89,10 +89,10 @@ abstract public class QuestionnaireContent {
 		text.setTextColor(0xFF573b3b);
 		text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		text.setId(textId);
-		text.setTypeface(wordTypeface);
+		text.setTypeface(wordTypefaceBold);
 		
 		ImageView button = new ImageView(context);
-		button.setImageBitmap(choiceBmp);
+		button.setImageDrawable(choiceDrawable);
 		button.setId(imageId);
 		
 		v.addView(text);
@@ -126,16 +126,16 @@ abstract public class QuestionnaireContent {
 			ImageView vi = (ImageView) r.findViewById(imageId);
 			switch(e){
 				case MotionEvent.ACTION_OUTSIDE:
-					vi.setImageBitmap(choiceBmp);
+					vi.setImageDrawable(choiceDrawable);
 					break;
 				case MotionEvent.ACTION_MOVE:
-					vi.setImageBitmap(choiceSelectedBmp);
+					vi.setImageDrawable(choiceSelectedDrawable);
 					break;
 				case MotionEvent.ACTION_UP:
-					vi.setImageBitmap(choiceBmp);
+					vi.setImageDrawable(choiceDrawable);
 					break;
 				case MotionEvent.ACTION_DOWN:
-					vi.setImageBitmap(choiceSelectedBmp);
+					vi.setImageDrawable(choiceSelectedDrawable);
 					break;
 			}
 			return false;

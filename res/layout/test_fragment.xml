@@ -14,12 +14,11 @@
 	 />
     
     <ImageView
-        android:id = "@+id/test_background"
-        android:layout_width ="match_parent"
-        android:layout_height ="match_parent"
+        android:id="@+id/test_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:scaleType="fitXY"
-        />
+        android:src="@drawable/test_background" />
     
     <RelativeLayout
         android:id="@+id/test_start_layout"
@@ -27,37 +26,34 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
     >
+
     	<ImageView
-        	android:id = "@+id/test_start_button"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerInParent="true"
-        />
+    	    android:id="@+id/test_start_button"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerInParent="true"
+    	    android:src="@drawable/test_start_button" />
     
     	<ImageView
-	        android:id = "@+id/test_start_stroke"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerInParent="true"
-        />
+    	    android:id="@+id/test_start_stroke"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerInParent="true"
+    	    android:src="@drawable/test_button_stroke" />
     	
     	<ImageView
 	        android:id = "@+id/test_start_circle"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
         	android:layout_centerInParent="true"
         />
     
     	<ImageView
-	        android:id = "@+id/test_face"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerInParent="true"
-        	/>
+    	    android:id="@+id/test_face"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerInParent="true"
+    	    android:src="@drawable/test_face" />
     	
     	<TextView
     	    android:id="@+id/test_start_button_text"

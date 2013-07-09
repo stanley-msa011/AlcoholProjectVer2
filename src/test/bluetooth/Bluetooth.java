@@ -50,15 +50,19 @@ public class Bluetooth {
 	private final static float PRESSURE_DIFF_MAX = 20000.f;
 	private final static long IMAGE_MILLIS_0 = 500;
 	private final static long IMAGE_MILLIS_1 = 2500;
-	private final static long MAX_DURATION_MILLIS = 5000;
+	//private final static long MAX_DURATION_MILLIS = 5000;
+	private final static long MAX_DURATION_MILLIS = 7000;
 	
 	private final static long MILLIS_1 = 1000;
 	private final static long MILLIS_2 = 2000;
 	private final static long MILLIS_3 = 3000;
 	private final static long MILLIS_4 = 4000;
-	private final static long MILLIS_5 = 5000;
+	//private final static long MILLIS_5 = 5000;
+	private final static long MILLIS_5 = 7000;
 	
-	private final static long START_MILLIS = 2500;
+	//private final static long START_MILLIS = 2500;
+	private final static long START_MILLIS = 2000;
+	private final static long MAX_TEST_TIME = 15000;
 	
 	private long start_time;
 	private long end_time;
@@ -198,7 +202,7 @@ public class Bluetooth {
 	public void read(){
 		
 		int end=0;
-		byte[] temp = new byte[1024];
+		byte[] temp = new byte[512];
 		int bytes;
 		String msg = "";
 		isPeak=false;
@@ -221,6 +225,7 @@ public class Bluetooth {
 			while(bytes>0){
 				if (!start){
 					bytes =in.read(temp);
+					testFragment.showDebug("read before start");
 					continue;
 				}
 				//Log.d("BT","READ");
@@ -230,7 +235,7 @@ public class Bluetooth {
 					first_start_time = time;
 					Log.d("ERIC", "start");
 				}
-				else if (time_gap > 15000){
+				else if (time_gap > MAX_TEST_TIME){
 					Log.d("BT","TIME OUT");
 					end =-1; 
 					throw new Exception("time out");

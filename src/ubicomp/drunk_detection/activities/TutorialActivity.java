@@ -8,11 +8,9 @@ import android.os.Message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
@@ -27,11 +25,9 @@ import android.widget.TextView;
 
 public class TutorialActivity extends Activity {
 
-	private ImageView replay,next,arrow;
-	private Bitmap  replayBmp, nextBmp, replayOffBmp, nextOffBmp,bgBmp;
-	private Bitmap[] arrowBmps;
+	private ImageView replay,arrow;
 	private ImageView tab;
-	private Bitmap tabBmp;
+	private Drawable[] arrowDrawables;
 	
 	private TextView step;
 	private TextView help;
@@ -41,8 +37,7 @@ public class TutorialActivity extends Activity {
 	private static Point size;
 	
 	private RelativeLayout layout;
-	//private Typeface digitTypeface;
-	private Typeface wordTypeface;
+	private Typeface digitTypeface;
 	private Typeface wordTypefaceBold;
 	
 	private static final String[] STEP_STR = {"1","2","3"};
@@ -50,7 +45,6 @@ public class TutorialActivity extends Activity {
 	
 	private AlphaAnimation animation;
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -59,11 +53,11 @@ public class TutorialActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_tutorial);
 		
-		
-		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
+			@SuppressWarnings("deprecation")
 			int w = display.getWidth();
+			@SuppressWarnings("deprecation")
 			int h = display.getHeight();
 			size = new Point(w,h);
 		}
@@ -72,36 +66,39 @@ public class TutorialActivity extends Activity {
 			display.getSize(size);
 		}
 		
-		//digitTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dinproregular.ttf");
-		wordTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dfheistd-w3.otf");
-		wordTypefaceBold  = Typeface.createFromAsset(this.getAssets(), "fonts/dfheistd-w5.otf");
+		digitTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dinproregular.ttf");
+		wordTypefaceBold  = Typeface.createFromAsset(this.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		
 		replay = (ImageView) this.findViewById(R.id.tutorial_reply);
-		next = (ImageView) this.findViewById(R.id.tutorial_next);
 		arrow = (ImageView) this.findViewById(R.id.tutorial_arrow);
 		
+		RelativeLayout.LayoutParams rParam = (RelativeLayout.LayoutParams) replay.getLayoutParams();
+		rParam.bottomMargin = size.x * 32/480;
+		
 		step = (TextView) this.findViewById(R.id.tutorial_step);
-		help = (TextView) this.findViewById(R.id.tutorial_help);
-		step.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 144/1080);
-		step.setTypeface(wordTypefaceBold);
+		step.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 85/480);
+		step.setTypeface(digitTypeface);
 		
 		RelativeLayout.LayoutParams sParam = (RelativeLayout.LayoutParams) step.getLayoutParams();
-		sParam.topMargin = size.x * 200/1080;
-		
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 64/1080);
-		help.setTypeface(wordTypeface);
-		RelativeLayout.LayoutParams hParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
-		hParam.topMargin = size.x * 1150/1080;
+		sParam.topMargin = size.x * 79/480;
+		sParam.height = size.x * 85/480;
 		
 		notify= (TextView) this.findViewById(R.id.tutorial_notify);
-		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 64/1080);
+		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 25/480);
 		notify.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams nParam = (RelativeLayout.LayoutParams) notify.getLayoutParams();
-		nParam.topMargin = size.x * 40/1080;
+		nParam.topMargin = size.x * 25/480;
+		nParam.height = size.x * 25/480;
+		
+		help = (TextView) this.findViewById(R.id.tutorial_help);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 25/480);
+		help.setTypeface(wordTypefaceBold);
+		RelativeLayout.LayoutParams hParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
+		hParam.topMargin = size.x * 486/480;
+		hParam.height = size.x * 25/480;
 		
 		tab = (ImageView) this.findViewById(R.id.tutorial_tab);
-		
 		layout = (RelativeLayout) this.findViewById(R.id.tutorial_layout);
 		
 		loadingHandler = new LoadingHandler();
@@ -127,93 +124,21 @@ public class TutorialActivity extends Activity {
 	protected void onPause(){
 		super.onPause();
 		loadingHandler.removeMessages(0);
-		if (replay != null)
-			replay.setImageBitmap(null);
-		if (next != null)
-			next.setImageBitmap(null);
-		if (tab != null)
-			tab.setImageBitmap(null);
-		if (arrow != null)
-			arrow.setImageBitmap(null);
-		
-		if (replayBmp!=null && !replayBmp.isRecycled()){
-			replayBmp.recycle();
-			replayBmp = null;
+		if (animation!=null)
+			animation.cancel();
+		if (arrow != null){
+			arrow.setAnimation(null);
 		}
-		if (replayOffBmp!=null && !replayOffBmp.isRecycled()){
-			replayOffBmp.recycle();
-			replayOffBmp = null;
-		}
-		if (nextBmp!=null && !nextBmp.isRecycled()){
-			nextBmp.recycle();
-			nextBmp = null;
-		}
-		if (nextOffBmp!=null && !nextOffBmp.isRecycled()){
-			nextOffBmp.recycle();
-			nextOffBmp = null;
-		}
-		if (tabBmp!=null && !tabBmp.isRecycled()){
-			tabBmp.recycle();
-			tabBmp = null;
-		}
-		if (arrowBmps!=null){
-			for (int i=0;i<arrowBmps.length;++i)
-				if (arrowBmps[i]!=null && !arrowBmps[i].isRecycled()){
-					arrowBmps[i].recycle();
-					arrowBmps[i] = null;
-				}
-		}
-		
-		if (layout!=null)
-			layout.setBackground(null);
-		
-		if (bgBmp!=null && !bgBmp.isRecycled()){
-			bgBmp.recycle();
-			bgBmp = null;
-		}
-
 	}
 	
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
 		public void handleMessage(Message msg){
-			Bitmap tmp;
-			BitmapFactory.Options opt = new BitmapFactory.Options();
-			opt.inSampleSize = 4;
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_bg, opt);
-			bgBmp = Bitmap.createScaledBitmap(tmp, size.x, size.x*1920/1080,true);
-			tmp.recycle();
-			int buttonSize = size.x * 213/1080;
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_replay);
-			replayBmp = Bitmap.createScaledBitmap(tmp, buttonSize, buttonSize,true);
-			tmp.recycle();
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_replay_off);
-			replayOffBmp = Bitmap.createScaledBitmap(tmp, buttonSize, buttonSize,true);
-			tmp.recycle();
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_next);
-			nextBmp = Bitmap.createScaledBitmap(tmp, buttonSize, buttonSize,true);
-			tmp.recycle();
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_next_off);
-			nextOffBmp = Bitmap.createScaledBitmap(tmp, buttonSize, buttonSize,true);
-			tmp.recycle();
-			
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_tab);
-			tabBmp = Bitmap.createScaledBitmap(tmp, size.x, size.x * 207/1080,true);
-			tmp.recycle();
-			
-			arrowBmps = new Bitmap[3];
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_arrow1);
-			arrowBmps[0] = Bitmap.createScaledBitmap(tmp, buttonSize, buttonSize,true);
-			if (arrowBmps[0]!= tmp)
-				tmp.recycle();
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_arrow2);
-			arrowBmps[1] = Bitmap.createScaledBitmap(tmp, buttonSize, buttonSize,true);
-			if (arrowBmps[1]!= tmp)
-				tmp.recycle();
-			tmp = BitmapFactory.decodeResource(getResources(), R.drawable.tutorial_arrow3);
-			arrowBmps[2] = Bitmap.createScaledBitmap(tmp, buttonSize, buttonSize,true);
-			if (arrowBmps[2]!= tmp)
-				tmp.recycle();
+
+			arrowDrawables = new Drawable[3];
+			arrowDrawables[0] = getResources().getDrawable(R.drawable.tutorial_arrow1);
+			arrowDrawables[1] = getResources().getDrawable(R.drawable.tutorial_arrow2);
+			arrowDrawables[2] = getResources().getDrawable(R.drawable.tutorial_arrow3);
 			
 			animation = new AlphaAnimation(1.F,0.F);
 			animation.setRepeatCount(Animation.INFINITE);
@@ -221,8 +146,6 @@ public class TutorialActivity extends Activity {
 			animation.setDuration(300);
 			arrow.setAnimation(animation);
 			
-			if (bgBmp!=null && !bgBmp.isRecycled())
-				layout.setBackground(new BitmapDrawable(layout.getResources(),bgBmp));
 			settingState(0);
 			if (mDialog!=null && mDialog.isShowing())
 				mDialog.dismiss();
@@ -237,59 +160,38 @@ public class TutorialActivity extends Activity {
 		RelativeLayout.LayoutParams aParam = (LayoutParams) arrow.getLayoutParams();
 		aParam.addRule(RelativeLayout.RIGHT_OF,0);
 		aParam.addRule(RelativeLayout.ABOVE,0);
-		aParam.addRule(RelativeLayout.CENTER_HORIZONTAL,0);
+		aParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT,0);
 		if (state == 0){
 			layout .setOnClickListener(new Listener(0));
-			next.setOnClickListener(null);
-			next.setVisibility(View.INVISIBLE);
 			replay.setOnClickListener(null);
 			replay.setVisibility(View.INVISIBLE);
 			tab.setVisibility(View.INVISIBLE);
-			if (arrowBmps!=null && arrowBmps[0]!=null && !arrowBmps[0].isRecycled())
-				arrow.setImageBitmap(arrowBmps[0]);
+			arrow.setImageDrawable(arrowDrawables[0]);
 			aParam.addRule(RelativeLayout.RIGHT_OF, help.getId());
-			aParam.topMargin = size.x * 1200/1080;
-			aParam.leftMargin = 0;
-			aParam.width = size.x * 98/1080;
-			aParam.height = size.x * 356/1080;
+			aParam.topMargin = size.x * 550/480;
+			aParam.leftMargin = size.x * 10/480;
 			animation.start();
 		}
 		else if (state == 1){
 			layout .setOnClickListener(new Listener(1));
-			next.setOnClickListener(null);
-			next.setVisibility(View.INVISIBLE);
 			replay.setOnClickListener(null);
 			replay.setVisibility(View.INVISIBLE);
-			if (tabBmp!=null && !tabBmp.isRecycled())
-				tab.setImageBitmap(tabBmp);
 			tab.setVisibility(View.VISIBLE);
-			if (arrowBmps!=null && arrowBmps[1]!=null && !arrowBmps[1].isRecycled())
-				arrow.setImageBitmap(arrowBmps[1]);
+			arrow.setImageDrawable(arrowDrawables[1]);
 			aParam.addRule(RelativeLayout.ABOVE, tab.getId());
 			aParam.topMargin = 0;
-			aParam.leftMargin = size.x * 140/1080;
-			aParam.width = size.x * 93/1080;
-			aParam.height = size.x * 410/1080;
+			aParam.leftMargin = size.x * 40/480;
 			animation.start();
 		}
 		else if (state == 2){
 			layout .setOnClickListener(new EndListener());
-			next.setOnClickListener(new EndListener());
-			if (nextBmp!=null && !nextBmp.isRecycled())
-				next.setImageBitmap(nextBmp);
-			next.setVisibility(View.VISIBLE);
 			replay.setOnClickListener(new Listener(-1));
-			if (replayBmp!=null && !replayBmp.isRecycled())
-				replay.setImageBitmap(replayBmp);
 			replay.setVisibility(View.VISIBLE);
 			tab.setVisibility(View.INVISIBLE);
-			if (arrowBmps!=null && arrowBmps[2]!=null && !arrowBmps[2].isRecycled())
-				arrow.setImageBitmap(arrowBmps[2]);
-			aParam.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-			aParam.topMargin = size.x * 850/1080;
-			aParam.leftMargin = 0;
-			aParam.width = size.x * 393/1080;
-			aParam.height = size.x * 389/1080;
+			arrow.setImageDrawable(arrowDrawables[2]);
+			aParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+			aParam.topMargin = size.x * 377/480;
+			aParam.leftMargin = size.x * 170/480;
 			animation.start();
 		}
 	}
