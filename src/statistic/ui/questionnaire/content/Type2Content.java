@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
+import statistic.ui.questionnaire.listener.SelectedListener;
 import statistic.ui.questionnaire.listener.SelfOnClickListener;
 import ubicomp.drunk_detection.activities.AlarmReceiver;
 
@@ -19,7 +20,7 @@ public class Type2Content extends QuestionnaireContent {
 
 	@Override
 	protected void setContent() {
-		
+		msgBox.setNextButton("", null);
 		Context context=msgBox.getContext();
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		Intent service_intent = new Intent();
@@ -35,13 +36,12 @@ public class Type2Content extends QuestionnaireContent {
 		editor.putBoolean("hourly_alarm", true);
     	editor.commit();
 		
-    	contentSeq.clear();
 		seq.clear();
     	seq.add("3");
 		msgBox.openBox();
 		setHelp("你似乎開始喝酒了，\n現在啟用一小時停酒提醒，\n同時建議你可以：");
-		setSelectItem("自行處理與面對",new SelfOnClickListener(msgBox));
-		setSelectItem("跟親友聊天", new FamilyOnClickListener(msgBox));
+		setSelectItem("自行處理與面對",new SelectedListener(msgBox,new SelfOnClickListener(msgBox),"下一步"));
+		setSelectItem("跟親友聊天", new SelectedListener(msgBox,new FamilyOnClickListener(msgBox),"下一步"));
 	}
 
 	@Override

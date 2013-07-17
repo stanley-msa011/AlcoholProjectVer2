@@ -501,6 +501,13 @@ public class HistoryDB {
     	db.close();
     }
     
+    public void cleanInteractionHistory(){
+    	db = dbHelper.getWritableDatabase();
+    	String sql = "DELETE FROM Ranking";
+    	db.execSQL(sql);
+    	db.close();
+    }
+    
     public boolean getIsDone(Calendar curCal){
     	db = dbHelper.getReadableDatabase();
     	
@@ -520,6 +527,33 @@ public class HistoryDB {
     	cursor.close();
     	db.close();
 		return result;
+    }
+    
+    public void cleanAcc(){
+    	db = dbHelper.getWritableDatabase();
+    	String sql = "SELECT morning,noon,night,morning_pass,noon_pass,night_pass FROM AccDetection ORDER BY id DESC LIMIT 1";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	int count = cursor.getCount();
+    	if (count == 0){
+    		cursor.close();
+    		db.close();
+    		return;
+    	}
+    	
+    	cursor.moveToFirst();
+    	int t_morning = cursor.getInt(0);
+    	int t_noon = cursor.getInt(1);
+    	int t_night = cursor.getInt(2);
+    	int p_morning = cursor.getInt(3);
+    	int p_noon = cursor.getInt(4);
+    	int p_night = cursor.getInt(5);
+    	long ts = System.currentTimeMillis();
+    	sql = "INSERT INTO UsedDetection (morning,noon,night,morning_pass,noon_pass,night_pass,ts) VALUES (" +
+    			t_morning+","+t_noon+","+t_night+","+p_morning+","+p_noon+","+p_night+","+ts+
+    			")";
+    	db.execSQL(sql);
+    	cursor.close();
+    	db.close();
     }
     
 }

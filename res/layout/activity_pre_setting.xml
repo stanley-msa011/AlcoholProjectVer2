@@ -1,48 +1,67 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PreSettingActivity" 
-    android:orientation="vertical">
+    >
 
-      <TextView
-        android:id="@+id/version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="" />
+    <ScrollView 
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+        >
+    <LinearLayout 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical"
+        >
+      	<TextView
+	        android:id="@+id/version"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="" />
     
         <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="UID:" />
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="UID:" />
 
-    <EditText
-        android:id="@+id/uid_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10" >
+    	<EditText
+	        android:id="@+id/uid_edit"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:ems="10" >
+	        <requestFocus />
+	    </EditText>
 
-        <requestFocus />
-    </EditText>
+    	<TextView
+	        android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Target Good:" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Target:(1: 機車 50000 2:汽車 700000 3:筆電: 30000 )" />
+    	<EditText
+    	    android:id="@+id/target_good_edit"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:ems="10" />
+    
+    	<TextView
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Target $:" />
     
         <EditText
             android:id="@+id/target_money_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="3"
+            android:ems="10"
             android:inputType="number" >
         <requestFocus />
-    </EditText>
+    	</EditText>
     
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="per Drink:" />
+    	<TextView
+	        android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="per Drink:" />
     
         <EditText
             android:id="@+id/target_drink_edit"
@@ -50,40 +69,102 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number" >
-        <requestFocus />
-    </EditText>
+        	<requestFocus />
+    	</EditText>
         
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Date:" />
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-     <Button
-        android:id="@+id/date_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="date" /> 
-     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="timeblock/day" />
-    
-        <EditText
-            android:id="@+id/target_tb_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="2"
-            android:inputType="number" >
-        <requestFocus />
-    </EditText>
-    <Button
-        android:id="@+id/uid_OK"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="OK" />
+    	<TextView
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Start Date:" />
+    	<TextView
+	        android:id="@+id/date"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="xxxx/xx/xx"
+        	/>
+     	<Button
+        	android:id="@+id/date_button"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="date" />
 
-</LinearLayout>
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="社區諮商:" />
+
+     	<Spinner
+     	    android:id="@+id/connect_social_0"
+     	    android:layout_width="match_parent"
+     	    android:layout_height="wrap_content" />
+     	<Spinner
+     	    android:id="@+id/connect_social_1"
+     	    android:layout_width="match_parent"
+     	    android:layout_height="wrap_content" />
+     	<Spinner
+     	    android:id="@+id/connect_social_2"
+     	    android:layout_width="match_parent"
+     	    android:layout_height="wrap_content" />
+ 
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="親友資訊" />
+
+     	<EditText
+     	    android:id="@+id/connect_name_0"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:ems="10"
+     	    android:inputType="textPersonName" />
+
+     	<EditText
+     	    android:id="@+id/connect_0"
+     	    android:layout_width="match_parent"
+     	    android:layout_height="wrap_content"
+     	    android:ems="12"
+     	    android:inputType="phone" />
+     	
+     	<EditText
+     	    android:id="@+id/connect_name_1"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:ems="10"
+     	    android:inputType="textPersonName" />
+     	
+     	<EditText
+     	    android:id="@+id/connect_1"
+     	    android:layout_width="match_parent"
+     	    android:layout_height="wrap_content"
+     	    android:ems="12"
+     	    android:inputType="phone" />
+     	
+     	<EditText
+     	    android:id="@+id/connect_name_2"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:ems="10"
+     	    android:inputType="textPersonName" />
+     	
+     	<EditText
+     	    android:id="@+id/connect_2"
+     	    android:layout_width="match_parent"
+     	    android:layout_height="wrap_content"
+     	    android:ems="12"
+     	    android:inputType="phone" />
+     	
+    	<Button
+	        android:id="@+id/uid_OK"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="OK" />
+    	
+    	<Button
+	        android:id="@+id/clean_OK"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="清空點數" />
+	
+    </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

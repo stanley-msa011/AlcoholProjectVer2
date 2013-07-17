@@ -25,7 +25,7 @@ import android.util.Log;
 
 public class UserLevelCollector {
 
-	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/userStates.php";
+	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/userStates2.php";
 	
 	private Context context;
 	private ResponseHandler< String> responseHandler;
@@ -70,6 +70,9 @@ public class UserLevelCollector {
 			}
 			if (responseString != null){
 				RankHistory[] historys= parse(responseString);
+				for (int i=0;i<historys.length;++i){
+					Log.d("user states","history "+historys[i].uid +" "+historys[i].score);
+				}
 				return historys;
 			}
 			
@@ -83,21 +86,30 @@ public class UserLevelCollector {
 			return null;
 		response = response.substring(2, response.length()-2);
 		String[] tmp = response.split("]," );
-		if (tmp.length==0)
+		Log.d("user states","splited");
+		if (tmp.length==0){
+			Log.d("user states","null split");
 			return null;
-		
+		}
+		Log.d("user states","len "+tmp.length);
 		RankHistory[] historys;
 		historys = new RankHistory[tmp.length];
+		Log.d("user states","before for loop");
 		for (int i=0;i<tmp.length;++i){
+			Log.d("user states","loop");
 			if (tmp[i].charAt(0)=='[')
 				tmp[i]=tmp[i].substring(1,tmp[i].length());
+			Log.d("user states","loop-1:  "+tmp[i]);
 			String[] items = tmp[i].split(",");
 			String uid = items[0].substring(1, items[0].length()-1);
+			Log.d("user states","loop-2 items length: "+ items.length);
+			Log.d("user states","items1: "+items[1]);
 			int level;
 			if (items[1].equals("null"))
 				level = 0;
 			else
-				level= Integer.valueOf(items[1].substring(1,items[1].length()-1));
+				level= Integer.valueOf(items[1]);
+			Log.d("user states","loop uid "+uid+": "+level);
 			historys[i] = new RankHistory(level,uid);
 		}
 		

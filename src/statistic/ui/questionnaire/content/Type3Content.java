@@ -3,6 +3,7 @@ package statistic.ui.questionnaire.content;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.EndOnClickListener;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
+import statistic.ui.questionnaire.listener.SelectedListener;
 import statistic.ui.questionnaire.listener.SelfOnClickListener;
 
 public class Type3Content extends QuestionnaireContent {
@@ -13,14 +14,14 @@ public class Type3Content extends QuestionnaireContent {
 
 	@Override
 	protected void setContent() {
-		contentSeq.clear();
+		msgBox.setNextButton("", null);
 		seq.clear();
 		seq.add("4");
 		msgBox.openBox();
 		setHelp("您似乎喝了不少酒，\n建議你可以：");
-		setSelectItem("回家休息", new EndOnClickListener(msgBox,3));
-		setSelectItem("跟親友聊天", new FamilyOnClickListener(msgBox));
-		setSelectItem("自我處理與面對",new SelfOnClickListener(msgBox));
+		setSelectItem("回家休息", new SelectedListener(msgBox,new EndOnClickListener(msgBox,3),"確定"));
+		setSelectItem("跟親友聊天", new SelectedListener(msgBox,new FamilyOnClickListener(msgBox),"下一步"));
+		setSelectItem("自我處理與面對",new SelectedListener(msgBox,new SelfOnClickListener(msgBox),"下一步"));
 		
 	}
 

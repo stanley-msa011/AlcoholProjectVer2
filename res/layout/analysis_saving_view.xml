@@ -61,7 +61,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:adjustViewBounds="true"
             android:scaleType="fitXY"
             android:layout_toRightOf="@+id/analysis_saving_cur_bar_start"
             android:src="@drawable/analysis_money_cur_bar_internal" />

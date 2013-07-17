@@ -29,6 +29,7 @@ public class UIMsgBox {
 	private RelativeLayout boxLayout = null;
 	
 	private TextView help,emotionText,desireText,gpsText;
+	private ImageView emotionSeekBg,desireSeekBg;
 	private SeekBar emotionSeekBar,desireSeekBar;
 	private Switch gpsSwitch;
 	
@@ -135,6 +136,9 @@ public class UIMsgBox {
 		
 		emotionSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_emotion_seek_bar);
 		desireSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_desire_seek_bar);
+		emotionSeekBg = (ImageView) boxLayout.findViewById(R.id.msg_emotion_bar_bg);
+		desireSeekBg = (ImageView) boxLayout.findViewById(R.id.msg_desire_bar_bg);
+		
 		gpsSwitch = (Switch) boxLayout.findViewById(R.id.msg_gps_switch);
 		gpsSwitch.setHeight(screen.x * 40/480);
 		gpsSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 40/480 );
@@ -144,12 +148,7 @@ public class UIMsgBox {
 		
 		emotionSeekBar.setOnSeekBarChangeListener(new EmotionListener());
 		desireSeekBar.setOnSeekBarChangeListener(new DesireListener());
-		/*
-		eStart = (ImageView) boxLayout.findViewById(R.id.msg_emotion_seek_start);
-		eEnd = (ImageView) boxLayout.findViewById(R.id.msg_emotion_seek_end);
-		dStart = (ImageView) boxLayout.findViewById(R.id.msg_desire_seek_start);
-		dEnd = (ImageView) boxLayout.findViewById(R.id.msg_desire_seek_end);
-		*/
+
 		emotionShowText = (TextView) boxLayout.findViewById(R.id.msg_emotion_show_text);
 		emotionShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		emotionShowText.setTypeface(wordTypeface);
@@ -167,6 +166,9 @@ public class UIMsgBox {
 		
 		eP = (LayoutParams) eNum.getLayoutParams();
 		dP = (LayoutParams) dNum.getLayoutParams();
+		
+		eP.width =dP.width =  screen.x * 26/480;
+		
 		
 		emotionLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_layout);
 		LinearLayout.LayoutParams eParam =  (LinearLayout.LayoutParams)emotionLayout.getLayoutParams();
@@ -191,8 +193,6 @@ public class UIMsgBox {
 	}
 	
 	public void settingInBackground(){
-		
-		Point screen = FragmentTabs.getSize();
 		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
 		boxParam.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
@@ -223,25 +223,25 @@ public class UIMsgBox {
 		desireDrawables[9]  = r.getDrawable(R.drawable.msg_desire_10);
 		
 		
-		int padding_ver = screen.x * 2/480;
-		int padding_hor = screen.x * 0/480;
+		int padding_ver = screen.x * 4/480;
+		int padding_hor = screen.x * 26/480;
 		
 		emotionSeekBar.setPadding(padding_hor , padding_ver,padding_hor , padding_ver);
 		desireSeekBar.setPadding(padding_hor , padding_ver, padding_hor , padding_ver);
-		/*eStart.setPadding(0, padding_ver, 0, padding_ver);
-		eEnd.setPadding(0, padding_ver, 0, padding_ver);
-		dStart.setPadding(0, padding_ver, 0, padding_ver);
-		dEnd.setPadding(0, padding_ver, 0, padding_ver);
-		*/
+
 		emotionSeekBar.bringToFront();
 		desireSeekBar.bringToFront();
 		
 		RelativeLayout.LayoutParams esParam = (LayoutParams) emotionSeekBar.getLayoutParams();
-		esParam.width = screen.x * 240/480;
+		esParam.width = screen.x * 260/480;
 		esParam.topMargin = screen.x * 16/480;
 		RelativeLayout.LayoutParams dsParam = (LayoutParams) desireSeekBar.getLayoutParams();
-		dsParam.width = screen.x * 240/480;
+		dsParam.width = screen.x * 260/480;
 		dsParam.topMargin = screen.x * 16/480;
+		RelativeLayout.LayoutParams esbgParam = (LayoutParams) emotionSeekBg.getLayoutParams();
+		esbgParam.topMargin = screen.x * 22/480;
+		RelativeLayout.LayoutParams dsbgParam = (LayoutParams) desireSeekBg.getLayoutParams();
+		dsbgParam.topMargin = screen.x * 22/480;
 		
 		LinearLayout.LayoutParams eParam = (LinearLayout.LayoutParams) emotionShowText.getLayoutParams();
 		eParam.width = screen.x * 90/480;
@@ -357,7 +357,7 @@ public class UIMsgBox {
 			emotionShow.setImageDrawable(emotionDrawables[progress]);
 			emotionShowText.setText(emotionStr[progress]);
 			eNum.setText(String.valueOf(progress+1));
-			eP.leftMargin = emotionSeekBar.getWidth() *  progress/5;
+			eP.leftMargin = progress*(screen.x * 52/480);
 			enableSend(true);
 		}
 		@Override
@@ -373,7 +373,7 @@ public class UIMsgBox {
 			desireShow.setImageDrawable(desireDrawables[progress]);
 			desireShowText.setText(desireStr[progress]);
 			dNum.setText(String.valueOf(progress+1));
-			dP.leftMargin = desireSeekBar.getWidth() * progress/10;
+			dP.leftMargin =progress*(screen.x * 26/480);
 			enableSend(true);
 		}
 		@Override

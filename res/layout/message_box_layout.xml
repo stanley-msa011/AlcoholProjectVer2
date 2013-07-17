@@ -41,6 +41,12 @@
     	        android:layout_below="@+id/msg_emotion_text"
     	        >
 
+    	        <ImageView
+    	            android:id="@+id/msg_emotion_bar_bg"
+    	            android:layout_width="wrap_content"
+    	            android:layout_height="wrap_content"
+    	            android:src="@drawable/msg_bar_bg" />
+    	        
     	    	<SeekBar
     	    	    android:id="@+id/msg_emotion_seek_bar"
     	    	    android:layout_width="wrap_content"
@@ -48,20 +54,6 @@
     	    	    android:max="4"
     	    	    android:progressDrawable="@drawable/msg_bar_progress"
     	    	    android:thumb="@drawable/msg_bar_button" />
-				<ImageView 
-				    android:id ="@+id/msg_emotion_seek_start"
-    			    android:layout_width="wrap_content"
-    			    android:layout_height="wrap_content"
-    			    android:layout_toLeftOf="@+id/msg_emotion_seek_bar"
-    			    />
-
-    	    	<ImageView
-    	    	    android:id ="@+id/msg_emotion_seek_end"
-    	    	    android:layout_width="wrap_content"
-    	    	    android:layout_height="wrap_content"
-    	    	    android:layout_toRightOf="@+id/msg_emotion_seek_bar"
-    	    	    android:baselineAlignBottom="true"
-    	    	     />
 
     	    	<TextView 
     	    	    android:id="@+id/msg_emotion_num"
@@ -117,6 +109,13 @@
     	        android:layout_height="wrap_content"
     	        android:layout_below="@+id/msg_desire_text"
     	        >
+
+    	        <ImageView
+    	            android:id="@+id/msg_desire_bar_bg"
+    	             android:layout_width="wrap_content"
+    	            android:layout_height="wrap_content"
+    	            android:src="@drawable/msg_bar_bg" />
+    	        
     	    	<SeekBar
     	    	    android:id="@+id/msg_desire_seek_bar"
     	    	    android:layout_width="wrap_content"
@@ -124,18 +123,7 @@
     	    	    android:max="9"
     	    	    android:progressDrawable="@drawable/msg_bar_progress"
     	    	    android:thumb="@drawable/msg_bar_button" />
-    	    	<ImageView
-    	    	    android:id ="@+id/msg_desire_seek_start" 
-    			    android:layout_width="wrap_content"
-    			    android:layout_height="wrap_content"
-    			    android:layout_toLeftOf="@+id/msg_desire_seek_bar"
-    			    />
-    	    	<ImageView 
-    	    	    android:id ="@+id/msg_desire_seek_end" 
-    			    android:layout_width="wrap_content"
-    			    android:layout_height="wrap_content"
-    			    android:layout_toRightOf="@+id/msg_desire_seek_bar"
-    			    />
+
     	    	<TextView 
     	    	    android:id="@+id/msg_desire_num"
     	    	    android:layout_width="wrap_content"

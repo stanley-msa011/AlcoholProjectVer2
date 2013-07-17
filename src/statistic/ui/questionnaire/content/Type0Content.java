@@ -2,6 +2,7 @@ package statistic.ui.questionnaire.content;
 
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.EndOnClickListener;
+import statistic.ui.questionnaire.listener.SelectedListener;
 
 public class Type0Content extends QuestionnaireContent {
 
@@ -11,12 +12,13 @@ public class Type0Content extends QuestionnaireContent {
 
 	@Override
 	protected void setContent() {
-		contentSeq.clear();
+		msgBox.setNextButton("", null);
 		seq.clear();
 		seq.add("1");
 		msgBox.openBox();
 		setHelp("為了家人和不一樣的\n自己，請繼續加油，\n堅持下去");
-		setSelectItem("我相信我做得到的", new EndOnClickListener(msgBox,1));
+		//setSelectItem("我相信我做得到的", new SelectedListener(msgBox,new EndOnClickListener(msgBox,1),"確定"));
+		msgBox.setNextButton("我相信我做得到的",new EndOnClickListener(msgBox,1));
 	}
 
 	@Override

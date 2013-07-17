@@ -55,7 +55,7 @@ public class AnalysisCounterView extends StatisticPageView {
 	}
 
 	
-	private static final int COUPON_COUNTER = 30;
+	private static final int COUPON_COUNTER = 40;
 	private String sc_message;
 	
 	@Override

@@ -58,12 +58,15 @@ public class StatisticFragment extends Fragment {
 	private ImageView showImage;
 	
 	private ShowDismissHandler showDismissHandler;
+	private ScrollDismissHandler scrollDismissHandler;
 	
 	private static final int[] DOT_ID={0xFF0,0xFF1,0xFF2};
 	
 	private AlphaAnimation questionAnimation;
 	
 	private QuestionMsgBox msgBox;
+	
+	private ImageView firstScroll;
 	
 	// For Click Sequence Logging
 	private ClickLogger clickLogger;
@@ -106,7 +109,8 @@ public class StatisticFragment extends Fragment {
 		
 		if (showDismissHandler == null)
 			showDismissHandler = new ShowDismissHandler();
-		
+		if (scrollDismissHandler == null)
+			scrollDismissHandler = new ScrollDismissHandler();
 		loadHandler.sendEmptyMessage(0);
     }
     
@@ -189,6 +193,8 @@ public class StatisticFragment extends Fragment {
         	shadow = (FrameLayout) view.findViewById(R.id.statistic_shadow);
     		showImage = (ImageView) view.findViewById(R.id.statistic_picture);
     		
+    		firstScroll = (ImageView) view.findViewById(R.id.statistic_first_scroll);
+    		
         	for (int i=0;i<analysisViews.length;++i)
     			analysisLayout.addView(analysisViews[i].getView());
     		
@@ -244,6 +250,9 @@ public class StatisticFragment extends Fragment {
 			questionParam.topMargin =  screen.x * 23 / 480;
 			questionParam.rightMargin =  screen.x * 23 / 480;
 			
+			RelativeLayout.LayoutParams fsParam = (RelativeLayout.LayoutParams) firstScroll.getLayoutParams();
+			fsParam.topMargin = screen.x;
+			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			boolean tested = sp.getBoolean("tested", false);
 			int result = sp.getInt("latest_result", 0);
@@ -266,6 +275,12 @@ public class StatisticFragment extends Fragment {
 				showImage.setVisibility(View.INVISIBLE);
 				shadow.setVisibility(View.INVISIBLE);
 				FragmentTabs.enableTab(true);
+				boolean fs = sp.getBoolean("first_scroll", true);
+				if (fs){
+					firstScroll.setVisibility(View.VISIBLE);
+					Thread t = new Thread(new ScrollTimer());
+					t.start();
+				}
 			}
 			
 			if (msgBox!=null){
@@ -291,6 +306,24 @@ public class StatisticFragment extends Fragment {
 			showImage.setVisibility(View.INVISIBLE);
 			shadow.setVisibility(View.INVISIBLE);
 			FragmentTabs.enableTab(true);
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
+			boolean fs = sp.getBoolean("first_scroll", true);
+			if (fs){
+				firstScroll.setVisibility(View.VISIBLE);
+				Thread t = new Thread(new ScrollTimer());
+				t.start();
+			}
+		}
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class ScrollDismissHandler extends Handler{
+		public void handleMessage(Message msg){
+			firstScroll.setVisibility(View.INVISIBLE);
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
+			SharedPreferences.Editor edit = sp.edit();
+			edit.putBoolean("first_scroll", false);
+			edit.commit();
 		}
 	}
 	
@@ -299,12 +332,26 @@ public class StatisticFragment extends Fragment {
 		@Override
 		public void run() {
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(2500);
 			} catch (InterruptedException e) {
 			}
 			showDismissHandler.sendEmptyMessage(0);
 		}
 	}
+	
+	
+	private class ScrollTimer implements Runnable{
+
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e) {
+			}
+			scrollDismissHandler.sendEmptyMessage(0);
+		}
+	}
+	
 	
 	private class QuestionOnClickListener implements View.OnClickListener{
 
@@ -325,10 +372,10 @@ public class StatisticFragment extends Fragment {
 			else
 				msgBox.generateNormalBox();
 		}
-		
 	} 
 	
 	public void setQuestionAnimation(){
+		questionButton.setVisibility(View.VISIBLE);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 		int result = sp.getInt("latest_result", -1);
 		if (result  == -1){
@@ -345,6 +392,15 @@ public class StatisticFragment extends Fragment {
 	public void enablePage(boolean enable){
 		statisticView.setEnabled(enable);
 		analysisView.setEnabled(enable);
+		questionButton.setEnabled(enable);
 		FragmentTabs.enableTab(enable);
+	}
+	
+	public void showEndOfQuestionnaire(){
+		showImage.setImageResource(R.drawable.statistic_show_pass);
+		shadow.setVisibility(View.VISIBLE);
+		showImage.setVisibility(View.VISIBLE);
+		Thread t = new Thread(new ShowTimer());
+		t.start();
 	}
 }

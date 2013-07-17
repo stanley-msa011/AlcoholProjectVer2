@@ -161,8 +161,8 @@ public class AnalysisRatingView extends StatisticPageView {
 		helpParam2.topMargin = helpParam2.bottomMargin =  screen.x * 11/480;
 		helpParam2.leftMargin = screen.x * 40/480;
 		
-		minLeftPointer  = screen.x * 181/1080;
-		maxLeftPointer = minLeftPointer +  screen.x * 898/1080;
+		minLeftPointer  = screen.x * 80/480;
+		maxLeftPointer = minLeftPointer +  screen.x * 315/480;
 		
 		LinearLayout.LayoutParams contentParam = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
 		contentParam.bottomMargin = screen.x * 11/480;
@@ -200,8 +200,11 @@ public class AnalysisRatingView extends StatisticPageView {
 		protected void onPostExecute(Void result){
 			if (historys == null)
 				return;
-			for (int i=0;i<historys.length;++i)
+			db.cleanInteractionHistory();
+			for (int i=0;i<historys.length;++i){
+				Log.d("Interaction",historys[i].uid +" "+historys[i].score);
 				db.insertInteractionHistory(historys[i]);
+			}
 			setPointer();
 		}
 		

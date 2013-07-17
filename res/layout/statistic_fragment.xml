@@ -62,11 +62,21 @@
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
     />
+
+<ImageView
+    android:id="@+id/statistic_first_scroll"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:visibility="invisible"
+    android:src="@drawable/statistic_scroll" />
+
 <ImageView
     android:id="@+id/question_background"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentRight="true"
+    android:visibility="invisible"
     android:src="@drawable/statistic_question_button" />
 
 </RelativeLayout>

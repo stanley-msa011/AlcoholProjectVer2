@@ -13,11 +13,11 @@ public class HistoryStorytelling {
 				R.drawable.history_page001,R.drawable.history_page001,R.drawable.history_page001,
 				R.drawable.history_page001,R.drawable.history_page001,R.drawable.history_page001,
 				}, // 1
-			{	R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
-					R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
-					R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
-					R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
-					R.drawable.history_page016,R.drawable.history_page016,R.drawable.history_page016,
+			{	R.drawable.history_page016,R.drawable.history_page017,R.drawable.history_page018,
+					R.drawable.history_page019,R.drawable.history_page020,R.drawable.history_page021,
+					R.drawable.history_page022,R.drawable.history_page023,R.drawable.history_page024,
+					R.drawable.history_page025,R.drawable.history_page026,R.drawable.history_page027,
+					R.drawable.history_page028,R.drawable.history_page029,R.drawable.history_page030,
 				}, // 2
 			{	R.drawable.history_page031,R.drawable.history_page031,R.drawable.history_page031,
 					R.drawable.history_page031,R.drawable.history_page031,R.drawable.history_page031,
@@ -113,13 +113,13 @@ public class HistoryStorytelling {
 		return PAGE[week][score];
 	}
 
-
+/*
 	public static boolean isChangePage(AccumulatedHistoryState prev,AccumulatedHistoryState cur){
 		if (prev == null || cur == null)
 			return false;
 		return prev.week < cur.week;
 	}
-	
+	*/
 	
 	public static int[] getAnimationBgs(AccumulatedHistoryState[] states){
 		if (states == null)

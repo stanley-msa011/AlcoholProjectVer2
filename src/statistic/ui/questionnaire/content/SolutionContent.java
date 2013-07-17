@@ -21,10 +21,11 @@ public class SolutionContent extends QuestionnaireContent {
 
 	@Override
 	protected void setContent() {
+		msgBox.setNextButton("", null);
 		seq.add(","+aid);
 		setHelp("請依照以下指示：");
-		setSelectItem(TEXT[aid-1],new EndOnClickListener(msgBox,-1));
-
+		//setSelectItem(TEXT[aid-1],new EndOnClickListener(msgBox,-1));
+		msgBox.setNextButton(TEXT[aid-1],new EndOnClickListener(msgBox,-1));
 	}
 
 	@Override

@@ -12,11 +12,8 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.HistoryFragment;
 import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -63,6 +60,7 @@ public class AudioRecordBox {
 	private EndRecListener endRecListener = new EndRecListener();
 	private PlayListener playListener = new PlayListener();
 	private EndPlayListener endPlayListener= new EndPlayListener();
+	private EndListener endListener = new EndListener();
 	
 	private final static int MAX_MEDIA_DURATION = 120000;
 	
@@ -129,7 +127,7 @@ public class AudioRecordBox {
 		param.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 		
 		closeButton = (ImageView) boxLayout.findViewById(R.id.rec_close_button);
-		closeButton.setOnClickListener(new EndListener());
+		closeButton.setOnClickListener(endListener);
 		
 		recButton = (ImageView) boxLayout.findViewById(R.id.rec_rec_button);
 		RelativeLayout.LayoutParams rParam = (LayoutParams) recButton.getLayoutParams();
@@ -176,7 +174,6 @@ public class AudioRecordBox {
 		this.curIdx = idx;
 		curDV = dv;
 		historyFragment.enablePage(false);
-		help.setText("錄下或聆聽在"+dv.toString()+"的心情\n(最長可達兩分鐘)");
 		setButtonState(STATE_INIT);
 		backgroundLayout.setVisibility(View.VISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
@@ -300,6 +297,8 @@ public class AudioRecordBox {
 		case STATE_INIT:
 			recButton.setImageDrawable(recDrawable);
 			recButton.setOnClickListener(recListener);
+			closeButton.setOnClickListener(endListener);
+			closeButton.setVisibility(View.VISIBLE);
 			if (db.hasAudio(curDV)){
 				playButton.setImageDrawable(playDrawable);
 				playButton.setOnClickListener(playListener);
@@ -308,22 +307,32 @@ public class AudioRecordBox {
 				playButton.setImageDrawable(playOffDrawable);
 				playButton.setOnClickListener(null);
 			}
+			help.setText("錄下或聆聽在"+curDV+"的心情\n(最長可達兩分鐘)");
 			break;
 		case STATE_ON_PLAY:
 			recButton.setImageDrawable(null);
 			recButton.setOnClickListener(null);
 			playButton.setImageDrawable(stopDrawable);
 			playButton.setOnClickListener(endPlayListener);
+			closeButton.setOnClickListener(null);
+			closeButton.setVisibility(View.INVISIBLE);
+			help.setText("播放中");
 			break;
 		case STATE_ON_RECORD:
 			recButton.setImageDrawable(stopDrawable);
 			recButton.setOnClickListener(endRecListener);
 			playButton.setImageBitmap(null);
 			playButton.setOnClickListener(null);
+			closeButton.setOnClickListener(null);
+			closeButton.setVisibility(View.INVISIBLE);
+			help.setText("錄音中");
 			break;
 		case STATE_PREPARING:
 			recButton.setOnClickListener(null);
 			playButton.setOnClickListener(null);
+			closeButton.setOnClickListener(null);
+			closeButton.setVisibility(View.INVISIBLE);
+			help.setText("準備中");
 			break;
 		}
 	}

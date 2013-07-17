@@ -15,9 +15,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -25,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView;
 
 public class QuestionMsgBox {
 
@@ -44,14 +47,15 @@ public class QuestionMsgBox {
 	
 	private ImageView exitView;
 	
+	private TextView help,next;
+	
 	private Drawable choiceDrawable, choiceSelectedDrawable;
-	private ImageView top,bottom;
 	
 	private Resources r;
 	private Point screen;
 	
 	private QuestionDB db;
-	
+	private Typeface wordTypefaceBold;
 	private int type;
 	
 	public QuestionMsgBox(StatisticFragment statisticFragment,RelativeLayout mainLayout){
@@ -67,6 +71,7 @@ public class QuestionMsgBox {
 		clickSequence = new ArrayList<String>();
 		contentSequence = new ArrayList<QuestionnaireContent>();
 		type = -1;
+		
 		setting();
 	}
 	
@@ -74,17 +79,21 @@ public class QuestionMsgBox {
 		
 		backgroundLayout.setVisibility(View.INVISIBLE);
 		
-		boxLayout = (RelativeLayout) inflater.inflate(R.layout.question_box_layout2,null);
+		boxLayout = (RelativeLayout) inflater.inflate(R.layout.question_box_layout,null);
 		boxLayout.setVisibility(View.INVISIBLE);
 		
 		questionLayout = (LinearLayout) boxLayout.findViewById(R.id.question_layout);
 		questionAllLayout = (LinearLayout) boxLayout.findViewById(R.id.question_all_layout);
+		
+		help = (TextView) boxLayout.findViewById(R.id.question_text);
+		next = (TextView) boxLayout.findViewById(R.id.question_next);
+		
 		exitView = (ImageView) boxLayout.findViewById(R.id.question_exit);
-		top = (ImageView) boxLayout.findViewById(R.id.question_top);
-		bottom = (ImageView) boxLayout.findViewById(R.id.question_bottom);
 	}
 	
 	public void settingPreTask(){
+		
+		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		mainLayout.addView(backgroundLayout);
 		mainLayout.addView(boxLayout);
 		
@@ -93,9 +102,22 @@ public class QuestionMsgBox {
 		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
 		boxParam.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
-		boxParam.width = screen.x * 358/480;
+		boxParam.width = screen.x * 348/480;
 		RelativeLayout.LayoutParams qParam = (LayoutParams) questionAllLayout.getLayoutParams();
 		qParam.topMargin = screen.x * 12/480;
+		
+		
+		int textSize = screen.x * 21/480;
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		help.setTypeface(wordTypefaceBold);
+		RelativeLayout.LayoutParams hParam = (LayoutParams) help.getLayoutParams();
+		hParam.leftMargin = screen.x * 40/480;
+		
+		next.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		next.setTypeface(wordTypefaceBold);
+		RelativeLayout.LayoutParams nParam = (LayoutParams) next.getLayoutParams();
+		nParam.rightMargin = screen.x * 40/480;
+		nParam.height = textSize*2;
 	}
 	
 	
@@ -109,13 +131,8 @@ public class QuestionMsgBox {
 	}
 	
 	public void clear(){
-		top.setImageBitmap(null);
-		bottom.setImageBitmap(null);
-		exitView.setImageBitmap(null);
-		questionLayout.setBackground(null);
 		if (backgroundLayout != null)
 			mainLayout.removeView(backgroundLayout);
-		
 		if (boxLayout !=null)
 			mainLayout.removeView(boxLayout);
 	}
@@ -129,6 +146,7 @@ public class QuestionMsgBox {
 	
 	public void generateType1Box(){
 		type = 1;
+		setNextButton("", null);
 		contentSequence.clear();
 		contentSequence.add(new Type1Content(this));
 		contentSequence.get(contentSequence.size()-1).onPush();
@@ -136,6 +154,7 @@ public class QuestionMsgBox {
 	
 	public void generateType2Box(){
 		type = 2;
+		setNextButton("", null);
 		contentSequence.clear();
 		contentSequence.add(new Type2Content(this));
 		contentSequence.get(contentSequence.size()-1).onPush();
@@ -143,6 +162,7 @@ public class QuestionMsgBox {
 	
 	public void generateType3Box(){
 		type = 3;
+		setNextButton("", null);
 		contentSequence.clear();
 		contentSequence.add(new Type3Content(this));
 		contentSequence.get(contentSequence.size()-1).onPush();
@@ -150,6 +170,7 @@ public class QuestionMsgBox {
 	
 	public void generateNormalBox(){
 		type = -1;
+		setNextButton("", null);
 		contentSequence.clear();
 		contentSequence.add(new Type0Content(this));
 		contentSequence.get(contentSequence.size()-1).onPush();
@@ -212,6 +233,26 @@ public class QuestionMsgBox {
 		return sb.toString();
 	}
 	
+	public void setHelpMessage(String str){
+		help.setText(str);
+	}
+	
+	public void setNextButton(String str, View.OnClickListener listener){
+		next.setText(str);
+		next.setOnClickListener(listener);
+	}
+	
+	public Typeface getTypeface(){
+		return wordTypefaceBold;
+	}
+	
+	public void cleanSelection(){
+		int idx = contentSequence.size()-1;
+		Log.d("Questionnaire","Size = "+contentSequence.size());
+		if (idx >=0)
+			contentSequence.get(idx).cleanSelection();
+	}
+	
 	private class ExitListener implements View.OnClickListener{
 
 		@Override
@@ -223,6 +264,10 @@ public class QuestionMsgBox {
 			boxLayout.setVisibility(View.INVISIBLE);
 		}
 		
+	}
+	
+	public void showEndOfQuestionnaire(){
+		statisticFragment.showEndOfQuestionnaire();
 	}
 	
 }

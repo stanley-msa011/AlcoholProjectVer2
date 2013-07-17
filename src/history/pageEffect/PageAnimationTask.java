@@ -92,7 +92,7 @@ public class PageAnimationTask extends AsyncTask<Void, Void, Void> {
 			prev_cur = cur;
 			prev_next= next;
 		}
-		historyFragment.setPage();
+		//historyFragment.setPage();
 		if (prev_next!=null&&!prev_next.isRecycled()){
 			prev_next.recycle();
 			prev_next = null;

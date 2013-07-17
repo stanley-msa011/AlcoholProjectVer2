@@ -243,7 +243,7 @@ public class StatisticDayView extends StatisticPageView {
 		}
 		else{
 			Calendar cal = Calendar.getInstance();
-			cal.setTimeInMillis(brac_time*1000L);
+			cal.setTimeInMillis(brac_time);
 			int month = cal.get(Calendar.MONTH)+1;
 			int day = cal.get(Calendar.DATE);
 			int hour = cal.get(Calendar.HOUR);

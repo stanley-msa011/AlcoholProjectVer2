@@ -12,7 +12,7 @@ public class EmotionCallOnClickListener extends QuestionnaireOnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		contentSeq.add(new CallCheckContent(msgBox,"心情專線","0212345678",true));
+		contentSeq.add(new CallCheckContent(msgBox,"心情專線","0800788995",true));
 		contentSeq.get(contentSeq.size()-1).onPush();
 	}
 

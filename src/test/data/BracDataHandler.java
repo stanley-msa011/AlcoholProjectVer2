@@ -161,7 +161,7 @@ public class BracDataHandler {
 		return avg_result;
 	}
 	
-	private double parseTextFile(File textFile){
+	protected double parseTextFile(File textFile){
 		double avg = 0;
         try {
 			Scanner s = new Scanner(textFile);

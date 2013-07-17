@@ -210,7 +210,7 @@ public class EmotionManageActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*230/1080;
 		
-		String str = "請繼續加油!";
+		String str = "完成後能得到點數，請繼續加油！\n(一天限定早中晚各一次)";
 		View tv = createTextView(str);
 		mainLayout.addView(tv);
 		View vv = createIconView("完成",R.drawable.questionnaire_item_ok,new EndOnClickListener());
@@ -247,7 +247,7 @@ public class EmotionManageActivity extends Activity {
 		EditText edit = new EditText(activity);
 		edit.setBackground(mainLayout.getContext().getResources().getDrawable(R.drawable.questionnaire_input));
 		edit.setTextColor(0xFF000000);
-		edit.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize *3/4);
+		edit.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize*4/3);
 		edit.setTypeface(wordTypefaceBold);
 		
 		layout.addView(edit);

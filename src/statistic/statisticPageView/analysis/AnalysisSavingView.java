@@ -2,7 +2,6 @@ package statistic.statisticPageView.analysis;
 
 import ubicomp.drunk_detection.activities.R;
 import statistic.statisticPageView.StatisticPageView;
-import statistic.statisticSetting.TargetSetting;
 import ubicomp.drunk_detection.activities.StatisticFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -26,6 +25,7 @@ public class AnalysisSavingView extends StatisticPageView {
 	
 	private ImageView goalBar, currentBar, start;
 	
+	private String goalGood;
 	private int goalMoney;
 	private int drinkCost;
 	private int currentMoney;
@@ -38,7 +38,8 @@ public class AnalysisSavingView extends StatisticPageView {
 		super(context, R.layout.analysis_saving_view,statisticFragment);
 		db = new HistoryDB(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		goalMoney = sp.getInt("goal_money", 10000);
+		goalGood = sp.getString("goal_good", "機車");
+		goalMoney = sp.getInt("goal_money", 50000);
 		drinkCost = sp.getInt("drink_cost", 1);
 	}
 
@@ -93,10 +94,10 @@ public class AnalysisSavingView extends StatisticPageView {
 		
 		int maxWidth = screen.x * 839/1080;
 		int width;
-		if (currentMoney> TargetSetting.getTargetValue(goalMoney))
+		if (currentMoney > goalMoney)
 			width = maxWidth;
 		else{
-			width = maxWidth *currentMoney/TargetSetting.getTargetValue(goalMoney);
+			width = maxWidth *currentMoney/goalMoney;
 		}
 		
 		RelativeLayout.LayoutParams currentBarParam = (RelativeLayout.LayoutParams)currentBar.getLayoutParams();
@@ -111,9 +112,9 @@ public class AnalysisSavingView extends StatisticPageView {
 		String text =  "<font color=#000000>您已節省 </font><font color=#f39700><strong>$"
 								+currentMoney
 								+"</strong></font><font color=#000000> 元，"
-								+TargetSetting.getTargetName(goalMoney)
+								+goalGood
 								+"為 </font><font color=#f39700><strong>$"
-								+TargetSetting.getTargetValue(goalMoney)
+								+goalMoney
 								+"</strong></font><font color=#000000></font><font color=#000000> 元</font>";
 		help.setText(Html.fromHtml(text));
 		

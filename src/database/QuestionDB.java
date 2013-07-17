@@ -434,4 +434,56 @@ public class QuestionDB {
     	db.close();
     	return out2;
     }
+    
+    public void cleanAcc(){
+    	long ts = System.currentTimeMillis();
+    	db = dbHelper.getWritableDatabase();
+    	String sql = "SELECT acc_tb0,acc_tb1,acc_tb2 FROM Emotion ORDER BY id DESC LIMIT 1";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	if (cursor.moveToFirst()){
+    		int a0 = cursor.getInt(0);
+    		int a1 = cursor.getInt(1);
+    		int a2 = cursor.getInt(2);
+    		sql = "INSERT INTO Emotion (ts,selection,acc_tb0,acc_tb1,acc_tb2,used_tb0,used_tb1,used_tb2) VALUES(" +
+    				ts+","+(-1)+","+a0+","+a1+","+a2+","+a0+","+a1+","+a2+
+    				")";
+    		db.execSQL(sql);
+    	}
+    	cursor.close();
+    	
+    	sql = "SELECT acc_tb0,acc_tb1,acc_tb2 FROM EmotionManage ORDER BY id DESC LIMIT 1";
+    	cursor = db.rawQuery(sql, null);
+    	if (cursor.moveToFirst()){
+    		int a0 = cursor.getInt(0);
+    		int a1 = cursor.getInt(1);
+    		int a2 = cursor.getInt(2);
+    		sql = "INSERT INTO EmotionManage (ts,emotion,type,reason,acc_tb0,acc_tb1,acc_tb2,used_tb0,used_tb1,used_tb2) VALUES(" +
+    				ts+","+(-1)+","+(-1)+","+"'CLEAN SELF HELP COUNTER'"+","+a0+","+a1+","+a2+","+a0+","+a1+","+a2+
+    				")";
+    		db.execSQL(sql);
+    	}
+    	cursor.close();
+    	
+    	sql = "SELECT * FROM Questionnaire ORDER BY id DESC LIMIT 1";
+    	cursor = db.rawQuery(sql, null);
+    	if (cursor.moveToFirst()){
+    		int[] acc = new int[12];
+    		for (int i=0;i<acc.length;++i)
+    			acc[i] = cursor.getInt(i+5);
+    		sql = "INSERT INTO Questionnaire (ts,type,sequence," +
+    				"acc_tb0_0, acc_tb1_0, acc_tb2_0,used_tb0_0, used_tb1_0, used_tb2_0,"+
+    				"acc_tb0_1, acc_tb1_1, acc_tb2_1,used_tb0_1, used_tb1_1, used_tb2_1,"+
+    				"acc_tb0_2, acc_tb1_2, acc_tb2_2,used_tb0_2, used_tb1_2, used_tb2_2,"+
+    				"acc_tb0_3, acc_tb1_3, acc_tb2_3,used_tb0_3, used_tb1_3, used_tb2_3"+
+    				") VALUES ("+ts+","+(-2)+","+"'"+""+"'"+","+
+    				acc[0]+","+acc[1]+","+acc[2]+","+acc[0]+","+acc[1]+","+acc[2]+","+
+    				acc[3]+","+acc[4]+","+acc[5]+","+acc[3]+","+acc[4]+","+acc[5]+","+
+    				acc[6]+","+acc[7]+","+acc[8]+","+acc[6]+","+acc[7]+","+acc[8]+","+
+    				acc[9]+","+acc[10]+","+acc[11]+","+acc[9]+","+acc[10]+","+acc[11]+
+    				")";
+    		db.execSQL(sql);
+    	}
+    	cursor.close();
+    	db.close();
+    }
 }

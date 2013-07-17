@@ -9,10 +9,12 @@ import ubicomp.drunk_detection.activities.R;
 import test.bluetooth.BTInitHandler;
 import test.bluetooth.BTRunTask;
 import test.bluetooth.Bluetooth;
+import test.bluetooth.BluetoothDebugMode;
 import test.camera.CameraInitHandler;
 import test.camera.CameraRecorder;
 import test.camera.CameraRunHandler;
 import test.data.BracDataHandler;
+import test.data.BracDataHandlerDebugMode;
 import test.file.BracValueDebugHandler;
 import test.file.BracValueFileHandler;
 import test.file.ImageFileHandler;
@@ -242,7 +244,12 @@ public class TestFragment extends Fragment {
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		cameraRecorder = new CameraRecorder(testFragment,imgFileHandler);
 		cameraRunHandler = new CameraRunHandler(cameraRecorder);
-		bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+		Boolean debug = sp.getBoolean("debug", false);
+		if (debug)
+			bt = new BluetoothDebugMode(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		else
+			bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
 		for (int i=0;i<3;++i)
 			INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
 	}
@@ -420,7 +427,12 @@ public class TestFragment extends Fragment {
 				}
 			}
 			if (DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
-				BDH = new BracDataHandler(timestamp, testFragment);
+				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+				Boolean debug = sp.getBoolean("debug", false);
+				if (debug)
+					BDH = new BracDataHandlerDebugMode(timestamp,testFragment);
+				else
+					BDH = new BracDataHandler(timestamp, testFragment);
 				int bdh_result = BDH.start();
 				if (bdh_result != BracDataHandler.ERROR){
 					double result = BDH.getResult();

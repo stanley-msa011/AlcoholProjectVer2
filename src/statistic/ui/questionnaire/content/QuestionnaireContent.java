@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import statistic.ui.QuestionMsgBox;
 import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.R;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -11,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -26,7 +28,7 @@ abstract public class QuestionnaireContent {
 	private int textSize;
 	private int contentSideMargin, contentMargin;
 	private Context context;
-	private ItemOnTouchListener itemOnTouchListener;
+	//private ItemOnTouchListener itemOnTouchListener;
 	private Typeface wordTypefaceBold;
 	private int itemHeight;
 	
@@ -45,8 +47,8 @@ abstract public class QuestionnaireContent {
 		contentSideMargin = x * 40/480;
 		contentMargin = x * 10/480;
 		itemHeight = x * 60/480;
-		this.itemOnTouchListener = new ItemOnTouchListener();
-		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
+		//this.itemOnTouchListener = new ItemOnTouchListener();
+		wordTypefaceBold = msgBox.getTypeface();
 	}
 	
 	public void onPush(){
@@ -59,7 +61,7 @@ abstract public class QuestionnaireContent {
 	abstract public void onPop();
 	
 	protected void setHelp(String str){
-		
+		/*
 		RelativeLayout v = new RelativeLayout(context);
 		TextView text = new TextView(context);
 		text.setText(str);
@@ -77,10 +79,12 @@ abstract public class QuestionnaireContent {
 		questionnaireLayout.addView(v);
 		LinearLayout.LayoutParams vParam = (LinearLayout.LayoutParams)v.getLayoutParams();
 		vParam.topMargin = vParam.bottomMargin = contentMargin;
+		*/
+		msgBox.setHelpMessage(str);
 	}
 	
-	private static final int imageId = 0x00;
-	private static final int textId = 0x01;
+	public static final int QUESTION_IMAGE_ID = 0x00;
+	public static final int QUESTION_TEXT_ID = 0x01;
 	
 	protected void setSelectItem(String str, View.OnClickListener listener){
 		RelativeLayout v = new RelativeLayout(context);
@@ -88,12 +92,12 @@ abstract public class QuestionnaireContent {
 		text.setText(str);
 		text.setTextColor(0xFF573b3b);
 		text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-		text.setId(textId);
+		text.setId(QUESTION_TEXT_ID);
 		text.setTypeface(wordTypefaceBold);
 		
 		ImageView button = new ImageView(context);
 		button.setImageDrawable(choiceDrawable);
-		button.setId(imageId);
+		button.setId(QUESTION_IMAGE_ID);
 		
 		v.addView(text);
 		v.addView(button);
@@ -109,14 +113,24 @@ abstract public class QuestionnaireContent {
 		bParam.rightMargin = contentSideMargin;
 		
 		v.setOnClickListener(listener);
-		v.setOnTouchListener(itemOnTouchListener);
+		//v.setOnTouchListener(itemOnTouchListener);
 		
 		questionnaireLayout.addView(v);
 		LinearLayout.LayoutParams vParam = (LinearLayout.LayoutParams)v.getLayoutParams();
-		//vParam.topMargin = vParam.bottomMargin = contentMargin;
+		vParam.topMargin = vParam.bottomMargin = contentMargin;
 		vParam.height = 	itemHeight;
 	}
 	
+	public void cleanSelection(){
+		int count = questionnaireLayout.getChildCount();
+		for (int i=0;i<count;++i){
+			ViewGroup v = (ViewGroup) questionnaireLayout.getChildAt(i);
+			ImageView img = (ImageView) v.findViewById(QUESTION_IMAGE_ID);
+			img.setImageDrawable(choiceDrawable);
+		}
+	}
+	
+	/*
 	private class ItemOnTouchListener implements View.OnTouchListener{
 
 		@Override
@@ -140,5 +154,5 @@ abstract public class QuestionnaireContent {
 			}
 			return false;
 		}
-	}
+	}*/
 }

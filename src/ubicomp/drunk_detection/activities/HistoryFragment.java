@@ -59,7 +59,6 @@ public class HistoryFragment extends Fragment {
 
 	private View  view;
 	
-	private ImageView prevImage;
 	private RelativeLayout pageLayout;
 	private RelativeLayout chartLayout;
 	private RelativeLayout chartAreaLayout;
@@ -70,9 +69,6 @@ public class HistoryFragment extends Fragment {
 	private PageAnimationTaskVertical2 pageAnimationTask2;
 	
 	private HorizontalScrollView scrollView;
-	
-	private AlphaAnimation prevAnimation;
-	private AlphaAnimationEndHandler aaEndHandler;
 	
 	private Point screen;
 	
@@ -106,7 +102,7 @@ public class HistoryFragment extends Fragment {
 	private int width, height,top_margin,bg_x;
 	
 	private Bitmap cur_bg_bmp,next_bg_bmp;
-	private Drawable prev_bgDrawable;
+	//private Drawable prev_bgDrawable;
 	
 	private PointF touchPoint;
 	private PointF from,to;
@@ -139,18 +135,18 @@ public class HistoryFragment extends Fragment {
 	private AccumulatedHistoryState[] page_states;
 	
 	private static final String[] QUOTE_STR = {
-		"酒精是一位可畏的敵人，\n但你相信不會被敵人擺布。\n你不會低頭，也不會認輸。",
-		"你告訴自己，想踏上這條戒酒的路已經想很久了，\n現在就正在這路上, 你會珍惜。\n一天過一天，你可以感覺狀況愈來愈好。",
-		"你發現不能空等你的船來到，\n而是你得自己游向它。",
-		"你清楚你可以從過去的失敗中，\n要如何讓自己現在更好，\n更珍惜戒酒的日子。",
-		"你開始懂得好好善待自己，\n並且”自愛”是一生最重要的一場戀愛。",
-		"對過去憤怒，或對未來恐懼，\n只是讓你的生活變得更無力，\n更容易錯過現在。",
-		"我們的價值是由我們是怎樣的人來決定，\n而不是我們有了什麼來決定。\n你更確認自己要保持清醒。",
-		"你正勇於面對每一個戒酒在生活的挑戰，\n特別是接受自己的不足或缺點，\n但你珍惜自己的任何改變。",
-		"你發現當你越認真努力戒酒，\n生活變得更順，運氣也會跟著變好。",
-		"你相信自己一步一步在走\n你自己所創造的不一樣中。",
-		"就像一次一次的身體訓練，\n每一次都讓我們變得更強壯或更堅定。",
-		"你發現別人的鼓勵可以讓我們更堅持下去，\n但如果也可以鼓勵他人，\n更能讓我們生活更有意義。"
+		"酒精是一位可畏的敵人，但你相信不會被\n敵人擺布，也決不低頭認輸。",
+		"想踏上戒酒這條路已經很久了，你正在這\n路上。珍惜每一天，會感覺愈來愈好。",
+		"你發現不能空等你的船來到，而是你得自\n己游向它。",
+		"你清楚你可以從過去的失敗中，要如何讓\n自己現在更好，更珍惜戒酒的日子。",
+		"你開始懂得好好善待自己，並且”自愛”\n是一生最重要的一場戀愛。",
+		"對過去憤怒，或對未來恐懼，只是讓你的\n生活變得更無力，更容易錯過現在。",
+		"我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。",
+		"我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。",
+		"你發現當你越認真努力戒酒，生活變得更\n順，運氣也會跟著變好。",
+		"你相信自己一步一步在走你自己所創造的\n不一樣中。",
+		"就像一次一次的身體訓練，每一次都讓我\n們變得更強壯或更堅定。",
+		"你發現別人的鼓勵讓我們更堅持下去，但\n如果也可以鼓勵他人，更能讓生活更有意義。"
 	};
 	
 	private static final int MAX_PAGE_WEEK = 11;
@@ -229,14 +225,12 @@ public class HistoryFragment extends Fragment {
 	
     private void clear(){
     	pageLayout.removeView(pageWidget);
-    	pageLayout.removeView(prevImage);
     	chartLayout.removeView(chart);
     	chartAreaLayout.removeView(chartYAxis);
     	chartAreaLayout.removeView(chartTitle);
     	chartAreaLayout.removeView(chartLabel);
     	
     	pageWidget.setBitmaps(null, null);
-    	prevImage.setImageDrawable(null);
     	
     	if (loadHandler !=null)
     		loadHandler.removeMessages(0);
@@ -248,10 +242,6 @@ public class HistoryFragment extends Fragment {
     	if (pageAnimationTask2!=null){
     		pageAnimationTask2.cancel(true);
     		pageAnimationTask2 = null;
-    	}
-    	if (aaEndHandler!=null){
-    		aaEndHandler.removeMessages(0);
-    		aaEndHandler = null;
     	}
     	
     	if (cur_bg_bmp!=null && !cur_bg_bmp.isRecycled()){
@@ -291,7 +281,7 @@ public class HistoryFragment extends Fragment {
     	/*Setting the play*/
     	bg_x = screen.x;
     	width = bg_x;
-    	height = bg_x* 1155/1080;
+    	height = bg_x* 1137/1080;
     	
     	from = new PointF(width,height);
     	to = new PointF(width*0.8F,-height);
@@ -306,7 +296,7 @@ public class HistoryFragment extends Fragment {
     	stageMessageText.setTypeface(wordTypefaceBold);
     	
     	quoteText = (TextView) view.findViewById(R.id.history_quote);
-    	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*20/480);
+    	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*24/480);
     	quoteText.setTypeface(wordTypefaceBold);
     	
     	format = new DecimalFormat();
@@ -322,16 +312,10 @@ public class HistoryFragment extends Fragment {
     	AccumulatedHistoryState curAH = page_states[page_week];
 		cur_bg_bmp = BitmapFactory.decodeResource(r, HistoryStorytelling.getPage(curAH.getScore(), curAH.week));
 		next_bg_bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-			
-		prev_bgDrawable = null;
-		AccumulatedHistoryState prevAH = null;
-		if ( page_week> 0){
-			prevAH = page_states[page_week - 1];
-			prev_bgDrawable = r.getDrawable(HistoryStorytelling.getPage(prevAH.getScore(), prevAH.week));
-		}	
-		 setPage();
+	
+		 //setPage();
 		 
-		 int chart_height = screen.x * 554/1080;
+		 int chart_height = screen.x * 564/1080;
 		chartBg1Drawable = r.getDrawable(R.drawable.chart_bg1);
 		chartBg2Drawable = r.getDrawable(R.drawable.chart_bg2);
 		chartBg3Drawable = r.getDrawable(R.drawable.chart_bg3);
@@ -353,21 +337,22 @@ public class HistoryFragment extends Fragment {
     	param.width = width;
     	param.height = height;
 
-    	prevImage = new ImageView(pageLayout.getContext());
-    	pageLayout.addView(prevImage);
-    	LayoutParams pParam = (LayoutParams) prevImage.getLayoutParams();
+    	//prevImage = new ImageView(pageLayout.getContext());
+    	//pageLayout.addView(prevImage);
+    	/*LayoutParams pParam = (LayoutParams) prevImage.getLayoutParams();
     	pParam.width = width;
     	pParam.height = height;
     	pParam.topMargin = top_margin;
     	pParam.leftMargin = 0;
-    	prevAnimation = null;
+    	*/
+    	/*prevAnimation = null;
     	if (prev_bgDrawable!=null && !HistoryStorytelling.isChangePage(prevAH,curAH)){
     		prevImage.setImageDrawable(prev_bgDrawable);
     		prevAnimation = new AlphaAnimation(1.0F,0.0F);
     		prevAnimation.setDuration(2000);
     		prevImage.setAnimation(prevAnimation);
     		aaEndHandler = new AlphaAnimationEndHandler(); 
-    	}
+    	}*/
     	/*
     	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(view.getContext());
     	int prev_counter = sp.getInt("self_help_counter", 0);
@@ -411,14 +396,15 @@ public class HistoryFragment extends Fragment {
     	chartAreaLayout.addView(chartTitle);
     	RelativeLayout.LayoutParams chartTitleParam = (RelativeLayout.LayoutParams) chartTitle.getLayoutParams();
 		chartTitleParam.width = screen.x;
-		chartTitleParam.height = screen.x * 90 / 1080;
+		chartTitleParam.height = screen.x * 100 / 1080;
+		chartTitleParam.topMargin = screen.x * 35/1080;
 		
 		chartLabel = new ChartLabelView(this.getActivity());
 		chartAreaLayout.addView(chartLabel,0);
 		RelativeLayout.LayoutParams chartLabelParam = (RelativeLayout.LayoutParams) chartLabel.getLayoutParams();
 		chartLabelParam.width = screen.x * 540/1080;
 		chartLabelParam.height = screen.x * 90 / 1080;
-		chartLabelParam.topMargin = screen.x * 110/1080;
+		chartLabelParam.topMargin = screen.x * 130/1080;
 		chartLabelParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		
 		if (chart_type == 0)
@@ -471,14 +457,14 @@ public class HistoryFragment extends Fragment {
     	isAnimation = false;
     	chart.invalidate();
     }
-    
+    /*
     public void setPage(){
     	Log.d("History","setPage start");
-    	pageWidget.setBitmaps(cur_bg_bmp, next_bg_bmp);
-    	pageWidget.setTouchPosition(curPageTouch);
+    	//pageWidget.setBitmaps(cur_bg_bmp, next_bg_bmp);
+    	//pageWidget.setTouchPosition(curPageTouch);
     	Log.d("History","setPage end");
     }
-    
+    */
     public void resetPage(int change){
     	Log.d("History","resetPage start");
     	if (cur_bg_bmp!=null && !cur_bg_bmp.isRecycled()){
@@ -525,13 +511,6 @@ public class HistoryFragment extends Fragment {
 		if (page_week == 0)
 			return;
 		
-		AccumulatedHistoryState prevAH = null;
-		AccumulatedHistoryState curAH = null;
-		curAH = page_states[page_week];
-		if (page_week > 0)
-			prevAH = page_states[page_week-1];
-		
-		if (HistoryStorytelling.isChangePage(prevAH,curAH)){
 			Log.d("PAGE_ANIMATION","START CHANGE PAGE ANIMATION");
 			isAnimation = true;
 			FragmentTabs.enableTab(false);
@@ -541,48 +520,10 @@ public class HistoryFragment extends Fragment {
 			int startIdx = pageIdx-1;
 			if (startIdx <0)
 				startIdx =0;
-			prevImage.setVisibility(View.INVISIBLE);
 			setStageVisible(false);
 			pageAnimationTask = new PageAnimationTaskVertical(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx);
 			Log.d("PAGE_ANIMATION","START CHANGE PAGE ANIMATION EXECUTE");
 			pageAnimationTask.execute();
-			
-		}else{
-			isAnimation = true;
-			Log.d("PAGE_ANIMATION","START ALPHA ANIMATION=0");
-			if (prevAnimation!=null){
-				Log.d("PAGE_ANIMATION","START ALPHA ANIMATION");
-				prevImage.setVisibility(View.VISIBLE);
-				Runnable r = new alphaAnimationTimer();
-				Thread t = new Thread(r);
-				prevAnimation.start();
-				Log.d("PAGE_ANIMATION","START ALPHA ANIMATION EXECUTE");
-				t.start();
-			}
-		}
-	}
-	
-	private class alphaAnimationTimer implements Runnable{
-		@Override
-		public void run() {
-			try {
-				Thread.sleep(2000);
-				if (aaEndHandler!=null)
-					aaEndHandler.sendEmptyMessage(0);
-				isAnimation = false; 
-			} catch (InterruptedException e) {}
-		}
-	}
-	@SuppressLint("HandlerLeak")
-	private class AlphaAnimationEndHandler extends Handler{
-		public void handleMessage(Message msg){
-			if (prevAnimation!=null)
-				prevAnimation.cancel();
-			prevImage.setAnimation(null);
-			prevImage.setImageDrawable(null);
-			prevImage.setVisibility(View.INVISIBLE);
-			isAnimation = false;
-		}
 	}
 	
 	public void setStageVisible(boolean t){
@@ -636,7 +577,7 @@ public class HistoryFragment extends Fragment {
 					return true;
 				}
 				Log.d("PAGE_ANIMATION", "UP2");
-				prevImage.setVisibility(View.INVISIBLE);
+				//prevImage.setVisibility(View.INVISIBLE);
 				setStageVisible(false);
 				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx,1);
 				pageAnimationTask2.execute();
@@ -655,7 +596,7 @@ public class HistoryFragment extends Fragment {
 					return true;
 				}
 				Log.d("PAGE_ANIMATION", "DOWN2");
-				prevImage.setVisibility(View.INVISIBLE);
+				//prevImage.setVisibility(View.INVISIBLE);
 				setStageVisible(false);
 				
 				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,endIdx,0);
@@ -871,7 +812,6 @@ public class HistoryFragment extends Fragment {
 		@Override
 		protected void onDraw(Canvas canvas){
 			super.onDraw(canvas);
-			
 			int base = screen.x * 44/1080;
 			int gap = screen.x * 10/1080;
 			int top = screen.x * 20/1080;
@@ -947,8 +887,7 @@ public class HistoryFragment extends Fragment {
 	    private ArrayList<Point> selected_centers;
 	    private ArrayList<Point> button_centers;
 	    
-	    private Path playPath;
-	    
+	    private float top_touch;
 	    
 		public ChartView(Context context) {
 			super(context);
@@ -960,7 +899,7 @@ public class HistoryFragment extends Fragment {
 			record_paint.setColor(0xFFff6f61);
 			no_record_paint.setColor(0xFF858585);
 			
-			paint_highlight .setColor(0x44AAAAFF);
+			paint_highlight .setColor(0x33FFFFFF);
 			
 			circle_paint_stroke.setColor(0xFFFF0000);
 			circle_paint_stroke.setStyle(Style.STROKE);
@@ -1015,11 +954,7 @@ public class HistoryFragment extends Fragment {
 			BUTTON_RADIUS_SQUARE = BUTTON_RADIUS*BUTTON_RADIUS;
 			BUTTON_GAPS = BUTTON_RADIUS * 8/3;
 			
-			playPath = new Path();
-			playPath.lineTo(2*circle_radius, circle_radius);
-			playPath.lineTo(0, 2*circle_radius);
-			playPath.lineTo(0, 0);
-			playPath.setFillType(FillType.EVEN_ODD);
+			top_touch = screen.x * 180/1080;
 		}
 		
 	    @Override  
@@ -1048,8 +983,11 @@ public class HistoryFragment extends Fragment {
 	    		if (onButton)
 	    			recordBox.showMsgBox(selected_dates.get(buttonNum),selected_idx.get(buttonNum));
 	    		else{
-	    			curX = (int) event.getX();  
-	    			curY = (int) event.getY();
+	    			float ty = event.getY();
+	    			if (ty>= top_touch){
+	    				curX = (int) event.getX();  
+	    				curY = (int) event.getY();
+	    			}
 	    		}
 	    	}
 	    	invalidate();
@@ -1213,13 +1151,7 @@ public class HistoryFragment extends Fragment {
 				//Draw bars & annotation_circles
 				Point center = new Point(left+bar_half,_top - bar_gap - circle_radius);
 				
-				//Paint dot_paint;
 				boolean hasAudioData = hasAudio.get(i);;
-				//if (hasAudio.get(i))
-				//	dot_paint = record_paint;
-				//else
-				//	dot_paint = no_record_paint;
-				//canvas.drawCircle(center.x,center.y, circle_radius, dot_paint);
 				if (!hasAudioData)
 					canvas.drawCircle(center.x,center.y, circle_radius, no_record_paint);
 				else
@@ -1245,7 +1177,6 @@ public class HistoryFragment extends Fragment {
 				//Draw X axis Label
 				if (i%7 == 0){
 					String str= (bar.dv.month+1)+"/"+bar.dv.date;
-					//canvas.drawLine(left+circle_radius, _bottom, left+circle_radius, _bottom + circle_radius, axis_paint);
 					canvas.drawText(str, left+circle_radius, _bottom + bar_width*2, text_paint_small);
 				}
 				left += (bar_width+bar_gap);

@@ -29,79 +29,73 @@ import android.util.Log;
 
 public class Bluetooth {
 
-	private BluetoothAdapter btAdapter;
+	protected BluetoothAdapter btAdapter;
 	
-	private static final UUID uuid=  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-	private static String DEVICE_NAME = "BOLUTEK";
-	private static String DEVICE_NAME2 = "AEGIN";
-	private BluetoothDevice sensor;
-	private BluetoothSocket socket;
+	protected static final UUID uuid=  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+	protected static String DEVICE_NAME = "BOLUTEK";
+	protected static String DEVICE_NAME2 = "AEGIN";
+	protected BluetoothDevice sensor;
+	protected BluetoothSocket socket;
 	
-	private InputStream in;
-	private Context context;
+	protected InputStream in;
+	protected Context context;
 	
-	private float local_min;
-	//private float local_max;
-	private float prev_prev_pressure;
-	private float prev_pressure;
-	private float now_pressure;
-	private boolean isPeak = false;
-	private final static float PRESSURE_DIFF_MIN = 300.f;
-	private final static float PRESSURE_DIFF_MAX = 20000.f;
-	private final static long IMAGE_MILLIS_0 = 500;
-	private final static long IMAGE_MILLIS_1 = 2500;
-	//private final static long MAX_DURATION_MILLIS = 5000;
-	private final static long MAX_DURATION_MILLIS = 7000;
+	protected float local_min;
+	protected float prev_prev_pressure;
+	protected float prev_pressure;
+	protected float now_pressure;
+	protected boolean isPeak = false;
+	protected final static float PRESSURE_DIFF_MIN = 300.f;
+	protected final static float PRESSURE_DIFF_MAX = 20000.f;
+	protected final static long IMAGE_MILLIS_0 = 500;
+	protected final static long IMAGE_MILLIS_1 = 2500;
+	protected final static long MAX_DURATION_MILLIS = 7000;
 	
-	private final static long MILLIS_1 = 1000;
-	private final static long MILLIS_2 = 2000;
-	private final static long MILLIS_3 = 3000;
-	private final static long MILLIS_4 = 4000;
-	//private final static long MILLIS_5 = 5000;
-	private final static long MILLIS_5 = 7000;
+	protected final static long MILLIS_1 = 1000;
+	protected final static long MILLIS_2 = 2000;
+	protected final static long MILLIS_3 = 3000;
+	protected final static long MILLIS_4 = 4000;
+	protected final static long MILLIS_5 = 7000;
 	
-	//private final static long START_MILLIS = 2500;
-	private final static long START_MILLIS = 2000;
-	private final static long MAX_TEST_TIME = 15000;
+	protected final static long START_MILLIS = 2000;
+	protected final static long MAX_TEST_TIME = 15000;
 	
-	private long start_time;
-	private long end_time;
-	private long first_start_time;
-	private long duration = 0;
+	protected long start_time;
+	protected long end_time;
+	protected long first_start_time;
+	protected long duration = 0;
 	
-	private boolean start;
+	protected boolean start;
 	
-	private boolean success;
+	protected boolean success;
 	
-	private final static int READ_NULL = 0;
-	private final static int READ_ALCOHOL = 1;
-	private final static int READ_PRESSURE = 2;
+	protected final static int READ_NULL = 0;
+	protected final static int READ_ALCOHOL = 1;
+	protected final static int READ_PRESSURE = 2;
 	
-	private Object lock = new Object();
-	private BTUIHandler btUIHandler;
+	protected Object lock = new Object();
+	protected BTUIHandler btUIHandler;
 	
-	private int image_count;
+	protected int image_count;
 	
-	private CameraRunHandler cameraRunHandler;
-	private BracValueFileHandler bracFileHandler;
-	private BracValueDebugHandler bracDebugHandler;
+	protected CameraRunHandler cameraRunHandler;
+	protected BracValueFileHandler bracFileHandler;
 	
-	private TestFragment testFragment;
+	protected TestFragment testFragment;
 	
-	private int count;
-	private float sum;
+	protected int count;
+	protected float sum;
 	
-	private SharedPreferences sp;
-	private SharedPreferences.Editor sp_editor;
+	protected SharedPreferences sp;
+	protected SharedPreferences.Editor sp_editor;
 	
-	private boolean start_recorder = false;
+	protected boolean start_recorder = false;
 	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler, BracValueDebugHandler bracDebugHandler){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.cameraRunHandler = cameraRunHandler;
 		this.bracFileHandler = bracFileHandler;
-		this.bracDebugHandler = bracDebugHandler;
 		btAdapter =  BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null)
 			Log.e("BT","NOT SUPPORT BT");
@@ -150,7 +144,7 @@ public class Bluetooth {
 		}
 	}
 	
-	private class btReceiver extends BroadcastReceiver{
+	protected class btReceiver extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
@@ -225,7 +219,6 @@ public class Bluetooth {
 			while(bytes>0){
 				if (!start){
 					bytes =in.read(temp);
-					testFragment.showDebug("read before start");
 					continue;
 				}
 				//Log.d("BT","READ");
@@ -244,13 +237,11 @@ public class Bluetooth {
 				for (int i=0;i<bytes;++i){
 					if ((char)temp[i]=='a'){
 						end = sendMsgToApp(msg);
-						sendDebugMsg(msg);
 						msg="a";
 						read_type = READ_ALCOHOL;
 					}
 					else if ((char)temp[i]=='m'){
 						end = sendMsgToApp(msg);
-						sendDebugMsg(msg);
 						msg="m";
 						read_type = READ_PRESSURE;
 					}
@@ -270,38 +261,12 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
 			close();
-			testFragment.showDebug("Close by exception or timeout" );
 			if(!success){
 					cameraRunHandler.sendEmptyMessage(1);
 			}
 		}
 	}
-	
-	private String debugMsg = "";
-	
-	private void sendDebugMsg(String msg){
-		if (msg == "")
-			return;
-		
-		if (msg.charAt(0) == 'm'){
-			String output = ","+msg.substring(1,msg.length()-1);
-			debugMsg = debugMsg+output+"\n";
-		}
-		else if (msg.charAt(0) == 'a'){
-			long timestamp = System.currentTimeMillis();
-			debugMsg = timestamp+","+msg.substring(1,msg.length()-1);
-			return;
-		}else
-			return;
-		
-		Message message = new Message();
-		Bundle data = new Bundle();
-		data.putString("ALCOHOL_DEBUG", debugMsg);
-		message.setData(data);
-		bracDebugHandler.sendMessage(message);
-	}
-	
-	private int sendMsgToApp(String msg){
+	protected int sendMsgToApp(String msg){
 		synchronized(lock){
 			if (msg=="");
 				//Do nothing
@@ -311,8 +276,6 @@ public class Bluetooth {
 					
 					float alcohol = Float.valueOf(msg.substring(1));
 					String output = timeStamp+"\t"+alcohol+"\n";
-					testFragment.showDebug("time: "+timeStamp);
-					testFragment.showDebug("alcohol: "+alcohol);
 					if (start_recorder){
 						sum+=alcohol;
 						++count;
@@ -328,39 +291,28 @@ public class Bluetooth {
 					prev_pressure = Float.valueOf(msg.substring(1));
 					prev_prev_pressure = Float.valueOf(msg.substring(1));
 					Log.d("ERIC", "first pressure: "+prev_pressure);
-					testFragment.showDebug("set_pressure: "+ prev_pressure);
 				}
 				else {
 					prev_prev_pressure = prev_pressure;
 					prev_pressure = now_pressure;
 					now_pressure = Float.valueOf(msg.substring(1));
-					testFragment.showDebug("set_pressure: "+ now_pressure);
-					Log.d("ERIC", "set_pressure: "+ now_pressure);
 					float diff = now_pressure - prev_pressure;
 					
 					long time = System.currentTimeMillis();
 					if(prev_pressure < prev_prev_pressure && prev_pressure < now_pressure && !isPeak){
 						local_min = prev_pressure;
-						Log.d("ERIC", "set local min = " + prev_pressure);
 					}
 					else if(prev_pressure > prev_prev_pressure && prev_pressure > now_pressure){
 						//local_max = prev_pressure;
-						Log.d("ERIC", "set local max = " + prev_pressure);
 					}
 					if(local_min > 1 && now_pressure > local_min + 1000 && !isPeak){
-						testFragment.showDebug("P_PeakStart" );
-						Log.d("ERIC", "P_PeakStart");
 						isPeak = true;
 						start_time = time;
 					}
 					
-					testFragment.showDebug("P_diff: "+diff );
-					Log.d("ERIC", "P_diff: "+diff);
 					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
 					}else if (diff > -PRESSURE_DIFF_MIN/2){
 						if (isPeak){
-							testFragment.showDebug("P_Peak" );
-							Log.d("ERIC","P_Peak");
 							end_time = time;
 							duration += (end_time-start_time);
 							start_time = end_time;
@@ -372,8 +324,6 @@ public class Bluetooth {
 								value = sum/count;
 							
 							if (duration > MILLIS_5){
-								testFragment.showDebug("End of Blowing" );
-								Log.d("ERIC","End of Blowing");
 								show_in_UI(value,5);
 							}else if (duration > MILLIS_4){
 								show_in_UI(value,4);
@@ -406,8 +356,6 @@ public class Bluetooth {
 							
 						}
 					}else if (diff <-PRESSURE_DIFF_MIN/2 ){
-						testFragment.showDebug("P_PeakEnd" );
-						Log.d("ERIC","P_PeakEnd");
 						isPeak = false;
 						start_time = end_time = 0;
 					}
@@ -432,28 +380,16 @@ public class Bluetooth {
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();
-		if (bracDebugHandler !=null)
-			bracDebugHandler.close();
 	}
 	
-	private void write_to_file(String str){
+	protected void write_to_file(String str){
 		Message msg = new Message();
 		Bundle data = new Bundle();
 		data.putString("ALCOHOL", str);
 		msg.setData(data);
 		bracFileHandler.sendMessage(msg);
 	}
-	/*
-	private void show_in_UI(int time){
-		Message msg = new Message();
-		Bundle data = new Bundle();
-		data.putInt("TIME", time);
-		msg.setData(data);
-		msg.what = 0;
-		btUIHandler.sendMessage(msg);
-	}
-	*/
-	private void show_in_UI(float value,int time){
+	protected void show_in_UI(float value,int time){
 		Message msg = new Message();
 		Bundle data = new Bundle();
 		data.putFloat("value", value);

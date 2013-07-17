@@ -18,6 +18,7 @@ public class EndOnClickListener extends QuestionnaireOnClickListener {
 			seq.add(","+aid);
 		msgBox.insertSeq();
 		msgBox.closeBox();
+		msgBox.showEndOfQuestionnaire();
 	}
 
 }

@@ -14,8 +14,8 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	private PointF from;
 	private float width_gap_1;
 	private float height_gap_1;
-	public static final int gaps = 30;
-	private static final int clip_time = 300;
+	public static final int gaps = 60;
+	private static final int clip_time = 600;
 	private static final int sleep_time = clip_time/gaps;
 	private int[] bgs;
 	private HistoryFragment historyFragment;
@@ -104,7 +104,7 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 			prev_cur = cur;
 			prev_next= next;
 		}
-		historyFragment.setPage();
+		//historyFragment.setPage();
 		if (prev_next!=null&&!prev_next.isRecycled()){
 			prev_next.recycle();
 			prev_next = null;

@@ -1,10 +1,15 @@
 package ubicomp.drunk_detection.activities;
 
+import statistic.ui.questionnaire.content.ConnectSocialInfo;
 import ubicomp.drunk_detection.activities.R;
 import database.QuestionDB;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.util.TypedValue;
@@ -21,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RelativeLayout.LayoutParams;
 
 public class EmotionActivity extends Activity {
 
@@ -30,7 +36,11 @@ public class EmotionActivity extends Activity {
 	private int iconMargin;
 	private Typeface wordTypefaceBold;
 	
+	private RelativeLayout bgLayout;
 	private LinearLayout mainLayout;
+	private RelativeLayout callLayout;
+	private View shadowBg;
+	private TextView callOK,callCancel,callHelp;
 	
 	private Activity activity;
 	
@@ -60,6 +70,8 @@ public class EmotionActivity extends Activity {
 			new HelpOnClickListener(3),
 			new HelpOnClickListener(4)
 	};
+	
+	private static final int TYPE_SOCIAL = 3, TYPE_FAMILY = 4;
 	
 	QuestionDB db;
 	
@@ -95,12 +107,48 @@ public class EmotionActivity extends Activity {
 	protected void onResume(){
 		super.onResume();
 		this.activity = this;
+		bgLayout = (RelativeLayout) this.findViewById(R.id.emotion_all_layout);
+		bgLayout.setBackgroundColor(0xFF00FF00);
 		mainLayout = (LinearLayout) this.findViewById(R.id.emotion_main_layout);
 		inflater = LayoutInflater.from(activity);
+		shadowBg = new View(this);
+		shadowBg.setBackgroundColor(0x99000000);
+		callLayout = (RelativeLayout) inflater.inflate(R.layout.call_check_layout, null);
 		wordTypefaceBold = Typeface.createFromAsset(activity.getAssets(), "fonts/DFLiHeiStd-W5.otf");
+		setCallCheckBox();
 		db = new QuestionDB(activity);
 		setQuestionStart();
 
+	}
+	
+	
+	private RelativeLayout.LayoutParams shadowParam;
+	private RelativeLayout.LayoutParams boxParam;
+	
+	private void setCallCheckBox(){
+		
+		callOK = (TextView) callLayout.findViewById(R.id.call_ok_button);
+		callCancel = (TextView) callLayout.findViewById(R.id.call_cancel_button);
+		callHelp = (TextView) callLayout.findViewById(R.id.call_help);
+		
+		
+		callHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callHelp.setTypeface(wordTypefaceBold);
+		RelativeLayout.LayoutParams hParam = (LayoutParams) callHelp.getLayoutParams();
+		hParam.width = screen.x * 349/480;
+		hParam.height = screen.x * 114/480;
+		
+		
+		RelativeLayout.LayoutParams rParam = (LayoutParams) callOK.getLayoutParams();
+		rParam.width = screen.x * 154/480;
+		rParam.height = screen.x * 60/480;
+		rParam.topMargin = screen.x * 5/480;
+		rParam.rightMargin = screen.x * 15/480; 
+		RelativeLayout.LayoutParams pParam = (LayoutParams) callCancel.getLayoutParams();
+		pParam.width = screen.x * 154/480;
+		pParam.height = screen.x * 60/480;
+		pParam.topMargin = screen.x * 5/480;
+		pParam.leftMargin = screen.x * 35/1480; 
 	}
 	
 	private void setQuestionStart(){
@@ -131,12 +179,6 @@ public class EmotionActivity extends Activity {
 		}
 	}
 	
-	private static final String[] dummyTexts = {
-			"dummy:0212345678",
-			"dummy:0212345678",
-			"dummy:0212345678"
-			};
-	
 	private void setQuestionCall(int type){
 		state = 1;
 		
@@ -147,21 +189,39 @@ public class EmotionActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*230/1080;
 		
-		View tv = createTextView("請選擇聯絡對象：");
+		View tv = createTextView("要打給誰：");
 		mainLayout.addView(tv);
 
-		String[] texts = dummyTexts;
+		String[] names = new String[3];
+		String[] calls = new String[3];
 		
-		OnClickListener[] dummyListeners = {
-				new CallOnClickListener(type,dummyTexts[0]),
-				new CallOnClickListener(type,dummyTexts[1]),
-				new CallOnClickListener(type,dummyTexts[2])
-		};
+		if (type == TYPE_FAMILY){
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+			names[0] = sp.getString("connect_n0", "");
+			names[1] = sp.getString("connect_n1", "");
+			names[2] = sp.getString("connect_n2", "");
+			calls[0] = sp.getString("connect_p0", "");
+			calls[1] = sp.getString("connect_p1", "");
+			calls[2] = sp.getString("connect_p2", "");
+		}else if (type == TYPE_SOCIAL){
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
+			int connectS0,connectS1,connectS2;
+			connectS0 = sp.getInt("connect_s0", 0);
+			connectS1 = sp.getInt("connect_s1", 1);
+			connectS2 = sp.getInt("connect_s2", 2);
+			names[0] = ConnectSocialInfo.NAME[connectS0];
+			names[1] = ConnectSocialInfo.NAME[connectS1];
+			names[2] = ConnectSocialInfo.NAME[connectS2];
+			calls[0] = ConnectSocialInfo.PHONE[connectS0];
+			calls[1] = ConnectSocialInfo.PHONE[connectS1];
+			calls[2] = ConnectSocialInfo.PHONE[connectS2];
+		}
 		
-		OnClickListener[] listeners = dummyListeners;
 		
-		for (int i=0;i<texts.length;++i){
-			View vv = createIconView(texts[i],R.drawable.questionnaire_item_call,listeners[i]);
+		for (int i=0;i<3;++i){
+			OnClickListener listener = new CallCheckOnClickListener(type,names[i],calls[i]);
+			String text = names[i]+"："+calls[i];
+			View vv = createIconView(text,R.drawable.questionnaire_item_call,listener);
 			mainLayout.addView(vv);
 		}
 		
@@ -181,7 +241,7 @@ public class EmotionActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*244/1080;
 		
-		String str = "請繼續加油!";
+		String str =  "完成後能得到點數，請繼續加油！\n(一天限定早中晚各一次)";
 		View tv = createTextView(str);
 		mainLayout.addView(tv);
 		View vv = createIconView("完成",R.drawable.questionnaire_item_ok,new EndOnClickListener(selection));
@@ -275,18 +335,70 @@ public class EmotionActivity extends Activity {
 		}
 	}
 	
-	private class CallOnClickListener implements View.OnClickListener{
-		int in;
-		String call;
+	private class CallCheckOnClickListener  implements View.OnClickListener{
+
+		private int in;
+		private String name;
+		private String call;
 		
-		CallOnClickListener(int in,String call){
-			this.in = in+1;
+		CallCheckOnClickListener(int in,String name,String call){
+			this.in = in;
+			this.name = name;
 			this.call = call;
 		}
 		
 		@Override
 		public void onClick(View v) {
-			db.insertEmotion(in,call);
+			int item_count = mainLayout.getChildCount();
+			for (int i=0;i<item_count;++i)
+				mainLayout.getChildAt(i).setEnabled(false);
+			
+			
+			bgLayout.addView(shadowBg);
+			bgLayout.addView(callLayout);
+			shadowParam = (LayoutParams) shadowBg.getLayoutParams();
+			shadowParam.width = shadowParam.height = LayoutParams.MATCH_PARENT;
+			
+			boxParam = (LayoutParams) callLayout.getLayoutParams();
+			boxParam.width = screen.x * 349/480;
+			boxParam.height = screen.x * 189/480;
+			boxParam.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+			
+			callHelp.setText("確定要打給 "+name+" 嗎？");
+			callOK.setOnClickListener(new CallOnClickListener(in,name,call));
+			callCancel.setOnClickListener(new CallCancelOnClickListener());
+		}
+		
+	}
+	
+	private class CallCancelOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			bgLayout.removeView(shadowBg);
+			bgLayout.removeView(callLayout);
+			int item_count = mainLayout.getChildCount();
+			for (int i=0;i<item_count;++i)
+				mainLayout.getChildAt(i).setEnabled(true);
+		}
+		
+	}
+	
+	private class CallOnClickListener implements View.OnClickListener{
+		private int in;
+		private String name;
+		private String call;
+		
+		CallOnClickListener(int in,String name,String call){
+			this.in = in+1;
+			this.name = name;
+			this.call = call;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			db.insertEmotion(in,name);
+			Intent intentDial = new Intent("android.intent.action.CALL",Uri.parse("tel:"+call));
+			activity.startActivity(intentDial);
 			activity.finish();
 		}
 	}
