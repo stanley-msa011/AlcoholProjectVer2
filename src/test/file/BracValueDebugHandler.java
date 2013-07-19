@@ -24,8 +24,10 @@ public class BracValueDebugHandler extends Handler {
 	
 	public void handleMessage(Message msg){
 		String str = msg.getData().getString("ALCOHOL_DEBUG");
+		Log.d("DEBUG","BEFORE WRITE DEBUG = "+str);
 		if (writer!=null){
 			try {
+				Log.d("BRAC DEBUG WRITER","SUCCESS");
 				writer.write(str);
 			} catch (IOException e) {
 				Log.d("BRAC DEBUG WRITER","FAIL TO WRITE");
@@ -38,6 +40,7 @@ public class BracValueDebugHandler extends Handler {
 	public void close(){
 		if (writer!=null){
 			try {
+				Log.d("BRAC DEBUG WRITER","CLOSE");
 				writer.close();
 			} catch (IOException e) {
 				Log.d("BRAC DEUBG WRITER","FAIL TO CLOSE");

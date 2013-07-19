@@ -80,6 +80,8 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				}
 			}
 
+			Log.d("EMOTION_UPLOADER","end EMOTION DIY");
+			
 			EmotionManageData[] em_data = db.getNotUploadedEmotionManage();
 			if (em_data != null){
 				for (int i=0;i<em_data.length;++i){
@@ -91,6 +93,9 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			        }
 				}
 			}
+			
+			Log.d("EMOTION_UPLOADER","end EMOTION MANAGe");
+			
 			QuestionnaireData[] q_data = db.getNotUploadedQuestionnaire();
 			if (q_data != null){
 				for (int i=0;i<q_data.length;++i){
@@ -104,11 +109,14 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				}
 			}
 			
+			Log.d("EMOTION_UPLOADER","end Questionnaire");
+			
 			return null;
 		}
 		
 		@Override
 		protected void onPostExecute(Void result ){
+			Log.d("EMOTION_UPLOADER","POST EXECUTE");
 			AudioUploader.upload(context);
 		}
 		

@@ -67,13 +67,13 @@ public class DataUploader extends AsyncTask<Void, Void, Integer> {
 	 protected void onPostExecute(Integer result) {
 		if (result == -1){
 			Log.d("UPLOADER","UPLOAD FAILED");
+		}
+		else{
+			Log.d("UPLOADER","UPLOAD SUCCESS");
 			//put ts to the uploader
 			HistoryDB db = new HistoryDB(context);
 			long _ts =Long.valueOf(ts)*1000L;
 			db.updateDetectionUploaded(_ts);
-		}
-		else{
-			Log.d("UPLOADER","UPLOAD SUCCESS");
 		}
     }
 	

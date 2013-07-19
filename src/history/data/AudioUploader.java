@@ -56,11 +56,12 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	
 	@Override
 	protected void onPreExecute(){
+		Log.d("AUDIO UPLOADER","PRE EXECUTE");
 		setStorage();
 	}
 	
 	private void setStorage(){
-		Log.d("Audio Uploader", "set storage");
+		Log.d("AUDIO UPLOADER","SET STORAGE");
 		String state = Environment.getExternalStorageState();
 		File dir = null;
 		if (state.equals(Environment.MEDIA_MOUNTED))
@@ -80,18 +81,21 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	
 	@Override
 	protected Void doInBackground(Void... arg0) {
+		Log.d("AUDIO UPLOADER","start");
 		AudioInfo[] ais = db.getNotUploadedInfo();
-		Log.d("Audio Uploader", "in background");
-		if (ais == null)
+		if (ais == null){
+			Log.d("AUDIO UPLOADER","count = 0");
 			return null;
+		}
+		Log.d("AUDIO UPLOADER","count = "+ais.length);
 		for (int i=0;i<ais.length;++i){
 			int result = connectingToServer(ais[i]);
 			if (result == 0){
 				db.uploadedAudio(ais[i]);
-				Log.d("Audio Uploader", "upload: "+ais[i].toString());
+				Log.d("AUDIO UPLOADER", "upload: "+ais[i].toString());
 			}else if (result == -2);//no file
 			else{
-				Log.d("Audio Uploader", "fail to upload: "+ais[i].toString());
+				Log.d("AUDIO UPLOADER", "fail to upload: "+ais[i].toString());
 				break;
 			}
 		}
@@ -100,6 +104,7 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 
 	@Override
 	protected void onPostExecute(Void result){
+		Log.d("AUDIO UPLOADER", "POST EXECUTE");
 		uploader = null;
 	}
 	
@@ -136,7 +141,7 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.ts/1000L)));
 			
 			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.year)));
-			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.month)));
+			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.month+1)));
 			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.date)));
 			
 			File audio = new File(mainDirectory,info.filename+".3gp");

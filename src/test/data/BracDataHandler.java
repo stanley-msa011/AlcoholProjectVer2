@@ -256,7 +256,7 @@ public class BracDataHandler {
 		    int mDay = sp.getInt("sDate", c.get(Calendar.DATE));
 		    
 		    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
-		    
+		    Log.d("UPLOAD","JoinDate = "+joinDate);
 		    mpEntity.addPart("userData[]", new StringBody(joinDate));
 			
 		    PackageInfo pinfo;

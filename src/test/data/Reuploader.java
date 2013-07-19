@@ -150,8 +150,9 @@ public class Reuploader {
 			    int mMonth = sp.getInt("sMonth", c.get(Calendar.MONTH));
 			    int mDay = sp.getInt("sDate", c.get(Calendar.DATE));
 			    
-			    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
 			    
+			    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
+			    Log.d("UPLOAD","JoinDate = "+joinDate);
 			    mpEntity.addPart("userData[]", new StringBody(joinDate));
 				
 			    PackageInfo pinfo;
@@ -182,7 +183,8 @@ public class Reuploader {
 				httpPost.setEntity(mpEntity);
 				int result = uploader(httpClient, httpPost,ts,context);
 				if (result == 1){
-					db.updateDetectionUploaded(Long.valueOf(ts));
+					Log.d("UPLOAD","UPLOADED");
+					db.updateDetectionUploaded(Long.valueOf(ts)*1000L);
 				}
 				
 			} catch (Exception e) {

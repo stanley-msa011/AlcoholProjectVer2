@@ -72,6 +72,7 @@ public class Bluetooth {
 	protected final static int READ_NULL = 0;
 	protected final static int READ_ALCOHOL = 1;
 	protected final static int READ_PRESSURE = 2;
+	protected final static int READ_VOLTAGE = 3;
 	
 	protected Object lock = new Object();
 	protected BTUIHandler btUIHandler;
@@ -279,7 +280,6 @@ public class Bluetooth {
 					if (start_recorder){
 						sum+=alcohol;
 						++count;
-						/*write to the file*/
 						write_to_file(output);
 					}
 				}
@@ -323,17 +323,16 @@ public class Bluetooth {
 							else
 								value = sum/count;
 							
-							if (duration > MILLIS_5){
+							if (duration > MILLIS_5)
 								show_in_UI(value,5);
-							}else if (duration > MILLIS_4){
+							else if (duration > MILLIS_4)
 								show_in_UI(value,4);
-							}else if (duration > MILLIS_3){
+							else if (duration > MILLIS_3)
 								show_in_UI(value,3);
-							}else if (duration > MILLIS_2){
+							else if (duration > MILLIS_2)
 								show_in_UI(value,2);
-							}else if (duration > MILLIS_1){
+							else if (duration > MILLIS_1)
 								show_in_UI(value,1);
-							}
 							
 							if (duration >= START_MILLIS)
 								start_recorder = true;
@@ -360,6 +359,11 @@ public class Bluetooth {
 						start_time = end_time = 0;
 					}
 				}
+			}else if (msg.charAt(0) == 'v'){
+				//float voltage = Float.valueOf(msg.substring(1));
+				//String output = "\t"+voltage+"\n";
+				//if (start_recorder)
+				//	write_to_file(output);
 			}
 		}
 		return 0;

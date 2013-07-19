@@ -27,9 +27,9 @@ public class BracDataHandlerDebugMode extends BracDataHandler {
 			while(s.hasNext()){
 				index++;
 				String word = s.next();
-				if(index % 4 == 3)
+				if(index % 5 == 3)
 					valueArray_A0.add(word);
-				else if (index %4 == 0)
+				else if (index %5 == 4)
 					valueArray_A1.add(word);
 			}
 			

@@ -18,6 +18,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class HistoryDB {
 
@@ -435,6 +436,7 @@ public class HistoryDB {
     	String sql = "SELECT id,week, ts, brac, emotion, desire FROM Detection WHERE upload = 0 ORDER BY id ASC";
     	Cursor cursor = db.rawQuery(sql, null);
     	int count = cursor.getCount();
+    	Log.d("UPLOAD","not uploaded count= "+count);
     	if (count == 0){
     		cursor.close();
     		db.close();

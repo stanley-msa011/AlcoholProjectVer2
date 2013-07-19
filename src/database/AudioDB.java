@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class AudioDB {
 	private SQLiteOpenHelper dbHelper = null;
@@ -65,7 +66,7 @@ public class AudioDB {
     	db.close();
     }
     
-    public void InsertAudio(DateValue dv){
+    public void insertAudio(DateValue dv){
     	if (dv == null)
     		return;
     	db = dbHelper.getWritableDatabase();
@@ -78,6 +79,7 @@ public class AudioDB {
     	Cursor cursor = db.rawQuery(sql, null);
     	long ts = Calendar.getInstance().getTimeInMillis();
     	if (cursor.getCount() > 0){
+    		Log.d("AUDIO","update");
     		sql = "UPDATE Record SET upload = 0, ts = "+ts+"WHERE " +
     			"year= " +dv.year+
     			" AND month= " +dv.month+

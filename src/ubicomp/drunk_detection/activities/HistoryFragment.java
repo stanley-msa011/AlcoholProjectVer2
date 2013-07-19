@@ -477,7 +477,7 @@ public class HistoryFragment extends Fragment {
     		++page_week;
     		if (page_week > max_week)
     			page_week = max_week;
-    	}else{
+    	}else if (change <0){
     		--page_week;
     		if (page_week < 0)
     			page_week =0;
@@ -508,9 +508,10 @@ public class HistoryFragment extends Fragment {
 	private void startAnim(){
 		
 		Log.d("PAGE_ANIMATION","START ANIMATION");
-		if (page_week == 0)
+		if (page_week == 0){
+			resetPage(0);
 			return;
-		
+		}
 			Log.d("PAGE_ANIMATION","START CHANGE PAGE ANIMATION");
 			isAnimation = true;
 			FragmentTabs.enableTab(false);

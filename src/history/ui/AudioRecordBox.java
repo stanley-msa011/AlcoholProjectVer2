@@ -228,7 +228,7 @@ public class AudioRecordBox {
 					mediaRecorder.stop();
 					mediaRecorder.release();
 					mediaRecorder = null;
-					db.InsertAudio(curDV);
+					db.insertAudio(curDV);
 					Toast.makeText(mainLayout.getContext(), "錄音完成", Toast.LENGTH_LONG).show();
 				} catch (IllegalStateException e) {
 					Log.d("RECORDER",e.getMessage());
