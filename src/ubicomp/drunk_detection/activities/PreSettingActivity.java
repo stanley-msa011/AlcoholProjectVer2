@@ -5,6 +5,7 @@ import java.util.Calendar;
 import database.HistoryDB;
 import database.QuestionDB;
 
+import restore.RestoreData;
 import statistic.ui.questionnaire.content.ConnectSocialInfo;
 import test.data.Reuploader;
 import ubicomp.drunk_detection.activities.R;
@@ -23,8 +24,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -39,7 +38,7 @@ public class PreSettingActivity extends Activity {
 	private EditText connect_n0,connect_n1,connect_n2;
 	private EditText connect_p0,connect_p1,connect_p2;
 	
-	private Button ok_button,clean_button;
+	private Button ok_button,clean_button,restoreButton;
 	private Activity activity;
 	private static final int MIN_NAME_LENGTH = 3;
 	
@@ -155,8 +154,20 @@ public class PreSettingActivity extends Activity {
 	    clean_button = (Button) this.findViewById(R.id.clean_OK);
 	    clean_button.setOnClickListener(new CleanOnClickListener());
 		
+	    
+	    restoreButton = (Button) this.findViewById(R.id.restore);
+	    restoreButton.setOnClickListener(new RestoreOnClickListener());
 	}
 
+	private class RestoreOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			RestoreData rd = new RestoreData(uid.getText().toString(),activity);
+			rd.execute();
+		}
+		
+	}
+	
 	private class OKOnclickListener implements OnClickListener{
 		@Override
 		public void onClick(View v) {

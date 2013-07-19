@@ -21,17 +21,19 @@
         	android:text="" />
     
         <TextView
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:text="UID:" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UID:" />
 
     	<EditText
-	        android:id="@+id/uid_edit"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:ems="10" >
-	        <requestFocus />
-	    </EditText>
+    	    android:id="@+id/uid_edit"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:ems="10"
+    	    android:focusable="false"
+    	    android:focusableInTouchMode="false" >
+
+  	    </EditText>
 
     	<TextView
 	        android:layout_width="wrap_content"
@@ -55,7 +57,6 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number" >
-        <requestFocus />
     	</EditText>
     
     	<TextView
@@ -69,7 +70,6 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number" >
-        	<requestFocus />
     	</EditText>
         
     	<TextView
@@ -164,6 +164,12 @@
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:text="清空點數" />
+
+    	<Button
+    	    android:id="@+id/restore"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:text="RESTORE" />
 	
     </LinearLayout>
     </ScrollView>

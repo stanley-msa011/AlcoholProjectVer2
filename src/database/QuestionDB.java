@@ -486,4 +486,41 @@ public class QuestionDB {
     	cursor.close();
     	db.close();
     }
+    
+    public void restoreData(EmotionData ed, EmotionManageData emd, QuestionnaireData qd){
+    	db = dbHelper.getWritableDatabase();
+    	String sql;
+    	
+    	if (ed!=null){
+    		sql = "INSERT INTO Emotion (ts,selection," +
+				"acc_tb0, acc_tb1, acc_tb2,used_tb0, used_tb1, used_tb2, upload"+
+				") VALUES ("+ed.ts+","+ed.selection+","+
+				ed.acc[0]+","+ed.acc[1]+","+ed.acc[2]+","+ed.used[0]+","+ed.used[1]+","+ed.used[2]+
+				",1)";
+    		db.execSQL(sql);
+    	}
+    	if (emd!=null){
+    		sql = "INSERT INTO EmotionManage (ts,emotion,type,reason," +
+				"acc_tb0, acc_tb1, acc_tb2,used_tb0, used_tb1, used_tb2, upload"+
+				") VALUES ("+emd.ts+","+emd.emotion+","+emd.type+","+"'"+emd.reason+"'"+","+
+				emd.acc[0]+","+emd.acc[1]+","+emd.acc[2]+","+emd.used[0]+","+emd.used[1]+","+emd.used[2]+
+				",1)";
+    		db.execSQL(sql);
+    	}
+    	if (qd!=null){
+    		sql = "INSERT INTO Questionnaire (ts,type,sequence," +
+				"acc_tb0_0, acc_tb1_0, acc_tb2_0,used_tb0_0, used_tb1_0, used_tb2_0,"+
+				"acc_tb0_1, acc_tb1_1, acc_tb2_1,used_tb0_1, used_tb1_1, used_tb2_1,"+
+				"acc_tb0_2, acc_tb1_2, acc_tb2_2,used_tb0_2, used_tb1_2, used_tb2_2,"+
+				"acc_tb0_3, acc_tb1_3, acc_tb2_3,used_tb0_3, used_tb1_3, used_tb2_3"+
+				") VALUES ("+qd.ts+","+qd.type+","+"'"+qd.seq+"'"+","+
+				qd.acc[0]+","+qd.acc[1]+","+qd.acc[2]+","+qd.used[0]+","+qd.used[1]+","+qd.used[2]+","+
+				qd.acc[3]+","+qd.acc[4]+","+qd.acc[5]+","+qd.used[3]+","+qd.used[4]+","+qd.used[5]+","+
+				qd.acc[6]+","+qd.acc[7]+","+qd.acc[8]+","+qd.used[6]+","+qd.used[7]+","+qd.used[8]+","+
+				qd.acc[9]+","+qd.acc[10]+","+qd.acc[11]+","+qd.used[9]+","+qd.used[10]+","+qd.used[11]+
+				")";
+    		db.execSQL(sql);
+    	}
+    }
+    
 }

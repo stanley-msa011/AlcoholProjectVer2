@@ -558,4 +558,20 @@ public class HistoryDB {
     	db.close();
     }
     
+    public void restoreUsedDetection(UsedDetection usedDetection){//FOR RESTORE
+    	db = dbHelper.getWritableDatabase();
+    	
+    	int t_morning = usedDetection.test[0];
+    	int t_noon = usedDetection.test[1];
+    	int t_night = usedDetection.test[2];
+    	int p_morning = usedDetection.pass[0];
+    	int p_noon = usedDetection.pass[1];
+    	int p_night = usedDetection.pass[2];
+    	long ts = System.currentTimeMillis();
+    	String sql = "INSERT INTO UsedDetection (morning,noon,night,morning_pass,noon_pass,night_pass,ts) VALUES (" +
+    			t_morning+","+t_noon+","+t_night+","+p_morning+","+p_noon+","+p_night+","+ts+
+    			")";
+    	db.execSQL(sql);
+    	db.close();
+    }
 }

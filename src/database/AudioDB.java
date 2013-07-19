@@ -77,19 +77,19 @@ public class AudioDB {
     			" AND day= " + dv.date+
     			" AND filename=" + "'"+dv.toFileString()+"'";
     	Cursor cursor = db.rawQuery(sql, null);
-    	long ts = Calendar.getInstance().getTimeInMillis();
+    	long ts = System.currentTimeMillis();
     	if (cursor.getCount() > 0){
     		Log.d("AUDIO","update");
-    		sql = "UPDATE Record SET upload = 0, ts = "+ts+"WHERE " +
+    		sql = "UPDATE Record SET upload = 0, ts = "+ts+" WHERE " +
     			"year= " +dv.year+
     			" AND month= " +dv.month+
     			" AND day= " + dv.date+
     			" AND filename=" + "'"+dv.toFileString()+"'";
+    		db.execSQL(sql);
     		cursor.close();
     		db.close();
     		return;
     	}
-    	
     	
     	sql = "INSERT INTO Record (year,month,day,filename,ts) VALUES (" +
     					dv.year+", " +
@@ -117,5 +117,23 @@ public class AudioDB {
     	cursor.close();
     	db.close();
     	return result;
+    }
+    
+    
+    public void restoreAudio(DateValue dv,long ts){
+    	if (dv == null)
+    		return;
+    	db = dbHelper.getWritableDatabase();
+    	
+    	String sql;
+    	
+    	sql = "INSERT INTO Record (year,month,day,filename,ts) VALUES (" +
+    					dv.year+", " +
+    					dv.month+	"," +
+    					dv.date+"," +
+    					"'"+dv.toFileString()+"',"+
+    					ts+")";
+    	db.execSQL(sql);
+    	db.close();
     }
 }
