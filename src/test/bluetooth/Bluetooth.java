@@ -45,17 +45,18 @@ public class Bluetooth {
 	protected float prev_pressure;
 	protected float now_pressure;
 	protected boolean isPeak = false;
-	protected final static float PRESSURE_DIFF_MIN = 300.f;
+	protected final static float PRESSURE_DIFF_MIN = 100.f;
 	protected final static float PRESSURE_DIFF_MAX = 20000.f;
 	protected final static long IMAGE_MILLIS_0 = 500;
 	protected final static long IMAGE_MILLIS_1 = 2500;
-	protected final static long MAX_DURATION_MILLIS = 7000;
+	protected final static long IMAGE_MILLIS_2 = 4900;
+	protected final static long MAX_DURATION_MILLIS = 5000;
 	
 	protected final static long MILLIS_1 = 1000;
 	protected final static long MILLIS_2 = 2000;
 	protected final static long MILLIS_3 = 3000;
 	protected final static long MILLIS_4 = 4000;
-	protected final static long MILLIS_5 = 7000;
+	protected final static long MILLIS_5 = 5000;
 	
 	protected final static long START_MILLIS = 2000;
 	protected final static long MAX_TEST_TIME = 15000;
@@ -225,12 +226,9 @@ public class Bluetooth {
 				//Log.d("BT","READ");
 				long time = System.currentTimeMillis();
 				long time_gap = time - first_start_time;
-				if (first_start_time == -1){
+				if (first_start_time == -1)
 					first_start_time = time;
-					Log.d("ERIC", "start");
-				}
 				else if (time_gap > MAX_TEST_TIME){
-					Log.d("BT","TIME OUT");
 					end =-1; 
 					throw new Exception("time out");
 				}
@@ -248,23 +246,22 @@ public class Bluetooth {
 					}
 					else if ( (char)temp[i]=='b'){
 						throw new Exception("NO BETTARY");
-					}
-					else if (read_type!= READ_NULL){
+					}else if ((char)temp[i]=='v'){
+						msg = "v";
+						read_type = READ_VOLTAGE;
+					}else if (read_type!= READ_NULL)
 							msg += (char)temp[i];
-					}
 				}
-				if (end == -1){
+				if (end == -1)
 					break;
-				}
 				bytes =in.read(temp);
 			}
 			close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
 			close();
-			if(!success){
+			if(!success)
 					cameraRunHandler.sendEmptyMessage(1);
-			}
 		}
 	}
 	protected int sendMsgToApp(String msg){
@@ -286,7 +283,6 @@ public class Bluetooth {
 			}
 			else if (msg.charAt(0)=='m'){
 				
-				//Log.d("BT","READ-M");
 				if (prev_pressure == 0.f){
 					prev_pressure = Float.valueOf(msg.substring(1));
 					prev_prev_pressure = Float.valueOf(msg.substring(1));
@@ -302,17 +298,12 @@ public class Bluetooth {
 					if(prev_pressure < prev_prev_pressure && prev_pressure < now_pressure && !isPeak){
 						local_min = prev_pressure;
 					}
-					else if(prev_pressure > prev_prev_pressure && prev_pressure > now_pressure){
-						//local_max = prev_pressure;
-					}
-					if(local_min > 1 && now_pressure > local_min + 1000 && !isPeak){
+					if(local_min > 1 && now_pressure > local_min +PRESSURE_DIFF_MIN && !isPeak){
 						isPeak = true;
 						start_time = time;
 					}
 					
-					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
-					}else if (diff > -PRESSURE_DIFF_MIN/2){
-						if (isPeak){
+					if (diff > -PRESSURE_DIFF_MIN/2 && isPeak){
 							end_time = time;
 							duration += (end_time-start_time);
 							start_time = end_time;
@@ -344,26 +335,20 @@ public class Bluetooth {
 							else if (image_count == 1 && duration > IMAGE_MILLIS_1){
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
-							}
-							else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
+							}else if (image_count == 2 && duration > IMAGE_MILLIS_2){
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
+							}else if (image_count == 3 && duration >MAX_DURATION_MILLIS ){
 								show_in_UI(value,6);
 								success = true;
 								return -1;
 							}
 							
-						}
-					}else if (diff <-PRESSURE_DIFF_MIN/2 ){
+					}else if (diff <-PRESSURE_DIFF_MIN /2){
 						isPeak = false;
 						start_time = end_time = 0;
 					}
 				}
-			}else if (msg.charAt(0) == 'v'){
-				//float voltage = Float.valueOf(msg.substring(1));
-				//String output = "\t"+voltage+"\n";
-				//if (start_recorder)
-				//	write_to_file(output);
 			}
 		}
 		return 0;

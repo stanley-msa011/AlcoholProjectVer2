@@ -36,6 +36,7 @@
         		/>
     	    
     	    <RelativeLayout
+    	        android:id="@+id/msg_emotion_seek_bar_layout"
     	        android:layout_width="wrap_content"
     	        android:layout_height="wrap_content"
     	        android:layout_below="@+id/msg_emotion_text"
@@ -45,6 +46,7 @@
     	            android:id="@+id/msg_emotion_bar_bg"
     	            android:layout_width="wrap_content"
     	            android:layout_height="wrap_content"
+    	            android:scaleType="fitXY"
     	            android:src="@drawable/msg_bar_bg" />
     	        
     	    	<SeekBar
@@ -59,7 +61,7 @@
     	    	    android:id="@+id/msg_emotion_num"
     	    	    android:layout_width="wrap_content"
     	    	    android:layout_height="wrap_content"
-    	    	    android:gravity="left"
+    	    	    android:layout_alignParentLeft="true"
     	    	    android:textColor="#FF898989"
     	    	    android:layout_below="@+id/msg_emotion_seek_bar"
     	    	    />
@@ -75,6 +77,7 @@
     	    		android:id="@+id/msg_emotion_show"
         			android:layout_width="wrap_content"
         			android:layout_height="wrap_content"
+        			android:scaleType="fitXY"
         			android:layout_gravity="center"
     	    		/>
     			<TextView
@@ -105,6 +108,7 @@
         		/>
     	    
     	    <RelativeLayout
+    	        android:id="@+id/msg_desire_seek_bar_layout"
     	        android:layout_width="wrap_content"
     	        android:layout_height="wrap_content"
     	        android:layout_below="@+id/msg_desire_text"
@@ -114,6 +118,7 @@
     	            android:id="@+id/msg_desire_bar_bg"
     	             android:layout_width="wrap_content"
     	            android:layout_height="wrap_content"
+    	            android:scaleType="fitXY"
     	            android:src="@drawable/msg_bar_bg" />
     	        
     	    	<SeekBar
@@ -128,7 +133,7 @@
     	    	    android:id="@+id/msg_desire_num"
     	    	    android:layout_width="wrap_content"
     	    	    android:layout_height="wrap_content"
-    	    	    android:gravity="left"
+    	    	    android:layout_alignParentLeft="true"
     	    	    android:textColor="#FF898989"
     	    	    android:layout_below="@+id/msg_desire_seek_bar"
     	    	    />
@@ -146,6 +151,7 @@
         				android:layout_width="wrap_content"
         				android:layout_height="wrap_content"
         				android:layout_gravity="center"
+        				android:scaleType="fitXY"
     	    			/>
     				<TextView
 		    		    android:id = "@+id/msg_desire_show_text"

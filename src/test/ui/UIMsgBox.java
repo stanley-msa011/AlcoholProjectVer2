@@ -3,11 +3,15 @@ package test.ui;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.TestFragment;
 import ubicomp.drunk_detection.activities.R;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -34,6 +38,8 @@ public class UIMsgBox {
 	private Switch gpsSwitch;
 	
 	private RelativeLayout mainLayout;
+	
+	private RelativeLayout emotionSeekBarLayout,desireSeekBarLayout;
 	
 	private ImageView emotionShow;
 	private ImageView desireShow;
@@ -108,7 +114,7 @@ public class UIMsgBox {
 		title.setTypeface(wordTypefaceBold);
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)title.getLayoutParams();
 		tParam.topMargin = screen.x*53/480;
-		tParam.bottomMargin = screen.x*74/480;
+		tParam.bottomMargin = screen.x*60/480;
 		
 		help = (TextView) boxLayout.findViewById(R.id.msg_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
@@ -169,6 +175,12 @@ public class UIMsgBox {
 		
 		eP.width =dP.width =  screen.x * 26/480;
 		
+		emotionSeekBarLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_seek_bar_layout);
+		RelativeLayout.LayoutParams eSBParam = (LayoutParams) emotionSeekBarLayout.getLayoutParams();
+		eSBParam.width = screen.x * 260/480;
+		desireSeekBarLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_desire_seek_bar_layout);
+		RelativeLayout.LayoutParams dSBParam = (LayoutParams) desireSeekBarLayout.getLayoutParams();
+		dSBParam.width = screen.x * 260/480;
 		
 		emotionLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_layout);
 		LinearLayout.LayoutParams eParam =  (LinearLayout.LayoutParams)emotionLayout.getLayoutParams();
@@ -178,7 +190,7 @@ public class UIMsgBox {
 		dParam.bottomMargin = screen.x * 50/480;
 		
 		LinearLayout.LayoutParams sParam =  (LinearLayout.LayoutParams)gpsSwitch.getLayoutParams();
-		sParam.bottomMargin = screen.x * 0/480;
+		sParam.bottomMargin = screen.x * 16/480;
 		
 		send = (TextView) boxLayout.findViewById(R.id.msg_send);
 		send.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSizeLarge);
@@ -197,7 +209,8 @@ public class UIMsgBox {
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
 		boxParam.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
 		boxParam.topMargin = screen.x * 80/480;
-		
+		boxParam.width = screen.x * 435/480;
+		boxParam.height = screen.x * 637/480;
 		
 		RelativeLayout.LayoutParams qParam = (RelativeLayout.LayoutParams) questionLayout.getLayoutParams();
 		qParam.leftMargin = qParam.rightMargin = screen.x * 44/480;
@@ -223,8 +236,8 @@ public class UIMsgBox {
 		desireDrawables[9]  = r.getDrawable(R.drawable.msg_desire_10);
 		
 		
-		int padding_ver = screen.x * 4/480;
-		int padding_hor = screen.x * 26/480;
+		int padding_ver = screen.x * 5/480;
+		int padding_hor = screen.x * 24/480;
 		
 		emotionSeekBar.setPadding(padding_hor , padding_ver,padding_hor , padding_ver);
 		desireSeekBar.setPadding(padding_hor , padding_ver, padding_hor , padding_ver);
@@ -234,14 +247,14 @@ public class UIMsgBox {
 		
 		RelativeLayout.LayoutParams esParam = (LayoutParams) emotionSeekBar.getLayoutParams();
 		esParam.width = screen.x * 260/480;
-		esParam.topMargin = screen.x * 16/480;
+		esParam.topMargin = screen.x * 13/480;
 		RelativeLayout.LayoutParams dsParam = (LayoutParams) desireSeekBar.getLayoutParams();
 		dsParam.width = screen.x * 260/480;
-		dsParam.topMargin = screen.x * 16/480;
+		dsParam.topMargin = screen.x * 13/480;
 		RelativeLayout.LayoutParams esbgParam = (LayoutParams) emotionSeekBg.getLayoutParams();
-		esbgParam.topMargin = screen.x * 22/480;
+		esbgParam.topMargin = screen.x * 44/960;
 		RelativeLayout.LayoutParams dsbgParam = (LayoutParams) desireSeekBg.getLayoutParams();
-		dsbgParam.topMargin = screen.x * 22/480;
+		dsbgParam.topMargin = screen.x * 44/960;
 		
 		LinearLayout.LayoutParams eParam = (LinearLayout.LayoutParams) emotionShowText.getLayoutParams();
 		eParam.width = screen.x * 90/480;
@@ -357,7 +370,9 @@ public class UIMsgBox {
 			emotionShow.setImageDrawable(emotionDrawables[progress]);
 			emotionShowText.setText(emotionStr[progress]);
 			eNum.setText(String.valueOf(progress+1));
-			eP.leftMargin = progress*(screen.x * 52/480);
+			Log.d("SEEK_BAR","emotion progress="+progress);
+			int margin = screen.x*52/480;
+			eP.leftMargin =progress*margin;
 			enableSend(true);
 		}
 		@Override
@@ -373,7 +388,9 @@ public class UIMsgBox {
 			desireShow.setImageDrawable(desireDrawables[progress]);
 			desireShowText.setText(desireStr[progress]);
 			dNum.setText(String.valueOf(progress+1));
-			dP.leftMargin =progress*(screen.x * 26/480);
+			Log.d("SEEK_BAR","desire progress="+progress);
+			int margin = screen.x*26/480;
+			dP.leftMargin =progress*margin;
 			enableSend(true);
 		}
 		@Override

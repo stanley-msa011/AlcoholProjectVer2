@@ -30,8 +30,7 @@
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:ems="10"
-    	    android:focusable="false"
-    	    android:focusableInTouchMode="false" >
+    	    >
 
   	    </EditText>
 
@@ -95,15 +94,15 @@
 
      	<Spinner
      	    android:id="@+id/connect_social_0"
-     	    android:layout_width="match_parent"
+     	    android:layout_width="wrap_content"
      	    android:layout_height="wrap_content" />
      	<Spinner
      	    android:id="@+id/connect_social_1"
-     	    android:layout_width="match_parent"
+     	    android:layout_width="wrap_content"
      	    android:layout_height="wrap_content" />
      	<Spinner
      	    android:id="@+id/connect_social_2"
-     	    android:layout_width="match_parent"
+     	    android:layout_width="wrap_content"
      	    android:layout_height="wrap_content" />
  
      	<TextView
@@ -111,6 +110,11 @@
      	    android:layout_height="wrap_content"
      	    android:text="親友資訊" />
 
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="姓名：" />
+     	
      	<EditText
      	    android:id="@+id/connect_name_0"
      	    android:layout_width="wrap_content"
@@ -118,12 +122,22 @@
      	    android:ems="10"
      	    android:inputType="textPersonName" />
 
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="電話：" />
+     	
      	<EditText
      	    android:id="@+id/connect_0"
-     	    android:layout_width="match_parent"
+     	    android:layout_width="wrap_content"
      	    android:layout_height="wrap_content"
      	    android:ems="12"
      	    android:inputType="phone" />
+     	
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="姓名：" />
      	
      	<EditText
      	    android:id="@+id/connect_name_1"
@@ -132,12 +146,22 @@
      	    android:ems="10"
      	    android:inputType="textPersonName" />
      	
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="電話：" />
+     	
      	<EditText
      	    android:id="@+id/connect_1"
-     	    android:layout_width="match_parent"
+     	    android:layout_width="wrap_content"
      	    android:layout_height="wrap_content"
      	    android:ems="12"
      	    android:inputType="phone" />
+     	
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="姓名：" />
      	
      	<EditText
      	    android:id="@+id/connect_name_2"
@@ -146,9 +170,14 @@
      	    android:ems="10"
      	    android:inputType="textPersonName" />
      	
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="電話：" />
+     	
      	<EditText
      	    android:id="@+id/connect_2"
-     	    android:layout_width="match_parent"
+     	    android:layout_width="wrap_content"
      	    android:layout_height="wrap_content"
      	    android:ems="12"
      	    android:inputType="phone" />
@@ -170,6 +199,18 @@
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:text="RESTORE" />
+    	
+    	<Button
+    	    android:id="@+id/debug_normal_switch"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:text="Debug Mode Switch" />
+    	
+    	<Button
+    	    android:id="@+id/dummy_data_switch"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:text="Dummy Data Switch" />
 	
     </LinearLayout>
     </ScrollView>

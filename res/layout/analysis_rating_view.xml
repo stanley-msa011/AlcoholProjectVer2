@@ -14,6 +14,7 @@
             android:id="@+id/analysis_rating_title_bg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:scaleType="fitXY"
             android:src="@drawable/analysis_title_bar" />
 
    		<TextView
@@ -48,6 +49,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_centerHorizontal="true"
 	        android:layout_centerVertical="true"
+	        android:scaleType="fitXY"
 	        android:src="@drawable/analysis_rating_bar" />
         
         <ImageView
@@ -55,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:scaleType="fitXY"
             android:src="@drawable/analysis_rating_pointer" />
         
         <TextView
@@ -103,6 +106,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_centerHorizontal="true"
 	        android:layout_centerVertical="true"
+	        android:scaleType="fitXY"
 	        android:src="@drawable/analysis_rating_bar" />
         
         <ImageView
@@ -110,6 +114,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:scaleType="fitXY"
             android:src="@drawable/analysis_rating_pointer" />
         
         <TextView

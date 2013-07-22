@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
@@ -60,7 +61,7 @@ public class BracDataHandler {
 	public static final int Nothing = 0; 
 	public static final int ERROR = -1;
 	public static final int SUCCESS = 1;
-	public static final double THRESHOLD = 0.01;
+	public static final double THRESHOLD = 0.015;
 	public static final double THRESHOLD2 = 0.25;
 	
 	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload_2.php";
@@ -162,28 +163,29 @@ public class BracDataHandler {
 	}
 	
 	protected double parseTextFile(File textFile){
-		double avg = 0;
+		double median = 0;
         try {
 			Scanner s = new Scanner(textFile);
 			int index = 0;
-			List<String> valueArray = new ArrayList<String>();
+			List<Double> valueArray2 = new ArrayList<Double>();
 			
 			while(s.hasNext()){
 				index++;
 				String word = s.next();
-				if(index % 2 == 0)
-					valueArray.add(word);
+				if(index % 2 == 0){
+					valueArray2.add(Double.valueOf(word));
+				}
 			}
-			for(int i = 0; i < valueArray.size(); ++i)
-				avg += Double.parseDouble(valueArray.get(i));
-			if (valueArray.size()==0)
+			if (valueArray2.size()==0)
 				return ERROR;
-			avg /= valueArray.size();
+			Double[] values = valueArray2.toArray(new Double[valueArray2.size()]);
+			Arrays.sort(values);
+			median = values[(values.length-1)/2];
 			
 		} catch (FileNotFoundException e1) {
 			return ERROR;
 		}
-        return avg;
+        return median;
 	}
 	
 	private int getQuestionResult(File textFile){

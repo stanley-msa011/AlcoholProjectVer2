@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="16"
-    android:versionName="2.20" >
+    android:versionCode="20"
+    android:versionName="2.40" >
 
     <uses-sdk
         android:maxSdkVersion="17"
@@ -69,11 +69,10 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
-                <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </receiver>
         
-        <receiver android:name="ubicomp.drunk_data.recorda.activities.AlarmReceiver" >
+        <receiver android:name="ubicomp.drunk_detection.activities.AlarmReceiver" >
             <intent-filter>
                 <action android:name="com.android.alarmclock.ALARM_ALERT" />
             </intent-filter>
@@ -81,34 +80,36 @@
 
         <service android:name="ubicomp.drunk_detection.activities.AlarmService" >
         </service>
-        <service android:name="ubicomp.drunk_data.recorda.activities.HourlyAlarmService" >
+        <service android:name="ubicomp.drunk_detection.activities.HourlyAlarmService" >
         </service>
 
         <activity
             android:name="ubicomp.drunk_detection.activities.PreSettingActivity"
-            android:screenOrientation="portrait" 
             android:noHistory="true"
-            >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionActivity"
-            android:screenOrientation="portrait" 
-            >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionManageActivity"
-            android:screenOrientation="portrait" 
-            >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.TutorialActivity"
-            android:screenOrientation="portrait" 
-            android:noHistory="true">
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.AboutActivity"
-            android:screenOrientation="portrait" 
             android:noHistory="true"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ubicomp.drunk_detection.activities.DeveloperActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait"
             >
         </activity>
     </application>

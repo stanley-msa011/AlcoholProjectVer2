@@ -25,7 +25,7 @@ public class HourlyAlarmService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
 		super.onStartCommand(intent, flags, startId);
-		Log.e("BrACReceiver","Start AlarmService(Hourly)");   
+		Log.e("ALARM","Start AlarmService(Hourly)");   
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		boolean start = sp.getBoolean("hourly_alarm", false);

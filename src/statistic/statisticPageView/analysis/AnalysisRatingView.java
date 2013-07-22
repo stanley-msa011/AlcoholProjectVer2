@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import statistic.statisticPageView.StatisticPageView;
 import ubicomp.drunk_detection.activities.StatisticFragment;
@@ -27,6 +28,7 @@ public class AnalysisRatingView extends StatisticPageView {
 	private TextView low,high, low2 , high2;
 	private HistoryDB db;
 	
+	private ImageView bar, bar2;
 	private ImageView pointer, pointer2;
 	
 	private NetworkTask netTask;
@@ -142,6 +144,9 @@ public class AnalysisRatingView extends StatisticPageView {
 		high2.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		high2.setTypeface(wordTypeface);
 		
+		bar = (ImageView) view.findViewById(R.id.analysis_rating_bar);
+		bar2 = (ImageView) view.findViewById(R.id.analysis_rating_bar2);
+		
 		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_rating_content_layout);
 		contentLayout2 = (RelativeLayout) view.findViewById(R.id.analysis_rating_content_layout2);
 		
@@ -168,6 +173,11 @@ public class AnalysisRatingView extends StatisticPageView {
 		contentParam.bottomMargin = screen.x * 11/480;
 		LinearLayout.LayoutParams contentParam2 = (LinearLayout.LayoutParams)contentLayout2.getLayoutParams();
 		contentParam2.bottomMargin =  screen.x * 11/480;
+		
+		RelativeLayout.LayoutParams barParam = (LayoutParams) bar.getLayoutParams();
+		barParam.width = screen.x * 346/480;
+		RelativeLayout.LayoutParams bar2Param = (LayoutParams) bar2.getLayoutParams();
+		bar2Param.width = screen.x * 346/480;
 	}
 
 	@Override

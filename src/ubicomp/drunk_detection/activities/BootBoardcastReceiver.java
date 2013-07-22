@@ -17,7 +17,7 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("BrACReceiver",intent.getAction());
+		Log.d("ALARM",intent.getAction());
 		
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		
@@ -50,10 +50,12 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 			}
 		}
 		
-		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		Log.d("ALARM","BOOTRECEIVER");
+		
+		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarm.cancel(pending);
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(),2*AlarmManager.INTERVAL_HOUR,pending);
-		
+		//alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),30000,pending);
 	}
 
 }

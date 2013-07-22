@@ -25,6 +25,7 @@
         android:id="@+id/statistic_day_emotion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:scaleType="fitXY"
         android:layout_below="@+id/statistic_day_brac_time"
         />
     
@@ -32,6 +33,7 @@
         android:id="@+id/statistic_day_desire"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:scaleType="fitXY"
         android:layout_below="@+id/statistic_day_brac_time"
         android:layout_toRightOf="@+id/statistic_day_emotion"
         />
@@ -44,8 +46,9 @@
     
     	<ImageView 
         	android:id = "@+id/statistic_day_value_circle"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
+        	android:layout_width="match_parent"
+        	android:layout_height="match_parent"
+        	android:scaleType="fitXY"
         	android:layout_centerInParent="true"
         />
     

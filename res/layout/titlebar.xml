@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/titlebar_icon" 
         android:layout_centerVertical="true"
+        android:scaleType="fitXY"
         />
     <TextView 
         android:id="@+id/titlebar_text"

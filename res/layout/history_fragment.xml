@@ -19,21 +19,46 @@
         	android:layout_height="wrap_content"
         	/>
     	
-    	<TextView 
-    	    android:id = "@+id/history_stage_message"
+    	<RelativeLayout 
+    	    android:id = "@+id/history_stage_message_layout"
+    	    android:layout_width = "wrap_content"
+    	    android:layout_height = "wrap_content"
+    	    >
+    	
+    	    <TextView 
+    	        android:id="@+id/history_stage"
+    	        android:layout_width="wrap_content"
+    	        android:layout_height="wrap_content"
+    	        android:gravity="center"
+    	        android:layout_centerHorizontal="true"
+    	        android:textColor="#FF717071"
+    	        android:text="頁數"
+    	        />
+    	    
+    		<TextView 
+	    	    android:id = "@+id/history_stage_message"
+    	    	android:layout_width="wrap_content"
+    	    	android:layout_height="wrap_content"
+    	    	android:layout_centerHorizontal="true"
+    	    	android:layout_below="@+id/history_stage"
+    	    	android:gravity="center"
+    	    	android:textColor="#FFe79100"
+    	    	/>
+    	
+    	</RelativeLayout>
+    	
+    	<TextView
+    	    android:id="@+id/history_stage_rate"
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
-    	    android:layout_centerHorizontal="true"
-    	    android:textAlignment="center"
-    	    android:gravity="center"
-    	    android:textColor="#FF717071"
-    	    />
+    	    android:gravity="left" />
     	
     	<TextView
     	    android:id="@+id/history_quote"
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:gravity="left"
+    	    android:layout_toRightOf="@+id/history_stage_rate"
     	    android:textAlignment="textStart"
     	    android:textColor="#FF717071" />
     	

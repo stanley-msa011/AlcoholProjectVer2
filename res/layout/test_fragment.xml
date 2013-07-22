@@ -32,6 +32,7 @@
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
+    	    android:scaleType="fitXY"
     	    android:src="@drawable/test_start_button" />
     
     	<ImageView
@@ -39,12 +40,14 @@
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
+    	    android:scaleType="fitXY"
     	    android:src="@drawable/test_button_stroke" />
     	
     	<ImageView
 	        android:id = "@+id/test_start_circle"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
+        	android:scaleType="fitXY"
         	android:layout_centerInParent="true"
         />
     
@@ -53,6 +56,7 @@
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
+    	    android:scaleType="fitXY"
     	    android:src="@drawable/test_face" />
     	
     	<TextView

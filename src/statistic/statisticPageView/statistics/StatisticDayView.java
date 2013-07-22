@@ -168,7 +168,10 @@ public class StatisticDayView extends StatisticPageView {
 		format.setMinimumIntegerDigits(1);
 		format.setMinimumFractionDigits(2);
 		format.setMaximumFractionDigits(2);
-		output =format.format(brac); 
+		if (brac < BracDataHandler.THRESHOLD)
+			output = "0.00";
+		else
+			output =format.format(brac); 
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		
@@ -183,6 +186,7 @@ public class StatisticDayView extends StatisticPageView {
 		RelativeLayout.LayoutParams vParam = (LayoutParams) valueLayout.getLayoutParams();
 		vParam.rightMargin =screen.x * 43/480;
 		vParam.topMargin = screen.x * 54/480;
+		vParam.width = vParam.height = screen.x * 202/480;
 		
 		RelativeLayout.LayoutParams bParam = (LayoutParams) blockLayout.getLayoutParams();
 		bParam.topMargin = screen.x * 18/480;
@@ -190,7 +194,7 @@ public class StatisticDayView extends StatisticPageView {
 		RelativeLayout.LayoutParams hParam = (LayoutParams) bracHelp.getLayoutParams();
 		hParam.topMargin = screen.x * 140/480;
 		
-		int icon_size = screen.x*120/1080;
+		int icon_size = screen.x*60/480;
 		RelativeLayout.LayoutParams emotionParam = (LayoutParams) emotion.getLayoutParams();
 		emotionParam.topMargin = screen.x * 23/480;
 		emotionParam.width = emotionParam.height = icon_size;

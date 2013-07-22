@@ -18,8 +18,9 @@
    		        >
    		    	<ImageView
    		        	android:id="@+id/question_top"
-   		        	android:layout_width="wrap_content"
+   		        	android:layout_width="match_parent"
    		        	android:layout_height="wrap_content"
+   		        	android:scaleType="fitXY"
    		        	android:src="@drawable/question_bg_top" />
    		    	<TextView 
    		    	    android:id="@+id/question_text"
@@ -42,8 +43,9 @@
         		    >
         		<ImageView
 	        	    android:id="@+id/question_bottom"
-        	    	android:layout_width="wrap_content"
+        	    	android:layout_width="match_parent"
         	    	android:layout_height="wrap_content"
+        	    	android:scaleType="fitXY"
         	    	android:src="@drawable/question_bg_bottom" />
         		<TextView 
    		    	    android:id="@+id/question_next"

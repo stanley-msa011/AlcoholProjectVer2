@@ -219,16 +219,14 @@ public class BluetoothDebugMode extends Bluetooth {
 					if(prev_pressure < prev_prev_pressure && prev_pressure < now_pressure && !isPeak){
 						local_min = prev_pressure;
 					}
-					if(local_min > 1 && now_pressure > local_min + 1000 && !isPeak){
+					if(local_min > 1 && now_pressure > local_min + PRESSURE_DIFF_MIN && !isPeak){
 						testFragment.showDebug("P_PeakStart" );
 						isPeak = true;
 						start_time = time;
 					}
 					
 					testFragment.showDebug("P_diff: "+diff );
-					if ( diff>PRESSURE_DIFF_MIN  && diff <PRESSURE_DIFF_MAX  && !isPeak){
-					}else if (diff > -PRESSURE_DIFF_MIN/2){
-						if (isPeak){
+					if (diff > -PRESSURE_DIFF_MIN /2&& isPeak){
 							testFragment.showDebug("P_Peak" );
 							end_time = time;
 							duration += (end_time-start_time);
@@ -253,20 +251,18 @@ public class BluetoothDebugMode extends Bluetooth {
 							if (image_count == 0 && duration > IMAGE_MILLIS_0){
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
-							}
-							else if (image_count == 1 && duration > IMAGE_MILLIS_1){
+							}else if (image_count == 1 && duration > IMAGE_MILLIS_1){
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
-							}
-							else if (image_count == 2 && duration >MAX_DURATION_MILLIS ){
+							}else if (image_count == 2 && duration > IMAGE_MILLIS_2){
 								cameraRunHandler.sendEmptyMessage(0);
 								++image_count;
+							}else if (image_count == 3 && duration >MAX_DURATION_MILLIS ){
 								testFragment.showDebug("End of Blowing" );
 								show_in_UI(value,6);
 								success = true;
 								return -1;
 							}
-						}
 					}else if (diff <-PRESSURE_DIFF_MIN/2 ){
 						testFragment.showDebug("P_PeakEnd" );
 						Log.d("ERIC","P_PeakEnd");

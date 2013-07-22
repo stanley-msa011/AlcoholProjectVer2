@@ -4,6 +4,7 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.HistoryFragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,7 +15,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 	private PointF from,to;
 	private float width_gap_1;
 	private float height_gap_1;
-	public static final int gaps = 60;
+	public static final int gaps = 20;
 	private static final int clip_time = 300;
 	private static final int sleep_time = clip_time/gaps;
 	private int[] bgs;
@@ -24,7 +25,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 	
 	private Bitmap cur=null,next=null,tmp=null;
 	private Bitmap prev_cur=null,prev_next=null;
-	
+	Point screen;
 	private int type=-1; 
 	
 	public PageAnimationTaskVertical2(PageWidgetVertical pageWidget, PointF from, PointF to, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx, int type){
@@ -34,7 +35,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		this.startImageIdx = startImageIdx;
 		
 		this.historyFragment = historyFragment;
-		
+		screen = FragmentTabs.getSize();
 		width_gap_1 = (to.x - from.x)/(float)gaps;
 		height_gap_1 = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;
@@ -52,12 +53,18 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		
 		int curC = startImageIdx;
 		
+		Bitmap tmp2;
+		
 		if  (type == 1){// cur to next ()
 			Log.d("PAGE_ANIMATION", "in UP");
-			
-			cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
-			
-			next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1]);
+			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
+			cur = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			tmp2.recycle();
+			//cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
+			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1]);
+			next = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			tmp2.recycle();
+			//next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1]);
 			
 			pageWidget.setBitmaps(cur, next);
 			pageWidget.setTouchPosition(from);
@@ -82,9 +89,14 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		}else{ //next to cur (DOWN)
 			Log.d("PAGE_ANIMATION", "in DOWN");
 			
-			next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
-			
-			cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
+			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
+			next = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			tmp2.recycle();
+			//next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
+			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
+			cur = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			tmp2.recycle();
+			//cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
 			
 			pageWidget.setBitmaps(cur, next);
 			pageWidget.setTouchPosition(to);

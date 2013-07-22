@@ -127,7 +127,7 @@ public class AboutActivity extends Activity {
 						if (hidden_state == 0)
 							++hidden_state;
 						else if (hidden_state ==4){
-							Intent newIntent = new Intent(activity, PreSettingActivity.class);
+							Intent newIntent = new Intent(activity, DeveloperActivity.class);
 							activity.startActivity(newIntent);
 						}
 						else 

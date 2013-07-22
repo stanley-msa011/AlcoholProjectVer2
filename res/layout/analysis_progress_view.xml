@@ -14,6 +14,7 @@
             android:id="@+id/analysis_progress_title_bg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:scaleType="fitXY"
             android:src="@drawable/analysis_title_bar" />
 
    		<TextView

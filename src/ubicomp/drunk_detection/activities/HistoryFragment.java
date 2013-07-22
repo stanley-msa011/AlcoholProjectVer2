@@ -40,6 +40,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -62,6 +63,7 @@ public class HistoryFragment extends Fragment {
 	private RelativeLayout pageLayout;
 	private RelativeLayout chartLayout;
 	private RelativeLayout chartAreaLayout;
+	private RelativeLayout stageLayout;
 	private HistoryDB hdb;
 	private AudioDB adb;
 	private PageWidgetVertical pageWidget;
@@ -112,11 +114,11 @@ public class HistoryFragment extends Fragment {
 	private PointF curPageTouch;
 	private LoadingHandler loadHandler;
 	
-	private Typeface wordTypefaceBold, digitTypeface;
+	private Typeface wordTypefaceBold, digitTypeface,digitTypefaceBold;
 	
 	private DecimalFormat format;
 	private TextView quoteText;
-	private TextView stageMessageText;
+	private TextView stageMessageText,stageMessage,stageRateText;
 	
 	private Calendar from_cal;
 	private Calendar to_cal;
@@ -273,11 +275,12 @@ public class HistoryFragment extends Fragment {
     	pageLayout = (RelativeLayout) view.findViewById(R.id.history_book_layout);
     	chartLayout = (RelativeLayout) view.findViewById(R.id.history_content_layout);
     	scrollView = (HorizontalScrollView) view.findViewById(R.id.history_scroll_view);
+    	scrollView.setSmoothScrollingEnabled(true);
     	chartAreaLayout = (RelativeLayout) view.findViewById(R.id.history_chart_area_layout);
     	
     	wordTypefaceBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/DFLiHeiStd-W5.otf");
     	digitTypeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/dinproregular.ttf");
-    	
+    	digitTypefaceBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/dinpromedium.ttf");
     	/*Setting the play*/
     	bg_x = screen.x;
     	width = bg_x;
@@ -291,12 +294,24 @@ public class HistoryFragment extends Fragment {
     	
     	curPageTouch = touchPoint;
 
+    	int textSize = bg_x*21/480;
+    	
+    	stageLayout = (RelativeLayout) view.findViewById(R.id.history_stage_message_layout);
+    	
+    	stageMessage = (TextView) view.findViewById(R.id.history_stage);
+    	stageMessage.setTypeface(wordTypefaceBold);
+    	
     	stageMessageText = (TextView) view.findViewById(R.id.history_stage_message);
-    	stageMessageText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*24/480);
-    	stageMessageText.setTypeface(wordTypefaceBold);
+    	stageMessageText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*58/480);
+    	stageMessageText.setTypeface(digitTypefaceBold);
+    	
+    	stageRateText = (TextView) view.findViewById(R.id.history_stage_rate);
+    	stageRateText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+    	stageRateText.setTypeface(wordTypefaceBold);
+    	
     	
     	quoteText = (TextView) view.findViewById(R.id.history_quote);
-    	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*24/480);
+    	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
     	quoteText.setTypeface(wordTypefaceBold);
     	
     	format = new DecimalFormat();
@@ -309,12 +324,13 @@ public class HistoryFragment extends Fragment {
     	
     	Resources r = historyFragment.getResources();
 		
-    	AccumulatedHistoryState curAH = page_states[page_week];
-		cur_bg_bmp = BitmapFactory.decodeResource(r, HistoryStorytelling.getPage(curAH.getScore(), curAH.week));
-		next_bg_bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+    	//AccumulatedHistoryState curAH = page_states[page_week];
+    	/*Bitmap tmp;
+    	tmp = BitmapFactory.decodeResource(r, HistoryStorytelling.getPage(curAH.getScore(), curAH.week));
+    	cur_bg_bmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.x * 1137/1080, true);
+		cur_bg_bmp = BitmapFactory.decodeResource(r, HistoryStorytelling.getPage(curAH.getScore(), curAH.week));*/
+		
 	
-		 //setPage();
-		 
 		 int chart_height = screen.x * 564/1080;
 		chartBg1Drawable = r.getDrawable(R.drawable.chart_bg1);
 		chartBg2Drawable = r.getDrawable(R.drawable.chart_bg2);
@@ -324,12 +340,18 @@ public class HistoryFragment extends Fragment {
 		chartCircleBmp = BitmapFactory.decodeResource(r, R.drawable.chart_circle);
 		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		
-    	LayoutParams sParam = (LayoutParams) stageMessageText.getLayoutParams();
-    	sParam.leftMargin = bg_x*15/480;
-    	sParam.topMargin = bg_x * 45/480;
+    	LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
+    	sParam.leftMargin = bg_x*10/480;
+    	sParam.topMargin = bg_x * 60/480;
+    	sParam.width = bg_x*70/480;
+    	
+    	LayoutParams rParam = (LayoutParams) stageRateText.getLayoutParams();
+    	rParam.leftMargin = bg_x*20/480;
+    	rParam.topMargin = bg_x * 430/480;
+    	rParam.width = bg_x*70/480;
     	
     	LayoutParams qParam = (LayoutParams) quoteText.getLayoutParams();
-    	qParam.leftMargin = bg_x*15/480;
+    	qParam.leftMargin = bg_x*5/480;
     	qParam.topMargin = bg_x * 430/480;
     	
     	pageLayout.addView(pageWidget);
@@ -337,28 +359,6 @@ public class HistoryFragment extends Fragment {
     	param.width = width;
     	param.height = height;
 
-    	//prevImage = new ImageView(pageLayout.getContext());
-    	//pageLayout.addView(prevImage);
-    	/*LayoutParams pParam = (LayoutParams) prevImage.getLayoutParams();
-    	pParam.width = width;
-    	pParam.height = height;
-    	pParam.topMargin = top_margin;
-    	pParam.leftMargin = 0;
-    	*/
-    	/*prevAnimation = null;
-    	if (prev_bgDrawable!=null && !HistoryStorytelling.isChangePage(prevAH,curAH)){
-    		prevImage.setImageDrawable(prev_bgDrawable);
-    		prevAnimation = new AlphaAnimation(1.0F,0.0F);
-    		prevAnimation.setDuration(2000);
-    		prevImage.setAnimation(prevAnimation);
-    		aaEndHandler = new AlphaAnimationEndHandler(); 
-    	}*/
-    	/*
-    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(view.getContext());
-    	int prev_counter = sp.getInt("self_help_counter", 0);
-    	int prev_coupon = sp.getInt("self_help_coupon", 0);
-    	*/
-    	
     	//Set chart
     	RelativeLayout.LayoutParams scrollParam = (RelativeLayout.LayoutParams)scrollView.getLayoutParams();
     	scrollParam.width = screen.x;
@@ -421,19 +421,15 @@ public class HistoryFragment extends Fragment {
     }
     
     private void setStorytellingTexts(){
-    	StringBuilder sb = new StringBuilder();
     	
     	AccumulatedHistoryState curAH = page_states[page_week];
     	float progress = (float)curAH.getScore()*100F/(float)curAH.MAX_SCORE;
-    	String progress_str = format.format(progress)+"%";
-
-
-    	sb.append("頁數: "+(page_week+1)+"  ");
-    	sb.append("  已完成: ");
-    	sb.append(progress_str);
     	
-    	stageMessageText.setText(sb.toString());
+    	String stageText = String.valueOf(page_week+1);
     	
+    	stageMessageText.setText(stageText);
+    	String progress_str =  "<font color=#e79100>"+ format.format(progress)+"%"+"</font><font color=#717071><br/>完成</font>";
+    	stageRateText.setText(Html.fromHtml(progress_str));
     	quoteText.setText(QUOTE_STR[page_week]);
     	
     }
@@ -457,19 +453,16 @@ public class HistoryFragment extends Fragment {
     	isAnimation = false;
     	chart.invalidate();
     }
-    /*
-    public void setPage(){
-    	Log.d("History","setPage start");
-    	//pageWidget.setBitmaps(cur_bg_bmp, next_bg_bmp);
-    	//pageWidget.setTouchPosition(curPageTouch);
-    	Log.d("History","setPage end");
-    }
-    */
+    
     public void resetPage(int change){
     	Log.d("History","resetPage start");
     	if (cur_bg_bmp!=null && !cur_bg_bmp.isRecycled()){
     		cur_bg_bmp.recycle();
     		cur_bg_bmp = null;
+    	}
+    	if (next_bg_bmp!=null && !next_bg_bmp.isRecycled()){
+    		next_bg_bmp.recycle();
+    		next_bg_bmp = null;
     	}
     	Log.d("PAGE_ANIMATION", "reset level: "+page_week);
     	
@@ -485,9 +478,18 @@ public class HistoryFragment extends Fragment {
     	
     	Log.d("PAGE_ANIMATION", "reset level fix: "+page_week);
     	AccumulatedHistoryState AH = page_states[page_week];
-		cur_bg_bmp =BitmapFactory.decodeResource(historyFragment.getResources(), HistoryStorytelling.getPage(AH.getScore(),AH.week));
+    	Bitmap tmp = BitmapFactory.decodeResource(historyFragment.getResources(), HistoryStorytelling.getPage(AH.getScore(),AH.week));
+    	cur_bg_bmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.x*1137/1080, true);
+    	tmp.recycle();
+    	next_bg_bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
     	pageWidget.setBitmaps(cur_bg_bmp, next_bg_bmp);
     	pageWidget.setTouchPosition(curPageTouch);
+    	
+    	int scroll_value = bar_left+( screen.x * 48 / 1080)*7*(page_week-1);
+    	if (scroll_value <0)
+    		scroll_value = 0;
+    	scrollView.smoothScrollTo(scroll_value, 0);
+    	//scrollView.setScrollX(scroll_value);
     	Log.d("History","resetPage end");
     }
     
@@ -530,10 +532,14 @@ public class HistoryFragment extends Fragment {
 	public void setStageVisible(boolean t){
 		if (t){
 			stageMessageText.setVisibility(View.VISIBLE);
+			stageMessage.setVisibility(View.VISIBLE);
+			stageRateText.setVisibility(View.VISIBLE);
 			quoteText.setVisibility(View.VISIBLE);
 		}
 		else{
 			stageMessageText.setVisibility(View.INVISIBLE);
+			stageMessage.setVisibility(View.INVISIBLE);
+			stageRateText.setVisibility(View.INVISIBLE);
 			quoteText.setVisibility(View.INVISIBLE);
 		}
 	}
@@ -953,7 +959,7 @@ public class HistoryFragment extends Fragment {
 			RADIUS_SQUARE = RADIUS *RADIUS ;
 			BUTTON_RADIUS = chartCircleBmp.getWidth()/2;
 			BUTTON_RADIUS_SQUARE = BUTTON_RADIUS*BUTTON_RADIUS;
-			BUTTON_GAPS = BUTTON_RADIUS * 8/3;
+			BUTTON_GAPS = BUTTON_RADIUS * 4;
 			
 			top_touch = screen.x * 180/1080;
 		}
@@ -1158,15 +1164,11 @@ public class HistoryFragment extends Fragment {
 				else
 					canvas.drawBitmap(chartPlay, center.x - playW, center.y - playH, null);
 				
-				if (!bar.hasData){
-					//canvas.drawRect(left, _top, right, _bottom, paint_none);
-				}
-				else if (bar.brac > 0F){
+				if (!bar.hasData);
+				else if (bar.brac > 0F)
 					canvas.drawRect(left, _top, right, _bottom, paint_fail);
-				}
-				else{
+				else
 					canvas.drawRect(left, _top, right, _bottom, paint_pass);
-				}
 				
 				circle_centers.add(center);
 
@@ -1202,7 +1204,7 @@ public class HistoryFragment extends Fragment {
 					}
 				}
 				
-				int b_center_x = screen.x * 290/1080 + scrollView.getScrollX(); 
+				int b_center_x = screen.x * 180/1080 + scrollView.getScrollX(); 
 				
 				int b_center_y = screen.x * 170/1080;
 				

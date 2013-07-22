@@ -543,6 +543,7 @@ public class TestFragment extends Fragment {
 			
 			RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
 			startLayoutParam.topMargin = screen.x * 190/480;
+			startLayoutParam.width = startLayoutParam.height = screen.x * 255/480;
 			
 			RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
 			previewParam.width =screen.x *254/480;

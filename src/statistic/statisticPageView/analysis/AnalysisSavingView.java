@@ -24,6 +24,7 @@ public class AnalysisSavingView extends StatisticPageView {
 	private HistoryDB db;
 	
 	private ImageView goalBar, currentBar, start;
+	private ImageView bar;
 	
 	private String goalGood;
 	private int goalMoney;
@@ -65,6 +66,7 @@ public class AnalysisSavingView extends StatisticPageView {
 		goalBar = (ImageView) view.findViewById(R.id.analysis_saving_bar);
 		currentBar = (ImageView) view.findViewById(R.id.analysis_saving_cur_bar);
 		start = (ImageView) view.findViewById(R.id.analysis_saving_cur_bar_start);
+		bar = (ImageView) view.findViewById(R.id.analysis_saving_bar);
 		
 		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_saving_content_layout);
 	}
@@ -88,11 +90,13 @@ public class AnalysisSavingView extends StatisticPageView {
 		RelativeLayout.LayoutParams barParam = (RelativeLayout.LayoutParams)goalBar.getLayoutParams();
 		barParam.leftMargin = screen.x * 90/1080;
 		
-		
 		RelativeLayout.LayoutParams startParam = (RelativeLayout.LayoutParams)start.getLayoutParams();
 		startParam.leftMargin = screen.x * 90/1080;
+
+		RelativeLayout.LayoutParams bar0Param = (RelativeLayout.LayoutParams)bar.getLayoutParams();
+		bar0Param.width =screen.x*400/480;
 		
-		int maxWidth = screen.x * 839/1080;
+		int maxWidth = screen.x * 372/480;
 		int width;
 		if (currentMoney > goalMoney)
 			width = maxWidth;

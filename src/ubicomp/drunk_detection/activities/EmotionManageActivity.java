@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView.ScaleType;
 
 public class EmotionManageActivity extends Activity {
 
@@ -131,7 +132,7 @@ public class EmotionManageActivity extends Activity {
 			mainLayout.addView(v);
 		}
 		
-		int rest_block = 10 - mainLayout.getChildCount();
+		int rest_block = 12 - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -154,7 +155,7 @@ public class EmotionManageActivity extends Activity {
 			mainLayout.addView(vv);
 		}
 		
-		int rest_block = 10 - mainLayout.getChildCount();
+		int rest_block = 12 - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -193,7 +194,7 @@ public class EmotionManageActivity extends Activity {
 			}
 		}
 		
-		int rest_block = 10 - mainLayout.getChildCount();
+		int rest_block = 12 - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -210,13 +211,13 @@ public class EmotionManageActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*230/1080;
 		
-		String str = "完成後能得到點數，請繼續加油！\n(一天限定早中晚各一次)";
+		String str = "完成後能得到點數，請繼續加油！\n(早中晚各能得到一點)";
 		View tv = createTextView(str);
 		mainLayout.addView(tv);
 		View vv = createIconView("完成",R.drawable.questionnaire_item_ok,new EndOnClickListener());
 		mainLayout.addView(vv);
 		
-		int rest_block = 10 - mainLayout.getChildCount();
+		int rest_block = 12 - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);

@@ -38,7 +38,8 @@ public class PreSettingActivity extends Activity {
 	private EditText connect_n0,connect_n1,connect_n2;
 	private EditText connect_p0,connect_p1,connect_p2;
 	
-	private Button ok_button,clean_button,restoreButton;
+	private Button ok_button,clean_button,restoreButton,debugButton,dummyButton;
+	boolean debug,dummy;
 	private Activity activity;
 	private static final int MIN_NAME_LENGTH = 3;
 	
@@ -157,6 +158,23 @@ public class PreSettingActivity extends Activity {
 	    
 	    restoreButton = (Button) this.findViewById(R.id.restore);
 	    restoreButton.setOnClickListener(new RestoreOnClickListener());
+	    
+	    debug = sp.getBoolean("debug", false);
+	    dummy = sp.getBoolean("Dummy", false);
+	    debugButton = (Button) this.findViewById(R.id.debug_normal_switch);
+	    if (debug)
+	    	debugButton.setText("Switch to normal mode");
+	    else
+	    	debugButton.setText("Switch to debug mode");
+	    debugButton.setOnClickListener(new DebugOnClickListener());
+	    
+	    
+	    dummyButton = (Button) this.findViewById(R.id.dummy_data_switch);
+	    if (dummy)
+	    	dummyButton.setText("Delete debug data");
+	    else
+	    	dummyButton.setText("Use debug data");
+	    dummyButton.setOnClickListener(new DummyOnClickListener());
 	}
 
 	private class RestoreOnClickListener implements View.OnClickListener{
@@ -165,7 +183,33 @@ public class PreSettingActivity extends Activity {
 			RestoreData rd = new RestoreData(uid.getText().toString(),activity);
 			rd.execute();
 		}
-		
+	}
+	
+	private class DebugOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+	    	debug = !debug;
+	    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+	    	SharedPreferences.Editor editor = sp.edit();
+	    	editor.putBoolean("debug", debug);
+			editor.commit();
+			if (debug)
+		    	debugButton.setText("Switch to normal mode");
+		    else
+		    	debugButton.setText("Switch to debug mode");
+		}
+	}
+	
+	private class DummyOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			DummyData.generateDummyData(getBaseContext());
+			dummy = !dummy;
+			if (dummy)
+		    	dummyButton.setText("Delete debug data");
+		    else
+		    	dummyButton.setText("Use debug data");
+		}
 	}
 	
 	private class OKOnclickListener implements OnClickListener{

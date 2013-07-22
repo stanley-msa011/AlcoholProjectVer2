@@ -14,6 +14,7 @@
             android:id="@+id/analysis_saving_title_bg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:scaleType="fitXY"
             android:src="@drawable/analysis_title_bar" />
 
    		<TextView
@@ -47,6 +48,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_centerVertical="true"
+	        android:scaleType="fitXY"
 	        android:src="@drawable/analysis_money_bar" />
         
 	    <ImageView
@@ -54,6 +56,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_centerVertical="true"
+	        android:scaleType="fitXY"
 	        android:src="@drawable/analysis_money_cur_bar_start" />
 	    
         <ImageView
@@ -70,6 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:scaleType="fitXY"
             android:layout_toRightOf="@+id/analysis_saving_cur_bar"
             android:src="@drawable/analysis_money_cur_bar_end" />
         

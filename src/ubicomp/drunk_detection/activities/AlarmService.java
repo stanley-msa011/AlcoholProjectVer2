@@ -30,7 +30,7 @@ public class AlarmService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
 		super.onStartCommand(intent, flags, startId);
-		Log.e("BrACReceiver","Start AlarmService");   
+		Log.e("ALARM","Start AlarmService");   
 		
 		db = new HistoryDB(this);
 		
