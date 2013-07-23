@@ -306,11 +306,15 @@ public class StatisticDayView extends StatisticPageView {
 			}
 			else{
 				String value =format.format(historys[i].brac);
-				circleValues[i].setText(value);
-				if (historys[i].brac < BracDataHandler.THRESHOLD)
+				
+				if (historys[i].brac < BracDataHandler.THRESHOLD){
 					circleImages[i].setImageDrawable(circleDrawables[2]);
-				else
+					circleValues[i].setText("0.00");
+				}
+				else{
 					circleImages[i].setImageDrawable(circleDrawables[1]);
+					circleValues[i].setText(value);
+				}
 			}
 			
 			

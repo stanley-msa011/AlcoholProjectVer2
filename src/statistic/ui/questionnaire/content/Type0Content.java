@@ -2,7 +2,6 @@ package statistic.ui.questionnaire.content;
 
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.EndOnClickListener;
-import statistic.ui.questionnaire.listener.SelectedListener;
 
 public class Type0Content extends QuestionnaireContent {
 

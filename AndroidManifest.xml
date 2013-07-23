@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="20"
-    android:versionName="2.40" >
+    android:versionCode="22"
+    android:versionName="2.42" >
 
     <uses-sdk
         android:maxSdkVersion="17"
@@ -82,7 +82,9 @@
         </service>
         <service android:name="ubicomp.drunk_detection.activities.HourlyAlarmService" >
         </service>
-
+		<service android:name="ubicomp.drunk_detection.activities.RegularCheckService" >
+        </service>
+        
         <activity
             android:name="ubicomp.drunk_detection.activities.PreSettingActivity"
             android:noHistory="true"

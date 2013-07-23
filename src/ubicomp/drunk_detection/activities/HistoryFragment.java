@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.R;
 
 import data.history.AccumulatedHistoryState;
@@ -29,7 +30,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
-import android.graphics.Path.FillType;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Typeface;
@@ -48,10 +48,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -101,10 +99,9 @@ public class HistoryFragment extends Fragment {
     
     private boolean isAnimation = false;
     
-	private int width, height,top_margin,bg_x;
+	private int page_width, page_height,bg_x;
 	
 	private Bitmap cur_bg_bmp,next_bg_bmp;
-	//private Drawable prev_bgDrawable;
 	
 	private PointF touchPoint;
 	private PointF from,to;
@@ -175,6 +172,13 @@ public class HistoryFragment extends Fragment {
 		
 		isAnimation = false;
 		screen = FragmentTabs.getSize();
+		
+    	bg_x = screen.x;
+    	page_width = bg_x;
+    	if (FragmentTabs.isWideScreen())
+    		page_height = bg_x* 1137/1080;
+    	else
+    		page_height = bg_x*993/1080;
 		
 		page_states =hdb.getAccumulatedHistoryStateByWeek(); 
 		page_week = page_states.length - 1;
@@ -281,16 +285,13 @@ public class HistoryFragment extends Fragment {
     	wordTypefaceBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/DFLiHeiStd-W5.otf");
     	digitTypeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/dinproregular.ttf");
     	digitTypefaceBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/dinpromedium.ttf");
-    	/*Setting the play*/
-    	bg_x = screen.x;
-    	width = bg_x;
-    	height = bg_x* 1137/1080;
     	
-    	from = new PointF(width,height);
-    	to = new PointF(width*0.8F,-height);
+    	
+    	from = new PointF(page_width,page_height);
+    	to = new PointF(page_width*0.8F,-page_height);
     	touchPoint = new PointF(from.x,from.y);
     	
-    	pageWidget= new PageWidgetVertical(pageLayout.getContext(),width,height);
+    	pageWidget= new PageWidgetVertical(pageLayout.getContext(),page_width,page_height);
     	
     	curPageTouch = touchPoint;
 
@@ -320,16 +321,8 @@ public class HistoryFragment extends Fragment {
 		format.setMinimumFractionDigits(0);
 		format.setMaximumFractionDigits(0);
     	
-    	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     	
     	Resources r = historyFragment.getResources();
-		
-    	//AccumulatedHistoryState curAH = page_states[page_week];
-    	/*Bitmap tmp;
-    	tmp = BitmapFactory.decodeResource(r, HistoryStorytelling.getPage(curAH.getScore(), curAH.week));
-    	cur_bg_bmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.x * 1137/1080, true);
-		cur_bg_bmp = BitmapFactory.decodeResource(r, HistoryStorytelling.getPage(curAH.getScore(), curAH.week));*/
-		
 	
 		 int chart_height = screen.x * 564/1080;
 		chartBg1Drawable = r.getDrawable(R.drawable.chart_bg1);
@@ -345,19 +338,24 @@ public class HistoryFragment extends Fragment {
     	sParam.topMargin = bg_x * 60/480;
     	sParam.width = bg_x*70/480;
     	
+    	int quoteTopMargin;
+    	if (FragmentTabs.isWideScreen())
+    		quoteTopMargin = bg_x*430/480;
+    	else
+    		quoteTopMargin = bg_x * 380/480;
+    	
     	LayoutParams rParam = (LayoutParams) stageRateText.getLayoutParams();
     	rParam.leftMargin = bg_x*20/480;
-    	rParam.topMargin = bg_x * 430/480;
+    	rParam.topMargin = quoteTopMargin;
     	rParam.width = bg_x*70/480;
     	
     	LayoutParams qParam = (LayoutParams) quoteText.getLayoutParams();
-    	qParam.leftMargin = bg_x*5/480;
-    	qParam.topMargin = bg_x * 430/480;
+    	qParam.topMargin = quoteTopMargin;
     	
     	pageLayout.addView(pageWidget);
     	LayoutParams param = (LayoutParams) pageWidget.getLayoutParams();
-    	param.width = width;
-    	param.height = height;
+    	param.width = page_width;
+    	param.height = page_height;
 
     	//Set chart
     	RelativeLayout.LayoutParams scrollParam = (RelativeLayout.LayoutParams)scrollView.getLayoutParams();
@@ -479,7 +477,7 @@ public class HistoryFragment extends Fragment {
     	Log.d("PAGE_ANIMATION", "reset level fix: "+page_week);
     	AccumulatedHistoryState AH = page_states[page_week];
     	Bitmap tmp = BitmapFactory.decodeResource(historyFragment.getResources(), HistoryStorytelling.getPage(AH.getScore(),AH.week));
-    	cur_bg_bmp = Bitmap.createScaledBitmap(tmp, screen.x, screen.x*1137/1080, true);
+    	cur_bg_bmp = Bitmap.createScaledBitmap(tmp, screen.x, page_height, true);
     	tmp.recycle();
     	next_bg_bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
     	pageWidget.setBitmaps(cur_bg_bmp, next_bg_bmp);
@@ -1165,10 +1163,10 @@ public class HistoryFragment extends Fragment {
 					canvas.drawBitmap(chartPlay, center.x - playW, center.y - playH, null);
 				
 				if (!bar.hasData);
-				else if (bar.brac > 0F)
-					canvas.drawRect(left, _top, right, _bottom, paint_fail);
-				else
+				else if (bar.brac <BracDataHandler.THRESHOLD)
 					canvas.drawRect(left, _top, right, _bottom, paint_pass);
+				else
+					canvas.drawRect(left, _top, right, _bottom, paint_fail);
 				
 				circle_centers.add(center);
 

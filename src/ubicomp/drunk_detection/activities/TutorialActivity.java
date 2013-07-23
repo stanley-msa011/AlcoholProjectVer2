@@ -45,6 +45,8 @@ public class TutorialActivity extends Activity {
 	
 	private AlphaAnimation animation;
 	
+	private boolean isWideScreen;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,6 +67,7 @@ public class TutorialActivity extends Activity {
 			size = new Point();
 			display.getSize(size);
 		}
+		isWideScreen = (float)size.y/(float)size.x > 1.67;
 		
 		digitTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dinproregular.ttf");
 		wordTypefaceBold  = Typeface.createFromAsset(this.getAssets(), "fonts/DFLiHeiStd-W5.otf");
@@ -95,7 +98,10 @@ public class TutorialActivity extends Activity {
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 25/480);
 		help.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
-		hParam.topMargin = size.x * 486/480;
+		if (isWideScreen)
+			hParam.topMargin = size.x * 486/480;
+		else
+			hParam.topMargin = size.x * 446/480;
 		hParam.height = size.x * 25/480;
 		
 		tab = (ImageView) this.findViewById(R.id.tutorial_tab);
@@ -168,7 +174,10 @@ public class TutorialActivity extends Activity {
 			tab.setVisibility(View.INVISIBLE);
 			arrow.setImageDrawable(arrowDrawables[0]);
 			aParam.addRule(RelativeLayout.RIGHT_OF, help.getId());
-			aParam.topMargin = size.x * 550/480;
+			if (isWideScreen)
+				aParam.topMargin = size.x * 550/480;
+			else
+				aParam.topMargin = size.x * 510/480;
 			aParam.leftMargin = size.x * 10/480;
 			animation.start();
 		}
@@ -190,7 +199,10 @@ public class TutorialActivity extends Activity {
 			tab.setVisibility(View.INVISIBLE);
 			arrow.setImageDrawable(arrowDrawables[2]);
 			aParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
-			aParam.topMargin = size.x * 377/480;
+			if (isWideScreen)
+				aParam.topMargin = size.x * 377/480;
+			else
+				aParam.topMargin = size.x * 357/480;
 			aParam.leftMargin = size.x * 170/480;
 			animation.start();
 		}

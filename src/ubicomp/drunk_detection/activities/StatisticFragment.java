@@ -12,7 +12,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,7 +21,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +32,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import clicklog.ClickLogger;
 
 public class StatisticFragment extends Fragment {
@@ -206,7 +203,7 @@ public class StatisticFragment extends Fragment {
         	statisticViewLayoutParam.height = statistic_px.y;
 			
         	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
-        	analysisViewLayoutParam.height = screen.x * 1920/1080 - statistic_px.y - FragmentTabs.getTabSize().y;
+        	analysisViewLayoutParam.height = screen.y - statistic_px.y;
         	
 	    	dot_on = getResources().getDrawable(R.drawable.statistic_dot_on);
 	    	dot_off = getResources().getDrawable(R.drawable.statistic_dot_off);

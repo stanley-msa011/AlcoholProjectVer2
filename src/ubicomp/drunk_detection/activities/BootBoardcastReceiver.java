@@ -14,6 +14,7 @@ import android.util.Log;
 public class BootBoardcastReceiver extends BroadcastReceiver{
 
 	private static final int requestCode = 0x2013;
+	private static final int requestCode2 = 0x2014;
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -55,7 +56,15 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarm.cancel(pending);
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(),2*AlarmManager.INTERVAL_HOUR,pending);
-		//alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),30000,pending);
+		
+		
+		Intent check_intent = new Intent();
+		check_intent.setClass(context, AlarmReceiver.class);
+		check_intent.setAction("Regular_check");
+		
+		PendingIntent pending2 = PendingIntent.getBroadcast(context, requestCode2, check_intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		alarm.cancel(pending2);
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+10000, 4*AlarmManager.INTERVAL_HOUR, pending2);
 	}
 
 }

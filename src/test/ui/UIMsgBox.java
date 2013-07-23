@@ -3,15 +3,11 @@ package test.ui;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.TestFragment;
 import ubicomp.drunk_detection.activities.R;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -60,6 +56,7 @@ public class UIMsgBox {
 	
 	private Resources r;
 	private Point screen;
+	private boolean isWideScreen;
 	
 	private EndOnClickListener endListener;
 	private CancelOnClickListener cancelListener;
@@ -91,6 +88,7 @@ public class UIMsgBox {
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
 		screen = FragmentTabs.getSize();
+		isWideScreen = FragmentTabs.isWideScreen();
 		setting();
 	}
 	
@@ -114,7 +112,10 @@ public class UIMsgBox {
 		title.setTypeface(wordTypefaceBold);
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)title.getLayoutParams();
 		tParam.topMargin = screen.x*53/480;
-		tParam.bottomMargin = screen.x*60/480;
+		if(isWideScreen)
+			tParam.bottomMargin = screen.x*60/480;
+		else
+			tParam.bottomMargin = screen.x*30/480;
 		
 		help = (TextView) boxLayout.findViewById(R.id.msg_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
@@ -184,10 +185,16 @@ public class UIMsgBox {
 		
 		emotionLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_layout);
 		LinearLayout.LayoutParams eParam =  (LinearLayout.LayoutParams)emotionLayout.getLayoutParams();
-		eParam.bottomMargin = screen.x * 50/480;
+		if (isWideScreen)
+			eParam.bottomMargin = screen.x * 50/480;
+		else
+			eParam.bottomMargin = screen.x * 25/480;
 		desireLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_desire_layout);
 		LinearLayout.LayoutParams dParam =  (LinearLayout.LayoutParams)desireLayout.getLayoutParams();
-		dParam.bottomMargin = screen.x * 50/480;
+		if (isWideScreen)
+			dParam.bottomMargin = screen.x * 50/480;
+		else
+			dParam.bottomMargin = screen.x * 25/480;
 		
 		LinearLayout.LayoutParams sParam =  (LinearLayout.LayoutParams)gpsSwitch.getLayoutParams();
 		sParam.bottomMargin = screen.x * 16/480;
@@ -210,7 +217,10 @@ public class UIMsgBox {
 		boxParam.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
 		boxParam.topMargin = screen.x * 80/480;
 		boxParam.width = screen.x * 435/480;
-		boxParam.height = screen.x * 637/480;
+		if (isWideScreen)
+			boxParam.height = screen.x * 637/480;
+		else
+			boxParam.height = screen.x * 578/480;
 		
 		RelativeLayout.LayoutParams qParam = (RelativeLayout.LayoutParams) questionLayout.getLayoutParams();
 		qParam.leftMargin = qParam.rightMargin = screen.x * 44/480;

@@ -29,7 +29,8 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	private Bitmap prev_cur=null,prev_next=null;
 	
 	private int end_type=-1; 
-	Point screen;
+	private Point screen;
+	private int y_axis;
 	
 	
 	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx){
@@ -38,12 +39,15 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 		this.endTouch = endTouch;
 		this.startImageIdx = startImageIdx;
 		this.endImageIdx = endImageIdx;
-		
 		this.historyFragment = historyFragment;
 		screen = FragmentTabs.getSize();
 		width_gap_1 = (to.x - from.x)/(float)gaps;
 		height_gap_1 = (to.y - from.y)/(float)gaps;
-		this.bgs = bgs;	
+		this.bgs = bgs;
+		if (FragmentTabs.isWideScreen())
+			y_axis = screen.x*1137/1080;
+		else
+			y_axis = screen.x * 993/1080;
 	}
 	
 	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx,int type){
@@ -52,13 +56,16 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 		this.endTouch = endTouch;
 		this.startImageIdx = startImageIdx;
 		this.endImageIdx = endImageIdx;
-		
 		this.historyFragment = historyFragment;
-		
+		screen = FragmentTabs.getSize();
 		width_gap_1 = (to.x - from.x)/(float)gaps;
 		height_gap_1 = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;	
 		end_type = type;
+		if (FragmentTabs.isWideScreen())
+			y_axis = screen.x*1137/1080;
+		else
+			y_axis = screen.x * 993/1080;
 	}
 	
 	@Override
@@ -79,14 +86,12 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 			}
 			else{
 				tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c]);
-				cur = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+				cur = Bitmap.createScaledBitmap(tmp2, screen.x, y_axis, true);
 				tmp2.recycle();
-				//cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c]);
 			}
 			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c+1]);
-			next = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			next = Bitmap.createScaledBitmap(tmp2, screen.x, y_axis, true);
 			tmp2.recycle();
-			//next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[c+1]);
 			
 			pageWidget.setBitmaps(cur, next);
 			pageWidget.setTouchPosition(from);
@@ -115,7 +120,6 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 			prev_cur = cur;
 			prev_next= next;
 		}
-		//historyFragment.setPage();
 		if (prev_next!=null&&!prev_next.isRecycled()){
 			prev_next.recycle();
 			prev_next = null;

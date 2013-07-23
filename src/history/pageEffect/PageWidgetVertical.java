@@ -32,7 +32,7 @@ public class PageWidgetVertical extends View {
 	private PointF Beziervertex2 = new PointF();
 	private PointF BezierEnd2 = new PointF();
 	
-	private float middleX, middleY, degrees, touchToCornerDis;
+	private float middleX, middleY, degrees;
 	private ColorMatrixColorFilter colorMatrixFilter;
 	private Matrix matrix;
 	float [] matrixArray = {0,0,0,0,0,0,0,0,1};
@@ -118,8 +118,6 @@ public class PageWidgetVertical extends View {
 
 		BezierStart2.x = cornerX;
 		BezierStart2.y = BezierControl2.y - (cornerY - BezierControl2.y)/ 2;
-
-		touchToCornerDis = (float) Math.hypot((touch.x - cornerX),	(touch.y - cornerY));
 
 		BezierEnd1 = getCross(touch, BezierControl1, BezierStart1,BezierStart2);
 		BezierEnd2 = getCross(touch, BezierControl2, BezierStart1,BezierStart2);
@@ -230,14 +228,7 @@ public class PageWidgetVertical extends View {
 		path1.close();
 
 		degrees = (float) Math.toDegrees(Math.atan2(BezierControl1.x	- cornerX, BezierControl2.y - cornerY));
-		int leftx;
-		int rightx;
-		GradientDrawable backShadowDrawable;
 
-		leftx = (int) (BezierStart1.x - touchToCornerDis / 4);
-		rightx = (int) BezierStart1.x;
-		backShadowDrawable = backShadowDrawableRL;
-		
 		if (canvas==null)
 			return;
 		canvas.save();
@@ -246,8 +237,6 @@ public class PageWidgetVertical extends View {
 		if (bitmap != null && !bitmap.isRecycled())
 			canvas.drawBitmap(bitmap, 0, 0, null);
 		canvas.rotate(degrees, BezierStart1.x, BezierStart1.y);
-		//backShadowDrawable.setBounds(leftx, (int) BezierStart1.y, rightx,	(int) (maxLength + BezierStart1.y));
-		//backShadowDrawable.draw(canvas);
 		canvas.restore();
 	}
 	
@@ -287,11 +276,6 @@ public class PageWidgetVertical extends View {
 	}
 	
 	private void drawCurrentBackArea(Canvas canvas) {
-		int i = (int) (BezierStart1.x + BezierControl1.x) / 2;
-		float f1 = Math.abs(i - BezierControl1.x);
-		int i1 = (int) (BezierStart2.y + BezierControl2.y) / 2;
-		float f2 = Math.abs(i1 - BezierControl2.y);
-		float f3 = Math.min(f1, f2);
 		path1.reset();
 		path1.moveTo(Beziervertex2.x, Beziervertex2.y);
 		path1.lineTo(Beziervertex1.x, Beziervertex1.y);
@@ -299,13 +283,6 @@ public class PageWidgetVertical extends View {
 		path1.lineTo(touch.x, touch.y);
 		path1.lineTo(BezierEnd2.x, BezierEnd2.y);
 		path1.close();
-		GradientDrawable folderShadowDrawable;
-		int left;
-		int right;
-		
-		left= (int) (BezierStart1.x - f3 - 1);
-		right= (int) (BezierStart1.x + 1);
-		folderShadowDrawable = folderShadowDrawableRL;
 		
 		if (canvas==null)
 			return;
@@ -330,8 +307,6 @@ public class PageWidgetVertical extends View {
 		canvas.drawColor(0xFFF5F4F0);
 		
 		canvas.rotate(degrees, BezierStart1.x, BezierStart1.y);
-		//folderShadowDrawable.setBounds(left, (int) BezierStart1.y, right,(int) (BezierStart1.y + maxLength));
-		//folderShadowDrawable.draw(canvas);
 		canvas.restore();
 	}
 	

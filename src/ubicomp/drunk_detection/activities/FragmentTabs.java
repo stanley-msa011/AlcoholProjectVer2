@@ -34,6 +34,9 @@ import debuglog.DebugLoggingThread;
 
 public class FragmentTabs extends FragmentActivity {
 
+	
+	
+	private static boolean isWideScreen;
 	static private TabHost tabHost;
 
 	private static Context context;
@@ -48,7 +51,7 @@ public class FragmentTabs extends FragmentActivity {
 	private static final int[] iconOnId ={R.drawable.tabs_test_on,R.drawable.tabs_statistic_on,R.drawable.tabs_history_on}; 
 	private static final String[] iconText ={"測試","紀錄","人生新頁"}; 
 	
-	private Fragment[] fragments;
+	static private Fragment[] fragments;
 	private android.support.v4.app.FragmentTransaction ft;
 	private android.support.v4.app.FragmentManager fm;
 	TabChangeListener tabChangeListener;
@@ -83,6 +86,10 @@ public class FragmentTabs extends FragmentActivity {
 			display.getSize(screen_px);
 		}
 
+		Log.d("Screen Size",screen_px.x + ","+screen_px.y);
+		
+		isWideScreen = ((float)screen_px.y/(float)screen_px.x)>1.67F;
+		
 		tab_px = new Point(screen_px.x,screen_px.x*209/1080);
 		
 		tabHost = (TabHost) this.findViewById(android.R.id.tabhost);
@@ -126,9 +133,6 @@ public class FragmentTabs extends FragmentActivity {
 		widgetParam.width = tab_px.x;
 		widgetParam.height = tab_px.y;
 		
-		Log.d("TAB PX",tab_px.toString());
-		
-		
 	}
 	
 	
@@ -162,7 +166,6 @@ public class FragmentTabs extends FragmentActivity {
 	
 	
 	protected void onPause(){
-		resetState();
 		Reuploader.cancel();
 		Log.d("tabs","onPause");
 		super.onPause();
@@ -204,6 +207,10 @@ public class FragmentTabs extends FragmentActivity {
 		if (tab_px != null)
 			return tab_px;
 		return null;
+	}
+	
+	static public boolean isWideScreen(){
+		return isWideScreen;
 	}
 	
 	static public void changeTab(int pos){
@@ -274,10 +281,8 @@ public class FragmentTabs extends FragmentActivity {
 			if (lastTabId.equals(tabId))
 				return;
 			
-			resetState();
 			LoadingBox.show(fragmentTabs);
 			
-			Log.d("Eric", tabId);
 			ClickLogger logger = new ClickLogger();
 			logger.click_logging(System.currentTimeMillis(), tabId + "_click");
 			
@@ -286,21 +291,29 @@ public class FragmentTabs extends FragmentActivity {
 			ft = fm.beginTransaction();
 			
 			for (int i=0;i<fragments.length;++i){
-					if (fragments[i]!=null){
+					if (fragments[i]!=null)
 						ft.detach(fragments[i]);
-					}
 			}
 			for (int i=0;i<tabName.length;++i){
 				if (tabId.equals(tabName[i])){
 					if (fragments[i]== null){
-						if (i==0)
+						if (i==0){
+							if (fragments[i] != null)
+								ft.remove(fragments[i]);
 							fragments[i] = new TestFragment();
-						else if (i==1)
+						}
+						else if (i==1){
+							if (fragments[i] != null)
+								ft.remove(fragments[i]);
 							fragments[i] = new StatisticFragment();
-						else if (i==2)
+						}else if (i==2){
+							if (fragments[i] != null)
+								ft.remove(fragments[i]);
 							fragments[i] = new HistoryFragment();
+						}
 						ft.add(R.id.real_tabcontent,fragments[i],tabName[i] );
 					}else{
+						
 						ft.attach(fragments[i]);
 					}
 					break;
@@ -341,10 +354,6 @@ public class FragmentTabs extends FragmentActivity {
 		return null;
 	}
 	
-	public void resetState(){
-		state = 0;
-	}
-	
 	private ImageView loading_page;
 	
 	private class TimerRunnable implements Runnable{
@@ -369,19 +378,4 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	
 	
-	private int state;
-	/*
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event){
-		if (keyCode == KeyEvent.KEYCODE_BACK){
-			if (state == 0){
-					Toast.makeText(this, "確定離開？", Toast.LENGTH_LONG).show();
-					--state;
-			}else if (state == -1)
-				return super.onKeyDown(keyCode, event);
-		}
-		
-		return false;
-	}
-	*/
 }

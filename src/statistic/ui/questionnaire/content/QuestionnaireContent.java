@@ -4,13 +4,11 @@ import java.util.ArrayList;
 
 import statistic.ui.QuestionMsgBox;
 import ubicomp.drunk_detection.activities.FragmentTabs;
-import ubicomp.drunk_detection.activities.R;
 
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,14 +19,13 @@ import android.widget.TextView;
 abstract public class QuestionnaireContent {
 	
 	protected LinearLayout questionnaireLayout;
-	private Drawable choiceDrawable, choiceSelectedDrawable;
+	private Drawable choiceDrawable;
 	protected ArrayList<String>seq;
 	protected ArrayList <QuestionnaireContent> contentSeq;
 	protected QuestionMsgBox msgBox;
 	private int textSize;
 	private int contentSideMargin, contentMargin;
 	private Context context;
-	//private ItemOnTouchListener itemOnTouchListener;
 	private Typeface wordTypefaceBold;
 	private int itemHeight;
 	
@@ -39,7 +36,6 @@ abstract public class QuestionnaireContent {
 		this.seq = msgBox.getClickSequence();
 		this.contentSeq = msgBox.getQuestionSequence();
 		this.choiceDrawable = msgBox.getChoiceDrawable();
-		this.choiceSelectedDrawable = msgBox.getChoiceSelectedDrawable();
 		this.msgBox = msgBox;
 		this.context = msgBox.getContext();
 		int x = FragmentTabs.getScreenWidth();	
@@ -61,25 +57,6 @@ abstract public class QuestionnaireContent {
 	abstract public void onPop();
 	
 	protected void setHelp(String str){
-		/*
-		RelativeLayout v = new RelativeLayout(context);
-		TextView text = new TextView(context);
-		text.setText(str);
-		text.setTextColor(0xFF573b3b);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-		text.setTypeface(wordTypefaceBold);
-		
-		v.addView(text);
-		
-		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams) text.getLayoutParams();
-		tParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		tParam.addRule(RelativeLayout.CENTER_VERTICAL);
-		tParam.leftMargin = contentSideMargin;
-
-		questionnaireLayout.addView(v);
-		LinearLayout.LayoutParams vParam = (LinearLayout.LayoutParams)v.getLayoutParams();
-		vParam.topMargin = vParam.bottomMargin = contentMargin;
-		*/
 		msgBox.setHelpMessage(str);
 	}
 	
@@ -113,7 +90,6 @@ abstract public class QuestionnaireContent {
 		bParam.rightMargin = contentSideMargin;
 		
 		v.setOnClickListener(listener);
-		//v.setOnTouchListener(itemOnTouchListener);
 		
 		questionnaireLayout.addView(v);
 		LinearLayout.LayoutParams vParam = (LinearLayout.LayoutParams)v.getLayoutParams();
@@ -129,30 +105,4 @@ abstract public class QuestionnaireContent {
 			img.setImageDrawable(choiceDrawable);
 		}
 	}
-	
-	/*
-	private class ItemOnTouchListener implements View.OnTouchListener{
-
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			int e = event.getAction();
-			RelativeLayout r = (RelativeLayout) v;
-			ImageView vi = (ImageView) r.findViewById(imageId);
-			switch(e){
-				case MotionEvent.ACTION_OUTSIDE:
-					vi.setImageDrawable(choiceDrawable);
-					break;
-				case MotionEvent.ACTION_MOVE:
-					vi.setImageDrawable(choiceSelectedDrawable);
-					break;
-				case MotionEvent.ACTION_UP:
-					vi.setImageDrawable(choiceDrawable);
-					break;
-				case MotionEvent.ACTION_DOWN:
-					vi.setImageDrawable(choiceSelectedDrawable);
-					break;
-			}
-			return false;
-		}
-	}*/
 }

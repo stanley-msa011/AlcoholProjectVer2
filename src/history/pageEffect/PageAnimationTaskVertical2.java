@@ -25,8 +25,9 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 	
 	private Bitmap cur=null,next=null,tmp=null;
 	private Bitmap prev_cur=null,prev_next=null;
-	Point screen;
+	private Point screen;
 	private int type=-1; 
+	private int y_axis;
 	
 	public PageAnimationTaskVertical2(PageWidgetVertical pageWidget, PointF from, PointF to, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx, int type){
 		this.pageWidget = pageWidget;
@@ -40,6 +41,10 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		height_gap_1 = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;
 		this.type = type;
+		if (FragmentTabs.isWideScreen())
+			y_axis = screen.x*1137/1080;
+		else
+			y_axis = screen.x * 993/1080;
 	}
 	
 	@Override
@@ -49,8 +54,6 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		cur=null;next=null;tmp=null;
 		prev_cur=null;prev_next=null;
 		
-		//for (int c=startImageIdx;c<bgs.length-1;++c){
-		
 		int curC = startImageIdx;
 		
 		Bitmap tmp2;
@@ -58,13 +61,11 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		if  (type == 1){// cur to next ()
 			Log.d("PAGE_ANIMATION", "in UP");
 			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
-			cur = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			cur = Bitmap.createScaledBitmap(tmp2, screen.x, y_axis, true);
 			tmp2.recycle();
-			//cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
 			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1]);
-			next = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			next = Bitmap.createScaledBitmap(tmp2, screen.x, y_axis, true);
 			tmp2.recycle();
-			//next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC+1]);
 			
 			pageWidget.setBitmaps(cur, next);
 			pageWidget.setTouchPosition(from);
@@ -90,11 +91,11 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 			Log.d("PAGE_ANIMATION", "in DOWN");
 			
 			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
-			next = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			next = Bitmap.createScaledBitmap(tmp2, screen.x, y_axis, true);
 			tmp2.recycle();
 			//next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
 			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
-			cur = Bitmap.createScaledBitmap(tmp2, screen.x, screen.x*1137/1080, true);
+			cur = Bitmap.createScaledBitmap(tmp2, screen.x, y_axis, true);
 			tmp2.recycle();
 			//cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
 			

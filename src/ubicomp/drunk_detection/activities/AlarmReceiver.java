@@ -19,6 +19,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 			Log.e("ALARM","Hourly");
 			Intent a_intent = new Intent(context,HourlyAlarmService.class);
 			context.startService(a_intent);
+		} else if (intent.getAction().equals("Regular_check")){
+			Log.d("ALARM","Regular Check");
+			Intent a_intent = new Intent(context,RegularCheckService.class);
+			context.startService(a_intent);
 		}
 	}
 
