@@ -2,30 +2,25 @@ package statistic.ui.questionnaire.content;
 
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.EndOnClickListener;
+import ubicomp.drunk_detection.activities.R;
 
 public class SolutionContent extends QuestionnaireContent {
 
-	private static final String[] TEXT = {
-		"立即離開有酒的地方",
-		"少喝酒才能維持戒酒",
-		"請健走10~30分鐘",
-		"請專注於呼吸15次",
-		"請休息或就診"
-	};
-	
+	private static String[] TEXT;
 	private int aid;
 	public SolutionContent(QuestionMsgBox msgBox, int aid) {
 		super(msgBox);
 		this.aid = aid;
+		TEXT = msgBox.getContext().getResources().getStringArray(R.array.question_solutions);
 	}
 
 	@Override
 	protected void setContent() {
 		msgBox.setNextButton("", null);
 		seq.add(","+aid);
-		setHelp("請依照以下指示：");
-		//setSelectItem(TEXT[aid-1],new EndOnClickListener(msgBox,-1));
+		setHelp(R.string.follow_the_guide);
 		msgBox.setNextButton(TEXT[aid-1],new EndOnClickListener(msgBox,-1));
+		msgBox.showQuestionnaireLayout(false);
 	}
 
 	@Override

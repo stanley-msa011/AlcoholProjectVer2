@@ -339,8 +339,8 @@ public class QuestionDB {
 		int[] acc = new int[3];
 		int[] used = new int[3];
 		for (int j=0; j<3;++j){
-			acc[j] = cursor.getInt(j+5);
-			used[j] = cursor.getInt(j+8);
+			acc[j] = cursor.getInt(j+6);
+			used[j] = cursor.getInt(j+9);
 		}
 		cursor.close();
 		db.close();

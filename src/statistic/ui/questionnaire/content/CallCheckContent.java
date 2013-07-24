@@ -2,6 +2,7 @@ package statistic.ui.questionnaire.content;
 
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.CallOnClickListener;
+import ubicomp.drunk_detection.activities.R;
 
 public class CallCheckContent extends QuestionnaireContent {
 
@@ -25,12 +26,15 @@ public class CallCheckContent extends QuestionnaireContent {
 		msgBox.setNextButton("", null);
 		if (isEmotion){
 			seq.add(",1");
-			setHelp("確定撥打心情專線？");
+			setHelp(R.string.call_check_help_emotion_hot_line);
 		}
-		else
-			setHelp("確定要撥給 "+name +" ?");
-		//setSelectItem("確定",new CallOnClickListener(msgBox,phone));
-		msgBox.setNextButton("確定",new CallOnClickListener(msgBox,phone));
+		else{
+			String call_check = msgBox.getContext().getResources().getString(R.string.call_check_help);
+			String question_sign = msgBox.getContext().getResources().getString(R.string.question_sign);
+			setHelp(call_check+" "+name +" "+question_sign);
+		}
+		msgBox.showQuestionnaireLayout(false);
+		msgBox.setNextButton(R.string.ok,new CallOnClickListener(msgBox,phone));
 	}
 
 	@Override

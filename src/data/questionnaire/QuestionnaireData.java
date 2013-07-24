@@ -1,5 +1,7 @@
 package data.questionnaire;
 
+import android.util.Log;
+
 public class QuestionnaireData {
 
 	public long ts;
@@ -20,7 +22,7 @@ public class QuestionnaireData {
 		if (acc !=null && acc.length ==12)
 			this.acc = acc.clone();
 		if (used !=null && used.length ==12)
-			this.used = acc.clone();
+			this.used = used.clone();
 	}
 	
 	@Override
@@ -44,6 +46,17 @@ public class QuestionnaireData {
 	
 	public int getSelfHelpCounter(){
 		int score = 0;
+		StringBuilder sb = new StringBuilder();
+		for (int i=0;i<12;++i){
+			sb.append(acc[i]);
+			sb.append(",");
+		}
+		sb.append("-");
+		for (int i=0;i<12;++i){
+			sb.append(used[i]);
+			sb.append(",");
+		}
+		Log.d("Questionnaire score",sb.toString());
 		for (int i=0;i<12;++i)
 			score += (acc[i] - used[i]);
 		return score;

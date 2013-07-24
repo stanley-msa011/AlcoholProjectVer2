@@ -19,6 +19,7 @@ public class EndOnClickListener extends QuestionnaireOnClickListener {
 		msgBox.insertSeq();
 		msgBox.closeBox();
 		msgBox.showEndOfQuestionnaire();
+		msgBox.updateSelfCounter();
 	}
 
 }

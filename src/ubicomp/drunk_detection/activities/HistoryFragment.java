@@ -133,22 +133,11 @@ public class HistoryFragment extends Fragment {
 	
 	private AccumulatedHistoryState[] page_states;
 	
-	private static final String[] QUOTE_STR = {
-		"酒精是一位可畏的敵人，但你相信不會被\n敵人擺布，也決不低頭認輸。",
-		"想踏上戒酒這條路已經很久了，你正在這\n路上。珍惜每一天，會感覺愈來愈好。",
-		"你發現不能空等你的船來到，而是你得自\n己游向它。",
-		"你清楚你可以從過去的失敗中，要如何讓\n自己現在更好，更珍惜戒酒的日子。",
-		"你開始懂得好好善待自己，並且”自愛”\n是一生最重要的一場戀愛。",
-		"對過去憤怒，或對未來恐懼，只是讓你的\n生活變得更無力，更容易錯過現在。",
-		"我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。",
-		"我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。",
-		"你發現當你越認真努力戒酒，生活變得更\n順，運氣也會跟著變好。",
-		"你相信自己一步一步在走你自己所創造的\n不一樣中。",
-		"就像一次一次的身體訓練，每一次都讓我\n們變得更強壯或更堅定。",
-		"你發現別人的鼓勵讓我們更堅持下去，但\n如果也可以鼓勵他人，更能讓生活更有意義。"
-	};
+	private static String[] QUOTE_STR;
 	
 	private static final int MAX_PAGE_WEEK = 11;
+	
+	private String doneStr;
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -163,6 +152,8 @@ public class HistoryFragment extends Fragment {
 	    int mDay = sp.getInt("sDate", from_cal.get(Calendar.DATE));
     	from_cal.set(mYear, mMonth, mDay, 0, 0, 0);
     	from_cal.set(Calendar.MILLISECOND, 0);
+    	doneStr = getResources().getString(R.string.done);
+    	QUOTE_STR = getResources().getStringArray(R.array.quote_message);
     	return view;
     }
    
@@ -426,7 +417,7 @@ public class HistoryFragment extends Fragment {
     	String stageText = String.valueOf(page_week+1);
     	
     	stageMessageText.setText(stageText);
-    	String progress_str =  "<font color=#e79100>"+ format.format(progress)+"%"+"</font><font color=#717071><br/>完成</font>";
+    	String progress_str =  "<font color=#e79100>"+ format.format(progress)+"%"+"</font><font color=#717071><br/>"+doneStr +"</font>";
     	stageRateText.setText(Html.fromHtml(progress_str));
     	quoteText.setText(QUOTE_STR[page_week]);
     	
@@ -601,7 +592,6 @@ public class HistoryFragment extends Fragment {
 					return true;
 				}
 				Log.d("PAGE_ANIMATION", "DOWN2");
-				//prevImage.setVisibility(View.INVISIBLE);
 				setStageVisible(false);
 				
 				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,endIdx,0);
@@ -685,6 +675,7 @@ public class HistoryFragment extends Fragment {
 
 		private Paint text_paint_large = new Paint();
 		private Paint text_paint_large_2 = new Paint();
+		private String[] title_str = new String[4];
 		
 		public ChartTitleView(Context context) {
 			super(context);
@@ -696,6 +687,10 @@ public class HistoryFragment extends Fragment {
 			text_paint_large_2.setTextSize(screen.x * 48F/1080F);
 			text_paint_large_2.setTextAlign(Align.LEFT);
 			text_paint_large_2.setTypeface(wordTypefaceBold);
+			title_str[0] = getResources().getString(R.string.emotion);
+			title_str[1] = getResources().getString(R.string.craving);
+			title_str[2] = getResources().getString(R.string.brac_result);
+			title_str[3] = getResources().getString(R.string.total_result);
 		}
 		
 		@Override  
@@ -732,22 +727,22 @@ public class HistoryFragment extends Fragment {
 		@Override
 		protected void onDraw(Canvas canvas){
 			super.onDraw(canvas);
-			canvas.drawText("心情量尺", screen.x * 30F/1080F, screen.x * 75F/1080F,text_paint_large);	
-			canvas.drawText("渴癮指數", screen.x * 310F/1080F, screen.x * 75F/1080F,text_paint_large);
-			canvas.drawText("酒測結果", screen.x * 590F/1080F, screen.x * 75F/1080F,text_paint_large);
-			canvas.drawText("綜合資料", screen.x * 870F/1080F, screen.x * 75F/1080F,text_paint_large);
+			canvas.drawText(title_str[0], screen.x * 30F/1080F, screen.x * 75F/1080F,text_paint_large);	
+			canvas.drawText(title_str[1], screen.x * 310F/1080F, screen.x * 75F/1080F,text_paint_large);
+			canvas.drawText(title_str[2], screen.x * 590F/1080F, screen.x * 75F/1080F,text_paint_large);
+			canvas.drawText(title_str[3], screen.x * 870F/1080F, screen.x * 75F/1080F,text_paint_large);
 			switch(chart_type){
 				case 0:
-					canvas.drawText("心情量尺", screen.x * 30F/1080F, screen.x * 75F/1080F,text_paint_large_2);
+					canvas.drawText(title_str[0], screen.x * 30F/1080F, screen.x * 75F/1080F,text_paint_large_2);
 					break;
 				case 1:
-					canvas.drawText("渴癮指數", screen.x * 310F/1080F, screen.x * 75F/1080F,text_paint_large_2);
+					canvas.drawText(title_str[1], screen.x * 310F/1080F, screen.x * 75F/1080F,text_paint_large_2);
 					break;
 				case 2:
-					canvas.drawText("酒測結果", screen.x * 590F/1080F, screen.x * 75F/1080F,text_paint_large_2);
+					canvas.drawText(title_str[2], screen.x * 590F/1080F, screen.x * 75F/1080F,text_paint_large_2);
 					break;
 				case 3:
-					canvas.drawText("綜合資料", screen.x * 870F/1080F, screen.x * 75F/1080F,text_paint_large_2);
+					canvas.drawText(title_str[3], screen.x * 870F/1080F, screen.x * 75F/1080F,text_paint_large_2);
 					break;
 			}
 		}
@@ -757,6 +752,7 @@ public class HistoryFragment extends Fragment {
 
 		private Paint axis_paint = new Paint();
 		private Paint text_paint_small = new Paint();
+		private String high;
 		
 		public ChartYAxisView(Context context) {
 			super(context);
@@ -766,6 +762,7 @@ public class HistoryFragment extends Fragment {
 			text_paint_small.setTypeface(digitTypeface);
 			axis_paint.setColor(0xFF000000);
 			axis_paint.setStrokeWidth(screen.x * 7 / 1080);
+			high = getResources().getString(R.string.high);
 		}
 		
 		@Override
@@ -785,7 +782,7 @@ public class HistoryFragment extends Fragment {
 			else if (chart_type == 2)
 				maxLabel = "0.5";
 			else
-				maxLabel = "高";
+				maxLabel = high;
 			canvas.drawText(maxLabel, 3*bar_width/2, _bottom - max_height, text_paint_small);
 		}
 	}
@@ -798,6 +795,9 @@ public class HistoryFragment extends Fragment {
 		private Paint text_paint = new Paint();
 		private Paint paint_pass = new Paint();
 		private Paint paint_fail= new Paint();
+		
+		private String[] type_str = new String[3];
+		private String[] pass_str = new String[2];
 		
 		public ChartLabelView(Context context) {
 			super(context);
@@ -812,6 +812,12 @@ public class HistoryFragment extends Fragment {
 			
 			paint_pass.setColor(0xFF5bdebe);
 			paint_fail.setColor(0xFFf09600);
+			
+			type_str[0] = getResources().getString(R.string.emotion_short);
+			type_str[1] = getResources().getString(R.string.craving_short);
+			type_str[2] = getResources().getString(R.string.brac_result_short);
+			pass_str[0] = getResources().getString(R.string.test_pass);
+			pass_str[1] = getResources().getString(R.string.test_fail);
 		}
 		
 		@Override
@@ -826,17 +832,17 @@ public class HistoryFragment extends Fragment {
 			if (chart_type == 3 ){
 				canvas.drawRect(from, top, from+base, base+top, emotion_paint);
 				from += base + gap;
-				canvas.drawText("心情", from + line_len/2, top2 , text_paint);
+				canvas.drawText(type_str[0], from + line_len/2, top2 , text_paint);
 				from += line_len + gap;
 				
 				canvas.drawRect(from, top, from+base, base+top, desire_paint);
 				from += base + gap;
-				canvas.drawText("渴癮", from + line_len/2, top2, text_paint);
+				canvas.drawText(type_str[1], from + line_len/2, top2, text_paint);
 				from += line_len + gap;
 				
 				canvas.drawRect(from, top, from+base, base+top, brac_paint);
 				from += base + gap;
-				canvas.drawText("酒測值", from + line_len*3/4, top2, text_paint);
+				canvas.drawText(type_str[2], from + line_len*3/4, top2, text_paint);
 			}else{
 				//only two labels
 				from += base + gap;
@@ -844,12 +850,12 @@ public class HistoryFragment extends Fragment {
 				
 				canvas.drawRect(from, top, from+base, base+top, paint_pass);
 				from += base + gap;
-				canvas.drawText("通過", from + line_len/2, top2, text_paint);
+				canvas.drawText(pass_str[0], from + line_len/2, top2, text_paint);
 				from += line_len + gap;
 				
 				canvas.drawRect(from, top, from+base, base+top, paint_fail);
 				from += base + gap;
-				canvas.drawText("不通過", from + line_len*3/4, top2, text_paint);
+				canvas.drawText(pass_str[1], from + line_len*3/4, top2, text_paint);
 			}
 		}
 	}

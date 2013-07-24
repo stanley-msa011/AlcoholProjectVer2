@@ -10,12 +10,12 @@ public class SelectedListener implements OnClickListener {
 
 	private QuestionMsgBox msgBox;
 	private View.OnClickListener listener;
-	private String str;
+	private int str_id;
 	
-	public SelectedListener(QuestionMsgBox msgBox, View.OnClickListener listener,String str){
+	public SelectedListener(QuestionMsgBox msgBox, View.OnClickListener listener,int str_id){
 		this.msgBox = msgBox;
 		this.listener = listener;
-		this.str = str;
+		this.str_id = str_id;
 	}
 	
 	@Override
@@ -23,7 +23,7 @@ public class SelectedListener implements OnClickListener {
 		msgBox.cleanSelection();
 		ImageView img = (ImageView) v.findViewById(QuestionnaireContent.QUESTION_IMAGE_ID);
 		img.setImageDrawable(msgBox.getChoiceSelectedDrawable());
-		msgBox.setNextButton(str, listener);
+		msgBox.setNextButton(str_id, listener);
 	}
 
 }

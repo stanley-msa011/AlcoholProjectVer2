@@ -44,8 +44,8 @@ public class StatisticWeekView extends StatisticPageView {
 	private static final int nBlocks = 3;
 	private static final int nDate = 7;
 	
-	private static final String[] blockHint = {"早","中","晚"};
-	private static final String[] labelHint = {"通過","不通過","未測試"}; 
+	private static final int[] blockHint = {R.string.morning_short,R.string.noon_short,R.string.night_short};
+	private static final int[] labelHint = {R.string.test_pass,R.string.test_fail,R.string.test_none}; 
 	
 	private Typeface digitTypefaceBold;
 	private Typeface wordTypefaceBold;

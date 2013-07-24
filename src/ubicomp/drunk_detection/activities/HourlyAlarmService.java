@@ -37,10 +37,13 @@ public class HourlyAlarmService extends Service {
 
 		Notification notification;
 		
+		String title = getResources().getString(R.string.app_name);
+		String msgText = getResources().getString(R.string.notification_msg_2);
+		
 		if (Build.VERSION.SDK_INT>=16){
 			Notification.Builder notificationBuilder = new Notification.Builder(getBaseContext());
-			notificationBuilder.setContentTitle("戒酒小幫手");
-			notificationBuilder.setContentText("您已停酒了一小時，請再繼續努力");
+			notificationBuilder.setContentTitle(title);
+			notificationBuilder.setContentText(msgText);
 			notificationBuilder.setSmallIcon(R.drawable.icon);
 			notificationBuilder.setContentIntent(pIntent);
 
@@ -50,7 +53,7 @@ public class HourlyAlarmService extends Service {
 			notification = new Notification();
 			notification.contentIntent = pIntent;
 			notification.icon = R.drawable.icon;
-			notification.setLatestEventInfo(this,"戒酒小幫手","您已停酒了一小時，請再繼續努力", pIntent);
+			notification.setLatestEventInfo(this,title,msgText, pIntent);
 		}
 		notification.defaults = Notification.DEFAULT_ALL;
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;

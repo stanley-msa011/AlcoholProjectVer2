@@ -40,9 +40,12 @@ public class AnalysisRatingView extends StatisticPageView {
 	
 	private Typeface wordTypeface;
 	
+	private String[] helpStr;
+	
 	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
 		db = new HistoryDB(context);
+		helpStr = context.getResources().getStringArray(R.array.analysis_ranking_help);
 	}
 
 	@Override
@@ -182,8 +185,8 @@ public class AnalysisRatingView extends StatisticPageView {
 
 	@Override
 	public void onPostTask() {
-		help.setText("與其他戒酒朋友相比，您的排名為" );
-		help2.setText("與表現較佳的成員相比，您的排名為" );
+		help.setText(helpStr[0] );
+		help2.setText(helpStr[1]);
 		setPointer();
 		netTask = new NetworkTask();
 		netTask.execute();

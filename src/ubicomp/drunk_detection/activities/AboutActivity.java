@@ -80,7 +80,7 @@ public class AboutActivity extends Activity {
 		tParam.leftMargin =  screen.x * 26/480;
 		titleText.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleSize);
 		titleText.setTypeface(wordTypefaceBold);
-		titleText.setText("戒酒小幫手");
+		titleText.setText(R.string.app_name);
 		
 		LinearLayout.LayoutParams ttParam = (LinearLayout.LayoutParams) titleLayout.getLayoutParams();
 		ttParam.height = screen.x*230/1080;
@@ -169,18 +169,31 @@ public class AboutActivity extends Activity {
 				});
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("此應用程式由<br/><strong>國立台灣大學、</strong><br/><strong>中央研究院、</strong><br/><strong>臺北市立聯合醫院</strong>合作開發。<br/><br/>" +
-				"開發目為協助酗酒患者戒酒並自我控制使用。<br/>" +
-				"此應用程式需搭配專用酒測器方可使用。");
+		String[] message = getResources().getStringArray(R.array.about_message);
+		sb.append(message[0]);
+		sb.append("<br/><strong>");
+		sb.append(getResources().getString(R.string.ntu));
+		sb.append(getResources().getString(R.string.dot));
+		sb.append("</strong><br/><strong>");
+		sb.append(getResources().getString(R.string.sinica));
+		sb.append(getResources().getString(R.string.dot));
+		sb.append("</strong><br/><strong>");
+		sb.append(getResources().getString(R.string.taipei_city_hospital));
+		sb.append("</strong>");
+		sb.append(message[1]);
+		sb.append("<br/><br/>");
+		sb.append(message[2]);
+		sb.append("<br/>");
+		sb.append(message[3]);
+		sb.append("<br/><br/>");
 		
 		PackageInfo pinfo;
 		try {
 			pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 			String versionName = pinfo.versionName;
-			sb.append("<br/><br/>目前版本：");
+			sb.append(getResources().getString(R.string.current_version));
 			sb.append(versionName);
-		} catch (NameNotFoundException e) {
-		}
+		} catch (NameNotFoundException e) {}
 		aboutText.setText(Html.fromHtml(sb.toString()));
 		
 	}

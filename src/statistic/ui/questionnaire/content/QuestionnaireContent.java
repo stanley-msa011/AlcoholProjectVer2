@@ -43,7 +43,6 @@ abstract public class QuestionnaireContent {
 		contentSideMargin = x * 40/480;
 		contentMargin = x * 10/480;
 		itemHeight = x * 60/480;
-		//this.itemOnTouchListener = new ItemOnTouchListener();
 		wordTypefaceBold = msgBox.getTypeface();
 	}
 	
@@ -60,6 +59,10 @@ abstract public class QuestionnaireContent {
 		msgBox.setHelpMessage(str);
 	}
 	
+	protected void setHelp(int str_id){
+		msgBox.setHelpMessage(str_id);
+	}
+	
 	public static final int QUESTION_IMAGE_ID = 0x00;
 	public static final int QUESTION_TEXT_ID = 0x01;
 	
@@ -67,6 +70,40 @@ abstract public class QuestionnaireContent {
 		RelativeLayout v = new RelativeLayout(context);
 		TextView text = new TextView(context);
 		text.setText(str);
+		text.setTextColor(0xFF573b3b);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		text.setId(QUESTION_TEXT_ID);
+		text.setTypeface(wordTypefaceBold);
+		
+		ImageView button = new ImageView(context);
+		button.setImageDrawable(choiceDrawable);
+		button.setId(QUESTION_IMAGE_ID);
+		
+		v.addView(text);
+		v.addView(button);
+		
+		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams) text.getLayoutParams();
+		tParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		tParam.addRule(RelativeLayout.CENTER_VERTICAL);
+		tParam.leftMargin = contentSideMargin;
+		
+		RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams) button.getLayoutParams();
+		bParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		bParam.addRule(RelativeLayout.CENTER_VERTICAL);
+		bParam.rightMargin = contentSideMargin;
+		
+		v.setOnClickListener(listener);
+		
+		questionnaireLayout.addView(v);
+		LinearLayout.LayoutParams vParam = (LinearLayout.LayoutParams)v.getLayoutParams();
+		vParam.topMargin = vParam.bottomMargin = contentMargin;
+		vParam.height = 	itemHeight;
+	}
+	
+	protected void setSelectItem(int str_id, View.OnClickListener listener){
+		RelativeLayout v = new RelativeLayout(context);
+		TextView text = new TextView(context);
+		text.setText(str_id);
 		text.setTextColor(0xFF573b3b);
 		text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		text.setId(QUESTION_TEXT_ID);

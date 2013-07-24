@@ -46,11 +46,8 @@ public class UIMsgBox {
 	
 	private TextView eNum,dNum;
 	
-	private static final String[] emotionStr = {"　沮喪　","　低落　","　普通　", "　愉快　","　快樂　"};
-	private static final String[] desireStr = {"無\n　",
-																				"輕度\n尚未行動","輕度\n尚未行動","輕度\n尚未行動",
-																				"中~強度\n等下去買","中~強度\n等下去買","中~強度\n等下去買",
-																				"非常強烈\n即將要喝","非常強烈\n即將要喝","非常強烈\n即將要喝"};
+	private static String[] emotionStr ;
+	private static String[] desireStr ;
 	
 	private LinearLayout questionLayout;
 	
@@ -87,6 +84,8 @@ public class UIMsgBox {
 		this.r = context.getResources();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
+		emotionStr = context.getResources().getStringArray(R.array.emotion_state);
+		desireStr = context.getResources().getStringArray(R.array.craving_state);
 		screen = FragmentTabs.getSize();
 		isWideScreen = FragmentTabs.isWideScreen();
 		setting();
@@ -325,7 +324,7 @@ public class UIMsgBox {
 		@Override
 		public void onClick(View v) {
 			if (!done){
-				Toast.makeText(mainLayout.getContext(), "確定已完成？", Toast.LENGTH_LONG).show();
+				Toast.makeText(mainLayout.getContext(),R.string.msg_box_toast_send, Toast.LENGTH_LONG).show();
 				enableSend(true);
 				return;
 			}
@@ -347,7 +346,7 @@ public class UIMsgBox {
 		@Override
 		public void onClick(View v) {
 			if (!done){
-				Toast.makeText(mainLayout.getContext(), "確定不填寫？", Toast.LENGTH_LONG).show();
+				Toast.makeText(mainLayout.getContext(),R.string.msg_box_toast_cancel, Toast.LENGTH_LONG).show();
 				enableSend(true);
 				return;
 			}
@@ -364,7 +363,7 @@ public class UIMsgBox {
 	public void generateInitializingBox(){
 		send.setOnClickListener(null);
 		notSend.setOnClickListener(null);
-		help.setText("請稍待");
+		help.setText(R.string.wait);
 		questionLayout.setVisibility(View.INVISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
 	}

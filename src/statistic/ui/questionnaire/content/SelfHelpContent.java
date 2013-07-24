@@ -3,6 +3,7 @@ package statistic.ui.questionnaire.content;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.SelectedListener;
 import statistic.ui.questionnaire.listener.SituationOnClickListener;
+import ubicomp.drunk_detection.activities.R;
 
 public class SelfHelpContent extends QuestionnaireContent {
 
@@ -14,12 +15,13 @@ public class SelfHelpContent extends QuestionnaireContent {
 	protected void setContent() {
 		msgBox.setNextButton("", null);
 		seq.add(",6");
-		setHelp("請問您現在的狀況？");
-		setSelectItem("身邊有酒",new SelectedListener(msgBox,new SituationOnClickListener(msgBox,1),"下一步"));
-		setSelectItem("手頭寬裕",new SelectedListener(msgBox,new SituationOnClickListener(msgBox,2),"下一步"));
-		setSelectItem("感到無聊",new SelectedListener(msgBox,new SituationOnClickListener(msgBox,3),"下一步"));
-		setSelectItem("覺得有壓力",new SelectedListener(msgBox,new SituationOnClickListener(msgBox,4),"下一步"));
-		setSelectItem("身體不舒服",new SelectedListener(msgBox,new SituationOnClickListener(msgBox,5),"下一步"));
+		setHelp(R.string.self_help_help);
+		setSelectItem(R.string.self_help_selection0,new SelectedListener(msgBox,new SituationOnClickListener(msgBox,1),R.string.next));
+		setSelectItem(R.string.self_help_selection1,new SelectedListener(msgBox,new SituationOnClickListener(msgBox,2),R.string.next));
+		setSelectItem(R.string.self_help_selection2,new SelectedListener(msgBox,new SituationOnClickListener(msgBox,3),R.string.next));
+		setSelectItem(R.string.self_help_selection3,new SelectedListener(msgBox,new SituationOnClickListener(msgBox,4),R.string.next));
+		setSelectItem(R.string.self_help_selection4,new SelectedListener(msgBox,new SituationOnClickListener(msgBox,5),R.string.next));
+		msgBox.showQuestionnaireLayout(true);
 
 	}
 

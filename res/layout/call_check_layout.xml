@@ -21,9 +21,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/call_help"
         android:gravity="center"
-        android:textColor="#FF8a8b8b"
-        android:text="取消"
-        />
+        android:text="@string/cancel"
+        android:textColor="#FF8a8b8b" />
     
     <TextView
         android:id="@+id/call_ok_button"
@@ -32,8 +31,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/call_help"
         android:gravity="center"
-        android:textColor="#FF8a8b8b"
-        android:text="確定"
-        />
+        android:text="@string/ok"
+        android:textColor="#FF8a8b8b" />
 
 </RelativeLayout>

@@ -23,12 +23,13 @@ public class AnalysisCounterView extends StatisticPageView {
 	private QuestionDB qdb;
 	
 	private Typeface wordTypeface;
+	private String[] helpStr;
 	
 	public AnalysisCounterView(Context context,StatisticFragment statisticFragment){
 		super(context, R.layout.analysis_counter_view,statisticFragment);
 		hdb = new HistoryDB(context);
     	qdb = new QuestionDB(context);
-		
+		helpStr = context.getResources().getStringArray(R.array.analysis_counter_help);
 	}
 	
 	@Override
@@ -71,11 +72,11 @@ public class AnalysisCounterView extends StatisticPageView {
     	int coupon = total_counter/COUPON_COUNTER;
     	int counter = total_counter - coupon*COUPON_COUNTER;
 		
-    	sc_message = "<font color=#000000>已累積 </font><font color=#f39700><strong>"+
+    	sc_message = "<font color=#000000>"+helpStr[0]+" </font><font color=#f39700><strong>"+
     	counter+
-    	"</strong></font><font color=#000000> 點數及 </font><font color=#f39700><strong>"+
+    	"</strong></font><font color=#000000> "+helpStr[1]+" </font><font color=#f39700><strong>"+
     	coupon+
-    	"</strong></font><font color=#000000></font><font color=#000000> 張禮卷</font>";
+    	"</strong></font><font color=#000000></font><font color=#000000> "+helpStr[2]+"</font>";
     	
 		Point screen = StatisticFragment.getStatisticPx();
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();
@@ -87,6 +88,24 @@ public class AnalysisCounterView extends StatisticPageView {
 		
 	}
 
+	public void updateCounter(){
+		int total_counter = 
+    			hdb.getLatestAccumulatedHistoryState().getSelfHelpCounter()
+    			- hdb.getLatestUsedState().getSelfHelpCounter() 
+    			+ qdb.getLatestEmotion().getSelfHelpCounter() 
+    			+ qdb.getLatestEmotionManage().getSelfHelpCounter() 
+    			+ qdb.getLatestQuestionnaire().getSelfHelpCounter();
+    	int coupon = total_counter/COUPON_COUNTER;
+    	int counter = total_counter - coupon*COUPON_COUNTER;
+		
+    	sc_message = "<font color=#000000>"+helpStr[0]+" </font><font color=#f39700><strong>"+
+    	counter+
+    	"</strong></font><font color=#000000> "+helpStr[1]+" </font><font color=#f39700><strong>"+
+    	coupon+
+    	"</strong></font><font color=#000000></font><font color=#000000> "+helpStr[2]+"</font>";
+    	help.setText(Html.fromHtml(sc_message));
+	}
+	
 	@Override
 	public void onPostTask() {
 		help.setText(Html.fromHtml(sc_message));

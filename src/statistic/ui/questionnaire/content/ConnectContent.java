@@ -5,6 +5,7 @@ import android.preference.PreferenceManager;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.CallCheckOnClickListener;
 import statistic.ui.questionnaire.listener.SelectedListener;
+import ubicomp.drunk_detection.activities.R;
 
 public class ConnectContent extends QuestionnaireContent {
 
@@ -31,7 +32,7 @@ public class ConnectContent extends QuestionnaireContent {
 	protected void setContent() {
 		msgBox.setNextButton("", null);
 		seq.add(","+type+",5");
-		setHelp("要打給誰？");
+		setHelp(R.string.call_to);
 		if (type == TYPE_FAMILY){
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(msgBox.getContext());
 			String connectN0,connectN1,connectN2;
@@ -43,9 +44,9 @@ public class ConnectContent extends QuestionnaireContent {
 			connectP1 = sp.getString("connect_p1", "");
 			connectP2 = sp.getString("connect_p2", "");
 			
-			setSelectItem(connectN0,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN0,connectP0),"下一步"));
-			setSelectItem(connectN1,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN1,connectP1),"下一步"));
-			setSelectItem(connectN2,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN2,connectP2),"下一步"));
+			setSelectItem(connectN0,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN0,connectP0),R.string.next));
+			setSelectItem(connectN1,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN1,connectP1),R.string.next));
+			setSelectItem(connectN2,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN2,connectP2),R.string.next));
 		}else if(type == TYPE_SOCIAL){
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(msgBox.getContext());
 			int connectS0,connectS1,connectS2;
@@ -58,14 +59,14 @@ public class ConnectContent extends QuestionnaireContent {
 			String p0 = ConnectSocialInfo.PHONE[connectS0];
 			String p1 = ConnectSocialInfo.PHONE[connectS1];
 			String p2 = ConnectSocialInfo.PHONE[connectS2];
-			setSelectItem(n0,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n0,p0),"下一步"));
-			setSelectItem(n1,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n1,p1),"下一步"));
-			setSelectItem(n2,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n2,p2),"下一步"));
+			setSelectItem(n0,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n0,p0),R.string.next));
+			setSelectItem(n1,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n1,p1),R.string.next));
+			setSelectItem(n2,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n2,p2),R.string.next));
 		}else{
-			for (int i=0;i<dummyNames.length;++i){
-				setSelectItem(dummyNames[i]+":"+dummyPhones[i],new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,dummyNames[i],dummyPhones[i]),"下一步"));
-			}
+			for (int i=0;i<dummyNames.length;++i)
+				setSelectItem(dummyNames[i]+":"+dummyPhones[i],new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,dummyNames[i],dummyPhones[i]),R.string.next));
 		}
+		msgBox.showQuestionnaireLayout(true);
 	}
 
 	@Override

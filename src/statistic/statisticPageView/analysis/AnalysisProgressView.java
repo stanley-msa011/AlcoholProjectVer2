@@ -29,6 +29,8 @@ public class AnalysisProgressView extends StatisticPageView {
 	
 	private Typeface wordTypeface;
 	
+	private String[] helpStr;
+	
 	public AnalysisProgressView(Context context,StatisticFragment statisticFragment){
 		super(context, R.layout.analysis_progress_view,statisticFragment);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
@@ -40,6 +42,7 @@ public class AnalysisProgressView extends StatisticPageView {
 		fromCal.set(Calendar.YEAR, year);
 		fromCal.set(Calendar.MONTH, month);
 		fromCal.set(Calendar.DATE, date);
+		helpStr = context.getResources().getStringArray(R.array.analysis_progress_help);
 	}
 	
 	@Override
@@ -90,11 +93,11 @@ public class AnalysisProgressView extends StatisticPageView {
 
 	@Override
 	public void onPostTask() {
-		String text =  "<font color=#000000>已戒酒 </font><font color=#f39700><strong>"
+		String text =  "<font color=#000000>"+helpStr[0]+" </font><font color=#f39700><strong>"
 				+currentWeek
-				+"</strong></font><font color=#000000> 周，完成此療程尚餘 </font><font color=#f39700><strong>"
+				+"</strong></font><font color=#000000> "+helpStr[1]+" </font><font color=#f39700><strong>"
 				+restWeek
-				+"</strong></font><font color=#000000></font><font color=#000000> 周</font>";
+				+"</strong></font><font color=#000000></font><font color=#000000> "+helpStr[2]+"</font>";
 		help.setText(Html.fromHtml(text));
 	}
 

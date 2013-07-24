@@ -19,7 +19,7 @@ public class LoadingBox {
 			dialog.cancel();
 			dialog = new ProgressDialog(context);
 		}
-		dialog.setMessage("載入中");
+		dialog.setMessage(context.getResources().getString(R.string.loading));
 		dialog.setCancelable(true);
 		if (!dialog.isShowing())
 			dialog.show();

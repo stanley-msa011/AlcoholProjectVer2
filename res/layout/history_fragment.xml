@@ -25,15 +25,14 @@
     	    android:layout_height = "wrap_content"
     	    >
     	
-    	    <TextView 
+    	    <TextView
     	        android:id="@+id/history_stage"
     	        android:layout_width="wrap_content"
     	        android:layout_height="wrap_content"
-    	        android:gravity="center"
     	        android:layout_centerHorizontal="true"
-    	        android:textColor="#FF717071"
-    	        android:text="頁數"
-    	        />
+    	        android:gravity="center"
+    	        android:text="@string/page_help"
+    	        android:textColor="#FF717071" />
     	    
     		<TextView 
 	    	    android:id = "@+id/history_stage_message"

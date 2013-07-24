@@ -66,6 +66,8 @@ public class AudioRecordBox {
 	
 	private Drawable playDrawable,playOffDrawable, recDrawable, stopDrawable;
 	
+	private String[] helpStr;
+	
 	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
 		Log.d("UIMSG","NEW");
 		this.historyFragment = historyFragment;
@@ -77,6 +79,7 @@ public class AudioRecordBox {
 		screen = FragmentTabs.getSize();
 		mediaRecorder = null;
 		mediaPlayer = null;
+		helpStr = context.getResources().getStringArray(R.array.audio_box_help);
 		db = new AudioDB(context);
 		setting();
 	}
@@ -214,7 +217,7 @@ public class AudioRecordBox {
 		public void onInfo(MediaRecorder mr, int what, int extra) {
 			if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
 				mediaRecorder.release();
-				Toast.makeText(mainLayout.getContext(), "兩分鐘到了", Toast.LENGTH_LONG).show();
+				Toast.makeText(context, context.getString(R.string.audio_box_toast_timeup), Toast.LENGTH_LONG).show();
 				setButtonState(STATE_INIT);
 			}
 		}
@@ -229,7 +232,7 @@ public class AudioRecordBox {
 					mediaRecorder.release();
 					mediaRecorder = null;
 					db.insertAudio(curDV);
-					Toast.makeText(mainLayout.getContext(), "錄音完成", Toast.LENGTH_LONG).show();
+					Toast.makeText(context, context.getResources().getString(R.string.audio_box_toast_record_end), Toast.LENGTH_LONG).show();
 				} catch (IllegalStateException e) {
 					Log.d("RECORDER",e.getMessage());
 				}
@@ -307,7 +310,7 @@ public class AudioRecordBox {
 				playButton.setImageDrawable(playOffDrawable);
 				playButton.setOnClickListener(null);
 			}
-			help.setText("錄下或聆聽在"+curDV+"的心情\n(最長可達兩分鐘)");
+			help.setText(helpStr[0]+curDV+helpStr[1]);
 			break;
 		case STATE_ON_PLAY:
 			recButton.setImageDrawable(null);
@@ -316,7 +319,7 @@ public class AudioRecordBox {
 			playButton.setOnClickListener(endPlayListener);
 			closeButton.setOnClickListener(null);
 			closeButton.setVisibility(View.INVISIBLE);
-			help.setText("播放中");
+			help.setText(R.string.audio_box_playing);
 			break;
 		case STATE_ON_RECORD:
 			recButton.setImageDrawable(stopDrawable);
@@ -325,14 +328,14 @@ public class AudioRecordBox {
 			playButton.setOnClickListener(null);
 			closeButton.setOnClickListener(null);
 			closeButton.setVisibility(View.INVISIBLE);
-			help.setText("錄音中");
+			help.setText(R.string.audio_box_recording);
 			break;
 		case STATE_PREPARING:
 			recButton.setOnClickListener(null);
 			playButton.setOnClickListener(null);
 			closeButton.setOnClickListener(null);
 			closeButton.setVisibility(View.INVISIBLE);
-			help.setText("準備中");
+			help.setText(R.string.audio_box_preparing);
 			break;
 		}
 	}
@@ -345,7 +348,7 @@ public class AudioRecordBox {
 					mediaPlayer.stop();
 					mediaPlayer.release();
 					mediaPlayer = null;
-					Toast.makeText(mainLayout.getContext(), "結束播放", Toast.LENGTH_LONG).show();
+					Toast.makeText(context, context.getResources().getString(R.string.audio_box_toast_play_end), Toast.LENGTH_LONG).show();
 				} catch (IllegalStateException e) {
 					Log.d("PLAYER",e.getMessage());
 				}

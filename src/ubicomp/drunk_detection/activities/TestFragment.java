@@ -288,7 +288,7 @@ public class TestFragment extends Fragment {
 	}
 	
 	public void startBT(){
-		messageView.setText("請稍候");
+		messageView.setText(R.string.wait);
 		//initialize bt task
 		btInitHandler = new BTInitHandler(testFragment,bt);
 		btInitHandler.sendEmptyMessage(0);
@@ -313,7 +313,7 @@ public class TestFragment extends Fragment {
 		cleanMsgBox();
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg","未啟用酒測裝置");
+		data.putString("msg",getResources().getString(R.string.test_guide_not_turn_on));
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
@@ -345,7 +345,7 @@ public class TestFragment extends Fragment {
 				bracText.setText("0.00");
 				reset();
 				
-				messageView.setText("請按酒測裝置黑色按鈕\n以啟用酒測裝置");
+				messageView.setText(R.string.test_guide_show_turn_on);
 				Thread t = new Thread(new TimeUpRunnable(0,1500));
 				t.start();
 			}
@@ -403,7 +403,7 @@ public class TestFragment extends Fragment {
 				cameraInitHandler.removeMessages(0);
 				btRunTask = new BTRunTask(this,bt);
 				btRunTask.execute();
-				messageView.setText("已啟用酒測裝置");
+				messageView.setText(R.string.test_guide_turn_on);
 				showDebug("Device launched");
 				Thread t = new Thread(new TimeUpRunnable(1,1500));
 				t.start();
@@ -565,7 +565,7 @@ public class TestFragment extends Fragment {
 			bracText.setText("0.00");
 			bracText.setVisibility(View.VISIBLE);
 			
-			messageView.setText("請點選'開始'以進行測試");
+			messageView.setText(R.string.test_guide_start);
 			
 			startButton.setOnClickListener(new StartOnClickListener());
 			startButton.setVisibility(View.VISIBLE);
@@ -574,12 +574,6 @@ public class TestFragment extends Fragment {
 			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
 			face.setVisibility(View.INVISIBLE);
 			LoadingBox.dismiss();
-			/*
-			if (msgLoadingHandler == null)
-				msgLoadingHandler = new MsgLoadingHandler();
-			msgLoadingHandler.sendEmptyMessage(0);
-			msgBox.generateInitializingBox();
-			*/
 		}
 	}
     
@@ -596,7 +590,7 @@ public class TestFragment extends Fragment {
 			
 			if (msgBox!=null){
 				msgBox.generateGPSCheckBox();
-				messageView.setText("請依對話框指示進行操作");
+				messageView.setText(R.string.test_guide_msg_box);
 			}
 		}
 	}
@@ -621,7 +615,7 @@ public class TestFragment extends Fragment {
 			startButton.setOnClickListener(new EndTestOnClickListener());
 			startButton.setVisibility(View.VISIBLE);
 			face.setVisibility(View.INVISIBLE);
-			msgStr = msgStr.concat("\n請點選按鈕以結束");
+			msgStr = msgStr.concat(getResources().getString(R.string.test_guide_end));
 			
 			messageView.setText(msgStr);
 			
@@ -640,7 +634,7 @@ public class TestFragment extends Fragment {
 			
 			face.setVisibility(View.VISIBLE);
 			
-			messageView.setText("請將臉對於螢幕中央，\n並開始吹氣");
+			messageView.setText(R.string.test_guide_testing);
 			if (bt!=null && cameraRecorder!=null){
 				bt.start();
 				cameraRecorder.start();
@@ -661,7 +655,7 @@ public class TestFragment extends Fragment {
 		Log.d("test","stop by time out");
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg","測試超時或酒測器沒電了");
+		data.putString("msg",getResources().getString(R.string.test_guide_test_fail));
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)

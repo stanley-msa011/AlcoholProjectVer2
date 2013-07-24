@@ -49,7 +49,6 @@ public class FragmentTabs extends FragmentActivity {
 	private static final String[] tabName ={"Test","Record","History"}; 
 	private static final int[] iconId ={R.drawable.tabs_test,R.drawable.tabs_statistic,R.drawable.tabs_history}; 
 	private static final int[] iconOnId ={R.drawable.tabs_test_on,R.drawable.tabs_statistic_on,R.drawable.tabs_history_on}; 
-	private static final String[] iconText ={"測試","紀錄","人生新頁"}; 
 	
 	static private Fragment[] fragments;
 	private android.support.v4.app.FragmentTransaction ft;
@@ -101,7 +100,7 @@ public class FragmentTabs extends FragmentActivity {
 			customTabs = new CustomTab[3];
 		
 		for (int i=0;i<3;++i){
-			customTabs[i] = new CustomTab(this,iconId[i],iconOnId [i],iconText[i]);
+			customTabs[i] = new CustomTab(this,iconId[i],iconOnId [i]);
 			tabs[i] = tabHost.newTabSpec(tabName[i]).setIndicator(customTabs[i].getTab());
 			tabs[i].setContent(new DummyTabFactory(this));
 			tabHost.addTab(tabs[i]);
@@ -223,35 +222,15 @@ public class FragmentTabs extends FragmentActivity {
 	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-    	//menu.add(0, 0, 0, "Debug");
-    	//menu.add(0, 1, 1, "Normal");
-    	//menu.add(0, 2, 2, "Setting");
-    	//menu.add(0, 3, 3,"DummyData");
-    	menu.add(1, 0, 4, "心情DIY");
-    	menu.add(1, 1, 5, "情緒管理");
-    	menu.add(1, 2, 6, "關於");
+    	menu.add(1, 0, 0, R.string.emotionDIY_title);
+    	menu.add(1, 1, 1, R.string.emotion_manage_title);
+    	menu.add(1, 2, 2, R.string.about_title);
     	return super.onCreateOptionsMenu(menu);
     }
 	
     public boolean onOptionsItemSelected(MenuItem item){
-    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
-    	SharedPreferences.Editor editor = sp.edit();
 		int id = item.getItemId();
 		int gid = item.getGroupId();
-		if (gid == 0){
-			if (id == 0){
-				editor.putBoolean("debug", true);
-				editor.commit();
-			}else if (id == 1){
-				editor.putBoolean("debug", false);
-				editor.commit();
-			}else if (id == 2){
-				Intent newIntent = new Intent(this, PreSettingActivity.class);
-				this.startActivity(newIntent);
-			}else if (id == 3){
-				DummyData.generateDummyData(this);
-			}
-		}
 		if (gid == 1){
 			if (id == 0){
 				Intent newIntent = new Intent(this, EmotionActivity.class);
@@ -369,9 +348,8 @@ public class FragmentTabs extends FragmentActivity {
 	@SuppressLint("HandlerLeak")
 	private class LoadingPageHandler extends Handler{
 		public void handleMessage(Message msg){
-			if(msg.what == 0){
+			if(msg.what == 0)
 				loading_page.setVisibility(View.INVISIBLE);
-			}
 			else
 				loading_page.setVisibility(View.VISIBLE);
 		}

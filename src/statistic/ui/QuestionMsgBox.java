@@ -58,6 +58,8 @@ public class QuestionMsgBox {
 	private Typeface wordTypefaceBold;
 	private int type;
 	
+	private LinearLayout.LayoutParams questionParam;
+	
 	public QuestionMsgBox(StatisticFragment statisticFragment,RelativeLayout mainLayout){
 		this.statisticFragment = statisticFragment;
 		this.context = statisticFragment.getActivity();
@@ -83,6 +85,7 @@ public class QuestionMsgBox {
 		boxLayout.setVisibility(View.INVISIBLE);
 		
 		questionLayout = (LinearLayout) boxLayout.findViewById(R.id.question_layout);
+		questionParam = (LinearLayout.LayoutParams) questionLayout.getLayoutParams();
 		questionAllLayout = (LinearLayout) boxLayout.findViewById(R.id.question_all_layout);
 		
 		help = (TextView) boxLayout.findViewById(R.id.question_text);
@@ -237,8 +240,17 @@ public class QuestionMsgBox {
 		help.setText(str);
 	}
 	
+	public void setHelpMessage(int str_id){
+		help.setText(str_id);
+	}
+	
 	public void setNextButton(String str, View.OnClickListener listener){
 		next.setText(str);
+		next.setOnClickListener(listener);
+	}
+	
+	public void setNextButton(int str_id, View.OnClickListener listener){
+		next.setText(str_id);
 		next.setOnClickListener(listener);
 	}
 	
@@ -252,6 +264,14 @@ public class QuestionMsgBox {
 		if (idx >=0)
 			contentSequence.get(idx).cleanSelection();
 	}
+	
+	public void showQuestionnaireLayout(boolean visible){
+		if (visible)
+			questionParam.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+		else
+			questionParam.height = 0;
+	}
+	
 	
 	private class ExitListener implements View.OnClickListener{
 
@@ -270,4 +290,7 @@ public class QuestionMsgBox {
 		statisticFragment.showEndOfQuestionnaire();
 	}
 	
+	public void updateSelfCounter(){
+		statisticFragment.updateSelfHelpCounter();
+	}
 }

@@ -11,6 +11,7 @@ import statistic.ui.questionnaire.listener.FamilyOnClickListener;
 import statistic.ui.questionnaire.listener.SelectedListener;
 import statistic.ui.questionnaire.listener.SelfOnClickListener;
 import ubicomp.drunk_detection.activities.AlarmReceiver;
+import ubicomp.drunk_detection.activities.R;
 
 public class Type2Content extends QuestionnaireContent {
 
@@ -39,9 +40,10 @@ public class Type2Content extends QuestionnaireContent {
 		seq.clear();
     	seq.add("3");
 		msgBox.openBox();
-		setHelp("你似乎開始喝酒了，\n現在啟用一小時停酒提醒，\n同時建議你可以：");
-		setSelectItem("自行處理與面對",new SelectedListener(msgBox,new SelfOnClickListener(msgBox),"下一步"));
-		setSelectItem("跟親友聊天", new SelectedListener(msgBox,new FamilyOnClickListener(msgBox),"下一步"));
+		setHelp(R.string.question_type2_help);
+		setSelectItem(R.string.self_help,new SelectedListener(msgBox,new SelfOnClickListener(msgBox),R.string.next));
+		setSelectItem(R.string.connect_to_family, new SelectedListener(msgBox,new FamilyOnClickListener(msgBox),R.string.next));
+		msgBox.showQuestionnaireLayout(true);
 	}
 
 	@Override

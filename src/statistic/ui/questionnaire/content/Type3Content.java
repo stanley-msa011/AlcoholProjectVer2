@@ -5,6 +5,7 @@ import statistic.ui.questionnaire.listener.EndOnClickListener;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
 import statistic.ui.questionnaire.listener.SelectedListener;
 import statistic.ui.questionnaire.listener.SelfOnClickListener;
+import ubicomp.drunk_detection.activities.R;
 
 public class Type3Content extends QuestionnaireContent {
 
@@ -18,11 +19,11 @@ public class Type3Content extends QuestionnaireContent {
 		seq.clear();
 		seq.add("4");
 		msgBox.openBox();
-		setHelp("您似乎喝了不少酒，\n建議你可以：");
-		setSelectItem("回家休息", new SelectedListener(msgBox,new EndOnClickListener(msgBox,3),"確定"));
-		setSelectItem("跟親友聊天", new SelectedListener(msgBox,new FamilyOnClickListener(msgBox),"下一步"));
-		setSelectItem("自我處理與面對",new SelectedListener(msgBox,new SelfOnClickListener(msgBox),"下一步"));
-		
+		setHelp(R.string.question_type3_help);
+		setSelectItem(R.string.go_home, new SelectedListener(msgBox,new EndOnClickListener(msgBox,3),R.string.ok));
+		setSelectItem(R.string.connect_to_family, new SelectedListener(msgBox,new FamilyOnClickListener(msgBox),R.string.next));
+		setSelectItem(R.string.self_help,new SelectedListener(msgBox,new SelfOnClickListener(msgBox),R.string.next));
+		msgBox.showQuestionnaireLayout(true);
 	}
 
 	@Override

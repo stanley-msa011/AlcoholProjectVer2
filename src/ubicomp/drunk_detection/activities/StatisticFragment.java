@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import clicklog.ClickLogger;
 
 public class StatisticFragment extends Fragment {
@@ -53,6 +56,7 @@ public class StatisticFragment extends Fragment {
 	private FrameLayout shadow;
 	
 	private ImageView showImage;
+	private TextView showText;
 	
 	private ShowDismissHandler showDismissHandler;
 	private ScrollDismissHandler scrollDismissHandler;
@@ -64,6 +68,8 @@ public class StatisticFragment extends Fragment {
 	private QuestionMsgBox msgBox;
 	
 	private ImageView firstScroll;
+	
+	private Typeface wordTypefaceBold;
 	
 	// For Click Sequence Logging
 	private ClickLogger clickLogger;
@@ -173,7 +179,7 @@ public class StatisticFragment extends Fragment {
         	Point screen = FragmentTabs.getSize();
         	statistic_px = new Point(screen.x,screen.x*380/480);
         	
-        	
+        	wordTypefaceBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/DFLiHeiStd-W5.otf");
         	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
         	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
         	statisticView.setAdapter(statisticViewAdapter);
@@ -188,7 +194,11 @@ public class StatisticFragment extends Fragment {
         	questionButton.setOnClickListener(new QuestionOnClickListener());
     		
         	shadow = (FrameLayout) view.findViewById(R.id.statistic_shadow);
-    		showImage = (ImageView) view.findViewById(R.id.statistic_picture);
+    		showImage = (ImageView) view.findViewById(R.id.statistic_show_picture);
+    		showText = (TextView) view.findViewById(R.id.statistic_show_text);
+    		showText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 24/480);
+    		showText.setTypeface(wordTypefaceBold);
+    		
     		
     		firstScroll = (ImageView) view.findViewById(R.id.statistic_first_scroll);
     		
@@ -255,13 +265,18 @@ public class StatisticFragment extends Fragment {
 			int result = sp.getInt("latest_result", 0);
 			
 			if (tested){
-				if (result <=1)
-					showImage.setImageResource(R.drawable.statistic_show_pass);
-				else
-					showImage.setImageResource(R.drawable.statistic_show_fail);
+				if (result <=1){
+					showImage.setImageDrawable(getResources().getDrawable(R.drawable.statistic_show_pass));
+					showText.setText(R.string.after_test_pass);
+				}
+				else{
+					showImage.setImageDrawable(getResources().getDrawable(R.drawable.statistic_show_fail));
+					showText.setText(R.string.after_test_fail);
+				}
 				
 				shadow.setVisibility(View.VISIBLE);
 				showImage.setVisibility(View.VISIBLE);
+				showText.setVisibility(View.VISIBLE);
 				SharedPreferences.Editor editor = sp.edit();
 		    	editor.putBoolean("tested", false);
 		    	editor.commit();
@@ -270,6 +285,7 @@ public class StatisticFragment extends Fragment {
 			}
 			else{
 				showImage.setVisibility(View.INVISIBLE);
+				showText.setVisibility(View.INVISIBLE);
 				shadow.setVisibility(View.INVISIBLE);
 				FragmentTabs.enableTab(true);
 				boolean fs = sp.getBoolean("first_scroll", true);
@@ -301,6 +317,7 @@ public class StatisticFragment extends Fragment {
 	private class ShowDismissHandler extends Handler{
 		public void handleMessage(Message msg){
 			showImage.setVisibility(View.INVISIBLE);
+			showText.setVisibility(View.INVISIBLE);
 			shadow.setVisibility(View.INVISIBLE);
 			FragmentTabs.enableTab(true);
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
@@ -397,7 +414,16 @@ public class StatisticFragment extends Fragment {
 		showImage.setImageResource(R.drawable.statistic_show_pass);
 		shadow.setVisibility(View.VISIBLE);
 		showImage.setVisibility(View.VISIBLE);
+		showText.setVisibility(View.VISIBLE);
+		showText.setText(R.string.after_questionnaire);
 		Thread t = new Thread(new ShowTimer());
 		t.start();
+	}
+	
+	public void updateSelfHelpCounter(){
+		try{
+			AnalysisCounterView acv = (AnalysisCounterView) analysisViews[1];
+			acv.updateCounter();
+		}catch(Exception e){	}
 	}
 }

@@ -14,18 +14,19 @@
             android:id="@+id/analysis_rating_title_bg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/analysis_ranking"
             android:scaleType="fitXY"
             android:src="@drawable/analysis_title_bar" />
 
    		<TextView
-        	android:id ="@+id/analysis_rating_title"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:text="您的排名" 
-        	android:gravity="center"
-        	android:textAlignment="center"
-        	android:textColor="#FFFFFFFF"
-        	/>
+   		    android:id="@+id/analysis_rating_title"
+   		    android:layout_width="wrap_content"
+   		    android:layout_height="wrap_content"
+   		    android:gravity="center"
+   		    android:text="@string/analysis_ranking"
+   		    android:textAlignment="center"
+   		    android:textColor="#FFFFFFFF" />
+
    </RelativeLayout>
 
     <TextView
@@ -49,6 +50,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_centerHorizontal="true"
 	        android:layout_centerVertical="true"
+	        android:contentDescription="@string/analysis_ranking"
 	        android:scaleType="fitXY"
 	        android:src="@drawable/analysis_rating_bar" />
         
@@ -57,32 +59,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:contentDescription="@string/analysis_ranking"
             android:scaleType="fitXY"
             android:src="@drawable/analysis_rating_pointer" />
         
         <TextView
-            android:id = "@+id/analysis_rating_low"
+            android:id="@+id/analysis_rating_low"
             android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_centerVertical="true"
-        	android:layout_toLeftOf="@+id/analysis_rating_bar"
-        	android:textAlignment="center"
-        	android:gravity="center"
-        	android:textColor="#FF000000"
-        	android:text="低"
-            />
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/analysis_rating_bar"
+            android:gravity="center"
+            android:text="@string/low"
+            android:textAlignment="center"
+            android:textColor="#FF000000" />
         
          <TextView
-            android:id = "@+id/analysis_rating_high"
-            android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_centerVertical="true"
-        	android:layout_toRightOf="@+id/analysis_rating_bar"
-        	android:textAlignment="center"
-        	android:gravity="center"
-        	android:textColor="#FF000000"
-        	android:text="高"
-            />
+             android:id="@+id/analysis_rating_high"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_centerVertical="true"
+             android:layout_toRightOf="@+id/analysis_rating_bar"
+             android:gravity="center"
+             android:text="@string/high"
+             android:textAlignment="center"
+             android:textColor="#FF000000" />
         
        </RelativeLayout>
        
@@ -106,6 +107,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_centerHorizontal="true"
 	        android:layout_centerVertical="true"
+	        android:contentDescription="@string/analysis_ranking"
 	        android:scaleType="fitXY"
 	        android:src="@drawable/analysis_rating_bar" />
         
@@ -114,32 +116,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:contentDescription="@string/analysis_ranking"
             android:scaleType="fitXY"
             android:src="@drawable/analysis_rating_pointer" />
         
         <TextView
-            android:id = "@+id/analysis_rating_low2"
+            android:id="@+id/analysis_rating_low2"
             android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_centerVertical="true"
-        	android:layout_toLeftOf="@+id/analysis_rating_bar2"
-        	android:textAlignment="center"
-        	android:gravity="center"
-        	android:textColor="#FF000000"
-        	android:text="低"
-            />
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/analysis_rating_bar2"
+            android:gravity="center"
+            android:text="@string/low"
+            android:textAlignment="center"
+            android:textColor="#FF000000" />
         
          <TextView
-            android:id = "@+id/analysis_rating_high2"
-            android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_centerVertical="true"
-        	android:layout_toRightOf="@+id/analysis_rating_bar2"
-        	android:textAlignment="center"
-        	android:gravity="center"
-        	android:textColor="#FF000000"
-        	android:text="高"
-            />
+             android:id="@+id/analysis_rating_high2"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_centerVertical="true"
+             android:layout_toRightOf="@+id/analysis_rating_bar2"
+             android:gravity="center"
+             android:text="@string/high"
+             android:textAlignment="center"
+             android:textColor="#FF000000" />
         
        </RelativeLayout>
 

@@ -9,9 +9,8 @@
         android:id="@+id/statistic_day_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FF000000"
-        android:text="今日測試"
-        />
+        android:text="@string/today_test"
+        android:textColor="#FF000000" />
     
     <TextView
         android:id="@+id/statistic_day_brac_time"
@@ -21,22 +20,22 @@
         android:textColor="#FF727171"
         />
     
-    <ImageView 
+    <ImageView
         android:id="@+id/statistic_day_emotion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleType="fitXY"
         android:layout_below="@+id/statistic_day_brac_time"
-        />
+        android:contentDescription="@string/today_test"
+        android:scaleType="fitXY" />
     
-	<ImageView 
-        android:id="@+id/statistic_day_desire"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY"
-        android:layout_below="@+id/statistic_day_brac_time"
-        android:layout_toRightOf="@+id/statistic_day_emotion"
-        />
+	<ImageView
+	    android:id="@+id/statistic_day_desire"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/statistic_day_brac_time"
+	    android:layout_toRightOf="@+id/statistic_day_emotion"
+	    android:contentDescription="@string/today_test"
+	    android:scaleType="fitXY" />
     
     <RelativeLayout 
         android:id = "@+id/statistic_day_value_layout"
@@ -44,13 +43,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true">
     
-    	<ImageView 
-        	android:id = "@+id/statistic_day_value_circle"
-        	android:layout_width="match_parent"
-        	android:layout_height="match_parent"
-        	android:scaleType="fitXY"
-        	android:layout_centerInParent="true"
-        />
+    	<ImageView
+    	    android:id="@+id/statistic_day_value_circle"
+    	    android:layout_width="match_parent"
+    	    android:layout_height="match_parent"
+    	    android:layout_centerInParent="true"
+    	    android:contentDescription="@string/today_test"
+    	    android:scaleType="fitXY" />
     
     	<TextView
         	android:id="@+id/statistic_day_brac_value"
@@ -67,7 +66,7 @@
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:layout_centerHorizontal="true"
-    	    android:text="酒精濃度"
+    	    android:text="@string/brac"
     	    android:textAlignment="textStart"
     	    android:textColor="#FFFFFFFF" />
 

@@ -19,7 +19,7 @@ public class CustomTab {
 	private Drawable onDrawable;
 	private Drawable iconDrawable, iconOnDrawable;
 	
-	public CustomTab(Context context, int id, int onId, String text){
+	public CustomTab(Context context, int id, int onId){
 		this.context = context;
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.iconId = id;

@@ -41,7 +41,7 @@ public class TutorialActivity extends Activity {
 	private Typeface wordTypefaceBold;
 	
 	private static final String[] STEP_STR = {"1","2","3"};
-	private static final String[] HELP_STR = {"按下開關，使指示燈亮起","進入測試頁面按下開始按鈕","對準吹氣口持續吹氣五秒鐘"};
+	private static String[] HELP_STR;
 	
 	private AlphaAnimation animation;
 	
@@ -107,6 +107,8 @@ public class TutorialActivity extends Activity {
 		tab = (ImageView) this.findViewById(R.id.tutorial_tab);
 		layout = (RelativeLayout) this.findViewById(R.id.tutorial_layout);
 		
+		HELP_STR = getResources().getStringArray(R.array.tutorial_step);
+		
 		loadingHandler = new LoadingHandler();
 	}
 
@@ -114,7 +116,7 @@ public class TutorialActivity extends Activity {
 	
 	protected void onStart(){
 		mDialog = new ProgressDialog(this);
-        mDialog.setMessage("載入中");
+        mDialog.setMessage(this.getResources().getString(R.string.loading));
         mDialog.setCancelable(false);
         if (!mDialog.isShowing())
         	mDialog.show();

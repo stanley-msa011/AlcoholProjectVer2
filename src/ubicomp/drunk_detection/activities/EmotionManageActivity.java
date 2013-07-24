@@ -52,9 +52,7 @@ public class EmotionManageActivity extends Activity {
 		R.drawable.questionnaire_item_e7,
 	};
 	
-	private static final String[] emotion_texts = {
-		"喜",	"怒",	"哀",	"傷",	"悲",	"恐",	"驚"
-	} ;
+	private static String[] emotion_texts;
 	
 	private static final int[] RELATED_DRAWABLE_ID = {
 		R.drawable.questionnaire_item_c1,
@@ -63,9 +61,7 @@ public class EmotionManageActivity extends Activity {
 		R.drawable.questionnaire_item_c4
 	};
 	
-	private static final String[] related_texts = {
-		"人",	"事",	"物",	"現在情境"
-	} ;
+	private static String[] related_texts;
 	
 	QuestionDB db;
 	
@@ -81,6 +77,9 @@ public class EmotionManageActivity extends Activity {
 		emotion =  r_type = -1;
 		reason = "";
 		r_texts = null;
+		
+		emotion_texts = getResources().getStringArray(R.array.emotion_manage_emotion);
+		related_texts = getResources().getStringArray(R.array.emotion_manage_related);
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
@@ -123,7 +122,7 @@ public class EmotionManageActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*244/1080;
 		
-		View tv = createTextView("您現在的情緒是：");
+		View tv = createTextView(R.string.emotion_manage_help1);
 		mainLayout.addView(tv);
 		
 		for (int i=0;i<emotion_texts.length;++i){
@@ -146,7 +145,7 @@ public class EmotionManageActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*230/1080;
 		
-		View tv = createTextView("這個感覺跟什麼有關：");
+		View tv = createTextView(R.string.emotion_manage_help2);
 		mainLayout.addView(tv);
 		
 		for (int i=0;i<related_texts.length;++i){
@@ -171,7 +170,7 @@ public class EmotionManageActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*230/1080;
 		
-		String str = "請寫下正在影響你的"+related_texts[r_type-1];
+		String str = getResources().getString(R.string.emotion_manage_help3)+related_texts[r_type-1];
 
 		View tv = createTextView(str);
 		mainLayout.addView(tv);
@@ -179,10 +178,10 @@ public class EmotionManageActivity extends Activity {
 		View edv = createEditView(r_type);
 		mainLayout.addView(edv);
 		
-		View ev = createTextView("這是影響您停酒的因素\n但您仍可堅持停酒");
+		View ev = createTextView(R.string.emotion_manage_help4);
 		mainLayout.addView(ev);
 		
-		View vv=createIconView("確定",R.drawable.questionnaire_item_ok,new EditedOnClickListener());
+		View vv=createIconView(R.string.ok,R.drawable.questionnaire_item_ok,new EditedOnClickListener());
 		mainLayout.addView(vv);
 		
 		select_item = db.getInsertedReason(r_type);
@@ -210,10 +209,9 @@ public class EmotionManageActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*230/1080;
 		
-		String str = "完成後能得到點數，請繼續加油！\n(早中晚各能得到一點)";
-		View tv = createTextView(str);
+		View tv = createTextView(R.string.emotion_end_message);
 		mainLayout.addView(tv);
-		View vv = createIconView("完成",R.drawable.questionnaire_item_ok,new EndOnClickListener());
+		View vv = createIconView(R.string.done,R.drawable.questionnaire_item_ok,new EndOnClickListener());
 		mainLayout.addView(vv);
 		
 		int rest_block = 12 - mainLayout.getChildCount();
@@ -224,6 +222,23 @@ public class EmotionManageActivity extends Activity {
 	}
 	
 	private View createTextView(String textStr){
+		
+		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
+		TextView text = (TextView) layout.findViewById(R.id.question_description);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTypeface(wordTypefaceBold);
+		text.setTextColor(0xFF777777);
+		text.setText(textStr);
+		
+		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
+		tParam.leftMargin = textSize;
+		
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
+		
+		return layout;
+	}
+	
+private View createTextView(int textStr){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
@@ -266,7 +281,7 @@ public class EmotionManageActivity extends Activity {
 		TextView text = (TextView) layout.findViewById(R.id.titlebar_text);
 		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		text.setTypeface(wordTypefaceBold);
-		text.setText("情緒管理");
+		text.setText(R.string.emotion_manage_title);
 		
 		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams)text.getLayoutParams();
 		tParam.leftMargin = textSize;
@@ -300,6 +315,30 @@ public class EmotionManageActivity extends Activity {
 	}
 	
 	private View createIconView(String textStr, int DrawableId ,OnClickListener listener){
+		
+		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
+		TextView text = (TextView) layout.findViewById(R.id.question_description);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTypeface(wordTypefaceBold);
+		text.setTextColor(0xFF5c5c5c);
+		text.setText(textStr);
+		
+		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
+		tParam.leftMargin = textSize;
+		
+		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
+		icon.setImageResource(DrawableId);
+		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
+		iParam.rightMargin = iconMargin;
+		
+		layout.setOnClickListener(listener);
+		layout.setOnTouchListener(onTouchListener);
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_normal);
+		
+		return layout;
+	}
+	
+private View createIconView(int textStr, int DrawableId ,OnClickListener listener){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
@@ -398,7 +437,7 @@ public class EmotionManageActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event){
 		if (keyCode == KeyEvent.KEYCODE_BACK){
 			if (state == 0){
-				Toast.makeText(mainLayout.getContext(), "確定放棄填答情緒管理？", Toast.LENGTH_LONG).show();
+				Toast.makeText(activity,getResources().getString(R.string.emotion_manage_toast), Toast.LENGTH_LONG).show();
 				--state;
 			}else if (state == -1)
 				return super.onKeyDown(keyCode, event);

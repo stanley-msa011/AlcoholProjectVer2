@@ -35,6 +35,9 @@ public class AnalysisSavingView extends StatisticPageView {
 	
 	private Typeface wordTypeface;
 	
+	private String[] helpStr;
+	private String money_sign;
+	
 	public AnalysisSavingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_saving_view,statisticFragment);
 		db = new HistoryDB(context);
@@ -42,6 +45,8 @@ public class AnalysisSavingView extends StatisticPageView {
 		goalGood = sp.getString("goal_good", "機車");
 		goalMoney = sp.getInt("goal_money", 50000);
 		drinkCost = sp.getInt("drink_cost", 1);
+		helpStr = context.getResources().getStringArray(R.array.analysis_saving_help);
+		money_sign = context.getResources().getString(R.string.money_sign);
 	}
 
 	@Override
@@ -113,13 +118,13 @@ public class AnalysisSavingView extends StatisticPageView {
 
 	@Override
 	public void onPostTask() {
-		String text =  "<font color=#000000>您已節省 </font><font color=#f39700><strong>$"
+		String text =  "<font color=#000000>"+helpStr[0]+" </font><font color=#f39700><strong>"+money_sign
 								+currentMoney
-								+"</strong></font><font color=#000000> 元，"
+								+"</strong></font><font color=#000000> "+helpStr[1]
 								+goalGood
-								+"為 </font><font color=#f39700><strong>$"
+								+helpStr[2]+" </font><font color=#f39700><strong>"+money_sign
 								+goalMoney
-								+"</strong></font><font color=#000000></font><font color=#000000> 元</font>";
+								+"</strong></font><font color=#000000></font><font color=#000000> "+helpStr[3]+"</font>";
 		help.setText(Html.fromHtml(text));
 		
 	}

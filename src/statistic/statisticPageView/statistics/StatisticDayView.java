@@ -42,7 +42,7 @@ public class StatisticDayView extends StatisticPageView {
 	private ImageView emotion,desire;
 	private Bitmap emotionBmp, desireBmp;
 	
-	private String[] blockHint = {"早上\n0~12","中午\n12~18","晚上\n18~24"};
+	private int[] blockHint = {R.string.morning,R.string.noon,R.string.night};
 	
 	private static final int nBlocks = 3;
 	
@@ -237,13 +237,12 @@ public class StatisticDayView extends StatisticPageView {
 	@Override
 	public void onPostTask() {
 		
-		
 		valueCircle.setImageDrawable(valueCircleDrawable);
 		bracValue.setText(output);
 		
 		String time;
 		if (brac_time == 0){
-			time = "尚未測試";
+			bracTime.setText(R.string.today_test_none);
 		}
 		else{
 			Calendar cal = Calendar.getInstance();
@@ -259,13 +258,17 @@ public class StatisticDayView extends StatisticPageView {
 			else
 				min_str = String.valueOf(min);
 			
+			String m_text = context.getResources().getString(R.string.month);
+			String d_text = context.getResources().getString(R.string.day);
+			
 			if (am_pm == Calendar.AM)
-				time = month+"月"+day+"日\n"+hour+":"+min_str+" A.M";
+				time = month+m_text+day+d_text+"\n"+hour+":"+min_str+" A.M";
 			else
-				time = month+"月"+day+"日\n"+hour+":"+min_str+" P.M";
+				time = month+m_text+day+d_text+"\n"+hour+":"+min_str+" P.M";
+			bracTime.setText(time);
 		}
 
-		bracTime.setText(time);
+		
 		
 		if (emotionBmp !=null && !emotionBmp.isRecycled())
 			emotion.setImageBitmap(emotionBmp);

@@ -65,10 +65,9 @@
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
     	    android:gravity="center"
+    	    android:text="@string/start"
     	    android:textAlignment="center"
-    	    android:textColor="#FF454545" 
-    	    android:text="開始"
-    	    />
+    	    android:textColor="#FF454545" />
 
     </RelativeLayout>
     
@@ -93,16 +92,15 @@
     	    />
 	   
 	   	<TextView
-    	    android:id="@+id/test_brac_text"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerHorizontal="true"
-    	    android:gravity="center"
-    	    android:textAlignment="center"
-    	    android:textColor="#FFc98123" 
-    	    android:text="酒精濃度"
-    	    android:layout_below="@+id/test_brac_value_text"
-    	    />
+	   	    android:id="@+id/test_brac_text"
+	   	    android:layout_width="wrap_content"
+	   	    android:layout_height="wrap_content"
+	   	    android:layout_below="@+id/test_brac_value_text"
+	   	    android:layout_centerHorizontal="true"
+	   	    android:gravity="center"
+	   	    android:text="@string/brac"
+	   	    android:textAlignment="center"
+	   	    android:textColor="#FFc98123" />
 	
 	<RelativeLayout
         android:id="@+id/help_layout"

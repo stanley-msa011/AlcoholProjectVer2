@@ -5,6 +5,7 @@ import statistic.ui.questionnaire.listener.EmotionCallOnClickListener;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
 import statistic.ui.questionnaire.listener.SelectedListener;
 import statistic.ui.questionnaire.listener.SocialCallOnClickListener;
+import ubicomp.drunk_detection.activities.R;
 
 public class Type1Content extends QuestionnaireContent {
 
@@ -18,10 +19,11 @@ public class Type1Content extends QuestionnaireContent {
 		seq.clear();
 		seq.add("2");
 		msgBox.openBox();
-		setHelp("重新整理浮動的心，\n堅持持續戒酒的決心，\n建議你可以：");
-		setSelectItem("跟親友聊天", new SelectedListener (msgBox,new FamilyOnClickListener(msgBox)," 下一步"));
-		setSelectItem("聯絡心情專線", new SelectedListener(msgBox,new EmotionCallOnClickListener(msgBox),"下一步"));
-		setSelectItem("尋求社區心理諮商", new SelectedListener(msgBox,new SocialCallOnClickListener(msgBox),"下一步"));
+		setHelp(R.string.question_type1_help);
+		setSelectItem(R.string.connect_to_family, new SelectedListener (msgBox,new FamilyOnClickListener(msgBox),R.string.next));
+		setSelectItem(R.string.connect_to_emotion_hot_line, new SelectedListener(msgBox,new EmotionCallOnClickListener(msgBox),R.string.next));
+		setSelectItem(R.string.connect_for_social_help, new SelectedListener(msgBox,new SocialCallOnClickListener(msgBox),R.string.next));
+		msgBox.showQuestionnaireLayout(true);
 	}
 
 	@Override
