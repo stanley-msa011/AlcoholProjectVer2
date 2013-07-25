@@ -38,8 +38,8 @@ public class PreSettingActivity extends Activity {
 	private EditText connect_n0,connect_n1,connect_n2;
 	private EditText connect_p0,connect_p1,connect_p2;
 	
-	private Button ok_button,clean_button,restoreButton,debugButton,dummyButton;
-	boolean debug,dummy;
+	private Button ok_button,clean_button,restoreButton,debugButton,debugTypeButton,dummyButton;
+	boolean debug,dummy,debug_type;
 	private Activity activity;
 	private static final int MIN_NAME_LENGTH = 3;
 	
@@ -158,16 +158,29 @@ public class PreSettingActivity extends Activity {
 	    restoreButton.setOnClickListener(new RestoreOnClickListener());
 	    
 	    debug = sp.getBoolean("debug", false);
+	    debug_type = sp.getBoolean("debug_type", false);
 	    dummy = sp.getBoolean("Dummy", false);
 	    debugButton = (Button) this.findViewById(R.id.debug_normal_switch);
-	    if (debug)
+	    debugTypeButton = (Button) this.findViewById(R.id.debug_type_switch);
+	    dummyButton = (Button) this.findViewById(R.id.dummy_data_switch);
+	    
+	    if (debug){
 	    	debugButton.setText("Switch to normal mode");
-	    else
+	    	debugTypeButton.setEnabled(true);
+	    }
+	    else{
 	    	debugButton.setText("Switch to debug mode");
+	    	debugTypeButton.setEnabled(false);
+	    }
 	    debugButton.setOnClickListener(new DebugOnClickListener());
 	    
+	    if (debug_type)
+	    	debugTypeButton.setText("avm mode");
+	    else
+	    	debugTypeButton.setText("acvm mode");
+	    debugTypeButton.setOnClickListener(new DebugTypeOnClickListener());
 	    
-	    dummyButton = (Button) this.findViewById(R.id.dummy_data_switch);
+	    
 	    if (dummy)
 	    	dummyButton.setText("Delete debug data");
 	    else
@@ -191,10 +204,29 @@ public class PreSettingActivity extends Activity {
 	    	SharedPreferences.Editor editor = sp.edit();
 	    	editor.putBoolean("debug", debug);
 			editor.commit();
-			if (debug)
+			if (debug){
 		    	debugButton.setText("Switch to normal mode");
-		    else
+		    	debugTypeButton.setEnabled(true);
+		    }
+		    else{
 		    	debugButton.setText("Switch to debug mode");
+		    	debugTypeButton.setEnabled(false);
+		    }
+		}
+	}
+	
+	private class DebugTypeOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+	    	debug_type = !debug_type;
+	    	SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+	    	SharedPreferences.Editor editor = sp.edit();
+	    	editor.putBoolean("debug_type", debug_type);
+			editor.commit();
+			 if (debug_type)
+			    	debugTypeButton.setText("avm mode");
+			    else
+			    	debugTypeButton.setText("acvm mode");
 		}
 	}
 	

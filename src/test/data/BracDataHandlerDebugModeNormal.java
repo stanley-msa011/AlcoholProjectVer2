@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -18,9 +19,9 @@ import database.WeekNum;
 
 import ubicomp.drunk_detection.activities.TestFragment;
 
-public class BracDataHandlerDebugMode extends BracDataHandler {
+public class BracDataHandlerDebugModeNormal extends BracDataHandler {
 
-	public BracDataHandlerDebugMode(String timestamp_string,
+	public BracDataHandlerDebugModeNormal(String timestamp_string,
 			TestFragment fragment) {
 		super(timestamp_string, fragment);
 		// TODO Auto-generated constructor stub
@@ -109,36 +110,27 @@ public class BracDataHandlerDebugMode extends BracDataHandler {
 
 	@Override
 	protected double parseTextFile(File textFile){
-		double avg = 0;
+		double median = 0;
         try {
 			Scanner s = new Scanner(textFile);
 			int index = 0;
-			List<String> valueArray_A0 = new ArrayList<String>();
-			List<String> valueArray_A1 = new ArrayList<String>();
+			List<Double> valueArray = new ArrayList<Double>();
 			while(s.hasNext()){
 				index++;
 				String word = s.next();
-				if(index % 5 == 3)
-					valueArray_A0.add(word);
-				else if (index %5 == 4)
-					valueArray_A1.add(word);
+				if(index % 4 == 3)
+					valueArray.add(Double.valueOf(word));
 			}
-			
-			int len = valueArray_A0.size();
-			int len2 = valueArray_A1.size();
-			if (len2 < len)
-				len = len2;
-			for(int i = 0; i < len; ++i){
-				avg += Double.parseDouble(valueArray_A1.get(i)) - Double.parseDouble(valueArray_A0.get(i));
-			}
-			if (len==0)
+			if (valueArray.size()==0)
 				return ERROR;
-			avg /= len;
+			Double[] values = valueArray.toArray(new Double[valueArray.size()]);
+			Arrays.sort(values);
+			median = values[(values.length-1)/2];
 			
 		} catch (FileNotFoundException e1) {
 			return ERROR;
 		}
-        return avg;
+        return median;
 	}
 	
 }

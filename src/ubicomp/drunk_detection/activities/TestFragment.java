@@ -10,11 +10,13 @@ import test.bluetooth.BTInitHandler;
 import test.bluetooth.BTRunTask;
 import test.bluetooth.Bluetooth;
 import test.bluetooth.BluetoothDebugMode;
+import test.bluetooth.BluetoothDebugModeNormal;
 import test.camera.CameraInitHandler;
 import test.camera.CameraRecorder;
 import test.camera.CameraRunHandler;
 import test.data.BracDataHandler;
 import test.data.BracDataHandlerDebugMode;
+import test.data.BracDataHandlerDebugModeNormal;
 import test.file.BracValueDebugHandler;
 import test.file.BracValueFileHandler;
 import test.file.ImageFileHandler;
@@ -165,9 +167,8 @@ public class TestFragment extends Fragment {
 	public void onResume(){
 		super.onResume();
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
-		checkDebug2(sp.getBoolean("debug", false));
+		checkDebug2(sp.getBoolean("debug", false),sp.getBoolean("debug_type", false));
 		
-		Log.d("test","onresume");
 		if (!isKeepMsgBox()){
 			context = this.getActivity();
 			testFragment = this;
@@ -178,8 +179,6 @@ public class TestFragment extends Fragment {
 			setKeepMsgBox(false);
 			runGPS();
 		}
-		
-		Log.d("test","onresume end");
 	}
 	
 	private void setting(){
@@ -246,8 +245,13 @@ public class TestFragment extends Fragment {
 		cameraRunHandler = new CameraRunHandler(cameraRecorder);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		Boolean debug = sp.getBoolean("debug", false);
-		if (debug)
-			bt = new BluetoothDebugMode(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		Boolean debug_type = sp.getBoolean("debug_type", false);
+		if (debug){
+			if (debug_type)
+				bt = new BluetoothDebugModeNormal(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+			else
+				bt = new BluetoothDebugMode(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		}
 		else
 			bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
 		for (int i=0;i<3;++i)
@@ -429,8 +433,13 @@ public class TestFragment extends Fragment {
 			if (DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 				Boolean debug = sp.getBoolean("debug", false);
-				if (debug)
-					BDH = new BracDataHandlerDebugMode(timestamp,testFragment);
+				Boolean debug_type = sp.getBoolean("debug_type", false);
+				if (debug){
+					if (debug_type)
+						BDH = new BracDataHandlerDebugModeNormal(timestamp,testFragment);
+					else
+						BDH = new BracDataHandlerDebugMode(timestamp,testFragment);
+				}
 				else
 					BDH = new BracDataHandler(timestamp, testFragment);
 				int bdh_result = BDH.start();
@@ -574,6 +583,7 @@ public class TestFragment extends Fragment {
 			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
 			face.setVisibility(View.INVISIBLE);
 			LoadingBox.dismiss();
+			
 		}
 	}
     
@@ -756,19 +766,29 @@ public class TestFragment extends Fragment {
 			debugMsg.setClickable(false);
 			debugMsg.setOnKeyListener(null);
 			debugMsg.setEnabled(false);
-			
 		}else{
 			sv.setVisibility(View.INVISIBLE);
 			debugMsg.setVisibility(View.INVISIBLE);
 		}
 	}
 	
-	private void checkDebug2(boolean debug){
+	private void checkDebug2(boolean debug, boolean debug_type){
 		Button[] conditionButtons = new Button[4];
 		conditionButtons[0] = (Button) view.findViewById(R.id.condition_button_1);
 		conditionButtons[1] = (Button) view.findViewById(R.id.condition_button_2);
 		conditionButtons[2] = (Button) view.findViewById(R.id.condition_button_3);
 		conditionButtons[3] = (Button) view.findViewById(R.id.condition_button_4);
+		if (debug_type){
+			conditionButtons[0].setText("avm-1");
+			conditionButtons[1].setText("avm-2");
+			conditionButtons[2].setText("avm-3");
+			conditionButtons[3].setText("avm-4");
+		}else{
+			conditionButtons[0].setText("acvm-1");
+			conditionButtons[1].setText("acvm-2");
+			conditionButtons[2].setText("acvm-3");
+			conditionButtons[3].setText("acvm-4");
+		}
 		
 		if (debug){
 			for (int i=0;i<4;++i){
@@ -813,7 +833,7 @@ public class TestFragment extends Fragment {
 	public void showDebug(String message){
 		if (this == null)
 			return;
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		Boolean debug = sp.getBoolean("debug", false);
 		if (msgHandler!=null && debug){
 			Message msg = new Message();

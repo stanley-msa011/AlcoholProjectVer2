@@ -21,6 +21,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -66,6 +68,17 @@ public class RegularCheckService extends Service {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 			String uid = sp.getString("uid", "");
 			mpEntity.addPart("user[]", new StringBody(uid));
+			
+			String app_version = "unknown";
+			PackageInfo pinfo;
+			try {
+				pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+				app_version = pinfo.versionName;
+			} catch (NameNotFoundException e) {
+			}
+			
+			mpEntity.addPart("user[]", new StringBody(app_version));
+			
 			httpPost.setEntity(mpEntity);
 			int result = uploader(httpClient, httpPost,this);
 			if (result == -1){

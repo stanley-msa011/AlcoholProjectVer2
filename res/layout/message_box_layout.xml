@@ -54,15 +54,57 @@
     	    	    android:layout_width="wrap_content"
     	    	    android:layout_height="wrap_content"
     	    	    android:max="4"
+    	    	    android:progress="1"
     	    	    android:progressDrawable="@drawable/msg_bar_progress"
     	    	    android:thumb="@drawable/msg_bar_button" />
 
     	    	<TextView 
-    	    	    android:id="@+id/msg_emotion_num"
+    	    	    android:id="@+id/msg_emotion_num0"
     	    	    android:layout_width="wrap_content"
     	    	    android:layout_height="wrap_content"
-    	    	    android:layout_alignParentLeft="true"
     	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="1"
+    	    	    android:layout_below="@+id/msg_emotion_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_emotion_num1"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="2"
+    	    	    android:layout_toRightOf="@+id/msg_emotion_num0"
+    	    	    android:layout_below="@+id/msg_emotion_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_emotion_num2"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="3"
+    	    	    android:layout_toRightOf="@+id/msg_emotion_num1"
+    	    	    android:layout_below="@+id/msg_emotion_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_emotion_num3"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="4"
+    	    	    android:layout_toRightOf="@+id/msg_emotion_num2"
+    	    	    android:layout_below="@+id/msg_emotion_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_emotion_num4"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="5"
+    	    	    android:layout_toRightOf="@+id/msg_emotion_num3"
     	    	    android:layout_below="@+id/msg_emotion_seek_bar"
     	    	    />
     	    </RelativeLayout>
@@ -129,15 +171,107 @@
     	    	    android:layout_width="wrap_content"
     	    	    android:layout_height="wrap_content"
     	    	    android:max="9"
+    	    	    android:progress="1"
     	    	    android:progressDrawable="@drawable/msg_bar_progress"
     	    	    android:thumb="@drawable/msg_bar_button" />
-
+    	    	
     	    	<TextView 
-    	    	    android:id="@+id/msg_desire_num"
+    	    	    android:id="@+id/msg_desire_num0"
     	    	    android:layout_width="wrap_content"
     	    	    android:layout_height="wrap_content"
-    	    	    android:layout_alignParentLeft="true"
     	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="1"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num1"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="2"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num0"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num2"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="3"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num1"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num3"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="4"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num2"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num4"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="5"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num3"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num5"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="6"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num4"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num6"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="7"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num5"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num7"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="8"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num6"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num8"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="9"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num7"
+    	    	    android:layout_below="@+id/msg_desire_seek_bar"
+    	    	    />
+    	    	<TextView 
+    	    	    android:id="@+id/msg_desire_num9"
+    	    	    android:layout_width="wrap_content"
+    	    	    android:layout_height="wrap_content"
+    	    	    android:textColor="#FF898989"
+    	    	    android:gravity="center"
+    	    	    android:text="10"
+    	    	    android:layout_toRightOf="@+id/msg_desire_num8"
     	    	    android:layout_below="@+id/msg_desire_seek_bar"
     	    	    />
     	    	</RelativeLayout>

@@ -44,11 +44,11 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 
 public class BracDataHandler {
-	private String ts;
-	private Context context;
+	protected String ts;
+	protected Context context;
 	private String devId;
-	private double avg_result = 0;
-	private HistoryDB db;
+	protected double avg_result = 0;
+	protected HistoryDB db;
 	
 	
 	public BracDataHandler(String timestamp_string, TestFragment fragment){
@@ -188,7 +188,7 @@ public class BracDataHandler {
         return median;
 	}
 	
-	private int getQuestionResult(File textFile){
+	protected int getQuestionResult(File textFile){
 		int result = -1; 
         try {
 			Scanner s = new Scanner(textFile);

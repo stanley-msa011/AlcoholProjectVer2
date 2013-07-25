@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,12 +40,12 @@ public class UIMsgBox {
 	
 	private ImageView emotionShow;
 	private ImageView desireShow;
-	//private ImageView eStart,eEnd,dStart,dEnd;
 	private TextView emotionShowText;
 	private TextView desireShowText;
 	private TextView gpsNo,gpsYes;
 	
-	private TextView eNum,dNum;
+	private TextView[] eNum,dNum;
+	private RelativeLayout.LayoutParams eP, dP;
 	
 	private static String[] emotionStr ;
 	private static String[] desireStr ;
@@ -73,7 +74,7 @@ public class UIMsgBox {
 	
 	private TextView send,notSend;
 	
-	private RelativeLayout.LayoutParams eP, dP;
+	
 	
 	private boolean done;
 	
@@ -153,8 +154,10 @@ public class UIMsgBox {
 		desireShow = (ImageView) boxLayout.findViewById(R.id.msg_desire_show);
 		
 		emotionSeekBar.setOnSeekBarChangeListener(new EmotionListener());
+		emotionSeekBar.setOnTouchListener(new EmotionOnTouchListener());
 		desireSeekBar.setOnSeekBarChangeListener(new DesireListener());
-
+		desireSeekBar.setOnTouchListener(new DesireOnTouchListener());
+		
 		emotionShowText = (TextView) boxLayout.findViewById(R.id.msg_emotion_show_text);
 		emotionShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		emotionShowText.setTypeface(wordTypeface);
@@ -163,24 +166,56 @@ public class UIMsgBox {
 		desireShowText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		desireShowText.setTypeface(wordTypeface);
 		
-		eNum = (TextView) boxLayout.findViewById(R.id.msg_emotion_num);
-		eNum.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
-		eNum.setTypeface(digitTypeface);
-		dNum = (TextView) boxLayout.findViewById(R.id.msg_desire_num);
-		dNum.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
-		dNum.setTypeface(digitTypeface);
-		
-		eP = (LayoutParams) eNum.getLayoutParams();
-		dP = (LayoutParams) dNum.getLayoutParams();
-		
-		eP.width =dP.width =  screen.x * 26/480;
-		
 		emotionSeekBarLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_seek_bar_layout);
 		RelativeLayout.LayoutParams eSBParam = (LayoutParams) emotionSeekBarLayout.getLayoutParams();
 		eSBParam.width = screen.x * 260/480;
 		desireSeekBarLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_desire_seek_bar_layout);
 		RelativeLayout.LayoutParams dSBParam = (LayoutParams) desireSeekBarLayout.getLayoutParams();
 		dSBParam.width = screen.x * 260/480;
+		
+		int num_size = screen.x * 26/480;
+		int num_size2 = screen.x * 90/480;
+		int num_size3 = screen.x * 260/480 - (num_size + num_size2)*2;
+		
+		eNum = new TextView[5];
+		eNum[0] = (TextView) boxLayout.findViewById(R.id.msg_emotion_num0);
+		eNum[1] = (TextView) boxLayout.findViewById(R.id.msg_emotion_num1);
+		eNum[2] = (TextView) boxLayout.findViewById(R.id.msg_emotion_num2);
+		eNum[3] = (TextView) boxLayout.findViewById(R.id.msg_emotion_num3);
+		eNum[4] = (TextView) boxLayout.findViewById(R.id.msg_emotion_num4);
+
+		for (int i=0;i<5;++i){
+			eNum[i].setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+			eNum[i].setTypeface(digitTypeface);
+		}
+		eP = (LayoutParams) eNum[0].getLayoutParams();
+		eP.width =  num_size;
+		eP = (LayoutParams) eNum[1].getLayoutParams();
+		eP.width =  num_size2;
+		eP = (LayoutParams) eNum[2].getLayoutParams();
+		eP.width =  num_size3;
+		eP = (LayoutParams) eNum[3].getLayoutParams();
+		eP.width =  num_size2;
+		eP = (LayoutParams) eNum[4].getLayoutParams();
+		eP.width =  num_size;
+		
+		dNum = new TextView[10];
+		dNum[0] = (TextView) boxLayout.findViewById(R.id.msg_desire_num0);
+		dNum[1] = (TextView) boxLayout.findViewById(R.id.msg_desire_num1);
+		dNum[2] = (TextView) boxLayout.findViewById(R.id.msg_desire_num2);
+		dNum[3] = (TextView) boxLayout.findViewById(R.id.msg_desire_num3);
+		dNum[4] = (TextView) boxLayout.findViewById(R.id.msg_desire_num4);
+		dNum[5] = (TextView) boxLayout.findViewById(R.id.msg_desire_num5);
+		dNum[6] = (TextView) boxLayout.findViewById(R.id.msg_desire_num6);
+		dNum[7] = (TextView) boxLayout.findViewById(R.id.msg_desire_num7);
+		dNum[8] = (TextView) boxLayout.findViewById(R.id.msg_desire_num8);
+		dNum[9] = (TextView) boxLayout.findViewById(R.id.msg_desire_num9);
+		for (int i=0;i<10;++i){
+			dNum[i].setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+			dNum[i].setTypeface(digitTypeface);
+			dP = (LayoutParams) dNum[i].getLayoutParams();
+			dP.width =  num_size;
+		}
 		
 		emotionLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_layout);
 		LinearLayout.LayoutParams eParam =  (LinearLayout.LayoutParams)emotionLayout.getLayoutParams();
@@ -251,9 +286,6 @@ public class UIMsgBox {
 		emotionSeekBar.setPadding(padding_hor , padding_ver,padding_hor , padding_ver);
 		desireSeekBar.setPadding(padding_hor , padding_ver, padding_hor , padding_ver);
 
-		emotionSeekBar.bringToFront();
-		desireSeekBar.bringToFront();
-		
 		RelativeLayout.LayoutParams esParam = (LayoutParams) emotionSeekBar.getLayoutParams();
 		esParam.width = screen.x * 260/480;
 		esParam.topMargin = screen.x * 13/480;
@@ -281,12 +313,8 @@ public class UIMsgBox {
 	}
 	
 	public  void settingPostTask(){
-		
-		emotionSeekBar.setProgress(1);
-		desireSeekBar.setProgress(1);
 		emotionSeekBar.setProgress(0);
 		desireSeekBar.setProgress(0);
-		
 		gpsSwitch.setOnClickListener(
 				new View.OnClickListener(){
 					@Override
@@ -373,15 +401,35 @@ public class UIMsgBox {
 			return;
 	}
 	
+	private class EmotionOnTouchListener implements View.OnTouchListener{
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			int progress = emotionSeekBar.getProgress();
+			int margin = screen.x * 52/480;
+			eP.leftMargin = progress* margin;
+			return false;
+		}
+	}
+	
+	private class DesireOnTouchListener implements View.OnTouchListener{
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			int progress = desireSeekBar.getProgress();
+			int margin = screen.x * 26/480;
+			dP.leftMargin = progress* margin;
+			return false;
+		}
+	}
+	
 	private class EmotionListener implements SeekBar.OnSeekBarChangeListener{
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, 	boolean fromUser) {
 			emotionShow.setImageDrawable(emotionDrawables[progress]);
 			emotionShowText.setText(emotionStr[progress]);
-			eNum.setText(String.valueOf(progress+1));
+			for (int i=0;i<eNum.length;++i)
+				eNum[i].setVisibility(View.INVISIBLE);
+			eNum[progress].setVisibility(View.VISIBLE);
 			Log.d("SEEK_BAR","emotion progress="+progress);
-			int margin = screen.x*52/480;
-			eP.leftMargin =progress*margin;
 			enableSend(true);
 		}
 		@Override
@@ -396,11 +444,10 @@ public class UIMsgBox {
 		public void onProgressChanged(SeekBar seekBar, int progress, 	boolean fromUser) {
 			desireShow.setImageDrawable(desireDrawables[progress]);
 			desireShowText.setText(desireStr[progress]);
-			dNum.setText(String.valueOf(progress+1));
+			for (int i=0;i<dNum.length;++i)
+				dNum[i].setVisibility(View.INVISIBLE);
+			dNum[progress].setVisibility(View.VISIBLE);
 			Log.d("SEEK_BAR","desire progress="+progress);
-			int margin = screen.x*26/480;
-			dP.leftMargin =progress*margin;
-			enableSend(true);
 		}
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {}

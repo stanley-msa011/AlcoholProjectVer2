@@ -247,6 +247,7 @@ public class Bluetooth {
 					else if ( (char)temp[i]=='b'){
 						throw new Exception("NO BETTARY");
 					}else if ((char)temp[i]=='v'){
+						end = sendMsgToApp(msg);
 						msg = "v";
 						read_type = READ_VOLTAGE;
 					}else if (read_type!= READ_NULL)
@@ -349,7 +350,7 @@ public class Bluetooth {
 						start_time = end_time = 0;
 					}
 				}
-			}
+			}else if (msg.charAt(0) == 'v'){	}
 		}
 		return 0;
 	}
