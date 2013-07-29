@@ -1,8 +1,11 @@
 package ubicomp.drunk_detection.activities;
 
 import ubicomp.drunk_detection.activities.R;
-import tabControl.CustomTab;
-import test.data.Reuploader;
+import ubicomp.drunk_detection.fragments.HistoryFragment;
+import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
+import ubicomp.drunk_detection.ui.CustomTab;
+import ubicomp.drunk_detection.ui.LoadingBox;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +19,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,13 +30,12 @@ import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
-import clicklog.ClickLogUploader;
-import clicklog.ClickLogger;
-import debuglog.DebugLoggingThread;
+import data.uploader.Reuploader;
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLogUploader2;
+import debug.clicklog.ClickLoggerLog;
 
 public class FragmentTabs extends FragmentActivity {
-
-	
 	
 	private static boolean isWideScreen;
 	static private TabHost tabHost;
@@ -85,8 +86,6 @@ public class FragmentTabs extends FragmentActivity {
 			display.getSize(screen_px);
 		}
 
-		Log.d("Screen Size",screen_px.x + ","+screen_px.y);
-		
 		isWideScreen = ((float)screen_px.y/(float)screen_px.x)>1.67F;
 		
 		tab_px = new Point(screen_px.x,screen_px.x*209/1080);
@@ -136,11 +135,8 @@ public class FragmentTabs extends FragmentActivity {
 	
 	
 	protected void onStart(){
-		Log.d("Uploader","onStart");
 		Reuploader.reuploader(this);
-		ClickLogUploader.upload(this);
-		DebugLoggingThread debug_thread = new DebugLoggingThread();
-		debug_thread.execute();
+		ClickLogUploader2.upload(this);
 		super.onStart();
 	}
 	protected void onResume(){
@@ -158,7 +154,6 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	
 	protected void onStop(){
-		Log.d("TABS","ONSTOP");
 		context = null;
 		super.onStop();
 	}
@@ -166,19 +161,15 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onPause(){
 		Reuploader.cancel();
-		Log.d("tabs","onPause");
 		super.onPause();
-		Log.d("tabs","onPauseEnd");
 	}
 	
 	public void setTabState(String tabId){
 		for (int i=0;i<3;++i){
-			if (tabId.equals(tabName[i])){
+			if (tabId.equals(tabName[i]))
 				customTabs[i].changeState(true);
-			}
-			else{
+			else
 				customTabs[i].changeState(false);
-			}
 		}
 	}
 	
@@ -187,13 +178,8 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	
 	static public Point getSize(){
-		if (screen_px == null){
-			Log.d("SCREEN_SIZE","NULL");
-		}
-		else{
-			String str = screen_px.toString();
-			Log.d("SCREEN_SIZE",str);
-		}
+		if (screen_px == null)
+			return null;
 		Point size = new Point();
 		size.x = screen_px.x;
 		size.y = screen_px.y;
@@ -234,12 +220,15 @@ public class FragmentTabs extends FragmentActivity {
 		if (gid == 1){
 			if (id == 0){
 				Intent newIntent = new Intent(this, EmotionActivity.class);
+				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_EMOTIONDIY);
 				this.startActivity(newIntent);
 			}else if (id == 1){
 				Intent newIntent = new Intent(this, EmotionManageActivity.class);
+				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_EMOTIONMANAGE);
 				this.startActivity(newIntent);
 			}else if (id == 2){
 				Intent newIntent = new Intent(this, AboutActivity.class);
+				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_ABOUT);
 				this.startActivity(newIntent);
 			}
 		}
@@ -262,10 +251,14 @@ public class FragmentTabs extends FragmentActivity {
 			
 			LoadingBox.show(fragmentTabs);
 			
-			ClickLogger logger = new ClickLogger();
-			logger.click_logging(System.currentTimeMillis(), tabId + "_click");
-			
-			
+			long tab = -1;
+			if (tabId.equals(tabName[0]))
+				tab = ClickLogId.TAB_TEST;
+			else if (tabId.equals(tabName[1]))
+				tab = ClickLogId.TAB_STATISTIC;
+			else if (tabId.equals(tabName[2]))
+				tab = ClickLogId.TAB_STORYTELLING;
+			ClickLoggerLog.Log(getBaseContext(), tab);
 			
 			ft = fm.beginTransaction();
 			

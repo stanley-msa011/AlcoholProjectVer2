@@ -63,8 +63,6 @@ public class RegularCheckService extends Service {
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 			MultipartEntity mpEntity = new MultipartEntity();
 			
-			Log.d("Regular Check","start set entity");
-			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 			String uid = sp.getString("uid", "");
 			mpEntity.addPart("user[]", new StringBody(uid));
@@ -82,12 +80,12 @@ public class RegularCheckService extends Service {
 			httpPost.setEntity(mpEntity);
 			int result = uploader(httpClient, httpPost,this);
 			if (result == -1){
-				Log.d("Regular Check", "fail on connection");
+				Log.d("REGULAR CHECK", "FAIL TO CONNECT");
 				return -1;
 			}
 			
 		} catch (Exception e) {
-			Log.d("Regular Check", "fail by exception "+e.toString());
+			Log.d("REGULAR CHECK", "EXCEPTION:"+e.toString());
 			return -1;
 		} 
 		
@@ -104,7 +102,6 @@ public class RegularCheckService extends Service {
 	
 	
 	private int uploader(HttpClient httpClient, HttpPost httpPost,Context context){
-		Log.d("Regular Check","connecting");
 		HttpResponse httpResponse;
 		int  result = -1;
 		try {

@@ -51,8 +51,6 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 			}
 		}
 		
-		Log.d("ALARM","BOOTRECEIVER");
-		
 		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarm.cancel(pending);
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(),2*AlarmManager.INTERVAL_HOUR,pending);

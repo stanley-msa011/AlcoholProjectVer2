@@ -1,9 +1,8 @@
 package test.camera;
 
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 public class CameraInitHandler extends Handler {
 	
@@ -16,9 +15,7 @@ public class CameraInitHandler extends Handler {
 	}
 	
 	public void handleMessage(Message msg){
-		Log.d("CAMERA","START SETTING");
 		cameraRecorder.init();
-		Log.d("CAMERA","END INIT");
 		 cameraRecorder.setSurfaceCallback();
 		 testFragment.updateInitState(TestFragment._CAMERA);
 	}

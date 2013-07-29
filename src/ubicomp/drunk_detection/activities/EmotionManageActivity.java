@@ -1,7 +1,9 @@
 package ubicomp.drunk_detection.activities;
 
 import ubicomp.drunk_detection.activities.R;
-import database.QuestionDB;
+import data.database.QuestionDB;
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLoggerLog;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
@@ -21,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 public class EmotionManageActivity extends Activity {
@@ -264,6 +267,15 @@ private View createTextView(int textStr){
 		edit.setTextColor(0xFF000000);
 		edit.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize*4/3);
 		edit.setTypeface(wordTypefaceBold);
+		edit.setOnEditorActionListener(
+				new OnEditorActionListener(){
+					@Override
+					public boolean onEditorAction(TextView arg0, int arg1,KeyEvent arg2) {
+						ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_EDIT);
+						return false;
+					}
+			
+		});
 		
 		layout.addView(edit);
 		RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams)edit.getLayoutParams();
@@ -309,6 +321,7 @@ private View createTextView(int textStr){
 		
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			r_texts.setText(str);
 		}
 		
@@ -327,7 +340,7 @@ private View createTextView(int textStr){
 		tParam.leftMargin = textSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
-		icon.setImageResource(DrawableId);
+		icon.setImageDrawable(getResources().getDrawable(DrawableId));
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
 		iParam.rightMargin = iconMargin;
 		
@@ -351,7 +364,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		tParam.leftMargin = textSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
-		icon.setImageResource(DrawableId);
+		icon.setImageDrawable(getResources().getDrawable(DrawableId));
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
 		iParam.rightMargin = iconMargin;
 		
@@ -365,6 +378,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	private class EndOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			db.insertEmotionManage(emotion, r_type, reason);
 			activity.finish();
 		}
@@ -378,6 +392,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		}
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			state = 1;
 			emotion = _emotion;
 			setQuestionType();
@@ -394,6 +409,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			state = 2;
 			r_type = type;
 			setQuestionEdit();
@@ -403,6 +419,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	private class EditedOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			state = 3;
 			setQuestionEnd();
 		}
@@ -436,6 +453,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event){
 		if (keyCode == KeyEvent.KEYCODE_BACK){
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_RETURN_BUTTON);
 			if (state == 0){
 				Toast.makeText(activity,getResources().getString(R.string.emotion_manage_toast), Toast.LENGTH_LONG).show();
 				--state;

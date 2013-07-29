@@ -1,6 +1,6 @@
 package test.bluetooth;
 
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -19,20 +19,15 @@ public class BTInitHandler extends Handler {
 		bt.enableAdapter();
 		bt.pair();
 		int success = bt.connect();
-		if (success == 1){
-			Log.d("BT","BT CONNECT");
+		if (success == 1)
 			Init_success = true;
-		}
 		else{
 			Log.d("BT","CONNECT FAIL");
-			
 			Init_success = false;
 		}
-		Log.d("BT","END INIT");
 		 if (Init_success)
 			 testFragment.updateInitState(TestFragment._BT);
 		 else{
-			 //testFragment.stop();
 			 testFragment.stopDueToInit();
 			 testFragment.failBT();
 		 }

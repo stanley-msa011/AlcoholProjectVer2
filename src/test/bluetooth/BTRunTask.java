@@ -1,6 +1,6 @@
 package test.bluetooth;
 
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 import android.os.AsyncTask;
 
 public class BTRunTask extends AsyncTask<Void, Void, Void> {

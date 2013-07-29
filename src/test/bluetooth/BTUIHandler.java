@@ -1,6 +1,6 @@
 package test.bluetooth;
 
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 import android.os.Handler;
 import android.os.Message;
 
@@ -13,12 +13,7 @@ public class BTUIHandler extends Handler {
 	}
 	
 	public void handleMessage(Message msg){
-		if (msg.what == 0){
-			//int time = msg.getData().getInt("TIME");
-			//testFragment.changeTestMessage(time);
-		}else if (msg.what == 1){
-			//int change = msg.getData().getInt("CHANGE");
-		}else if (msg.what == 2){
+		if (msg.what == 2){
 			float value = msg.getData().getFloat("value");
 			int time = msg.getData().getInt("TIME");
 			testFragment.changeTestMessage(value,time);

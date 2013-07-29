@@ -1,5 +1,7 @@
 package ubicomp.drunk_detection.activities;
 
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLoggerLog;
 import ubicomp.drunk_detection.activities.R;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,7 +52,6 @@ public class TutorialActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_tutorial);
@@ -218,6 +219,10 @@ public class TutorialActivity extends Activity {
 		}
 		@Override
 		public void onClick(View v) {
+			if (step == -1)
+				ClickLoggerLog.Log(getBaseContext(), ClickLogId.TUTORIAL_REPLAY);
+			else
+				ClickLoggerLog.Log(getBaseContext(), ClickLogId.TUTORIAL_CLICK);
 			settingState(step+1);
 		}
 		
@@ -226,6 +231,7 @@ public class TutorialActivity extends Activity {
 	private class EndListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.TUTORIAL_END);
 			arrow.setAnimation(null);
 			animation.cancel();
 			finish();

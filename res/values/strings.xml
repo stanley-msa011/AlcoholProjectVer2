@@ -143,6 +143,7 @@
     <string name="connect_to_family">跟親友聊天</string>
     <string name="connect_for_social_help">尋求社區心理諮商</string>
     <string name="connect_to_emotion_hot_line">聯絡心情專線</string>
+    <string name="connect_null">沒有聯絡對象</string>
     <string name="follow_the_guide">請依照以下指示：</string>
     <string-array name="question_solutions">
         <item>立即離開有酒的地方</item>
@@ -171,6 +172,7 @@
 	    <item>尋求社區心理諮商</item>
 	    <item>與親友聊天</item>
 	</string-array>
+	<string name="emotion_connect_null">沒有聯絡對象\n請按返回鍵</string>
 	<string name="emotion_manage_title">情緒管理</string>
 	<string name="emotion_manage_toast">確定放棄填答情緒管理？</string>
 	<string-array name="emotion_manage_emotion">
@@ -205,4 +207,5 @@
 	<string name= "sinica">中央研究院</string>
 	<string name= "taipei_city_hospital">臺北市立聯合醫院</string>
 	<string name= "current_version">目前版本：</string>
+	<string name="testTimeCheckToast">吹氣測試的間隔請大於兩分鐘</string>
 </resources>

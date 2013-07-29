@@ -143,6 +143,7 @@
     <string name="connect_to_family">跟親友聊天</string>
     <string name="connect_for_social_help">尋求社區心理諮商</string>
     <string name="connect_to_emotion_hot_line">聯絡心情專線</string>
+    <string name="connect_null">沒有聯絡對象</string>
     <string name="follow_the_guide">Please follow the advice below:</string>
     <string-array name="question_solutions">
         <item>立即離開有酒的地方</item>
@@ -188,6 +189,7 @@
 	   	<item>Thing</item>
 	   	<item>Surrounding</item>
 	</string-array>
+	<string name="emotion_connect_null">沒有聯絡對象\n請按返回鍵</string>
 	<string name="emotion_manage_help1">Your feeling is:</string>
 	<string name="emotion_manage_help2">Your feeling is affected by:</string>
 	<string name="emotion_manage_help3">Please write down what affects you - </string>
@@ -205,4 +207,5 @@
 	<string name= "sinica">Academia Sinica</string>
 	<string name= "taipei_city_hospital">Taipei City Hospital</string>
 	<string name= "current_version">Version: </string>
+	<string name="testTimeCheckToast">Time between each test should be larger than 2 mins</string>
 </resources>

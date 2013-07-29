@@ -2,11 +2,10 @@ package test.bluetooth;
 
 import android.os.Bundle;
 import android.os.Message;
-import android.util.Log;
 import test.camera.CameraRunHandler;
-import test.file.BracValueDebugHandler;
-import test.file.BracValueFileHandler;
-import ubicomp.drunk_detection.activities.TestFragment;
+import test.data.BracValueDebugHandler;
+import test.data.BracValueFileHandler;
+import ubicomp.drunk_detection.fragments.TestFragment;
 
 public class BluetoothDebugModeNormal extends Bluetooth {
 
@@ -57,7 +56,6 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 					first_start_time = time;
 				}
 				else if (time_gap > MAX_TEST_TIME){
-					Log.d("BT","TIME OUT");
 					end =-1; 
 					throw new Exception("time out");
 				}
@@ -107,14 +105,12 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 		try {
 			socket.close();
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR");
 		}
 		
 		try {
 			if (in != null)
 				in.close();
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();
@@ -153,7 +149,6 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 		data.putString("ALCOHOL_DEBUG", output);
 		debugMsgBuilder = new StringBuilder();
 		message.setData(data);
-		Log.d("DEBUG","DEBUG = "+output);
 		bracDebugHandler.sendMessage(message);
 	}
 	

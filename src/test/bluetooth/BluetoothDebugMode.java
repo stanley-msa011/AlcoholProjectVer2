@@ -4,9 +4,9 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import test.camera.CameraRunHandler;
-import test.file.BracValueDebugHandler;
-import test.file.BracValueFileHandler;
-import ubicomp.drunk_detection.activities.TestFragment;
+import test.data.BracValueDebugHandler;
+import test.data.BracValueFileHandler;
+import ubicomp.drunk_detection.fragments.TestFragment;
 
 public class BluetoothDebugMode extends Bluetooth {
 
@@ -51,15 +51,12 @@ public class BluetoothDebugMode extends Bluetooth {
 					testFragment.showDebug("read before start");
 					continue;
 				}
-				//Log.d("BT","READ");
 				long time = System.currentTimeMillis();
 				long time_gap = time - first_start_time;
 				if (first_start_time == -1){
 					first_start_time = time;
-					Log.d("ERIC", "start");
 				}
 				else if (time_gap > MAX_TEST_TIME){
-					Log.d("BT","TIME OUT");
 					end =-1; 
 					throw new Exception("time out");
 				}
@@ -165,7 +162,6 @@ public class BluetoothDebugMode extends Bluetooth {
 		data.putString("ALCOHOL_DEBUG", output);
 		debugMsgBuilder = new StringBuilder();
 		message.setData(data);
-		Log.d("DEBUG","DEBUG = "+output);
 		bracDebugHandler.sendMessage(message);
 	}
 	
@@ -201,7 +197,6 @@ public class BluetoothDebugMode extends Bluetooth {
 				}
 			}else if (msg.charAt(0)=='m'){
 				
-				//Log.d("BT","READ-M");
 				if (prev_pressure == 0.f){
 					prev_pressure = Float.valueOf(msg.substring(1));
 					prev_prev_pressure = Float.valueOf(msg.substring(1));
@@ -265,7 +260,6 @@ public class BluetoothDebugMode extends Bluetooth {
 							}
 					}else if (diff <-PRESSURE_DIFF_MIN/2 ){
 						testFragment.showDebug("P_PeakEnd" );
-						Log.d("ERIC","P_PeakEnd");
 						isPeak = false;
 						start_time = end_time = 0;
 					}

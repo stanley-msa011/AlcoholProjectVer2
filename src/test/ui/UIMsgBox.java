@@ -1,14 +1,17 @@
 package test.ui;
 
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLoggerLog;
 import ubicomp.drunk_detection.activities.FragmentTabs;
-import ubicomp.drunk_detection.activities.TestFragment;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.fragments.TestFragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -76,10 +79,9 @@ public class UIMsgBox {
 	
 	
 	
-	private boolean done;
+	private boolean done,doneByDoubleClick;
 	
 	public UIMsgBox(TestFragment testFragment,RelativeLayout mainLayout){
-		Log.d("UIMSG","NEW");
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.r = context.getResources();
@@ -322,7 +324,6 @@ public class UIMsgBox {
 	}
 	
 	public void clear(){
-		Log.d("UIMSG","CLEAR");
 		mainLayout.removeView(boxLayout);
 	}
 	
@@ -336,10 +337,28 @@ public class UIMsgBox {
 			notSend.setTextColor(0xFF898989);
 		}
 		done = enable;
+		doneByDoubleClick = false;
+	}
+	
+	private void enableSend(boolean enable,boolean click){
+		if (enable){
+			send.setTextColor(0xFFf39800);
+			notSend.setTextColor(0xFFf39800);
+		}
+		else{
+			send.setTextColor(0xFF898989);
+			notSend.setTextColor(0xFF898989);
+		}
+		done = enable;
+		doneByDoubleClick = click;
 	}
 	
 	public void generateGPSCheckBox(){
 		enableSend(false);
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor edit = sp.edit();
+		edit.putLong("LatestTestTime", System.currentTimeMillis());
+		edit.commit();
 		help.setText("");
 		questionLayout.setVisibility(View.VISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
@@ -353,17 +372,19 @@ public class UIMsgBox {
 		public void onClick(View v) {
 			if (!done){
 				Toast.makeText(mainLayout.getContext(),R.string.msg_box_toast_send, Toast.LENGTH_LONG).show();
-				enableSend(true);
+				enableSend(true,true);
 				return;
 			}
+			if (doneByDoubleClick)
+				ClickLoggerLog.Log(context, ClickLogId.TEST_QUESTION_SEND);
+			else
+				ClickLoggerLog.Log(context, ClickLogId.TEST_QUESTION_SEND_DATA);
 			
 			boxLayout.setVisibility(View.INVISIBLE);
 			boolean enableGPS = gpsSwitch.isChecked();
 			int desire = desireSeekBar.getProgress()+1;
 			int emotion =  emotionSeekBar.getProgress()+1;
 				
-				String setting_str = desire+"/"+emotion+"/"+enableGPS; 
-				Log.d("MSGBOX SETTING",setting_str);
 				testFragment.writeQuestionFile(emotion, desire);
 				testFragment.startGPS(enableGPS);
 		}
@@ -382,7 +403,9 @@ public class UIMsgBox {
 			boolean enableGPS = false;
 			int desire = -1;
 			int emotion =  -1;
-				
+			
+			ClickLoggerLog.Log(context, ClickLogId.TEST_QUESTION_CANCEL);
+			
 			testFragment.writeQuestionFile(emotion, desire);
 			testFragment.startGPS(enableGPS);
 		}
@@ -429,7 +452,6 @@ public class UIMsgBox {
 			for (int i=0;i<eNum.length;++i)
 				eNum[i].setVisibility(View.INVISIBLE);
 			eNum[progress].setVisibility(View.VISIBLE);
-			Log.d("SEEK_BAR","emotion progress="+progress);
 			enableSend(true);
 		}
 		@Override
@@ -447,7 +469,6 @@ public class UIMsgBox {
 			for (int i=0;i<dNum.length;++i)
 				dNum[i].setVisibility(View.INVISIBLE);
 			dNum[progress].setVisibility(View.VISIBLE);
-			Log.d("SEEK_BAR","desire progress="+progress);
 		}
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {}

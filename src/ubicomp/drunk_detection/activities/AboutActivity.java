@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -118,12 +119,10 @@ public class AboutActivity extends Activity {
 		copyrightText.setText(COPYRIGHT);
 		
 		
-		
-		
-		logo.setOnClickListener(
-				new View.OnClickListener(){
+		logo.setOnTouchListener(
+				new View.OnTouchListener() {
 					@Override
-					public void onClick(View v) {
+					public boolean onTouch(View v, MotionEvent event) {
 						if (hidden_state == 0)
 							++hidden_state;
 						else if (hidden_state ==4){
@@ -132,41 +131,52 @@ public class AboutActivity extends Activity {
 						}
 						else 
 							hidden_state = 0;
+						return false;
 					}
-				});
-		
-		logo0.setOnClickListener(
-				new View.OnClickListener(){
+				}
+				);
+		logo0.setOnTouchListener(
+				new View.OnTouchListener() {
 					@Override
-					public void onClick(View v) {
-						if (hidden_state == 1)
-							++hidden_state;
-						else 
-							hidden_state = 0;
+					public boolean onTouch(View v, MotionEvent event) {
+						if (event.getAction() == MotionEvent.ACTION_DOWN){
+							if (hidden_state == 1)
+								++hidden_state;
+							else 
+								hidden_state = 0;
+						}
+						return false;
 					}
-				});
-		
-		logo1.setOnClickListener(
-				new View.OnClickListener(){
+				}
+				);
+		logo1.setOnTouchListener(
+				new View.OnTouchListener() {
 					@Override
-					public void onClick(View v) {
-						if (hidden_state == 2)
-							++hidden_state;
-						else 
-							hidden_state = 0;
+					public boolean onTouch(View v, MotionEvent event) {
+						if (event.getAction() == MotionEvent.ACTION_DOWN){
+							if (hidden_state == 2)
+								++hidden_state;
+							else 
+								hidden_state = 0;
+						}
+						return false;
 					}
-				});
-		
-		logo2.setOnClickListener(
-				new View.OnClickListener(){
+				}
+				);
+		logo2.setOnTouchListener(
+				new View.OnTouchListener() {
 					@Override
-					public void onClick(View v) {
-						if (hidden_state == 3)
-							++hidden_state;
-						else 
-							hidden_state = 0;
+					public boolean onTouch(View v, MotionEvent event) {
+						if (event.getAction() == MotionEvent.ACTION_DOWN){
+							if (hidden_state == 3)
+								++hidden_state;
+							else 
+								hidden_state = 0;
+						}
+						return false;
 					}
-				});
+				}
+				);
 		StringBuilder sb = new StringBuilder();
 		
 		String[] message = getResources().getStringArray(R.array.about_message);

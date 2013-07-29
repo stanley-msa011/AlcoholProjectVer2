@@ -80,7 +80,7 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 					cameraRecorder.camera.startFaceDetection();
 				}
 			}catch(Exception e){
-				Log.d("preview window",e.getMessage().toString());
+				Log.d("PREVIEW WINDOW",e.getMessage().toString());
 			}
 		}
 	}

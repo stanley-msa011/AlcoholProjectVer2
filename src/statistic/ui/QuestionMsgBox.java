@@ -2,15 +2,18 @@ package statistic.ui;
 
 import java.util.ArrayList;
 
-import database.QuestionDB;
+
+import data.database.QuestionDB;
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLoggerLog;
 import statistic.ui.questionnaire.content.QuestionnaireContent;
 import statistic.ui.questionnaire.content.Type0Content;
 import statistic.ui.questionnaire.content.Type1Content;
 import statistic.ui.questionnaire.content.Type2Content;
 import statistic.ui.questionnaire.content.Type3Content;
 import ubicomp.drunk_detection.activities.FragmentTabs;
-import ubicomp.drunk_detection.activities.StatisticFragment;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.fragments.StatisticFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -18,7 +21,6 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -198,6 +200,13 @@ public class QuestionMsgBox {
 		return;
 	}
 	
+	public void closeBoxNull(){
+    	statisticFragment.enablePage(true);
+    	backgroundLayout.setVisibility(View.INVISIBLE);
+		boxLayout.setVisibility(View.INVISIBLE);
+		return;
+	}
+	
 	public Context getContext(){
 		return context;
 	}
@@ -232,7 +241,6 @@ public class QuestionMsgBox {
 		StringBuilder sb = new StringBuilder();
 		for (int i=0;i<size;++i)
 			sb.append(clickSequence.get(i));
-		Log.d("Questionnaire",sb.toString());
 		return sb.toString();
 	}
 	
@@ -260,7 +268,6 @@ public class QuestionMsgBox {
 	
 	public void cleanSelection(){
 		int idx = contentSequence.size()-1;
-		Log.d("Questionnaire","Size = "+contentSequence.size());
 		if (idx >=0)
 			contentSequence.get(idx).cleanSelection();
 	}
@@ -277,6 +284,7 @@ public class QuestionMsgBox {
 
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getContext(), ClickLogId.STATISTIC_QUESTION_CANCEL);
 			clickSequence.clear();
 			contentSequence.clear();
 			statisticFragment.enablePage(true);

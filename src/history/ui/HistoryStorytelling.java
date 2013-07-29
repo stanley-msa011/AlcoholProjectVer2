@@ -1,6 +1,6 @@
 package history.ui;
 
-import data.history.AccumulatedHistoryState;
+import data.info.AccumulatedHistoryState;
 import ubicomp.drunk_detection.activities.R;
 
 public class HistoryStorytelling {

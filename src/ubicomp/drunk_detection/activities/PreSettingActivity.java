@@ -2,12 +2,13 @@ package ubicomp.drunk_detection.activities;
 
 import java.util.Calendar;
 
-import database.HistoryDB;
-import database.QuestionDB;
+import data.database.HistoryDB;
+import data.database.QuestionDB;
+import data.restore.RestoreData;
+import data.uploader.Reuploader;
+import debug.data_generator.DataGenerator;
 
-import restore.RestoreData;
 import statistic.ui.questionnaire.content.ConnectSocialInfo;
-import test.data.Reuploader;
 import ubicomp.drunk_detection.activities.R;
 
 import android.os.Bundle;
@@ -20,12 +21,12 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -37,6 +38,7 @@ public class PreSettingActivity extends Activity {
 	
 	private EditText connect_n0,connect_n1,connect_n2;
 	private EditText connect_p0,connect_p1,connect_p2;
+	private CheckBox uploadAudioCheckBox;
 	
 	private Button ok_button,clean_button,restoreButton,debugButton,debugTypeButton,dummyButton;
 	boolean debug,dummy,debug_type;
@@ -121,6 +123,9 @@ public class PreSettingActivity extends Activity {
 	    mYear = sp.getInt("sYear", c.get(Calendar.YEAR));
 	    mMonth = sp.getInt("sMonth", c.get(Calendar.MONTH));
 	    mDay = sp.getInt("sDate", c.get(Calendar.DATE));
+	    
+	    uploadAudioCheckBox = (CheckBox) findViewById(R.id.upload_audio_check_box);;
+	    uploadAudioCheckBox.setChecked(sp.getBoolean("upload_audio", true));
 	    
 		ok_button = (Button) this.findViewById(R.id.uid_OK);
 		ok_button.setOnClickListener(new OKOnclickListener());
@@ -233,7 +238,7 @@ public class PreSettingActivity extends Activity {
 	private class DummyOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			DummyData.generateDummyData(getBaseContext());
+			DataGenerator.generateData(getBaseContext());
 			dummy = !dummy;
 			if (dummy)
 		    	dummyButton.setText("Delete debug data");
@@ -287,8 +292,8 @@ public class PreSettingActivity extends Activity {
 			}
 			
 			if (check){
-				SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(activity);
-				SharedPreferences.Editor editor = settings.edit();
+				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
+				SharedPreferences.Editor editor = sp.edit();
 				editor.putString("uid", text);
 				editor.putString("goal_good", target_g);
 				editor.putInt("goal_money", target_t);
@@ -305,10 +310,11 @@ public class PreSettingActivity extends Activity {
 				editor.putInt("connect_s0", connectS0);
 				editor.putInt("connect_s1", connectS1);
 				editor.putInt("connect_s2", connectS2);
+				editor.putBoolean("upload_audio", uploadAudioCheckBox.isChecked());
 				editor.commit();
-				Log.d("PreSetting","Done");
+				activity.finish();
 			}
-			activity.finish();
+			
 		}
 		
 	}

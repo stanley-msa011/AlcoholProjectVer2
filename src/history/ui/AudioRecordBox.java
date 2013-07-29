@@ -1,16 +1,19 @@
 package history.ui;
 
 
-import history.data.AudioUploader;
 
 import java.io.File;
 import java.io.IOException;
 
-import database.AudioDB;
+
+import data.database.AudioDB;
+import data.uploader.AudioUploader;
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLoggerLog;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
-import ubicomp.drunk_detection.activities.HistoryFragment;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.fragments.HistoryFragment;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -69,7 +72,6 @@ public class AudioRecordBox {
 	private String[] helpStr;
 	
 	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
-		Log.d("UIMSG","NEW");
 		this.historyFragment = historyFragment;
 		this.context = historyFragment.getActivity();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -92,9 +94,9 @@ public class AudioRecordBox {
 		else
 			dir = new File(historyFragment.getActivity().getFilesDir(),"drunk_detection");
 		if (!dir.exists())
-			if (!dir.mkdirs())
-				Log.d("TEST_STORAGE","FAIL TO CREATE DIR");
-		
+			if (!dir.mkdirs()){
+				Log.d("AUDIO_STORAGE","FAIL TO CREATE DIR");
+			}
 		mainDirectory = new File(dir,"audio_records");
 		if (!mainDirectory.exists())
 			if (!mainDirectory.mkdirs()){
@@ -166,6 +168,7 @@ public class AudioRecordBox {
 	private class EndListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL);
 			backgroundLayout.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
 			historyFragment.updateHasRecorder(curIdx);
@@ -200,12 +203,11 @@ public class AudioRecordBox {
 			try {
 				mediaRecorder.prepare();
 			} catch (IllegalStateException e) {
-				Log.d("RECORDER",e.getMessage());
 				setButtonState(STATE_INIT);
 			} catch (IOException e) {
-				Log.d("RECORDER",e.getMessage());
 				setButtonState(STATE_INIT);
 			}
+			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_RECORD);
 			mediaRecorder.start();
 			setButtonState(STATE_ON_RECORD);
 		}
@@ -234,9 +236,9 @@ public class AudioRecordBox {
 					db.insertAudio(curDV);
 					Toast.makeText(context, context.getResources().getString(R.string.audio_box_toast_record_end), Toast.LENGTH_LONG).show();
 				} catch (IllegalStateException e) {
-					Log.d("RECORDER",e.getMessage());
 				}
 			}
+			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
 			AudioUploader.upload(context);
 			setButtonState(STATE_INIT);
 		}
@@ -268,23 +270,19 @@ public class AudioRecordBox {
 										mediaPlayer = null;
 										setButtonState(STATE_INIT);
 									} catch (IllegalStateException e) {
-										Log.d("PLAYER",e.getMessage());
 									}
 								}
 							});
 				} catch (IllegalArgumentException e) {
-					Log.d("PLAYER",e.getMessage());
 					setButtonState(STATE_INIT);
 				} catch (SecurityException e) {
-					Log.d("PLAYER",e.getMessage());
 					setButtonState(STATE_INIT);
 				} catch (IllegalStateException e) {
-					Log.d("PLAYER",e.getMessage());
 					setButtonState(STATE_INIT);
 				} catch (IOException e) {
-					Log.d("PLAYER",e.getMessage());
 					setButtonState(STATE_INIT);
 				}
+				ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_PLAY);
 				setButtonState(STATE_ON_PLAY);
 			}
 		}
@@ -350,9 +348,9 @@ public class AudioRecordBox {
 					mediaPlayer = null;
 					Toast.makeText(context, context.getResources().getString(R.string.audio_box_toast_play_end), Toast.LENGTH_LONG).show();
 				} catch (IllegalStateException e) {
-					Log.d("PLAYER",e.getMessage());
 				}
 			}
+			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_PLAY);
 			setButtonState(STATE_INIT);
 		}
 	}
@@ -364,7 +362,6 @@ public class AudioRecordBox {
 				mediaRecorder.release();
 				mediaRecorder = null;
 			} catch (IllegalStateException e) {
-				Log.d("RECORDER",e.getMessage());
 			}
 		}
 		if (mediaPlayer !=null){
@@ -373,7 +370,6 @@ public class AudioRecordBox {
 				mediaPlayer.release();
 				mediaPlayer = null;
 			} catch (IllegalStateException e) {
-				Log.d("PLAYER",e.getMessage());
 			}
 		}
 	}

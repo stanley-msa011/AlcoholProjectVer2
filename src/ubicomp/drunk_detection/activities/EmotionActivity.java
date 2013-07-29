@@ -2,7 +2,9 @@ package ubicomp.drunk_detection.activities;
 
 import statistic.ui.questionnaire.content.ConnectSocialInfo;
 import ubicomp.drunk_detection.activities.R;
-import database.QuestionDB;
+import data.database.QuestionDB;
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLoggerLog;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -212,12 +214,23 @@ public class EmotionActivity extends Activity {
 			calls[2] = ConnectSocialInfo.PHONE[connectS2];
 		}
 		
-		
+		int counter = 0;
 		for (int i=0;i<3;++i){
 			OnClickListener listener = new CallCheckOnClickListener(type,names[i],calls[i]);
-			String text = names[i]+"："+calls[i];
-			View vv = createIconView(text,R.drawable.questionnaire_item_call,listener);
-			mainLayout.addView(vv);
+			String text = names[i];
+			if (names[i].length()>0){
+				View vv = createIconView(text,R.drawable.questionnaire_item_call,listener);
+				mainLayout.addView(vv);
+				++counter;
+			}
+		}
+		if (counter == 0){
+			mainLayout.addView(title);
+			titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
+			titleparam.height = screen.x*230/1080;
+			
+			View tv2 = createTextView(R.string.emotion_connect_null);
+			mainLayout.addView(tv2);
 		}
 		
 		int rest_block = 12 - mainLayout.getChildCount();
@@ -279,7 +292,7 @@ private View createTextView(int textStr){
 		tParam.leftMargin = textSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
-		icon.setImageResource(DrawableId);
+		icon.setImageDrawable(getResources().getDrawable(DrawableId));
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
 		iParam.rightMargin = iconMargin;
 		
@@ -303,7 +316,7 @@ private View createTextView(int textStr){
 		tParam.leftMargin = textSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
-		icon.setImageResource(DrawableId);
+		icon.setImageDrawable(getResources().getDrawable(DrawableId));
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
 		iParam.rightMargin = iconMargin;
 		
@@ -348,6 +361,8 @@ private View createTextView(int textStr){
 		
 		@Override
 		public void onClick(View v) {
+			
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			db.insertEmotion(in,null);
 			activity.finish();
 		}
@@ -367,6 +382,7 @@ private View createTextView(int textStr){
 		
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			int item_count = mainLayout.getChildCount();
 			for (int i=0;i<item_count;++i)
 				mainLayout.getChildAt(i).setEnabled(false);
@@ -394,6 +410,7 @@ private View createTextView(int textStr){
 	private class CallCancelOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CANCEL_CALL);
 			bgLayout.removeView(shadowBg);
 			bgLayout.removeView(callLayout);
 			int item_count = mainLayout.getChildCount();
@@ -416,6 +433,7 @@ private View createTextView(int textStr){
 		
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CALL);
 			db.insertEmotion(in,name);
 			Intent intentDial = new Intent("android.intent.action.CALL",Uri.parse("tel:"+call));
 			activity.startActivity(intentDial);
@@ -431,6 +449,7 @@ private View createTextView(int textStr){
 		
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			setQuestionEnd(in);
 		}
 	}
@@ -443,6 +462,7 @@ private View createTextView(int textStr){
 		
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			setQuestionCall(type);
 		}
 	}
@@ -474,6 +494,7 @@ private View createTextView(int textStr){
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event){
 		if (keyCode == KeyEvent.KEYCODE_BACK){
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_RETURN_BUTTON);
 			if (state == 0){
 				Toast.makeText(activity, activity.getResources().getString(R.string.emotionDIY_toast), Toast.LENGTH_LONG).show();
 				--state;

@@ -12,11 +12,10 @@ public class CameraRunHandler extends Handler {
 	}
 	
 	public void handleMessage(Message msg){
-		if (msg.what == 0){
+		if (msg.what == 0)
 			cameraRecorder.takePicture();
-		}else if (msg.what == 1){
+		else if (msg.what == 1)
 			cameraRecorder.CloseFail();
-		}
 	}
 	
 	public void takePicture(){

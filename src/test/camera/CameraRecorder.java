@@ -5,9 +5,9 @@ import java.util.List;
 
 import ubicomp.drunk_detection.activities.R;
 
-import test.file.ImageFileHandler;
+import test.data.ImageFileHandler;
 import ubicomp.drunk_detection.activities.FragmentTabs;
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 
 import android.app.Activity;
 import android.graphics.Point;
@@ -16,7 +16,6 @@ import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Message;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -61,8 +60,6 @@ public class CameraRecorder {
 		Point bestSize = getBestSize(list);
 		params.setPictureSize(bestSize.x, bestSize.y);
 		camera.setParameters(params);
-		//if (camera.getParameters().getMaxNumDetectedFaces()>0)
-		//	camera.startFaceDetection();
     }
     
     private Point getBestSize(List<Size> list){
@@ -110,7 +107,6 @@ public class CameraRecorder {
     
     
     public void takePicture(){
-    		Log.d("TAKE PICTURE","TAKE PICTURE");
     		camera.takePicture(null,null, pictureCallback);
     }
     
@@ -124,7 +120,6 @@ public class CameraRecorder {
     	if (camera!=null){
     		Camera tmp = camera;
     		camera = null;
-    		//tmp.stopFaceDetection();
     		tmp.stopPreview();
     		tmp.release();
     		tmp = null;
@@ -137,7 +132,6 @@ public class CameraRecorder {
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
 			picture_count++;
-			Log.d("CAMERA","TAKE PICTURE "+picture_count);
 			
 			Message msg = new Message();
 			Bundle data_b = new Bundle();

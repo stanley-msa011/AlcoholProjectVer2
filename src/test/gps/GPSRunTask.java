@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 
 
 import android.location.Location;
@@ -36,9 +36,8 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 		file = new File(directory,"geo.txt");
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
-			Log.d("GEO WRITER","open successfully");
 		} catch (IOException e) {
-			Log.d("GEO WRITER","Fail to open");
+			Log.d("GEO WRITER","FAIL TO OPEN");
 			writer = null;
 		}
 	}
@@ -46,7 +45,6 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 	
 	@Override
 	protected Boolean doInBackground(Object... params) {
-		Log.d("GPS","RUN TASK");
 		Boolean check = (Boolean) params[0];
 		if (check.booleanValue()){
 			gpsHandler.sendEmptyMessage(GPS_HANDLER_WHAT );
@@ -68,10 +66,8 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 		@Override
 		public void onLocationChanged(Location location) {
 			if (location!=null){
-				Log.d("GPS_RUN_TASK","GET LOCATION");
-				if (bestLoc == null){
+				if (bestLoc == null)
 					bestLoc = location;
-				}
 				else{
 					Location tempLoc = bestLoc;
 					bestLoc = getBetterLocation(location, tempLoc);
@@ -99,23 +95,16 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 			double longitude = loc.getLongitude();
 		
 			String location_str = latitude+"\t"+longitude;
-			Log.d("LOCATION",location_str);
-		
 			write_to_file(location_str);
-		}
-		else{
-			Log.d("LOCATION","NULL");
 		}
 	}
 	
 	private void write_to_file(String str){
 		if (writer!=null){
 			try {
-				Log.d("GEO WRITER","WRITE");
 				writer.write(str);
 			} catch (IOException e) {
 				Log.d("GEO WRITER",e.toString());
-				Log.d("GEO WRITER","FAIL TO WRITE");
 			}
 		}else{
 			Log.d("GEO WRITER","NULL TO WRITE");
@@ -139,11 +128,8 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 
 		@Override
 		public void run() {
-			Log.d("GPS TIMER","RUN");
 			try {
 				Thread.sleep(8000);
-				Log.d("GPS TIMER","END");
-
 				 if (locationListener.bestLoc!=null){
 					 sendLocation(locationListener.bestLoc);
 				 }else{
@@ -155,7 +141,7 @@ public class GPSRunTask extends AsyncTask<Object, Void, Boolean> {
 				locationManager.removeUpdates(locationListener);
 				testFragment.updateDoneState(TestFragment._GPS);
 			} catch (InterruptedException e) {
-				Log.d("GPS TIMER","EXCEPTION");
+				Log.d("GPS TIMER",e.toString());
 			}
 		}
 	}

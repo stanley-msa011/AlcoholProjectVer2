@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="24"
-    android:versionName="2.44" >
+    android:versionCode="25"
+    android:versionName="2.45" >
 
     <uses-sdk
         android:maxSdkVersion="17"
@@ -72,7 +72,10 @@
             </intent-filter>
         </receiver>
         
-        <receiver android:name="ubicomp.drunk_detection.activities.AlarmReceiver" >
+        <receiver 
+            android:name="ubicomp.drunk_detection.activities.AlarmReceiver" 
+            android:exported="false"
+            >
             <intent-filter>
                 <action android:name="com.android.alarmclock.ALARM_ALERT" />
             </intent-filter>
@@ -83,6 +86,8 @@
         <service android:name="ubicomp.drunk_detection.activities.HourlyAlarmService" >
         </service>
 		<service android:name="ubicomp.drunk_detection.activities.RegularCheckService" >
+        </service>
+        <service android:name="ubicomp.drunk_detection.activities.ClickLoggerService" >
         </service>
         
         <activity

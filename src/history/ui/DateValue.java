@@ -16,4 +16,8 @@ public class DateValue {
 	public String toFileString(){
 		return year+"_"+(month+1)+"_"+date;
 	}
+	
+	public int toClickValue(){
+		return month * 1000 + date * 10;
+	}
 }

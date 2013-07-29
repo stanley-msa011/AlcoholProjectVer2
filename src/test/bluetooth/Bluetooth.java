@@ -9,9 +9,9 @@ import java.util.UUID;
 
 
 import test.camera.CameraRunHandler;
-import test.file.BracValueDebugHandler;
-import test.file.BracValueFileHandler;
-import ubicomp.drunk_detection.activities.TestFragment;
+import test.data.BracValueDebugHandler;
+import test.data.BracValueFileHandler;
+import ubicomp.drunk_detection.fragments.TestFragment;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -102,7 +102,6 @@ public class Bluetooth {
 		if (btAdapter == null)
 			Log.e("BT","NOT SUPPORT BT");
 		local_min = 0.f;
-		//local_max = 0.f;
 		prev_prev_pressure = 0.f;
 		prev_pressure = 0.f;
 		now_pressure = 0.f;
@@ -165,18 +164,12 @@ public class Bluetooth {
 		if (sensor == null)
 			return -1;
 		try {
-			
-			if (Build.VERSION.SDK_INT<11){
+			if (Build.VERSION.SDK_INT<11)
 				socket = sensor.createRfcommSocketToServiceRecord(uuid);
-				Log.d("BT","createSocket (<11)");
-			}
-			else{
+			else
 				socket = sensor.createRfcommSocketToServiceRecord(uuid);
-				Log.d("BT","createSocket (>=11)");
-			}
 			btAdapter.cancelDiscovery();
 			socket.connect();
-			Log.d("BT","createSocket connect");
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CONNECT TO THE SENSOR");
 			Log.e("BT",e.toString());
@@ -204,7 +197,6 @@ public class Bluetooth {
 		isPeak=false;
 		success = false;
 		local_min = 0;
-		//local_max = 0;
 		now_pressure = 0;
 		prev_prev_pressure = 0;
 		prev_pressure = 0;
@@ -223,7 +215,6 @@ public class Bluetooth {
 					bytes =in.read(temp);
 					continue;
 				}
-				//Log.d("BT","READ");
 				long time = System.currentTimeMillis();
 				long time_gap = time - first_start_time;
 				if (first_start_time == -1)
@@ -287,7 +278,6 @@ public class Bluetooth {
 				if (prev_pressure == 0.f){
 					prev_pressure = Float.valueOf(msg.substring(1));
 					prev_prev_pressure = Float.valueOf(msg.substring(1));
-					Log.d("ERIC", "first pressure: "+prev_pressure);
 				}
 				else {
 					prev_prev_pressure = prev_pressure;

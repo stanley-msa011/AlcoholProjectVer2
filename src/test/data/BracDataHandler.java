@@ -27,12 +27,13 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 
-import data.history.AccumulatedHistoryState;
-import data.history.DateBracDetectionState;
-import database.HistoryDB;
-import database.WeekNum;
+import data.calculate.WeekNum;
+import data.database.HistoryDB;
+import data.info.AccumulatedHistoryState;
+import data.info.DateBracDetectionState;
+import data.uploader.DataUploader;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -141,19 +142,17 @@ public class BracDataHandler {
        		String state_str = a_history.toString();
        		String used_str = db.getLatestUsedState().toString();
        		String output_str = state_str + used_str;
-       		Log.d("BracHandler","write: "+output_str);
        		state_writer.write(output_str);
        		state_writer.flush();
        		state_writer.close();
 		} catch (Exception e) {	
-			Log.d("BracHandler","fail to write");
+			Log.d("BrAC DATA HANDLER","FAIL TO WRITE");
 		}
        	
        	/*Connection to server*/
        	int server_connect = connectingToServer(textFile,geoFile,stateFile,questionFile,imageFiles);
 		if (server_connect == ERROR){ // error happens when preparing files
 			result = ERROR;
-			Log.d("BracHandler","Prepare file");
 		}
 		return result;
 	}
@@ -183,6 +182,7 @@ public class BracDataHandler {
 			median = values[(values.length-1)/2];
 			
 		} catch (FileNotFoundException e1) {
+			Log.d("BrAC DATA HANDLER","FILE NOT FOUND");
 			return ERROR;
 		}
         return median;
@@ -201,13 +201,9 @@ public class BracDataHandler {
 			if(s.hasNextInt())
 				desire = s.nextInt();
 			
-			Log.d("Question parse",emotion+"/"+desire);
-			
 			if (emotion == -1 || desire == -1)
 				return -1;
-			
 			result = emotion * 100 + desire;
-			Log.d("Question parse",String.valueOf(result));
 			
 		} catch (FileNotFoundException e1) {
 			return ERROR;
@@ -219,26 +215,19 @@ public class BracDataHandler {
 	private int connectingToServer(File textFile, File geoFile, File stateFile, File questionFile, File[] imageFiles){
 		try {
 			
-			Log.d("DataHandler","Start Init");
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			
 			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-			Log.d("DataHandler","got key");
 			InputStream instream = context.getResources().openRawResource(R.raw.alcohol_certificate);
 			try{
-				Log.d("DataHandler","new instream");
 				trustStore.load(instream, null);
-				Log.d("DataHandler","load");
 			} finally{
 				instream.close();
 			}
-			Log.d("DataHandler","Start ssl setting");
 			SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
 			Scheme sch = new Scheme("https",socketFactory,443);
 			
 			httpClient.getConnectionManager().getSchemeRegistry().register(sch);
-			
-			Log.d("DataHandler","end ssl setting");
 			
 			HttpPost httpPost = new HttpPost(SERVER_URL);
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -258,7 +247,6 @@ public class BracDataHandler {
 		    int mDay = sp.getInt("sDate", c.get(Calendar.DATE));
 		    
 		    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
-		    Log.d("UPLOAD","JoinDate = "+joinDate);
 		    mpEntity.addPart("userData[]", new StringBody(joinDate));
 			
 		    PackageInfo pinfo;
@@ -292,7 +280,6 @@ public class BracDataHandler {
 			
 			httpPost.setEntity(mpEntity);
 			DataUploader uploader = new DataUploader(httpClient,httpPost,ts,context);
-			Log.d("DataHandler","uploader execute");
 			uploader.execute();
 			
 		} catch (Exception e) {

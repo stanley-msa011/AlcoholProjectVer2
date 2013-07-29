@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.CallCheckOnClickListener;
+import statistic.ui.questionnaire.listener.EndOnClickListenerNoInput;
 import statistic.ui.questionnaire.listener.SelectedListener;
 import ubicomp.drunk_detection.activities.R;
 
@@ -33,6 +34,7 @@ public class ConnectContent extends QuestionnaireContent {
 		msgBox.setNextButton("", null);
 		seq.add(","+type+",5");
 		setHelp(R.string.call_to);
+		msgBox.showQuestionnaireLayout(true);
 		if (type == TYPE_FAMILY){
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(msgBox.getContext());
 			String connectN0,connectN1,connectN2;
@@ -44,9 +46,24 @@ public class ConnectContent extends QuestionnaireContent {
 			connectP1 = sp.getString("connect_p1", "");
 			connectP2 = sp.getString("connect_p2", "");
 			
-			setSelectItem(connectN0,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN0,connectP0),R.string.next));
-			setSelectItem(connectN1,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN1,connectP1),R.string.next));
-			setSelectItem(connectN2,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN2,connectP2),R.string.next));
+			int counter = 0;
+			if (connectN0.length()>0){
+				setSelectItem(connectN0,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN0,connectP0),R.string.next));
+				++counter;
+			}
+			if (connectN1.length()>0){
+				setSelectItem(connectN1,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN1,connectP1),R.string.next));
+				++counter;
+			}
+			if (connectN2.length()>0){
+				setSelectItem(connectN2,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,connectN2,connectP2),R.string.next));
+				++counter;
+			}
+			if (counter == 0){
+				setHelp(R.string.connect_null);
+				msgBox.showQuestionnaireLayout(false);
+				msgBox.setNextButton(R.string.ok,new EndOnClickListenerNoInput(msgBox));
+			}
 		}else if(type == TYPE_SOCIAL){
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(msgBox.getContext());
 			int connectS0,connectS1,connectS2;
@@ -66,7 +83,6 @@ public class ConnectContent extends QuestionnaireContent {
 			for (int i=0;i<dummyNames.length;++i)
 				setSelectItem(dummyNames[i]+":"+dummyPhones[i],new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,dummyNames[i],dummyPhones[i]),R.string.next));
 		}
-		msgBox.showQuestionnaireLayout(true);
 	}
 
 	@Override

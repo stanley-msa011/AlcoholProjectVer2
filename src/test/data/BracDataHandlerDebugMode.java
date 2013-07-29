@@ -11,12 +11,11 @@ import java.util.Scanner;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import data.history.AccumulatedHistoryState;
-import data.history.DateBracDetectionState;
-import database.WeekNum;
+import data.calculate.WeekNum;
+import data.info.AccumulatedHistoryState;
+import data.info.DateBracDetectionState;
 
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 
 public class BracDataHandlerDebugMode extends BracDataHandler {
 
@@ -30,8 +29,7 @@ public class BracDataHandlerDebugMode extends BracDataHandler {
 	public int start(){
 		
 		File mainStorageDir;
-		File textFile, geoFile, stateFile, questionFile;
-		File[] imageFiles = new File[3];
+		File textFile,stateFile, questionFile;
 		int result = SUCCESS;
 		
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
@@ -40,7 +38,6 @@ public class BracDataHandlerDebugMode extends BracDataHandler {
         	mainStorageDir = new File(context.getFilesDir(),"drunk_detection");
         
         textFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + ts + ".txt");
-        geoFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "geo.txt");
         questionFile = new File(mainStorageDir.getPath() + File.separator + ts + File.separator + "question.txt");
         
         avg_result = parseTextFile(textFile);
@@ -97,7 +94,6 @@ public class BracDataHandlerDebugMode extends BracDataHandler {
        		String state_str = a_history.toString();
        		String used_str = db.getLatestUsedState().toString();
        		String output_str = state_str + used_str;
-       		Log.d("BracHandler","write: "+output_str);
        		state_writer.write(output_str);
        		state_writer.flush();
        		state_writer.close();

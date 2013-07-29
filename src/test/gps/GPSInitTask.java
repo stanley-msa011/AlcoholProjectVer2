@@ -1,10 +1,9 @@
 package test.gps;
 
-import ubicomp.drunk_detection.activities.TestFragment;
+import ubicomp.drunk_detection.fragments.TestFragment;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 
@@ -17,7 +16,6 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 	
 	@Override
 	protected Boolean doInBackground(Object... params) {
-		Log.d("GPS","INIT TASK");
 		Boolean check = (Boolean) params[0];
 		Boolean newIntent = false;
 		if (check.booleanValue()){
@@ -36,7 +34,6 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 	@Override
 	 protected void onPostExecute(Boolean result) {
 		if (!result.booleanValue()){
-			Log.d("GPS","NO INTENT");
 			testFragment.runGPS();
 		}
      }

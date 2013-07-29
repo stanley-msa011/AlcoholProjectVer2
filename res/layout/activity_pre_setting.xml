@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
     	android:layout_height="wrap_content"
     	android:orientation="vertical"
+    	android:dividerPadding="5dp"
         >
       	<TextView
 	        android:id="@+id/version"
@@ -79,7 +80,6 @@
 	        android:id="@+id/date"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
-        	android:text="xxxx/xx/xx"
         	/>
      	<Button
         	android:id="@+id/date_button"
@@ -181,6 +181,12 @@
      	    android:layout_height="wrap_content"
      	    android:ems="12"
      	    android:inputType="phone" />
+
+     	<CheckBox
+     	    android:id="@+id/upload_audio_check_box"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="Upload Audio File" />
      	
     	<Button
 	        android:id="@+id/uid_OK"
