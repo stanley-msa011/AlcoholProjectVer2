@@ -14,7 +14,7 @@ public class SelfHelpContent extends QuestionnaireContent {
 	@Override
 	protected void setContent() {
 		msgBox.setNextButton("", null);
-		seq.add(",6");
+		seq.add(",1,6");
 		setHelp(R.string.self_help_help);
 		setSelectItem(R.string.self_help_selection0,new SelectedListener(msgBox,new SituationOnClickListener(msgBox,1),R.string.next));
 		setSelectItem(R.string.self_help_selection1,new SelectedListener(msgBox,new SituationOnClickListener(msgBox,2),R.string.next));

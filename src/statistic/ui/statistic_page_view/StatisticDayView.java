@@ -72,6 +72,10 @@ public class StatisticDayView extends StatisticPageView {
 	public StatisticDayView(Context context,StatisticFragment statisticFragment){
 		super(context,R.layout.statistic_day_view,statisticFragment);
 		db = new HistoryDB(context);
+		digitTypeface = statisticFragment.digitTypeface;
+		digitTypefaceBold = statisticFragment.digitTypefaceBold;
+		wordTypeface = statisticFragment.wordTypeface;
+		wordTypefaceBold = statisticFragment.wordTypefaceBold;
 	}
 	
 		@Override
@@ -90,11 +94,6 @@ public class StatisticDayView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		Point statistic_size = StatisticFragment.getStatisticPx();
-		
-		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
-		digitTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/dinpromedium.ttf");
-		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W3.otf");
-		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		
 		bracTitle = (TextView) view.findViewById(R.id.statistic_day_title);
 		bracTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,  statistic_size.x * 32/480);

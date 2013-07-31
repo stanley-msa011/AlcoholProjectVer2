@@ -70,13 +70,11 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 			dir = new File(Environment.getExternalStorageDirectory(),"drunk_detection");
 		else
 			dir = new File(context.getFilesDir(),"drunk_detection");
-		if (!dir.exists())
-			if (!dir.mkdirs())
-				Log.d("AUDIO UPLOADER","FAIL TO CREATE DIR");
 		
 		mainDirectory = new File(dir,"audio_records");
 		if (!mainDirectory.exists())
 			if (!mainDirectory.mkdirs()){
+				Log.d("AUDIO UPLOADER","FAIL TO CREATE DIR");
 				return;
 			}
 	}
@@ -88,11 +86,8 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 			return null;
 		for (int i=0;i<ais.length;++i){
 			int result = connectingToServer(ais[i]);
-			if (result == 0){
+			if (result == 0) // pass
 				db.uploadedAudio(ais[i]);
-			}else if (result == -2);//no file
-			else
-				break;
 		}
 		return null;
 	}

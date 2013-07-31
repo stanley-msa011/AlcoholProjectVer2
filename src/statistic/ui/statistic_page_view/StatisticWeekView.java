@@ -52,6 +52,8 @@ public class StatisticWeekView extends StatisticPageView {
 	public StatisticWeekView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_week_view, statisticFragment);
 		db = new HistoryDB(context);
+		digitTypefaceBold = statisticFragment.digitTypefaceBold;
+		wordTypefaceBold = statisticFragment.wordTypefaceBold;
 	}
 
 
@@ -62,9 +64,6 @@ public class StatisticWeekView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		Point screen = StatisticFragment.getStatisticPx();
-		
-		digitTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/dinpromedium.ttf");
-		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		
 		dateLayout = (LinearLayout) view.findViewById(R.id.statistic_week_date_label_layout);
 		timeLayout = (LinearLayout) view.findViewById(R.id.statistic_week_timeblock_label_layout);

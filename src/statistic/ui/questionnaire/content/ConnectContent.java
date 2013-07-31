@@ -10,17 +10,6 @@ import ubicomp.drunk_detection.activities.R;
 
 public class ConnectContent extends QuestionnaireContent {
 
-	String[] dummyNames = {
-			"dummy1",
-			"dummy2",
-			"dummy3"
-			};
-	String[] dummyPhones = {
-			"0212345678",
-			"0312345678",
-			"0412345678"
-			};
-	
 	private int type;
 	public static final int TYPE_FAMILY = 2, TYPE_SOCIAL = 3;
 	
@@ -79,9 +68,6 @@ public class ConnectContent extends QuestionnaireContent {
 			setSelectItem(n0,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n0,p0),R.string.next));
 			setSelectItem(n1,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n1,p1),R.string.next));
 			setSelectItem(n2,new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,n2,p2),R.string.next));
-		}else{
-			for (int i=0;i<dummyNames.length;++i)
-				setSelectItem(dummyNames[i]+":"+dummyPhones[i],new SelectedListener(msgBox,new CallCheckOnClickListener(msgBox,dummyNames[i],dummyPhones[i]),R.string.next));
 		}
 	}
 

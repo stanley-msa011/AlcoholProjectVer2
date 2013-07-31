@@ -32,7 +32,8 @@ public class AnalysisProgressView extends StatisticPageView {
 	public AnalysisProgressView(Context context,StatisticFragment statisticFragment){
 		super(context, R.layout.analysis_progress_view,statisticFragment);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		
+		wordTypeface = statisticFragment.wordTypeface;
+		helpStr = context.getResources().getStringArray(R.array.analysis_progress_help);
 		fromCal = Calendar.getInstance();
 		int year = sp.getInt("sYear", fromCal.get(Calendar.YEAR));
 		int month = sp.getInt("sMonth", fromCal.get(Calendar.MONTH));
@@ -40,7 +41,7 @@ public class AnalysisProgressView extends StatisticPageView {
 		fromCal.set(Calendar.YEAR, year);
 		fromCal.set(Calendar.MONTH, month);
 		fromCal.set(Calendar.DATE, date);
-		helpStr = context.getResources().getStringArray(R.array.analysis_progress_help);
+		
 	}
 	
 	@Override
@@ -51,8 +52,6 @@ public class AnalysisProgressView extends StatisticPageView {
 	
 	@Override
 	public void onPreTask() {
-		
-		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W3.otf");
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		

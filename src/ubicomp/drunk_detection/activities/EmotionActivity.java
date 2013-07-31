@@ -2,6 +2,7 @@ package ubicomp.drunk_detection.activities;
 
 import statistic.ui.questionnaire.content.ConnectSocialInfo;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
@@ -75,6 +76,8 @@ public class EmotionActivity extends Activity {
 	
 	private int state = 0;
 	
+	private Toast endToast;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -96,26 +99,23 @@ public class EmotionActivity extends Activity {
 			display.getSize(screen);
 		}
 		texts = getResources().getStringArray(R.array.emotionDIY_solution);
-	}
-
-	
-	
-	@Override
-	protected void onResume(){
-		super.onResume();
+		
 		this.activity = this;
 		bgLayout = (RelativeLayout) this.findViewById(R.id.emotion_all_layout);
-		bgLayout.setBackgroundColor(0xFF00FF00);
 		mainLayout = (LinearLayout) this.findViewById(R.id.emotion_main_layout);
-		inflater = LayoutInflater.from(activity);
+		inflater = LayoutInflater.from(this);
 		shadowBg = new View(this);
 		shadowBg.setBackgroundColor(0x99000000);
 		callLayout = (RelativeLayout) inflater.inflate(R.layout.call_check_layout, null);
-		wordTypefaceBold = Typeface.createFromAsset(activity.getAssets(), "fonts/DFLiHeiStd-W5.otf");
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(this);
 		setCallCheckBox();
 		db = new QuestionDB(activity);
-		setQuestionStart();
+	}
 
+	@Override
+	protected void onResume(){
+		super.onResume();
+		setQuestionStart();
 	}
 	
 	
@@ -247,7 +247,7 @@ public class EmotionActivity extends Activity {
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*244/1080;
+		titleparam.height = screen.x*230/1080;
 		
 		View tv = createTextView(R.string.emotion_end_message);
 		mainLayout.addView(tv);
@@ -496,7 +496,10 @@ private View createTextView(int textStr){
 		if (keyCode == KeyEvent.KEYCODE_BACK){
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_RETURN_BUTTON);
 			if (state == 0){
-				Toast.makeText(activity, activity.getResources().getString(R.string.emotionDIY_toast), Toast.LENGTH_LONG).show();
+				if (endToast!=null)
+					endToast.cancel();
+				endToast = Toast.makeText(this, R.string.emotionDIY_toast, Toast.LENGTH_SHORT);
+				endToast.show();
 				--state;
 			}else if (state == -1)
 				return super.onKeyDown(keyCode, event);

@@ -3,6 +3,7 @@ package ubicomp.drunk_detection.activities;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -70,8 +71,8 @@ public class TutorialActivity extends Activity {
 		}
 		isWideScreen = (float)size.y/(float)size.x > 1.67;
 		
-		digitTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dinproregular.ttf");
-		wordTypefaceBold  = Typeface.createFromAsset(this.getAssets(), "fonts/DFLiHeiStd-W5.otf");
+		digitTypeface = Typefaces.getDigitTypeface(this);
+		wordTypefaceBold  = Typefaces.getWordTypefaceBold(this);
 		
 		replay = (ImageView) this.findViewById(R.id.tutorial_reply);
 		arrow = (ImageView) this.findViewById(R.id.tutorial_arrow);

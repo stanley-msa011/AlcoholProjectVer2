@@ -16,7 +16,7 @@ public class TimeBlock {
 	public static int getTimeBlock(int hour_24){
 		if (hour_24 <12)
 			return MORNING;
-		else if(hour_24 >=12 && hour_24 < 18)
+		else if(hour_24 < 18)
 			return NOON;
 		else
 			return NIGHT;

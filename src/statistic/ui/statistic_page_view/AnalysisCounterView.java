@@ -29,6 +29,7 @@ public class AnalysisCounterView extends StatisticPageView {
 		hdb = new HistoryDB(context);
     	qdb = new QuestionDB(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_counter_help);
+		wordTypeface = statisticFragment.wordTypeface;
 	}
 	
 	@Override
@@ -40,14 +41,10 @@ public class AnalysisCounterView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		
-		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W3.otf");
-		
 		Point screen = StatisticFragment.getStatisticPx();
-		
 		title = (TextView) view.findViewById(R.id.analysis_counter_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 21/480);
 		title.setTypeface(wordTypeface);
-		
 		help = (TextView) view.findViewById(R.id.analysis_counter_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
 		help.setTypeface(wordTypeface);

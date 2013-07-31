@@ -8,6 +8,7 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.activities.TutorialActivity;
 import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.Typefaces;
 
 import test.bluetooth.BTInitHandler;
 import test.bluetooth.BTRunTask;
@@ -26,7 +27,7 @@ import test.data.ImageFileHandler;
 import test.data.QuestionFile;
 import test.gps.GPSInitTask;
 import test.gps.GPSRunTask;
-import test.ui.UIMsgBox;
+import test.ui.TestQuestionMsgBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -102,7 +103,7 @@ public class TestFragment extends Fragment {
 	private BracDataHandler BDH;
 	
 	private RelativeLayout main_layout;
-	private UIMsgBox msgBox;
+	private TestQuestionMsgBox msgBox;
 
 	private LoadingHandler loadingHandler;
 	private FailBgHandler failBgHandler;
@@ -143,6 +144,8 @@ public class TestFragment extends Fragment {
 	
 	private DecimalFormat format;
 	
+	private Toast startToast;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -152,6 +155,9 @@ public class TestFragment extends Fragment {
 		format.setMinimumIntegerDigits(1);
 		format.setMinimumFractionDigits(2);
 		format.setMaximumFractionDigits(2);
+		
+		digitTypeface = Typefaces.getDigitTypeface(getActivity());
+		wordTypefaceBold  = Typefaces.getWordTypefaceBold(getActivity());
 	}
 	
 	public void onPause(){
@@ -180,9 +186,6 @@ public class TestFragment extends Fragment {
 	}
 	
 	private void setting(){
-		
-		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
-		wordTypefaceBold  = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		
 		bg = (ImageView) view.findViewById(R.id.test_background);
 		startLayout = (RelativeLayout) view.findViewById(R.id.test_start_layout);
@@ -218,7 +221,7 @@ public class TestFragment extends Fragment {
 		RelativeLayout.LayoutParams mParam = (LayoutParams) messageView.getLayoutParams();
 		mParam.topMargin = screen.x * 40/480;
 		if (msgBox==null)
-			msgBox = new UIMsgBox(testFragment,main_layout);
+			msgBox = new TestQuestionMsgBox(testFragment,main_layout);
 		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
 
 		debugMsg = (EditText) view.findViewById(R.id.debug_msg);
@@ -299,9 +302,7 @@ public class TestFragment extends Fragment {
 	public void runBT(){
 		if (testHandler==null)
 			testHandler = new TestHandler();
-		
 			testHandler.sendEmptyMessage(0);
-
 	}
 	
 	public void failBT(){
@@ -346,8 +347,12 @@ public class TestFragment extends Fragment {
 					messageView.setText(R.string.test_guide_show_turn_on);
 					Thread t = new Thread(new TimeUpRunnable(0,1500));
 					t.start();
-				}else
-					Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.testTimeCheckToast), Toast.LENGTH_LONG).show();
+				}else{
+					if (startToast !=null)
+						startToast.cancel();
+					startToast = Toast.makeText(getActivity(), R.string.testTimeCheckToast, Toast.LENGTH_SHORT);
+					startToast.show();
+				}
 			}
 		}
 	}
@@ -419,7 +424,7 @@ public class TestFragment extends Fragment {
 			if (!DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
 				stop();
 					if (msgBox == null)
-						msgBox = new UIMsgBox(testFragment,main_layout);
+						msgBox = new TestQuestionMsgBox(testFragment,main_layout);
 					if (msgLoadingHandler == null)
 						msgLoadingHandler = new MsgLoadingHandler();
 					msgLoadingHandler.sendEmptyMessage(0);
@@ -537,7 +542,7 @@ public class TestFragment extends Fragment {
 			bParam.height = bParam.width*1709/1080;
 			
 			RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
-			startLayoutParam.topMargin = screen.x * 190/480;
+			startLayoutParam.topMargin = screen.x * 192/480;
 			startLayoutParam.width = startLayoutParam.height = screen.x * 255/480;
 			
 			RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();

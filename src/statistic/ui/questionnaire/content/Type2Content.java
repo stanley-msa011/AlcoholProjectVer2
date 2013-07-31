@@ -19,6 +19,8 @@ public class Type2Content extends QuestionnaireContent {
 		super(msgBox);
 	}
 
+	private static final long HOUR = AlarmManager.INTERVAL_HOUR;
+	
 	@Override
 	protected void setContent() {
 		msgBox.setNextButton("", null);
@@ -30,7 +32,7 @@ public class Type2Content extends QuestionnaireContent {
 		
 		PendingIntent pending = PendingIntent.getBroadcast(context, 0x9999, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarm.cancel(pending);
-		long trigger_time = 3600*1000L + System.currentTimeMillis();
+		long trigger_time = HOUR + System.currentTimeMillis();
 		alarm.set(AlarmManager.RTC_WAKEUP, trigger_time, pending);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor editor = sp.edit();

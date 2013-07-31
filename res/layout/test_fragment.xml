@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
+        android:scaleType="centerCrop"
         android:src="@drawable/test_background" />
     
     <RelativeLayout
@@ -33,6 +34,7 @@
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
     	    android:scaleType="fitXY"
+    	    android:visibility="invisible"
     	    android:src="@drawable/test_start_button" />
     
     	<ImageView
@@ -41,6 +43,7 @@
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
     	    android:scaleType="fitXY"
+    	    android:visibility="invisible"
     	    android:src="@drawable/test_button_stroke" />
     	
     	<ImageView
@@ -57,6 +60,7 @@
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
     	    android:scaleType="fitXY"
+    	    android:visibility="invisible"
     	    android:src="@drawable/test_face" />
     	
     	<TextView
@@ -66,6 +70,7 @@
     	    android:layout_centerInParent="true"
     	    android:gravity="center"
     	    android:text="@string/start"
+    	    android:visibility="invisible"
     	    android:textAlignment="center"
     	    android:textColor="#FF454545" />
 

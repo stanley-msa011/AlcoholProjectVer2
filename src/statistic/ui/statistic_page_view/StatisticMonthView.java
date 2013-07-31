@@ -52,6 +52,8 @@ public class StatisticMonthView extends StatisticPageView {
 	public StatisticMonthView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_month_view, statisticFragment);
 		db = new HistoryDB(context);
+		digitTypefaceBold = statisticFragment.digitTypefaceBold;
+		wordTypefaceBold = statisticFragment.wordTypefaceBold;
 	}
 
 
@@ -62,9 +64,6 @@ public class StatisticMonthView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		Point screen = StatisticFragment.getStatisticPx();
-		
-		digitTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/dinpromedium.ttf");
-		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");;
 		
 		timeLayout = (LinearLayout) view.findViewById(R.id.statistic_month_timeblock_label_layout);
 		blockLayout = (GridLayout) view.findViewById(R.id.statistic_month_block_layout);

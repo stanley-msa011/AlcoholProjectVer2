@@ -2,7 +2,9 @@ package test.bluetooth;
 
 
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +36,7 @@ public class Bluetooth {
 	protected static final UUID uuid=  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	protected static String DEVICE_NAME = "BOLUTEK";
 	protected static String DEVICE_NAME2 = "AEGIN";
+	protected static String DEVICE_NAME_ALL = "apple";
 	protected BluetoothDevice sensor;
 	protected BluetoothSocket socket;
 	
@@ -105,7 +108,6 @@ public class Bluetooth {
 		prev_prev_pressure = 0.f;
 		prev_pressure = 0.f;
 		now_pressure = 0.f;
-		success = false;
 		btUIHandler=new BTUIHandler(testFragment);
 		start = false;
 		sum = 0;
@@ -132,7 +134,7 @@ public class Bluetooth {
 		Iterator<BluetoothDevice> iter = devices.iterator();
 		while (iter.hasNext()){
 			BluetoothDevice device = iter.next();
-			if (device.getName().equals(DEVICE_NAME)||device.getName().equals(DEVICE_NAME2)){
+			if (device.getName().equals(DEVICE_NAME)||device.getName().equals(DEVICE_NAME2)||device.getName().contains(DEVICE_NAME_ALL)){
 				sensor = device;
 				break;
 			}
@@ -173,10 +175,6 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CONNECT TO THE SENSOR");
 			Log.e("BT",e.toString());
-			String s = e.toString();
-			sp_editor.putString("BT_CONNECTION_ERROR", s);
-			sp_editor.putBoolean("HAS_BT_CONNECTION_ERROR", true);
-			sp_editor.commit();
 			close();
 			return -1;
 		}
@@ -187,6 +185,37 @@ public class Bluetooth {
 		start = true;
 	}
 	
+	
+	private final static byte[] sendStartMessage = {'y','y','y'};
+	private final static byte[] sendEndMessage = {'z','z','z'};
+	
+	private OutputStream out;
+	
+	public boolean sendStart(){
+		try {
+			Log.d("BT","SEND START");
+			out = socket.getOutputStream();
+			out.write(sendStartMessage);
+			return true;
+		} catch (IOException e) {
+			Log.d("BT","SEND START FAIL "+ e.toString());
+			close();
+			cameraRunHandler.sendEmptyMessage(1);
+			return false;
+		}
+	}
+	
+	public boolean sendEnd(){
+		try {
+			Log.d("BT","SEND END");
+			out.write(sendEndMessage);
+			return true;
+		} catch (IOException e) {
+			Log.d("BT","SEND END FAIL "+ e.toString());
+			close();
+			return false;
+		}
+	}
 	
 	public void read(){
 		
@@ -244,13 +273,16 @@ public class Bluetooth {
 					}else if (read_type!= READ_NULL)
 							msg += (char)temp[i];
 				}
-				if (end == -1)
+				if (end == -1){
+					sendEnd();
 					break;
+				}
 				bytes =in.read(temp);
 			}
 			close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
+			sendEnd();
 			close();
 			if(!success)
 					cameraRunHandler.sendEmptyMessage(1);
@@ -351,12 +383,17 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CLOSE THE SENSOR");
 		}
-		
 		try {
 			if (in != null)
 				in.close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
+		}
+		try {
+			if (out != null)
+				out.close();
+		} catch (Exception e) {
+			Log.e("BT","FAIL TO CLOSE THE SENSOR OUTPUTSTREAM");
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();

@@ -14,6 +14,7 @@ import debug.clicklog.ClickLoggerLog;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -71,6 +72,8 @@ public class AudioRecordBox {
 	
 	private String[] helpStr;
 	
+	private Toast toast;
+	
 	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
 		this.historyFragment = historyFragment;
 		this.context = historyFragment.getActivity();
@@ -93,13 +96,10 @@ public class AudioRecordBox {
 			dir = new File(Environment.getExternalStorageDirectory(),"drunk_detection");
 		else
 			dir = new File(historyFragment.getActivity().getFilesDir(),"drunk_detection");
-		if (!dir.exists())
-			if (!dir.mkdirs()){
-				Log.d("AUDIO_STORAGE","FAIL TO CREATE DIR");
-			}
 		mainDirectory = new File(dir,"audio_records");
 		if (!mainDirectory.exists())
 			if (!mainDirectory.mkdirs()){
+				Log.d("AUDIO_STORAGE","FAIL TO CREATE DIR");
 				return;
 			}
 	}
@@ -108,7 +108,7 @@ public class AudioRecordBox {
 		
 		backgroundLayout.setVisibility(View.INVISIBLE);
 		
-		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.rec_layout,null);
 		boxLayout.setVisibility(View.INVISIBLE);
@@ -219,7 +219,10 @@ public class AudioRecordBox {
 		public void onInfo(MediaRecorder mr, int what, int extra) {
 			if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
 				mediaRecorder.release();
-				Toast.makeText(context, context.getString(R.string.audio_box_toast_timeup), Toast.LENGTH_LONG).show();
+				if (toast != null)
+					toast.cancel();
+				toast = 	Toast.makeText(context, R.string.audio_box_toast_timeup, Toast.LENGTH_SHORT);
+				toast.show();
 				setButtonState(STATE_INIT);
 			}
 		}
@@ -234,7 +237,10 @@ public class AudioRecordBox {
 					mediaRecorder.release();
 					mediaRecorder = null;
 					db.insertAudio(curDV);
-					Toast.makeText(context, context.getResources().getString(R.string.audio_box_toast_record_end), Toast.LENGTH_LONG).show();
+					if (toast != null)
+						toast.cancel();
+					toast = 	Toast.makeText(context, R.string.audio_box_toast_record_end, Toast.LENGTH_SHORT);
+					toast.show();
 				} catch (IllegalStateException e) {
 				}
 			}
@@ -346,7 +352,9 @@ public class AudioRecordBox {
 					mediaPlayer.stop();
 					mediaPlayer.release();
 					mediaPlayer = null;
-					Toast.makeText(context, context.getResources().getString(R.string.audio_box_toast_play_end), Toast.LENGTH_LONG).show();
+					if (toast !=null)
+						toast = 	Toast.makeText(context, R.string.audio_box_toast_play_end, Toast.LENGTH_SHORT);
+					toast.show();
 				} catch (IllegalStateException e) {
 				}
 			}

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="25"
-    android:versionName="2.45" >
+    android:versionCode="28"
+    android:versionName="2.52" >
 
     <uses-sdk
-        android:maxSdkVersion="17"
+        android:maxSdkVersion="18"
         android:minSdkVersion="14"
-        android:targetSdkVersion="17" />
+        android:targetSdkVersion="18" />
 
     <uses-feature android:name="android.hardware.camera" />
 
@@ -19,7 +19,6 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.GET_TASKS" />
@@ -37,8 +36,9 @@
         android:anyDensity="true"
         android:largeScreens="true"
         android:normalScreens="true"
-        android:resizeable="true"
-        android:smallScreens="true" />
+        android:smallScreens="false" 
+        android:resizeable="false"
+        />
 
     <application
         android:allowBackup="true"
@@ -55,15 +55,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <receiver
-            android:name="com.google.android.gcm.GCMBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-            </intent-filter>
-        </receiver>
         <receiver android:name="ubicomp.drunk_detection.activities.BootBoardcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

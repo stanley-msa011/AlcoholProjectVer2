@@ -1,6 +1,7 @@
 package ubicomp.drunk_detection.activities;
 
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
@@ -44,6 +45,8 @@ public class EmotionManageActivity extends Activity {
 	private int emotion, r_type;
 	private String reason;
 	private EditText r_texts;
+	
+	private Toast endToast;
 	
 	private static final int[] EMOTION_DRAWABLE_ID = {
 		R.drawable.questionnaire_item_e1,
@@ -97,16 +100,11 @@ public class EmotionManageActivity extends Activity {
 			display.getSize(screen);
 		}
 		
-	}
-
-	@Override
-	protected void onResume(){
-		super.onResume();
 		this.activity = this;
 		db = new QuestionDB(activity);
 		mainLayout = (LinearLayout) this.findViewById(R.id.emotion_main_layout);
 		inflater = LayoutInflater.from(activity);
-		wordTypefaceBold = Typeface.createFromAsset(activity.getAssets(), "fonts/DFLiHeiStd-W5.otf");
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(this);
 		
 		mainLayout.removeAllViews();
 		onTouchListener = new ItemOnTouchListener();
@@ -114,6 +112,11 @@ public class EmotionManageActivity extends Activity {
 		textSize = screen.x * 24/480;
 		iconMargin = screen.x * 33/480;
 		
+	}
+
+	@Override
+	protected void onResume(){
+		super.onResume();
 		setQuestionEmotion();
 	}
 	
@@ -123,7 +126,7 @@ public class EmotionManageActivity extends Activity {
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*244/1080;
+		titleparam.height = screen.x*230/1080;
 		
 		View tv = createTextView(R.string.emotion_manage_help1);
 		mainLayout.addView(tv);
@@ -340,7 +343,10 @@ private View createTextView(int textStr){
 		tParam.leftMargin = textSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
-		icon.setImageDrawable(getResources().getDrawable(DrawableId));
+		if (DrawableId!=0)
+			icon.setImageDrawable(getResources().getDrawable(DrawableId));
+		else
+			icon.setImageDrawable(null);
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
 		iParam.rightMargin = iconMargin;
 		
@@ -455,7 +461,10 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		if (keyCode == KeyEvent.KEYCODE_BACK){
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_RETURN_BUTTON);
 			if (state == 0){
-				Toast.makeText(activity,getResources().getString(R.string.emotion_manage_toast), Toast.LENGTH_LONG).show();
+				if (endToast!=null)
+					endToast.cancel();
+				endToast = Toast.makeText(this,R.string.emotion_manage_toast, Toast.LENGTH_SHORT);
+				endToast.show();
 				--state;
 			}else if (state == -1)
 				return super.onKeyDown(keyCode, event);

@@ -15,8 +15,8 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 	private PointF from,to;
 	private float width_gap_1;
 	private float height_gap_1;
-	public static final int gaps = 20;
-	private static final int clip_time = 300;
+	public static final int gaps = 25;
+	private static final int clip_time = 400;
 	private static final int sleep_time = clip_time/gaps;
 	private int[] bgs;
 	private HistoryFragment historyFragment;
@@ -41,10 +41,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		height_gap_1 = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;
 		this.type = type;
-		if (FragmentTabs.isWideScreen())
-			y_axis = screen.x*1137/1080;
-		else
-			y_axis = screen.x * 993/1080;
+		y_axis = screen.y - screen.x * 574/1080;
 	}
 	
 	@Override

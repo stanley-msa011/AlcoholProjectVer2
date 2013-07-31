@@ -26,7 +26,7 @@ public class BTInitHandler extends Handler {
 			Init_success = false;
 		}
 		 if (Init_success)
-			 testFragment.updateInitState(TestFragment._BT);
+				 testFragment.updateInitState(TestFragment._BT);
 		 else{
 			 testFragment.stopDueToInit();
 			 testFragment.failBT();

@@ -87,6 +87,7 @@ public class BluetoothDebugMode extends Bluetooth {
 					}
 				}
 				if (end == -1){
+					sendEnd();
 					break;
 				}
 				bytes =in.read(temp);
@@ -94,6 +95,7 @@ public class BluetoothDebugMode extends Bluetooth {
 			close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR");
+			sendEnd();
 			close();
 			testFragment.showDebug("Close by exception or timeout" );
 			if(!success){

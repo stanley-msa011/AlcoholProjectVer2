@@ -14,6 +14,7 @@ import statistic.ui.questionnaire.content.Type3Content;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -21,6 +22,7 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,6 +83,7 @@ public class QuestionMsgBox {
 	
 	private void setting(){
 		
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(getContext());
 		backgroundLayout.setVisibility(View.INVISIBLE);
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.question_box_layout,null);
@@ -98,7 +101,6 @@ public class QuestionMsgBox {
 	
 	public void settingPreTask(){
 		
-		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		mainLayout.addView(backgroundLayout);
 		mainLayout.addView(boxLayout);
 		
@@ -233,6 +235,7 @@ public class QuestionMsgBox {
 	
 	public void insertSeq(){
 		db.insertQuestionnaire(seq_toString(),type);
+		Log.d("insert",seq_toString());
 	}
 	
 

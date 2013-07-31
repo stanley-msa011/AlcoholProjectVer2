@@ -3,66 +3,68 @@ package data.info;
 
 public class AccumulatedHistoryState extends HistoryState {
 
-	public int[] acc_test = {0,0,0};
-	public int[] acc_pass = {0,0,0};
-	public int[] total_acc_test = {0,0,0};
-	public int[] total_acc_pass = {0,0,0};
+	private int[] empty_array = {0,0,0};
+	
+	public int[] acc_test_week = {0,0,0};
+	public int[] acc_pass_week = {0,0,0};
+	public int[] acc_test_total = {0,0,0};
+	public int[] acc_pass_total = {0,0,0};
 	
 	public int MAX_SCORE = 15;
 	
-	public AccumulatedHistoryState(int week,int[] acc_test,int[] acc_pass, int[] t_acc_test, int[] t_acc_pass) {
+	public AccumulatedHistoryState(int week,int[] acc_test_week,int[] acc_pass_week, int[] acc_test_total, int[] acc_pass_total) {
 		super(week);
-		if (acc_test != null && acc_test.length == 3)
-			this.acc_test = acc_test.clone();
-		if (acc_pass != null && acc_pass.length == 3)
-			this.acc_pass = acc_pass.clone();
-		if (t_acc_test != null && t_acc_test.length == 3)
-			this.total_acc_test = t_acc_test.clone();
-		if (t_acc_pass != null && t_acc_pass.length == 3)
-			this.total_acc_pass = t_acc_pass.clone();
+		if (acc_test_week != null && acc_test_week.length == 3)
+			this.acc_test_week = acc_test_week.clone();
+		if (acc_pass_week != null && acc_pass_week.length == 3)
+			this.acc_pass_week = acc_pass_week.clone();
+		if (acc_test_total != null && acc_test_total.length == 3)
+			this.acc_test_total = acc_test_total.clone();
+		if (acc_pass_total != null && acc_pass_total.length == 3)
+			this.acc_pass_total = acc_pass_total.clone();
 	}
 
 	public void changeAcc(boolean pass, int week, int timeblock){
 		if (this.week != week){
-			acc_test = new int[3];
-			acc_pass = new int[3];
+			acc_test_week = empty_array.clone();
+			acc_pass_week = empty_array.clone();
 		}
 		this.week = week;
-		acc_test[timeblock]+=1;
-		total_acc_test[timeblock] +=1;
+		++acc_test_week[timeblock];
+		++acc_test_total[timeblock];
 		if (pass){
-			acc_pass[timeblock] += 1;
-			total_acc_pass[timeblock] +=1;
+			++acc_pass_week[timeblock];
+			++acc_pass_total[timeblock];
 		}
 	}
 	
 	public int getScore(){
-		int score = (acc_test[0] + acc_test[2] + acc_pass[0] + acc_pass[2]) /2;
+		int score = (acc_test_week[0] + acc_test_week[2] + acc_pass_week[0] + acc_pass_week[2]) /2;
 		return score;
 	}
 	
 	public int getSelfHelpCounter(){
-		int score = (total_acc_test[0]+total_acc_test[1]+total_acc_test[2]) + (total_acc_pass[0]+total_acc_pass[1]+total_acc_pass[2]);
+		int score = (acc_test_total[0]+acc_test_total[1]+acc_test_total[2]) + (acc_pass_total[0]+acc_pass_total[1]+acc_pass_total[2]);
 		return score;
 	}
 	
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-		for (int i=0;i<acc_test.length;++i){
-			sb.append(acc_test[i]);
+		for (int i=0;i<acc_test_week.length;++i){
+			sb.append(acc_test_week[i]);
 			sb.append("\t");
 		}
-		for (int i=0;i<acc_pass.length;++i){
-			sb.append(acc_pass[i]);
+		for (int i=0;i<acc_pass_week.length;++i){
+			sb.append(acc_pass_week[i]);
 			sb.append("\t");
 		}
-		for (int i=0;i<total_acc_test.length;++i){
-			sb.append(total_acc_test[i]);
+		for (int i=0;i<acc_test_total.length;++i){
+			sb.append(acc_test_total[i]);
 			sb.append("\t");
 		}
-		for (int i=0;i<total_acc_pass.length;++i){
-			sb.append(total_acc_pass[i]);
+		for (int i=0;i<acc_pass_total.length;++i){
+			sb.append(acc_pass_total[i]);
 			sb.append("\t");
 		}
 		return sb.toString();

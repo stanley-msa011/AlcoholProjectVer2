@@ -5,19 +5,25 @@ package data.uploader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.protocol.HTTP;
 
 import ubicomp.drunk_detection.activities.R;
 
@@ -95,7 +101,6 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			        	Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - QUESTIONNAIRE");
 			        	return null;
 			        }
-			        
 				}
 			}
 			return null;
@@ -172,25 +177,24 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				
 				HttpPost httpPost = new HttpPost(SERVER_URL_EMOTION_MANAGE);
 				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-				MultipartEntity mpEntity = new MultipartEntity();
+				
+				List <NameValuePair> nvps = new ArrayList <NameValuePair>();
 				
 				
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
-				mpEntity.addPart("emotionManageData[]", new StringBody(uid));
-				mpEntity.addPart("emotionManageData[]", new StringBody(String.valueOf(em_data.ts)));
-				mpEntity.addPart("emotionManageData[]", new StringBody(String.valueOf(em_data.emotion)));
-				mpEntity.addPart("emotionManageData[]", new StringBody(String.valueOf(em_data.type)));
-				mpEntity.addPart("emotionManageData[]", new StringBody(em_data.reason));
+				nvps.add(new BasicNameValuePair("emotionManageData[]",uid));
+				nvps.add(new BasicNameValuePair("emotionManageData[]",String.valueOf(em_data.ts)));
+				nvps.add(new BasicNameValuePair("emotionManageData[]",String.valueOf(em_data.emotion)));
+				nvps.add(new BasicNameValuePair("emotionManageData[]",String.valueOf(em_data.type)));
+				nvps.add(new BasicNameValuePair("emotionManageData[]",em_data.reason));
 				int week = WeekNum.getWeek(context, em_data.ts);
-				mpEntity.addPart("emotionManageData[]", new StringBody(String.valueOf(week)));
+				nvps.add(new BasicNameValuePair("emotionManageData[]",String.valueOf(week)));
 				for (int i=0;i<em_data.acc.length;++i){
-					mpEntity.addPart("emotionManageAcc[]", new StringBody(String.valueOf(em_data.acc[i])));
-					mpEntity.addPart("emotionManageUsed[]", new StringBody(String.valueOf(em_data.used[i])));
+					nvps.add(new BasicNameValuePair("emotionManageAcc[]",String.valueOf(em_data.acc[i])));
+					nvps.add(new BasicNameValuePair("emotionManageUsed[]",String.valueOf(em_data.used[i])));
 				}
-				
-				
-				httpPost.setEntity(mpEntity);
+				httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 				int result = uploader(httpClient, httpPost,context);
 				if (result == 1){
 					db.setEmotionManageUploaded(em_data.ts);

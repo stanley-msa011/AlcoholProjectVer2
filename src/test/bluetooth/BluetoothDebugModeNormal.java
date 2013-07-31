@@ -86,6 +86,7 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 					}
 				}
 				if (end == -1){
+					sendEnd();
 					break;
 				}
 				bytes =in.read(temp);
@@ -93,6 +94,7 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 			close();
 		} catch (Exception e) {
 			close();
+			sendEnd();
 			testFragment.showDebug("Close by exception or timeout" );
 			if(!success){
 					cameraRunHandler.sendEmptyMessage(1);

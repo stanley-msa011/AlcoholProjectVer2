@@ -1,5 +1,6 @@
 package ubicomp.drunk_detection.activities;
 
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
@@ -44,8 +45,8 @@ public class AboutActivity extends Activity {
 		setContentView(R.layout.activity_about);
 		activity = this;
 		
-		wordTypefaceBold = Typeface.createFromAsset(this.getAssets(), "fonts/DFLiHeiStd-W5.otf");
-		digitTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/dinproregular.ttf");
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(this);
+		digitTypeface = Typefaces.getDigitTypeface(this);
 		titleLayout = (RelativeLayout) this.findViewById(R.id.about_title_layout );
 		titleText = (TextView) this.findViewById(R.id.about_title);
 		about = (TextView) this.findViewById(R.id.about_about);

@@ -71,9 +71,9 @@ public class DataGenerator {
 				float brac = 0.F; 
 				int emotion = rand.nextInt(5)+1;
 				int desire = rand.nextInt(10)+1;
-				if (fail > 3){
+				if (fail > 3)
 					brac = (float) (BracDataHandler.THRESHOLD + rand.nextFloat() * 0.2F);
-				}
+				
 				int week = WeekNum.getWeek(context, from);
 				DateBracDetectionState history = new DateBracDetectionState(week,from,brac,emotion,desire);
 				AccumulatedHistoryState a_state = hdb.getLatestAccumulatedHistoryState();

@@ -6,6 +6,7 @@ import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.fragments.TestFragment;
 import ubicomp.drunk_detection.ui.CustomTab;
 import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -71,9 +73,10 @@ public class FragmentTabs extends FragmentActivity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.tab_layout);
+
+		Typefaces.initAll(this);
 		
 		loading_page = (ImageView) this.findViewById(R.id.loading_page);
-		
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		if (Build.VERSION.SDK_INT<13){
@@ -137,6 +140,8 @@ public class FragmentTabs extends FragmentActivity {
 	protected void onStart(){
 		Reuploader.reuploader(this);
 		ClickLogUploader2.upload(this);
+		Intent a_intent = new Intent(this,RegularCheckService.class);
+		this.startService(a_intent);
 		super.onStart();
 	}
 	protected void onResume(){
@@ -208,31 +213,33 @@ public class FragmentTabs extends FragmentActivity {
 	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-    	menu.add(1, 0, 0, R.string.emotionDIY_title);
-    	menu.add(1, 1, 1, R.string.emotion_manage_title);
-    	menu.add(1, 2, 2, R.string.about_title);
-    	return super.onCreateOptionsMenu(menu);
+    	MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main_menu, menu);
+    	return true;
     }
 	
     public boolean onOptionsItemSelected(MenuItem item){
 		int id = item.getItemId();
-		int gid = item.getGroupId();
-		if (gid == 1){
-			if (id == 0){
-				Intent newIntent = new Intent(this, EmotionActivity.class);
+		Intent newIntent;
+		switch(id){
+			case R.id.menu_emotion_diy:
+				newIntent = new Intent(this, EmotionActivity.class);
 				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_EMOTIONDIY);
 				this.startActivity(newIntent);
-			}else if (id == 1){
-				Intent newIntent = new Intent(this, EmotionManageActivity.class);
+				return true;
+			case R.id.menu_emotion_management:
+				newIntent = new Intent(this, EmotionManageActivity.class);
 				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_EMOTIONMANAGE);
 				this.startActivity(newIntent);
-			}else if (id == 2){
-				Intent newIntent = new Intent(this, AboutActivity.class);
+				return true;
+			case R.id.menu_about:
+				newIntent = new Intent(this, AboutActivity.class);
 				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_ABOUT);
 				this.startActivity(newIntent);
-			}
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
-		return false;
     }
     
     public class TabChangeListener implements TabHost .OnTabChangeListener{
@@ -332,7 +339,7 @@ public class FragmentTabs extends FragmentActivity {
 		@Override
 		public void run() {
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(3000);
 				loadingPageHandler.sendEmptyMessage(0);
 			} catch (InterruptedException e) {}
 		}

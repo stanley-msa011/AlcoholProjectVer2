@@ -9,6 +9,7 @@ import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.Typefaces;
 
 import data.calculate.WeekNum;
 import data.database.AudioDB;
@@ -150,6 +151,11 @@ public class HistoryFragment extends Fragment {
     	hdb = new HistoryDB(this.getActivity());
     	adb = new AudioDB(this.getActivity());
     	from_cal = Calendar.getInstance();
+    	
+    	wordTypefaceBold = Typefaces.getDigitTypefaceBold(getActivity());
+    	digitTypeface = Typefaces.getDigitTypeface(getActivity());
+    	digitTypefaceBold = Typefaces.getWordTypefaceBold(getActivity());
+    	
     	SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 	    int mYear = sp.getInt("sYear", from_cal.get(Calendar.YEAR));
 	    int mMonth = sp.getInt("sMonth", from_cal.get(Calendar.MONTH));
@@ -170,10 +176,8 @@ public class HistoryFragment extends Fragment {
 		
     	bg_x = screen.x;
     	page_width = bg_x;
-    	if (FragmentTabs.isWideScreen())
-    		page_height = bg_x* 1137/1080;
-    	else
-    		page_height = bg_x*993/1080;
+    	
+    	page_height = screen.y - bg_x * 574/1080;
 		
 		page_states =hdb.getAccumulatedHistoryStateByWeek(); 
 		page_week = page_states.length - 1;
@@ -277,13 +281,8 @@ public class HistoryFragment extends Fragment {
     	scrollView.setSmoothScrollingEnabled(true);
     	chartAreaLayout = (RelativeLayout) view.findViewById(R.id.history_chart_area_layout);
     	
-    	wordTypefaceBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/DFLiHeiStd-W5.otf");
-    	digitTypeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/dinproregular.ttf");
-    	digitTypefaceBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/dinpromedium.ttf");
-    	
-    	
     	from = new PointF(page_width,page_height);
-    	to = new PointF(page_width*0.8F,-page_height);
+    	to = new PointF(page_width/2,-page_height);
     	touchPoint = new PointF(from.x,from.y);
     	
     	pageWidget= new PageWidgetVertical(pageLayout.getContext(),page_width,page_height);

@@ -240,10 +240,10 @@ public class HistoryDB {
     	
     	db = dbHelper.getWritableDatabase();
     	
-    	int[] accTest = a_state.acc_test;
-    	int[] accPass = a_state.acc_pass;
-    	int[] t_accTest = a_state.total_acc_test;
-    	int[] t_accPass = a_state.total_acc_pass;
+    	int[] accTest = a_state.acc_test_week;
+    	int[] accPass = a_state.acc_pass_week;
+    	int[] t_accTest = a_state.acc_test_total;
+    	int[] t_accPass = a_state.acc_pass_total;
     	long ts = state.timestamp;
     	float brac = state.brac;
     	int year = state.year;

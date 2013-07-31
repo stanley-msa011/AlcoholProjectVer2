@@ -5,6 +5,7 @@ import debug.clicklog.ClickLoggerLog;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.TestFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -25,7 +26,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Switch;
 import android.widget.TextView;
 
-public class UIMsgBox {
+public class TestQuestionMsgBox {
 
 	private TestFragment testFragment;
 	private Context context;
@@ -81,7 +82,7 @@ public class UIMsgBox {
 	
 	private boolean done,doneByDoubleClick;
 	
-	public UIMsgBox(TestFragment testFragment,RelativeLayout mainLayout){
+	public TestQuestionMsgBox(TestFragment testFragment,RelativeLayout mainLayout){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.r = context.getResources();
@@ -91,14 +92,13 @@ public class UIMsgBox {
 		desireStr = context.getResources().getStringArray(R.array.craving_state);
 		screen = FragmentTabs.getSize();
 		isWideScreen = FragmentTabs.isWideScreen();
+		digitTypeface = Typefaces.getDigitTypeface(context);
+		wordTypeface = Typefaces.getWordTypeface(context);
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
 		setting();
 	}
 	
 	private void setting(){
-		
-		digitTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/dinproregular.ttf");
-		wordTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W3.otf");
-		wordTypefaceBold = Typeface.createFromAsset(context.getAssets(), "fonts/DFLiHeiStd-W5.otf");
 		
 		endListener = new EndOnClickListener();
 		cancelListener = new CancelOnClickListener();
@@ -371,7 +371,7 @@ public class UIMsgBox {
 		@Override
 		public void onClick(View v) {
 			if (!done){
-				Toast.makeText(mainLayout.getContext(),R.string.msg_box_toast_send, Toast.LENGTH_LONG).show();
+				Toast.makeText(mainLayout.getContext(),R.string.msg_box_toast_send, Toast.LENGTH_SHORT).show();
 				enableSend(true,true);
 				return;
 			}

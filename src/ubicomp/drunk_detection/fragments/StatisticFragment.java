@@ -3,6 +3,7 @@ package ubicomp.drunk_detection.fragments;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.Typefaces;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.statistic_page_view.AnalysisCounterView;
 import statistic.ui.statistic_page_view.AnalysisProgressView;
@@ -72,12 +73,16 @@ public class StatisticFragment extends Fragment {
 	
 	private ImageView firstScroll;
 	
-	private Typeface wordTypefaceBold;
+	public Typeface wordTypeface,digitTypeface,wordTypefaceBold,digitTypefaceBold;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this.getActivity();
+        digitTypeface = Typefaces.getDigitTypeface(getActivity());
+		digitTypefaceBold = Typefaces.getDigitTypefaceBold(getActivity());
+		wordTypeface = Typefaces.getWordTypeface(getActivity());
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(getActivity());
     }
 
     @Override
@@ -88,19 +93,14 @@ public class StatisticFragment extends Fragment {
     
     public void onResume(){
     	super.onResume();
-		
     	statisticFragment = this;
-    	
     	analysisViews = new StatisticPageView[4];
     	analysisViews[0] = new AnalysisProgressView(activity, statisticFragment);
     	analysisViews[1] = new AnalysisCounterView(activity, statisticFragment);
     	analysisViews[2] = new AnalysisSavingView(activity, statisticFragment);
 		analysisViews[3] = new AnalysisRatingView(activity,statisticFragment);
-    	
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
-		
 		msgBox = new QuestionMsgBox(statisticFragment,(RelativeLayout) view);
-		
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
 		
@@ -185,7 +185,6 @@ public class StatisticFragment extends Fragment {
         	Point screen = FragmentTabs.getSize();
         	statistic_px = new Point(screen.x,screen.x*380/480);
         	
-        	wordTypefaceBold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/DFLiHeiStd-W5.otf");
         	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
         	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
         	statisticView.setAdapter(statisticViewAdapter);

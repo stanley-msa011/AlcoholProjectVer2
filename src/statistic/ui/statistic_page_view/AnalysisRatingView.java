@@ -44,6 +44,7 @@ public class AnalysisRatingView extends StatisticPageView {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
 		db = new HistoryDB(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_ranking_help);
+		wordTypeface = statisticFragment.wordTypeface;
 	}
 
 	@Override
@@ -108,8 +109,6 @@ public class AnalysisRatingView extends StatisticPageView {
 	
 	@Override
 	public void onPreTask() {
-		
-		wordTypeface = Typeface.createFromAsset(context.getAssets(),"fonts/DFLiHeiStd-W3.otf");
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		

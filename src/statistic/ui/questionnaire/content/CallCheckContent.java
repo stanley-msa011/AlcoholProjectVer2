@@ -1,5 +1,6 @@
 package statistic.ui.questionnaire.content;
 
+import android.content.Context;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.CallOnClickListener;
 import ubicomp.drunk_detection.activities.R;
@@ -29,12 +30,13 @@ public class CallCheckContent extends QuestionnaireContent {
 			setHelp(R.string.call_check_help_emotion_hot_line);
 		}
 		else{
-			String call_check = msgBox.getContext().getResources().getString(R.string.call_check_help);
-			String question_sign = msgBox.getContext().getResources().getString(R.string.question_sign);
+			Context context = msgBox.getContext();
+			String call_check = context.getString(R.string.call_check_help);
+			String question_sign = context.getString(R.string.question_sign);
 			setHelp(call_check+" "+name +" "+question_sign);
 		}
 		msgBox.showQuestionnaireLayout(false);
-		msgBox.setNextButton(R.string.ok,new CallOnClickListener(msgBox,phone));
+		msgBox.setNextButton(R.string.ok,new CallOnClickListener(msgBox,phone,isEmotion));
 	}
 
 	@Override

@@ -3,13 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <LinearLayout 
-        android:id="@+id/history_main_layout"
-        android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:orientation="vertical"
-        >
     <RelativeLayout
+        	android:id = "@+id/history_top_layout"
         	android:layout_width="match_parent"
         	android:layout_height="wrap_content"
         	>
@@ -31,6 +26,7 @@
     	        android:layout_height="wrap_content"
     	        android:layout_centerHorizontal="true"
     	        android:gravity="center"
+    	        android:visibility="invisible"
     	        android:text="@string/page_help"
     	        android:textColor="#FF717071" />
     	    
@@ -67,6 +63,7 @@
        	android:layout_width="match_parent"
        	android:layout_height="wrap_content"
        	android:background="#FF8c8d8d"
+       	android:layout_below="@+id/history_top_layout"
         >
     	<HorizontalScrollView 
 	       	android:id  ="@+id/history_scroll_view"
@@ -80,5 +77,4 @@
         		/>
     	</HorizontalScrollView>
     </RelativeLayout>
-    </LinearLayout>
 </RelativeLayout>

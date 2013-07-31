@@ -15,14 +15,14 @@ public class BTRunTask extends AsyncTask<Void, Void, Void> {
 	
 	@Override
 	protected Void doInBackground(Void... params) {
-		bt.read();
+		if(bt.sendStart())
+			bt.read();
 		return null;
 	}
 	
 	@Override
 	protected void onCancelled(Void result){
 		bt.close();
-		
 	};
 
 	protected void onPostExecute(Void result) {
