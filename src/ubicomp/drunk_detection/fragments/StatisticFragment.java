@@ -73,21 +73,62 @@ public class StatisticFragment extends Fragment {
 	
 	private ImageView firstScroll;
 	
-	public Typeface wordTypeface,digitTypeface,wordTypefaceBold,digitTypefaceBold;
+	private Typeface wordTypefaceBold;
+	
+	private Point screen;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this.getActivity();
-        digitTypeface = Typefaces.getDigitTypeface(getActivity());
-		digitTypefaceBold = Typefaces.getDigitTypefaceBold(getActivity());
-		wordTypeface = Typefaces.getWordTypeface(getActivity());
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(getActivity());
+		screen = FragmentTabs.getSize();
+		statistic_px = new Point(screen.x,screen.x*380/480);
+		dot_on = getResources().getDrawable(R.drawable.statistic_dot_on);
+    	dot_off = getResources().getDrawable(R.drawable.statistic_dot_off);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	view = inflater.inflate(R.layout.statistic_fragment, container,false);
+    	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
+    	analysisLayout  = (LinearLayout)  view.findViewById(R.id.brac_analysis_layout);
+    	analysisView = (ScrollView) view.findViewById(R.id.brac_analysis);
+    	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
+    	dots_layout = (RelativeLayout) view.findViewById(R.id.brac_statistics_dots);
+		questionButton = (ImageView) view.findViewById(R.id.question_background);
+		firstScroll = (ImageView) view.findViewById(R.id.statistic_first_scroll);
+		shadow = (FrameLayout) view.findViewById(R.id.statistic_shadow);
+		showImage = (ImageView) view.findViewById(R.id.statistic_show_picture);
+		showText = (TextView) view.findViewById(R.id.statistic_show_text);
+		showText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 24/480);
+		showText.setTypeface(wordTypefaceBold);
+		LayoutParams statisticViewLayoutParam =  statisticLayout.getLayoutParams();
+    	statisticViewLayoutParam.height = statistic_px.y;
+    	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
+    	analysisViewLayoutParam.height = screen.y - statistic_px.y;
+    	RelativeLayout.LayoutParams dotsLayoutParam = (RelativeLayout.LayoutParams) dots_layout.getLayoutParams();
+    	dotsLayoutParam.topMargin = screen.x*350/480;
+    	dots = new ImageView[3];
+    	for (int i=0;i<3;++i){
+    		dots[i] = new ImageView(activity);
+    		dots_layout.addView(dots[i]);
+    		dots[i].setId(DOT_ID[i]);
+    	}
+    	int dot_gap =screen.x * 10/480;
+    	RelativeLayout.LayoutParams dot1Param = (RelativeLayout.LayoutParams) dots[1].getLayoutParams();
+    	dot1Param.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
+    	RelativeLayout.LayoutParams dot0Param = (RelativeLayout.LayoutParams) dots[0].getLayoutParams();
+    	dot0Param.addRule(RelativeLayout.LEFT_OF,DOT_ID[1]);
+    	dot0Param.rightMargin = dot_gap;
+    	RelativeLayout.LayoutParams dot2Param = (RelativeLayout.LayoutParams) dots[2].getLayoutParams();
+    	dot2Param.addRule(RelativeLayout.RIGHT_OF,DOT_ID[1]);
+    	dot2Param.leftMargin = dot_gap;
+    	RelativeLayout.LayoutParams questionParam = (RelativeLayout.LayoutParams) questionButton.getLayoutParams();
+		questionParam.topMargin =  screen.x * 23 / 480;
+		questionParam.rightMargin =  screen.x * 23 / 480;
+		RelativeLayout.LayoutParams fsParam = (RelativeLayout.LayoutParams) firstScroll.getLayoutParams();
+		fsParam.topMargin = screen.x;
         return view;
     }
     
@@ -181,18 +222,10 @@ public class StatisticFragment extends Fragment {
 	private class LoadingHandler extends Handler{
 		public void handleMessage(Message msg){
 			FragmentTabs.enableTab(false);
-			
-        	Point screen = FragmentTabs.getSize();
-        	statistic_px = new Point(screen.x,screen.x*380/480);
-        	
-        	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
-        	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
         	statisticView.setAdapter(statisticViewAdapter);
         	statisticView.setOnPageChangeListener(new StatisticOnPageChangeListener());
         	statisticView.setSelected(true);
-        	analysisLayout  = (LinearLayout)  view.findViewById(R.id.brac_analysis_layout);
         	analysisLayout.removeAllViews();
-        	analysisView = (ScrollView) view.findViewById(R.id.brac_analysis);
         	analysisView.setOnTouchListener(new View.OnTouchListener() {
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
@@ -201,20 +234,8 @@ public class StatisticFragment extends Fragment {
 					return false;
 				}
 			});
-        	dots_layout = (RelativeLayout) view.findViewById(R.id.brac_statistics_dots);
         	
-    		questionButton = (ImageView) view.findViewById(R.id.question_background);
         	questionButton.setOnClickListener(new QuestionOnClickListener());
-    		
-        	shadow = (FrameLayout) view.findViewById(R.id.statistic_shadow);
-    		showImage = (ImageView) view.findViewById(R.id.statistic_show_picture);
-    		showText = (TextView) view.findViewById(R.id.statistic_show_text);
-    		showText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 24/480);
-    		showText.setTypeface(wordTypefaceBold);
-    		
-    		
-    		firstScroll = (ImageView) view.findViewById(R.id.statistic_first_scroll);
-    		
         	for (int i=0;i<analysisViews.length;++i)
     			analysisLayout.addView(analysisViews[i].getView());
     		
@@ -222,39 +243,10 @@ public class StatisticFragment extends Fragment {
     		for (int i=0;i<analysisViews.length;++i)
     			analysisViews[i].onPreTask();
     		
-			LayoutParams statisticViewLayoutParam =  statisticLayout.getLayoutParams();
-        	statisticViewLayoutParam.height = statistic_px.y;
-			
-        	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
-        	analysisViewLayoutParam.height = screen.y - statistic_px.y;
-        	
-	    	dot_on = getResources().getDrawable(R.drawable.statistic_dot_on);
-	    	dot_off = getResources().getDrawable(R.drawable.statistic_dot_off);
-			
-	    	RelativeLayout.LayoutParams dotsLayoutParam = (android.widget.RelativeLayout.LayoutParams) dots_layout.getLayoutParams();
-	    	dotsLayoutParam.topMargin = screen.x*350/480;
-	    	
 			statisticViewAdapter.onInBackground();
     		for (int i=0;i<analysisViews.length;++i)
     			analysisViews[i].onInBackground();
 			
-	    	int dot_gap =screen.x * 10/480;
-			
-	    	dots = new ImageView[3];
-	    	for (int i=0;i<3;++i){
-	    		dots[i] = new ImageView(dots_layout.getContext());
-	    		dots_layout.addView(dots[i]);
-	    		dots[i].setId(DOT_ID[i]);
-	    	}
-	    	
-	    	RelativeLayout.LayoutParams dot1Param = (android.widget.RelativeLayout.LayoutParams) dots[1].getLayoutParams();
-	    	dot1Param.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
-	    	RelativeLayout.LayoutParams dot0Param = (android.widget.RelativeLayout.LayoutParams) dots[0].getLayoutParams();
-	    	dot0Param.addRule(RelativeLayout.LEFT_OF,DOT_ID[1]);
-	    	dot0Param.rightMargin = dot_gap;
-	    	RelativeLayout.LayoutParams dot2Param = (android.widget.RelativeLayout.LayoutParams) dots[2].getLayoutParams();
-	    	dot2Param.addRule(RelativeLayout.RIGHT_OF,DOT_ID[1]);
-	    	dot2Param.leftMargin = dot_gap;
 	    	
 			statisticViewAdapter.onPostTask();
     		for (int i=0;i<analysisViews.length;++i)
@@ -265,13 +257,6 @@ public class StatisticFragment extends Fragment {
     		for (int i=0;i<3;++i)
     			dots[i].setImageDrawable(dot_off);
 			dots[0].setImageDrawable(dot_on);
-			
-			RelativeLayout.LayoutParams questionParam = (RelativeLayout.LayoutParams) questionButton.getLayoutParams();
-			questionParam.topMargin =  screen.x * 23 / 480;
-			questionParam.rightMargin =  screen.x * 23 / 480;
-			
-			RelativeLayout.LayoutParams fsParam = (RelativeLayout.LayoutParams) firstScroll.getLayoutParams();
-			fsParam.topMargin = screen.x;
 			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			boolean tested = sp.getBoolean("tested", false);

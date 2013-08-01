@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -32,7 +33,7 @@ public class AnalysisProgressView extends StatisticPageView {
 	public AnalysisProgressView(Context context,StatisticFragment statisticFragment){
 		super(context, R.layout.analysis_progress_view,statisticFragment);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		wordTypeface = statisticFragment.wordTypeface;
+		wordTypeface = Typefaces.getWordTypeface(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_progress_help);
 		fromCal = Calendar.getInstance();
 		int year = sp.getInt("sYear", fromCal.get(Calendar.YEAR));

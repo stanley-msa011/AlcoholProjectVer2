@@ -46,6 +46,7 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -62,7 +63,7 @@ import debug.clicklog.ClickLoggerLog;
 
 public class TestFragment extends Fragment {
 
-	private Activity context;
+	private Activity activity;
 	private TestFragment testFragment;
 	private View view;
 	private TextView messageView;
@@ -111,6 +112,7 @@ public class TestFragment extends Fragment {
 	private TestHandler testHandler;
 	private TimeUpHandler timeUpHandler;
 	private ChangeTabsHandler changeTabsHandler;
+	private CountDownHandler countDownHandler;
 	
 	private RelativeLayout startLayout;
 	private ImageView bg, startButton;
@@ -146,6 +148,10 @@ public class TestFragment extends Fragment {
 	
 	private Toast startToast;
 	
+	private Point screen;
+	
+	private int count_down_sec = 0;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -155,9 +161,9 @@ public class TestFragment extends Fragment {
 		format.setMinimumIntegerDigits(1);
 		format.setMinimumFractionDigits(2);
 		format.setMaximumFractionDigits(2);
-		
 		digitTypeface = Typefaces.getDigitTypeface(getActivity());
 		wordTypefaceBold  = Typefaces.getWordTypefaceBold(getActivity());
+		screen = FragmentTabs.getSize();
 	}
 	
 	public void onPause(){
@@ -172,11 +178,10 @@ public class TestFragment extends Fragment {
 		super.onResume();
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		checkDebug2(sp.getBoolean("debug", false),sp.getBoolean("debug_type", false));
-		
 		if (!isKeepMsgBox()){
-			context = this.getActivity();
+			activity = this.getActivity();
 			testFragment = this;
-			setting();
+			settingOnResume();
 			loadingHandler.sendEmptyMessage(0);
 		}
 		else{
@@ -184,17 +189,49 @@ public class TestFragment extends Fragment {
 			runGPS();
 		}
 	}
+	private void settingOnResume(){
+		if (msgBox==null)
+			msgBox = new TestQuestionMsgBox(testFragment,main_layout);
+		loadingHandler = new LoadingHandler();
+		msgLoadingHandler = new MsgLoadingHandler();
+		failBgHandler = new FailBgHandler();
+		testHandler = new TestHandler();
+		timeUpHandler = new TimeUpHandler();
+		changeTabsHandler = new ChangeTabsHandler(); 
+		countDownHandler = new CountDownHandler();
+	}
 	
-	private void setting(){
-		
-		bg = (ImageView) view.findViewById(R.id.test_background);
+	public void reset(){
+		checkDebug();
+		timestamp = setTimeStamp();
+		setStorage();
+		locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+		cameraRecorder = new CameraRecorder(testFragment,imgFileHandler);
+		cameraRunHandler = new CameraRunHandler(cameraRecorder);
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+		Boolean debug = sp.getBoolean("debug", false);
+		Boolean debug_type = sp.getBoolean("debug_type", false);
+		if (debug){
+			if (debug_type)
+				bt = new BluetoothDebugModeNormal(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+			else
+				bt = new BluetoothDebugMode(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		}
+		else
+			bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		for (int i=0;i<3;++i)
+			INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
+	}
+	
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    	view = inflater.inflate(R.layout.test_fragment, container,false);
+    	bg = (ImageView) view.findViewById(R.id.test_background);
 		startLayout = (RelativeLayout) view.findViewById(R.id.test_start_layout);
 		startButton = (ImageView) view.findViewById(R.id.test_start_button);
 		bracText =(TextView) view.findViewById(R.id.test_brac_value_text);
 		brac = (TextView) view.findViewById(R.id.test_brac_text);
 		startText = (TextView) view.findViewById(R.id.test_start_button_text);
-		
-		Point screen = FragmentTabs.getSize();
 		
 		helpLayout = (RelativeLayout) view.findViewById(R.id.help_layout);
 		helpButton = (ImageView) view.findViewById(R.id.help_background);
@@ -220,45 +257,34 @@ public class TestFragment extends Fragment {
 		
 		RelativeLayout.LayoutParams mParam = (LayoutParams) messageView.getLayoutParams();
 		mParam.topMargin = screen.x * 40/480;
-		if (msgBox==null)
-			msgBox = new TestQuestionMsgBox(testFragment,main_layout);
+		
 		preview_layout = (FrameLayout) view.findViewById(R.id.test_camera_preview_layout);
 
 		debugMsg = (EditText) view.findViewById(R.id.debug_msg);
 		
-		loadingHandler = new LoadingHandler();
-		msgLoadingHandler = new MsgLoadingHandler();
-		failBgHandler = new FailBgHandler();
-		testHandler = new TestHandler();
-		timeUpHandler = new TimeUpHandler();
-		changeTabsHandler = new ChangeTabsHandler(); 
-	}
-	
-	public void reset(){
-		checkDebug();
-		timestamp = setTimeStamp();
-		setStorage();
-		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		cameraRecorder = new CameraRecorder(testFragment,imgFileHandler);
-		cameraRunHandler = new CameraRunHandler(cameraRecorder);
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
-		Boolean debug = sp.getBoolean("debug", false);
-		Boolean debug_type = sp.getBoolean("debug_type", false);
-		if (debug){
-			if (debug_type)
-				bt = new BluetoothDebugModeNormal(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
-			else
-				bt = new BluetoothDebugMode(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
-		}
-		else
-			bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
-		for (int i=0;i<3;++i)
-			INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
-	}
-	
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    	view = inflater.inflate(R.layout.test_fragment, container,false);
+		RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams)bg.getLayoutParams();
+		bParam.width = screen.x;
+		bParam.height = bParam.width*1709/1080;
+		
+		RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
+		startLayoutParam.topMargin = screen.x * 192/480;
+		startLayoutParam.width = startLayoutParam.height = screen.x * 255/480;
+		
+		RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
+		previewParam.width =screen.x *254/480;
+		previewParam.height = screen.x * 254/480;
+		previewParam.topMargin = screen.x * 180/480;
+		
+		RelativeLayout.LayoutParams helpLayoutParam = (LayoutParams) helpLayout.getLayoutParams();
+		helpLayoutParam.topMargin =screen.x * 26/480;
+		helpLayoutParam.rightMargin = screen.x * 26/480;
+		
+		RelativeLayout.LayoutParams bracVParam = (LayoutParams) bracText.getLayoutParams();
+		bracVParam.topMargin =screen.x * 95/480;
+		
+		RelativeLayout.LayoutParams bracParam = (LayoutParams) brac.getLayoutParams();
+		bracParam.topMargin =screen.x * 18/480;
+		
     	return view;
     }
 	
@@ -283,9 +309,8 @@ public class TestFragment extends Fragment {
 			Object[] a = {gps_state};
 			gpsRunTask.execute(a);
 		}
-		else{
+		else
 			updateDoneState(_GPS);
-		}
 	}
 	
 	public void startBT(){
@@ -293,7 +318,6 @@ public class TestFragment extends Fragment {
 		//initialize bt task
 		btInitHandler = new BTInitHandler(testFragment,bt);
 		btInitHandler.sendEmptyMessage(0);
-		
 		//initialize camera task
 		cameraInitHandler = new CameraInitHandler(testFragment,cameraRecorder);
 		cameraInitHandler.sendEmptyMessage(0);
@@ -302,15 +326,15 @@ public class TestFragment extends Fragment {
 	public void runBT(){
 		if (testHandler==null)
 			testHandler = new TestHandler();
-			testHandler.sendEmptyMessage(0);
+		testHandler.sendEmptyMessage(0);
 	}
 	
 	public void failBT(){
 		messageView.setText("");
-		cleanMsgBox();
+		clear();
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg",getResources().getString(R.string.test_guide_not_turn_on));
+		data.putString("msg",getString(R.string.test_guide_not_turn_on));
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
@@ -340,10 +364,9 @@ public class TestFragment extends Fragment {
 				if (curTime - lastTime > 120000){
 					startButton.setOnClickListener(null);
 					startButton.setVisibility(View.INVISIBLE);
-					startText.setVisibility(View.INVISIBLE);
+					startText.setText("");
 					bracText.setText("0.00");
 					reset();
-				
 					messageView.setText(R.string.test_guide_show_turn_on);
 					Thread t = new Thread(new TimeUpRunnable(0,1500));
 					t.start();
@@ -360,7 +383,6 @@ public class TestFragment extends Fragment {
 	private class EndTestOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			
 			ClickLoggerLog.Log(getActivity(), ClickLogId.TEST_RESTART_BUTTON);
 			stopDueToInit();
 			if (loadingHandler!=null)
@@ -409,7 +431,7 @@ public class TestFragment extends Fragment {
 				btRunTask.execute();
 				messageView.setText(R.string.test_guide_turn_on);
 				showDebug("Device launched");
-				Thread t = new Thread(new TimeUpRunnable(1,1500));
+				Thread t = new Thread(new CountDownRunnable(1,10));
 				t.start();
 			}
 	}
@@ -451,22 +473,16 @@ public class TestFragment extends Fragment {
 	public void stopDueToInit(){
 		if (cameraRecorder!=null)
 			cameraRecorder.close();
-		
 		if (bt!=null)
 			bt.close();
-		
 		if (gpsInitTask!=null)
 			gpsInitTask.cancel(true);
-		
 		if (btInitHandler!=null)
 			btInitHandler.removeMessages(0);
-		
 		if (cameraInitHandler!=null)
 			cameraInitHandler.removeMessages(0);
-		
 		if (btRunTask!=null)
 			btRunTask.cancel(true);
-
 		if (gpsRunTask!=null){
 			gpsRunTask.cancel(true);
 		}
@@ -479,23 +495,16 @@ public class TestFragment extends Fragment {
 		
 		if (bt!=null)
 			bt.close();
-		
 		if (gpsInitTask!=null)
 			gpsInitTask.cancel(true);
-		
 		if (btInitHandler!=null)
 			btInitHandler.removeMessages(0);
-		
 		if (cameraInitHandler!=null)
 			cameraInitHandler.removeMessages(0);
-		
 		if (btRunTask!=null)
 			btRunTask.cancel(true);
-
-		if (gpsRunTask!=null){
+		if (gpsRunTask!=null)
 			gpsRunTask.cancel(true);
-		}
-		
 		if (loadingHandler!=null){
 			loadingHandler.removeMessages(0);
 			loadingHandler = null;
@@ -512,94 +521,60 @@ public class TestFragment extends Fragment {
 			failBgHandler.removeMessages(0);
 			failBgHandler = null;
 		}
-		
 		if (msgHandler!=null){
 			msgHandler.removeMessages(0);
 			msgHandler = null;
 		}
+		if (countDownHandler!=null){
+			countDownHandler.removeMessages(0);
+			countDownHandler = null;
+		}
 	}
 	
 	private void clear(){
-		cleanMsgBox();
-	}
-	
-    private void cleanMsgBox(){
-    	if (msgBox!=null){
+		if (msgBox!=null){
     		msgBox.clear();
     		msgBox = null;
     	}
-    }
-    
+	}
+	
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
-		
 		public void handleMessage(Message msg){
-			
-    		Point screen = FragmentTabs.getSize();
-			
-			RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams)bg.getLayoutParams();
-			bParam.width = screen.x;
-			bParam.height = bParam.width*1709/1080;
-			
-			RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
-			startLayoutParam.topMargin = screen.x * 192/480;
-			startLayoutParam.width = startLayoutParam.height = screen.x * 255/480;
-			
-			RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
-			previewParam.width =screen.x *254/480;
-			previewParam.height = screen.x * 254/480;
-			previewParam.topMargin = screen.x * 180/480;
-			
-			RelativeLayout.LayoutParams helpLayoutParam = (LayoutParams) helpLayout.getLayoutParams();
-			helpLayoutParam.topMargin =screen.x * 26/480;
-			helpLayoutParam.rightMargin = screen.x * 26/480;
-			
-			RelativeLayout.LayoutParams bracVParam = (LayoutParams) bracText.getLayoutParams();
-			bracVParam.topMargin =screen.x * 95/480;
-			
-			RelativeLayout.LayoutParams bracParam = (LayoutParams) brac.getLayoutParams();
-			bracParam.topMargin =screen.x * 18/480;
-			
 			testCircle.setImageDrawable(null);
-
 			bracText.setText("0.00");
 			bracText.setVisibility(View.VISIBLE);
-			
 			messageView.setText(R.string.test_guide_start);
-			
 			startButton.setOnClickListener(new StartOnClickListener());
 			startButton.setVisibility(View.VISIBLE);
-			startText.setVisibility(View.VISIBLE);
+			startText.setText(R.string.start);
+			startText.setTextColor(0xFF454545);
 			helpButton.setOnClickListener(new TutorialOnClickListener());
 			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
 			face.setVisibility(View.INVISIBLE);
-			LoadingBox.dismiss();
 			
+			bg.setOnTouchListener(new BackgroundDoubleOnTouchListener());
+			LoadingBox.dismiss();
 		}
 	}
     
 	@SuppressLint("HandlerLeak")
 	private class MsgLoadingHandler extends Handler{
-		
 		public void handleMessage(Message msg){
 			startButton.setOnClickListener(null);
-			if (msgBox!=null){
-				msgBox.settingPreTask();
-				msgBox.settingInBackground();
-				msgBox.settingPostTask();
-			}
-			
-			if (msgBox!=null){
-				msgBox.generateGPSCheckBox();
-				messageView.setText(R.string.test_guide_msg_box);
-			}
+			if (msgBox==null)
+				msgBox = new TestQuestionMsgBox(testFragment,main_layout);
+			msgBox.settingPreTask();
+			msgBox.settingInBackground();
+			msgBox.settingPostTask();
+			msgBox.generateGPSCheckBox();
+			messageView.setText(R.string.test_guide_msg_box);
 		}
 	}
     
 	@SuppressLint("HandlerLeak")
 	private class FailBgHandler extends Handler{
 		
-		private String msgStr;
 	
 		public void handleMessage(Message msg){
 			if (msgLoadingHandler !=null){
@@ -610,14 +585,12 @@ public class TestFragment extends Fragment {
 				testHandler.removeMessages(0);
 				testHandler = null;
 			}
-			this.msgStr = msg.getData().getString("msg");
-
+			String msgStr = msg.getData().getString("msg");
 			
 			startButton.setOnClickListener(new EndTestOnClickListener());
 			startButton.setVisibility(View.VISIBLE);
 			face.setVisibility(View.INVISIBLE);
-			msgStr = msgStr.concat(getResources().getString(R.string.test_guide_end));
-			
+			msgStr = msgStr.concat(getString(R.string.test_guide_end));
 			messageView.setText(msgStr);
 			
 		}
@@ -630,7 +603,7 @@ public class TestFragment extends Fragment {
 			if (blowDrawables == null){
 				blowDrawables = new Drawable[BLOW_RESOURCE.length];
 				for (int i=1;i<blowDrawables.length;++i)
-					blowDrawables[i] = context.getResources().getDrawable(BLOW_RESOURCE[i]);
+					blowDrawables[i] = activity.getResources().getDrawable(BLOW_RESOURCE[i]);
 			}
 			
 			face.setVisibility(View.VISIBLE);
@@ -647,9 +620,8 @@ public class TestFragment extends Fragment {
 		bracText.setText(format.format(value));
 		if (time >= blowDrawables.length)
 			time = blowDrawables.length-1;
-		if (blowDrawables!=null){
+		if (blowDrawables!=null)
 			testCircle.setImageDrawable(blowDrawables[time]);
-		}
 	}
 	
 	public void stopByFail(){
@@ -679,6 +651,8 @@ public class TestFragment extends Fragment {
 				startBT();
 			}
 			else if (t == 1){
+				messageView.setVisibility(View.VISIBLE);
+				startText.setText("");
 				showDebug(">Start to run the  device");
 				runBT();
 			}
@@ -703,7 +677,47 @@ public class TestFragment extends Fragment {
 		}
 		
 	}
+	
+	private class CountDownRunnable implements Runnable{
 
+		int msg;
+		int sec;
+		public CountDownRunnable (int msg, int sec){
+			this.msg = msg;
+			this.sec = sec;
+			count_down_sec = sec;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				for (int i=0;i<sec;++i){
+					Thread.sleep(500);
+					if (countDownHandler!=null)
+						countDownHandler.sendEmptyMessage(0);
+					Thread.sleep(500);
+					if (countDownHandler!=null)
+						countDownHandler.sendEmptyMessage(0);
+				}
+				timeUpHandler.sendEmptyMessage(msg);
+			} catch (InterruptedException e) {}
+		}
+	}
+
+	@SuppressLint("HandlerLeak")
+	private class CountDownHandler extends Handler{
+		public void handleMessage(Message msg){
+			if (messageView.getVisibility() == View.VISIBLE)
+				messageView.setVisibility(View.INVISIBLE);
+			else{
+				messageView.setVisibility(View.VISIBLE);
+				--count_down_sec;
+				startText.setTextColor(0xFFc98123);
+				startText.setText(String.valueOf(count_down_sec));
+			}
+		}
+	}
+	
 	@SuppressLint("HandlerLeak")
 	private class ChangeTabsHandler extends Handler{
 		public void handleMessage(Message msg){
@@ -715,22 +729,21 @@ public class TestFragment extends Fragment {
 	
 	private class TutorialOnClickListener implements View.OnClickListener{
 		public void onClick(View v) {
-			
 			ClickLoggerLog.Log(getActivity(), ClickLogId.TEST_TUTORIAL_BUTTON);
 			showTutorial();
 		}
 	}
 	private class TutorialOnLongClickListener implements View.OnLongClickListener{
 		public boolean onLongClick(View v) {
-				context.openOptionsMenu();
+				activity.openOptionsMenu();
 				return true;
 		}
 	}
 	
 	private void showTutorial(){
 		Intent intent= new Intent();
-		intent.setClass(context, TutorialActivity.class);
-		context.startActivity(intent);
+		intent.setClass(activity, TutorialActivity.class);
+		activity.startActivity(intent);
 	}
 	
 	
@@ -738,6 +751,33 @@ public class TestFragment extends Fragment {
 		questionFile.write(emotion, desire);
 	}
 	
+	private boolean doubleClickState = false;
+	
+	private class BackgroundDoubleOnTouchListener implements View.OnTouchListener{
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (!doubleClickState){
+				doubleClickState = true;
+				Thread t = new Thread(new BackgroundDoubleOnTouchRunnable());
+				t.start();
+			}
+			else
+				activity.openOptionsMenu();
+			return false;
+		}
+	}
+	
+	private class BackgroundDoubleOnTouchRunnable implements Runnable{
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e) {
+			}finally{
+				doubleClickState = false;
+			}
+		}
+	}
 	
 	//Debug --------------------------------------------------------------------------------------------------------
 	private void checkDebug(){
@@ -803,7 +843,7 @@ public class TestFragment extends Fragment {
 		@Override
 		public void onClick(View v) {
 			
-			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			SharedPreferences.Editor editor = sp.edit();
 	    	editor.putInt("latest_result", cond);
 	    	editor.putBoolean("tested", true);
@@ -818,7 +858,7 @@ public class TestFragment extends Fragment {
 	public void showDebug(String message){
 		if (this == null)
 			return;
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 		Boolean debug = sp.getBoolean("debug", false);
 		if (msgHandler!=null && debug){
 			Message msg = new Message();
@@ -839,4 +879,5 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
+
 }

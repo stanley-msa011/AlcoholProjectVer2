@@ -5,6 +5,7 @@ import data.database.QuestionDB;
 
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -29,7 +30,7 @@ public class AnalysisCounterView extends StatisticPageView {
 		hdb = new HistoryDB(context);
     	qdb = new QuestionDB(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_counter_help);
-		wordTypeface = statisticFragment.wordTypeface;
+		wordTypeface = Typefaces.getWordTypeface(context);
 	}
 	
 	@Override

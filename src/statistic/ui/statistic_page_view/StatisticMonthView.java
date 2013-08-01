@@ -21,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 
 public class StatisticMonthView extends StatisticPageView {
 
@@ -52,8 +53,8 @@ public class StatisticMonthView extends StatisticPageView {
 	public StatisticMonthView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_month_view, statisticFragment);
 		db = new HistoryDB(context);
-		digitTypefaceBold = statisticFragment.digitTypefaceBold;
-		wordTypefaceBold = statisticFragment.wordTypefaceBold;
+		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
 	}
 
 

@@ -10,6 +10,7 @@ import data.info.BracDetectionState;
 import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -72,10 +73,10 @@ public class StatisticDayView extends StatisticPageView {
 	public StatisticDayView(Context context,StatisticFragment statisticFragment){
 		super(context,R.layout.statistic_day_view,statisticFragment);
 		db = new HistoryDB(context);
-		digitTypeface = statisticFragment.digitTypeface;
-		digitTypefaceBold = statisticFragment.digitTypefaceBold;
-		wordTypeface = statisticFragment.wordTypeface;
-		wordTypefaceBold = statisticFragment.wordTypefaceBold;
+		digitTypeface = Typefaces.getDigitTypeface(context);
+		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
+		wordTypeface = Typefaces.getWordTypeface(context);
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
 	}
 	
 		@Override

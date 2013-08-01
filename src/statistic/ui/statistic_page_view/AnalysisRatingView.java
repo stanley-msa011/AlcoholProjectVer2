@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 
 public class AnalysisRatingView extends StatisticPageView {
 
@@ -44,7 +45,7 @@ public class AnalysisRatingView extends StatisticPageView {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
 		db = new HistoryDB(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_ranking_help);
-		wordTypeface = statisticFragment.wordTypeface;
+		wordTypeface = Typefaces.getWordTypeface(context);
 	}
 
 	@Override

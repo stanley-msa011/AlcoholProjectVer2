@@ -70,7 +70,7 @@
     <string name="notification_msg_1">Do BrAC Test</string>
     <string name="notification_msg_2">You have keep in sober in one hour. Keep going</string>
     <string name="test_guide_not_turn_on">The device is not turned on</string>
-    <string name="test_guide_turn_on">The device is turned on</string>
+    <string name="test_guide_turn_on">The device is turned on\nPlease wait for the device to prepare</string>
     <string name="test_guide_show_turn_on">Please press black button\n to turn on the device</string>
     <string name="test_guide_start">Press\'Start\'to start the test</string>
     <string name="test_guide_msg_box">Please follow the message box below</string>

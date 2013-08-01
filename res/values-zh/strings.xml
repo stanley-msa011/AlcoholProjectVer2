@@ -70,7 +70,7 @@
     <string name="notification_msg_1">該吹氣了！</string>
     <string name="notification_msg_2">您已停酒了一小時，請再繼續努力！</string>
     <string name="test_guide_not_turn_on">未啟動酒測裝置</string>
-    <string name="test_guide_turn_on">已啟用酒測裝置</string>
+    <string name="test_guide_turn_on">已啟用酒測裝置\n請稍待酒測器準備</string>
     <string name="test_guide_show_turn_on">請按酒測裝置黑色按鈕\n以啟用酒測裝置</string>
     <string name="test_guide_start">請點選\'開始\'以進行測試</string>
     <string name="test_guide_msg_box">請依對話框指示進行操作</string>

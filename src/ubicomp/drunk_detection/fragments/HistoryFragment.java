@@ -26,6 +26,7 @@ import history.ui.PageAnimationTaskVertical;
 import history.ui.PageAnimationTaskVertical2;
 import history.ui.PageWidgetVertical;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -62,6 +63,8 @@ import android.widget.TextView;
 public class HistoryFragment extends Fragment {
 
 	private View  view;
+	
+	private Activity activity;
 	
 	private RelativeLayout pageLayout;
 	private RelativeLayout chartLayout;
@@ -125,7 +128,7 @@ public class HistoryFragment extends Fragment {
 	private Calendar from_cal;
 	private Calendar to_cal;
 	
-	private Bitmap chartPlay;
+	private Bitmap chartPlayBmp;
 	
 	private int max_week;
 	private boolean chartTouchable = true;
@@ -144,26 +147,89 @@ public class HistoryFragment extends Fragment {
 	
 	private String doneStr;
 	
+	 @Override
+	    public void onCreate(Bundle savedInstanceState) {
+	        super.onCreate(savedInstanceState);
+	        this.activity = this.getActivity();
+	        hdb = new HistoryDB(activity);
+	    	adb = new AudioDB(activity);
+	    	from_cal = Calendar.getInstance();
+	    	
+	    	wordTypefaceBold = Typefaces.getDigitTypefaceBold(activity);
+	    	digitTypeface = Typefaces.getDigitTypeface(activity);
+	    	digitTypefaceBold = Typefaces.getWordTypefaceBold(activity);
+	    	
+	    	SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
+		    int mYear = sp.getInt("sYear", from_cal.get(Calendar.YEAR));
+		    int mMonth = sp.getInt("sMonth", from_cal.get(Calendar.MONTH));
+		    int mDay = sp.getInt("sDate", from_cal.get(Calendar.DATE));
+	    	from_cal.set(mYear, mMonth, mDay, 0, 0, 0);
+	    	from_cal.set(Calendar.MILLISECOND, 0);
+	    	doneStr = getResources().getString(R.string.done);
+	    	QUOTE_STR = getResources().getStringArray(R.array.quote_message);
+	    	
+	    	screen = FragmentTabs.getSize();
+	    	
+	    	bg_x = screen.x;
+	    	page_width = bg_x;
+	    	page_height = screen.y - bg_x * 574/1080;
+	    	from = new PointF(page_width,page_height);
+	    	to = new PointF(page_width/2,-page_height);
+	    	touchPoint = new PointF(from.x,from.y);
+	    	
+	    	format = new DecimalFormat();
+			format.setMaximumIntegerDigits(3);
+			format.setMinimumIntegerDigits(1);
+			format.setMinimumFractionDigits(0);
+			format.setMaximumFractionDigits(0);
+	    }
+	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	this.historyFragment = this;
     	view = inflater.inflate(R.layout.history_fragment, container,false);
-    	hdb = new HistoryDB(this.getActivity());
-    	adb = new AudioDB(this.getActivity());
-    	from_cal = Calendar.getInstance();
     	
-    	wordTypefaceBold = Typefaces.getDigitTypefaceBold(getActivity());
-    	digitTypeface = Typefaces.getDigitTypeface(getActivity());
-    	digitTypefaceBold = Typefaces.getWordTypefaceBold(getActivity());
+    	pageLayout = (RelativeLayout) view.findViewById(R.id.history_book_layout);
+    	chartLayout = (RelativeLayout) view.findViewById(R.id.history_content_layout);
+    	scrollView = (HorizontalScrollView) view.findViewById(R.id.history_scroll_view);
+    	chartAreaLayout = (RelativeLayout) view.findViewById(R.id.history_chart_area_layout);
     	
-    	SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
-	    int mYear = sp.getInt("sYear", from_cal.get(Calendar.YEAR));
-	    int mMonth = sp.getInt("sMonth", from_cal.get(Calendar.MONTH));
-	    int mDay = sp.getInt("sDate", from_cal.get(Calendar.DATE));
-    	from_cal.set(mYear, mMonth, mDay, 0, 0, 0);
-    	from_cal.set(Calendar.MILLISECOND, 0);
-    	doneStr = getResources().getString(R.string.done);
-    	QUOTE_STR = getResources().getStringArray(R.array.quote_message);
+    	int textSize = bg_x*21/480;
+    	stageLayout = (RelativeLayout) view.findViewById(R.id.history_stage_message_layout);
+    	stageMessage = (TextView) view.findViewById(R.id.history_stage);
+    	stageMessage.setTypeface(wordTypefaceBold);
+    	
+    	stageMessageText = (TextView) view.findViewById(R.id.history_stage_message);
+    	stageMessageText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*58/480);
+    	stageMessageText.setTypeface(digitTypefaceBold);
+    	
+    	stageRateText = (TextView) view.findViewById(R.id.history_stage_rate);
+    	stageRateText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+    	stageRateText.setTypeface(wordTypefaceBold);
+    	
+    	quoteText = (TextView) view.findViewById(R.id.history_quote);
+    	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+    	quoteText.setTypeface(wordTypefaceBold);
+    	
+    	LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
+    	sParam.leftMargin = bg_x*10/480;
+    	sParam.topMargin = bg_x * 60/480;
+    	sParam.width = bg_x*70/480;
+    	
+    	int quoteTopMargin;
+    	if (FragmentTabs.isWideScreen())
+    		quoteTopMargin = bg_x*430/480;
+    	else
+    		quoteTopMargin = bg_x * 380/480;
+    	
+    	LayoutParams rParam = (LayoutParams) stageRateText.getLayoutParams();
+    	rParam.leftMargin = bg_x*20/480;
+    	rParam.topMargin = quoteTopMargin;
+    	rParam.width = bg_x*70/480;
+    	
+    	LayoutParams qParam = (LayoutParams) quoteText.getLayoutParams();
+    	qParam.topMargin = quoteTopMargin;
+    	
     	return view;
     }
    
@@ -171,44 +237,9 @@ public class HistoryFragment extends Fragment {
 		
 		super.onResume();
 		
-		isAnimation = false;
-		screen = FragmentTabs.getSize();
 		
-    	bg_x = screen.x;
-    	page_width = bg_x;
-    	
-    	page_height = screen.y - bg_x * 574/1080;
-		
-		page_states =hdb.getAccumulatedHistoryStateByWeek(); 
-		page_week = page_states.length - 1;
-		if(page_week > MAX_PAGE_WEEK)
-			page_week = MAX_PAGE_WEEK;
-		max_week = page_week;
-		
-		historys = new ArrayList<DateBracDetectionState>();
-		selected_dates = new ArrayList<DateValue>();
-		selected_idx = new ArrayList<Integer>();
-		bars = new ArrayList<BarInfo>();
-		hasAudio = new ArrayList<Boolean>();
-		
-		gListener = new GestureListener();
-		gDetector = new GestureDetector(getActivity(), gListener);
-		gtListener = new TouchListener();
-		
-		DateBracDetectionState[] h = hdb.getAllHistory();
-		if (h != null)
-			for (int i=0;i<h.length;++i)
-				historys.add(h[i]);
-		
-		to_cal = Calendar.getInstance();
-		if (from_cal.before(to_cal)){
-			long millis = to_cal.getTimeInMillis() - from_cal.getTimeInMillis();
-			NUM_OF_BARS= (int)(millis/AlarmManager.INTERVAL_DAY) + 1;
-		}else
-			NUM_OF_BARS = 0;
-		
-		RelativeLayout r = (RelativeLayout) view;
-		recordBox = new AudioRecordBox(this,r);
+			RelativeLayout r = (RelativeLayout) view;
+			recordBox = new AudioRecordBox(this,r);
 		if (loadHandler == null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);
@@ -266,86 +297,40 @@ public class HistoryFragment extends Fragment {
     		pageWidget.clear();
     		pageWidget=null;
     	}
-    	if (chartPlay !=null && !chartPlay.isRecycled()){
-    		chartPlay.recycle();
-    		chartPlay = null;
+    	if (chartPlayBmp !=null && !chartPlayBmp.isRecycled()){
+    		chartPlayBmp.recycle();
+    		chartPlayBmp = null;
     	}
     	System.gc();
     }
     
     
     private void initView(){
-    	pageLayout = (RelativeLayout) view.findViewById(R.id.history_book_layout);
-    	chartLayout = (RelativeLayout) view.findViewById(R.id.history_content_layout);
-    	scrollView = (HorizontalScrollView) view.findViewById(R.id.history_scroll_view);
+    	
     	scrollView.setSmoothScrollingEnabled(true);
-    	chartAreaLayout = (RelativeLayout) view.findViewById(R.id.history_chart_area_layout);
-    	
-    	from = new PointF(page_width,page_height);
-    	to = new PointF(page_width/2,-page_height);
-    	touchPoint = new PointF(from.x,from.y);
-    	
-    	pageWidget= new PageWidgetVertical(pageLayout.getContext(),page_width,page_height);
+    	pageWidget= new PageWidgetVertical(activity,page_width,page_height);
     	
     	curPageTouch = touchPoint;
-
-    	int textSize = bg_x*21/480;
     	
-    	stageLayout = (RelativeLayout) view.findViewById(R.id.history_stage_message_layout);
-    	
-    	stageMessage = (TextView) view.findViewById(R.id.history_stage);
-    	stageMessage.setTypeface(wordTypefaceBold);
-    	
-    	stageMessageText = (TextView) view.findViewById(R.id.history_stage_message);
-    	stageMessageText.setTextSize(TypedValue.COMPLEX_UNIT_PX, bg_x*58/480);
-    	stageMessageText.setTypeface(digitTypefaceBold);
-    	
-    	stageRateText = (TextView) view.findViewById(R.id.history_stage_rate);
-    	stageRateText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-    	stageRateText.setTypeface(wordTypefaceBold);
-    	
-    	
-    	quoteText = (TextView) view.findViewById(R.id.history_quote);
-    	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-    	quoteText.setTypeface(wordTypefaceBold);
-    	
-    	format = new DecimalFormat();
-		format.setMaximumIntegerDigits(3);
-		format.setMinimumIntegerDigits(1);
-		format.setMinimumFractionDigits(0);
-		format.setMaximumFractionDigits(0);
-    	
-    	
-    	Resources r = historyFragment.getResources();
+    	Resources r = activity.getResources();
 	
 		 int chart_height = screen.x * 564/1080;
-		chartBg1Drawable = r.getDrawable(R.drawable.chart_bg1);
-		chartBg2Drawable = r.getDrawable(R.drawable.chart_bg2);
-		chartBg3Drawable = r.getDrawable(R.drawable.chart_bg3);
-		chartBg4Drawable = r.getDrawable(R.drawable.chart_bg4);		
+		 
+		 if (chartBg1Drawable == null)
+			 chartBg1Drawable = r.getDrawable(R.drawable.chart_bg1);
+		 if (chartBg2Drawable == null)
+			 chartBg2Drawable = r.getDrawable(R.drawable.chart_bg2);
+		 if (chartBg3Drawable == null)
+			 chartBg3Drawable = r.getDrawable(R.drawable.chart_bg3);
+		 if (chartBg4Drawable == null)
+			 chartBg4Drawable = r.getDrawable(R.drawable.chart_bg4);		
 
-		chartCircleBmp = BitmapFactory.decodeResource(r, R.drawable.chart_circle);
+		if(chartCircleBmp==null||chartCircleBmp.isRecycled())
+			chartCircleBmp = BitmapFactory.decodeResource(r, R.drawable.chart_circle);
+		if (chartPlayBmp==null||chartPlayBmp.isRecycled())
+			chartPlayBmp = BitmapFactory.decodeResource(r, R.drawable.chart_play);
 		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		
-    	LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
-    	sParam.leftMargin = bg_x*10/480;
-    	sParam.topMargin = bg_x * 60/480;
-    	sParam.width = bg_x*70/480;
-    	
-    	int quoteTopMargin;
-    	if (FragmentTabs.isWideScreen())
-    		quoteTopMargin = bg_x*430/480;
-    	else
-    		quoteTopMargin = bg_x * 380/480;
-    	
-    	LayoutParams rParam = (LayoutParams) stageRateText.getLayoutParams();
-    	rParam.leftMargin = bg_x*20/480;
-    	rParam.topMargin = quoteTopMargin;
-    	rParam.width = bg_x*70/480;
-    	
-    	LayoutParams qParam = (LayoutParams) quoteText.getLayoutParams();
-    	qParam.topMargin = quoteTopMargin;
-    	
     	pageLayout.addView(pageWidget);
     	LayoutParams param = (LayoutParams) pageWidget.getLayoutParams();
     	param.width = page_width;
@@ -363,10 +348,7 @@ public class HistoryFragment extends Fragment {
     	settingBars();
     	checkHasRecorder();
     	
-    	chartPlay = BitmapFactory.decodeResource(r, R.drawable.chart_play);
-    	
-    	chart = new ChartView(this.getActivity());
-    	
+    	chart = new ChartView(activity);
     	
     	chartHeight = chart_height;
     	chart_width =  bar_left * 3/2 + (bar_width + bar_gap)* NUM_OF_BARS;
@@ -378,20 +360,20 @@ public class HistoryFragment extends Fragment {
 		chartParam.width= chart_width;
 		chartParam.height = chart_height;
 		
-		chartYAxis = new ChartYAxisView(this.getActivity());
+		chartYAxis = new ChartYAxisView(activity);
 		chartAreaLayout.addView(chartYAxis);
 		RelativeLayout.LayoutParams chartYParam = (RelativeLayout.LayoutParams) chartYAxis.getLayoutParams();
 		chartYParam.width = screen.x * 94/1080;
 		chartYParam.height = chartParam.height;
 		
-    	chartTitle = new ChartTitleView(this.getActivity());
+    	chartTitle = new ChartTitleView(activity);
     	chartAreaLayout.addView(chartTitle);
     	RelativeLayout.LayoutParams chartTitleParam = (RelativeLayout.LayoutParams) chartTitle.getLayoutParams();
 		chartTitleParam.width = screen.x;
 		chartTitleParam.height = screen.x * 100 / 1080;
 		chartTitleParam.topMargin = screen.x * 35/1080;
 		
-		chartLabel = new ChartLabelView(this.getActivity());
+		chartLabel = new ChartLabelView(activity);
 		chartAreaLayout.addView(chartLabel,0);
 		RelativeLayout.LayoutParams chartLabelParam = (RelativeLayout.LayoutParams) chartLabel.getLayoutParams();
 		chartLabelParam.width = screen.x * 540/1080;
@@ -464,7 +446,7 @@ public class HistoryFragment extends Fragment {
     			page_week =0;
     	}
     	AccumulatedHistoryState AH = page_states[page_week];
-    	Bitmap tmp = BitmapFactory.decodeResource(historyFragment.getResources(), HistoryStorytelling.getPage(AH.getScore(),AH.week));
+    	Bitmap tmp = BitmapFactory.decodeResource(activity.getResources(), HistoryStorytelling.getPage(AH.getScore(),AH.week));
     	cur_bg_bmp = Bitmap.createScaledBitmap(tmp, screen.x, page_height, true);
     	tmp.recycle();
     	next_bg_bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
@@ -481,6 +463,36 @@ public class HistoryFragment extends Fragment {
 	private class LoadingHandler extends Handler{
 		
 		public void handleMessage(Message msg){
+			isAnimation = false;
+			
+			page_states =hdb.getAccumulatedHistoryStateByWeek(); 
+			page_week = page_states.length - 1;
+			if(page_week > MAX_PAGE_WEEK)
+				page_week = MAX_PAGE_WEEK;
+			max_week = page_week;
+			
+			historys = new ArrayList<DateBracDetectionState>();
+			selected_dates = new ArrayList<DateValue>();
+			selected_idx = new ArrayList<Integer>();
+			bars = new ArrayList<BarInfo>();
+			hasAudio = new ArrayList<Boolean>();
+			
+			gListener = new GestureListener();
+			gDetector = new GestureDetector(getActivity(), gListener);
+			gtListener = new TouchListener();
+			
+			DateBracDetectionState[] h = hdb.getAllHistory();
+			if (h != null)
+				for (int i=0;i<h.length;++i)
+					historys.add(h[i]);
+			
+			to_cal = Calendar.getInstance();
+			if (from_cal.before(to_cal)){
+				long millis = to_cal.getTimeInMillis() - from_cal.getTimeInMillis();
+				NUM_OF_BARS= (int)(millis/AlarmManager.INTERVAL_DAY) + 1;
+			}else
+				NUM_OF_BARS = 0;
+			
 			initView();
 			recordBox.setImage();
 			endAnimation();
@@ -1059,7 +1071,6 @@ public class HistoryFragment extends Fragment {
 					canvas.drawLine(left, _bottom, left, _bottom-max_height, axis_paint);
 					canvas.drawText(str, left+small_radius, _bottom + bar_width*2, text_paint_small);
 				}
-				
 				//Draw bars & annotation_circles
 				Point e_center = new Point(left+small_radius,e_top - bar_gap - small_radius);
 				Point d_center = new Point(left+small_radius,d_top - bar_gap - small_radius);
@@ -1128,8 +1139,8 @@ public class HistoryFragment extends Fragment {
 			if (bars.size() == 0)
 					return;
 
-			int playW = chartPlay.getWidth()/2;
-			int playH = chartPlay.getHeight()/2;
+			int playW = chartPlayBmp.getWidth()/2;
+			int playH = chartPlayBmp.getHeight()/2;
 			
 			int bar_half = bar_width/2;
 			for (int i=0;i<bars.size();++i){
@@ -1160,7 +1171,7 @@ public class HistoryFragment extends Fragment {
 				if (!hasAudioData)
 					canvas.drawCircle(center.x,center.y, circle_radius, no_record_paint);
 				else
-					canvas.drawBitmap(chartPlay, center.x - playW, center.y - playH, null);
+					canvas.drawBitmap(chartPlayBmp, center.x - playW, center.y - playH, null);
 				
 				if (!bar.hasData);
 				else if (bar.brac <BracDataHandler.THRESHOLD)

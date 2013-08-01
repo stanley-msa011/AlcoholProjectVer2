@@ -33,7 +33,7 @@ public class CameraRecorder {
     private PreviewWindow preview;
     private FrameLayout previewFrame = null;
     private RelativeLayout previewCircleLayout = null;
-    SurfaceHolder previewHolder;
+    private SurfaceHolder previewHolder;
     private ImageView circle;
     
     public int picture_count=0;
@@ -67,7 +67,6 @@ public class CameraRecorder {
 		int bestHeight = Integer.MAX_VALUE;
 		if (list.size()>1){
 			Iterator<Camera.Size> iter = list.iterator();
-		
 			while(iter.hasNext()){
 				Camera.Size cur = iter.next();
 				if(cur.width < bestWidth && cur.height < bestHeight){
@@ -114,9 +113,8 @@ public class CameraRecorder {
     public void close(){
     	if (preview !=null)
     		preview.setVisibility(View.INVISIBLE);
-    	if (previewFrame!=null){
+    	if (previewFrame!=null)
     		previewFrame.removeView(preview);
-    	}
     	if (camera!=null){
     		Camera tmp = camera;
     		camera = null;

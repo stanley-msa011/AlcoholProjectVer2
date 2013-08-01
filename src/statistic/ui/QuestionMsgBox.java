@@ -26,7 +26,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -44,20 +43,13 @@ public class QuestionMsgBox {
 	private RelativeLayout boxLayout = null;
 	
 	private RelativeLayout mainLayout;
-	
-	private FrameLayout backgroundLayout;
-	
+	private View shadow;
 	private LinearLayout questionLayout, questionAllLayout;
-	
 	private ImageView exitView;
-	
 	private TextView help,next;
-	
 	private Drawable choiceDrawable, choiceSelectedDrawable;
-	
 	private Resources r;
 	private Point screen;
-	
 	private QuestionDB db;
 	private Typeface wordTypefaceBold;
 	private int type;
@@ -70,8 +62,8 @@ public class QuestionMsgBox {
 		this.r = context.getResources();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
-		backgroundLayout = new FrameLayout(context);
-		backgroundLayout.setBackgroundColor(0x99000000);
+		shadow = new View(context);
+		shadow.setBackgroundColor(0x99000000);
 		screen = FragmentTabs.getSize();
 		db = new QuestionDB(context);
 		clickSequence = new ArrayList<String>();
@@ -84,7 +76,7 @@ public class QuestionMsgBox {
 	private void setting(){
 		
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(getContext());
-		backgroundLayout.setVisibility(View.INVISIBLE);
+		shadow.setVisibility(View.INVISIBLE);
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.question_box_layout,null);
 		boxLayout.setVisibility(View.INVISIBLE);
@@ -101,10 +93,10 @@ public class QuestionMsgBox {
 	
 	public void settingPreTask(){
 		
-		mainLayout.addView(backgroundLayout);
+		mainLayout.addView(shadow);
 		mainLayout.addView(boxLayout);
 		
-		RelativeLayout.LayoutParams bgParam = (LayoutParams) backgroundLayout.getLayoutParams();
+		RelativeLayout.LayoutParams bgParam = (LayoutParams) shadow.getLayoutParams();
 		bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
 		
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
@@ -138,8 +130,8 @@ public class QuestionMsgBox {
 	}
 	
 	public void clear(){
-		if (backgroundLayout != null)
-			mainLayout.removeView(backgroundLayout);
+		if (shadow != null)
+			mainLayout.removeView(shadow);
 		if (boxLayout !=null)
 			mainLayout.removeView(boxLayout);
 	}
@@ -185,7 +177,7 @@ public class QuestionMsgBox {
 	
 	public void openBox(){
 		statisticFragment.enablePage(false);
-		backgroundLayout.setVisibility(View.VISIBLE);
+		shadow.setVisibility(View.VISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
 		return;
 }
@@ -196,7 +188,7 @@ public class QuestionMsgBox {
 		editor.putInt("latest_result", -1);
     	editor.commit();
     	statisticFragment.enablePage(true);
-    	backgroundLayout.setVisibility(View.INVISIBLE);
+    	shadow.setVisibility(View.INVISIBLE);
 		boxLayout.setVisibility(View.INVISIBLE);
 		statisticFragment.setQuestionAnimation();
 		return;
@@ -204,7 +196,7 @@ public class QuestionMsgBox {
 	
 	public void closeBoxNull(){
     	statisticFragment.enablePage(true);
-    	backgroundLayout.setVisibility(View.INVISIBLE);
+    	shadow.setVisibility(View.INVISIBLE);
 		boxLayout.setVisibility(View.INVISIBLE);
 		return;
 	}
@@ -291,7 +283,7 @@ public class QuestionMsgBox {
 			clickSequence.clear();
 			contentSequence.clear();
 			statisticFragment.enablePage(true);
-			backgroundLayout.setVisibility(View.INVISIBLE);
+			shadow.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
 		}
 		

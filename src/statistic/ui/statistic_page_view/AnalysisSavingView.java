@@ -2,6 +2,7 @@ package statistic.ui.statistic_page_view;
 
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,7 +42,7 @@ public class AnalysisSavingView extends StatisticPageView {
 	public AnalysisSavingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_saving_view,statisticFragment);
 		db = new HistoryDB(context);
-		wordTypeface = statisticFragment.wordTypeface;
+		wordTypeface = Typefaces.getWordTypeface(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		goalGood = sp.getString("goal_good", "機車");
 		goalMoney = sp.getInt("goal_money", 50000);
