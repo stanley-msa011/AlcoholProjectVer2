@@ -1,6 +1,6 @@
 package data.info;
 
-public class UsedDetection {
+public class UsedDetection  implements SelfHelpCounter{
 	public int[] test = {0,0,0};
 	public int[] pass = {0,0,0};
 	

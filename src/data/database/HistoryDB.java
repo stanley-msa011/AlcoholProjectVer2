@@ -20,6 +20,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class HistoryDB {
 
@@ -233,6 +234,30 @@ public class HistoryDB {
 		db.close();
 		return new UsedDetection(test,pass);
     	
+    }
+    
+    public UsedDetection getUsedState(long ts){
+    	
+    	db = dbHelper.getReadableDatabase();
+    	String sql = "SELECT * FROM UsedDetection WHERE ts ="+ts;
+    	Cursor cursor = db.rawQuery(sql, null);
+    	if (cursor.getCount() == 0){
+    		cursor.close();
+    		db.close();
+    		return new UsedDetection(null,null);
+    	}
+    	
+    	cursor.moveToFirst();
+    	int[] test = new int[3];
+    	int[] pass = new int[3];
+    	for (int i=0;i<3;++i){
+    		test[i] = cursor.getInt(i+2);
+    		pass[i] = cursor.getInt(i+5);
+    	}
+    	
+    	cursor.close();
+		db.close();
+		return new UsedDetection(test,pass);
     }
     
     
@@ -486,6 +511,31 @@ public class HistoryDB {
     	return historys;
     }
     
+    public RankHistory[] getAllUsersHistoryToday(){
+    	RankHistory[] historys = null;
+    	db = dbHelper.getReadableDatabase();
+    	String sql = "SELECT * FROM RankingToday ORDER BY score DESC,  user_id ASC";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	int count = cursor.getCount();
+    	if (count == 0){
+    		cursor.close();
+    		db.close();
+    		return null;
+    	}
+    	historys = new RankHistory[count];
+    	int uid_idx = cursor.getColumnIndex("user_id");
+    	int level_idx = cursor.getColumnIndex("score");
+    	for (int i=0;i<count;++i){
+    		cursor.moveToPosition(i);
+    		String uid = cursor.getString(uid_idx);
+    		int score = cursor.getInt(level_idx);
+    		historys[i] = new RankHistory(score,uid);
+    	}
+    	cursor.close();
+    	db.close();
+    	return historys;
+    }
+    
     public void insertInteractionHistory(RankHistory history){
     	db = dbHelper.getWritableDatabase();
     	String sql = "SELECT * FROM Ranking WHERE user_id = '"+history.uid+"'";
@@ -502,9 +552,27 @@ public class HistoryDB {
     	db.close();
     }
     
+    public void insertInteractionHistoryToday(RankHistory history){
+    	db = dbHelper.getWritableDatabase();
+    	String sql = "SELECT * FROM RankingToday WHERE user_id = '"+history.uid+"'";
+    	Cursor cursor = db.rawQuery(sql, null);
+    	if (cursor.getCount() == 0){
+    		sql = "INSERT INTO RankingToday (user_id,score) VALUES ('"+history.uid+"',"+history.score+")";
+    		db.execSQL(sql);
+    	}
+    	else{
+    		sql =  "UPDATE RankingToday SET score = "+history.score	+" WHERE user_id ='"+history.uid+"'";
+    		db.execSQL(sql);
+    	}
+    	cursor.close();
+    	db.close();
+    }
+    
     public void cleanInteractionHistory(){
     	db = dbHelper.getWritableDatabase();
     	String sql = "DELETE FROM Ranking";
+    	db.execSQL(sql);
+    	sql = "DELETE FROM RankingToday";
     	db.execSQL(sql);
     	db.close();
     }
@@ -530,9 +598,13 @@ public class HistoryDB {
 		return result;
     }
     
-    public void cleanAcc(){
+    public void cleanAcc(long timestamp){
     	db = dbHelper.getWritableDatabase();
-    	String sql = "SELECT morning,noon,night,morning_pass,noon_pass,night_pass FROM AccDetection ORDER BY id DESC LIMIT 1";
+    	String sql;
+    	Log.d("EMOTION_UPLOADER","insert");
+    	sql = "INSERT INTO SelfHelpCounterUpdate (ts) VALUES ("+timestamp+")";
+    	db.execSQL(sql);
+    	sql = "SELECT morning,noon,night,morning_pass,noon_pass,night_pass FROM AccDetection ORDER BY id DESC LIMIT 1";
     	Cursor cursor = db.rawQuery(sql, null);
     	int count = cursor.getCount();
     	if (count == 0){
@@ -548,7 +620,7 @@ public class HistoryDB {
     	int p_morning = cursor.getInt(3);
     	int p_noon = cursor.getInt(4);
     	int p_night = cursor.getInt(5);
-    	long ts = System.currentTimeMillis();
+    	long ts = timestamp;
     	sql = "INSERT INTO UsedDetection (morning,noon,night,morning_pass,noon_pass,night_pass,ts) VALUES (" +
     			t_morning+","+t_noon+","+t_night+","+p_morning+","+p_noon+","+p_night+","+ts+
     			")";

@@ -19,18 +19,26 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
 import data.info.RankHistory;
+import data.uploader.ServerUrl;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class UserLevelCollector {
 
-	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/userStates2.php";
+	private static String SERVER_URL;
+	private static String SERVER_URL2;
 	
 	private Context context;
 	private ResponseHandler< String> responseHandler;
 	
 	public UserLevelCollector(Context context){
 		this.context = context;
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean developer = sp.getBoolean("developer", false);
+		SERVER_URL = ServerUrl.SERVER_URL_RANK(developer);
+		SERVER_URL2 = ServerUrl.SERVER_URL_RANK_TODAY(developer);
 		responseHandler=new BasicResponseHandler();
 	}
 	
@@ -52,6 +60,41 @@ public class UserLevelCollector {
 			httpClient.getConnectionManager().getSchemeRegistry().register(sch);
 		
 			HttpPost httpPost = new HttpPost(SERVER_URL);
+			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			
+			HttpResponse httpResponse;
+			httpResponse = httpClient.execute(httpPost);
+			String responseString = responseHandler.handleResponse(httpResponse);
+			int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
+			
+			if (responseString != null && httpStatusCode == HttpStatus.SC_OK){
+				RankHistory[] historys= parse(responseString);
+				return historys;
+			}
+			
+		}catch(Exception e){}
+		
+		return null;
+	}
+	
+	public RankHistory[] updateAverage(){
+		try{
+			
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+		
+			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			InputStream instream = context.getResources().openRawResource(R.raw.alcohol_certificate);
+			try{
+				trustStore.load(instream, null);
+			} finally{
+				instream.close();
+			}
+			SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
+			Scheme sch = new Scheme("https",socketFactory,443);
+			
+			httpClient.getConnectionManager().getSchemeRegistry().register(sch);
+		
+			HttpPost httpPost = new HttpPost(SERVER_URL2);
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 			
 			HttpResponse httpResponse;

@@ -77,6 +77,8 @@ public class BluetoothDebugMode extends Bluetooth {
 						sendDebugMsg(msg);
 						msg="m";
 						read_type = READ_PRESSURE;
+					}else if ( (char)temp[i]=='b'){
+						throw new Exception("NO BETTARY");
 					}else if ((char)temp[i]=='v'){
 						end = sendMsgToApp(msg);
 						sendDebugMsg(msg);
@@ -223,7 +225,7 @@ public class BluetoothDebugMode extends Bluetooth {
 					}
 					
 					testFragment.showDebug("P_diff: "+diff );
-					if (diff > -PRESSURE_DIFF_MIN /2&& isPeak){
+					if (diff > MINUS_PRESSURE_DIFF_MIN && isPeak){
 							testFragment.showDebug("P_Peak" );
 							end_time = time;
 							duration += (end_time-start_time);
@@ -260,7 +262,7 @@ public class BluetoothDebugMode extends Bluetooth {
 								success = true;
 								return -1;
 							}
-					}else if (diff <-PRESSURE_DIFF_MIN/2 ){
+					}else if (diff <MINUS_PRESSURE_DIFF_MIN  ){
 						testFragment.showDebug("P_PeakEnd" );
 						isPeak = false;
 						start_time = end_time = 0;

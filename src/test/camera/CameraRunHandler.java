@@ -15,14 +15,12 @@ public class CameraRunHandler extends Handler {
 		if (msg.what == 0)
 			cameraRecorder.takePicture();
 		else if (msg.what == 1)
-			cameraRecorder.CloseFail();
+			cameraRecorder.CloseFail(false);
+		else if (msg.what == 2)
+			cameraRecorder.CloseFail(true);
 	}
 	
 	public void takePicture(){
 		cameraRecorder.takePicture();
-	}
-	
-	public void closeFail(){
-		cameraRecorder.CloseFail();
 	}
 }

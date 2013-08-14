@@ -225,9 +225,10 @@ public class QuestionMsgBox {
 		return contentSequence;
 	}
 	
-	public void insertSeq(){
-		db.insertQuestionnaire(seq_toString(),type);
+	public boolean insertSeq(){
+		boolean addAcc = db.insertQuestionnaire(seq_toString(),type);
 		Log.d("insert",seq_toString());
+		return addAcc;
 	}
 	
 
@@ -289,8 +290,8 @@ public class QuestionMsgBox {
 		
 	}
 	
-	public void showEndOfQuestionnaire(){
-		statisticFragment.showEndOfQuestionnaire();
+	public void showEndOfQuestionnaire(boolean addAcc){
+		statisticFragment.showEndOfQuestionnaire(addAcc);
 	}
 	
 	public void updateSelfCounter(){

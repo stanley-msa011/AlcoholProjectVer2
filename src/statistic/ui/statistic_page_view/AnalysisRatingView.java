@@ -58,6 +58,7 @@ public class AnalysisRatingView extends StatisticPageView {
 	private void setPointer(){
 		
 		int nPeople ,rank;
+		int nPeopleToday, rankToday;
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		String uid = sp.getString("uid", "");
@@ -92,15 +93,37 @@ public class AnalysisRatingView extends StatisticPageView {
 		else
 			margin = (int)((maxLeftPointer - minLeftPointer)*(double)(nPeople - rank)/(double)nPeople ) + minLeftPointer;
 		
-		int margin2 = minLeftPointer;
-		if (nPeople == 0)
-			margin2 = minLeftPointer + maxLeftPointer/2;
-		else{
-			if (nPeople/2 < rank)
-				margin2 = minLeftPointer;
-			else
-				margin2 = (int)((maxLeftPointer - minLeftPointer)*(double)(nPeople/2- rank)/(double)(nPeople/2) ) + minLeftPointer;
+		
+		RankHistory[] historys_today = db.getAllUsersHistoryToday();
+		if (historys_today == null){
+			nPeopleToday =0;
+			rankToday = 0;
 		}
+		else{
+			rankToday = historys_today.length-1;
+			nPeopleToday = historys_today.length-1;
+			int tmp_rank = 0, count = 0;
+			int prev_score = historys_today[0].score;
+			
+			for (int i=0;i<historys_today.length;++i){
+				if (historys_today[i].score < prev_score){
+					tmp_rank = count;
+				}
+				if (historys_today[i].uid.equals(uid)){
+					rankToday = tmp_rank;
+					break;
+				}
+				++count;
+				prev_score = historys_today[i].score;
+			}
+		}
+		
+		int margin2 = minLeftPointer;
+		if (nPeopleToday == 0)
+			margin2 = minLeftPointer + maxLeftPointer/2;
+		else
+			margin2 = (int)((maxLeftPointer - minLeftPointer)*(double)(nPeopleToday- rankToday)/(double)nPeopleToday ) + minLeftPointer;
+		
 		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
 		pointerParam.leftMargin = margin;
 		RelativeLayout.LayoutParams pointerParam2 = (RelativeLayout.LayoutParams)pointer2.getLayoutParams();
@@ -194,6 +217,7 @@ public class AnalysisRatingView extends StatisticPageView {
 	}
 	
 	private RankHistory[] historys;
+	private RankHistory[] historys_average;
 	private UserLevelCollector levelCollector;
 	
 	private class NetworkTask extends AsyncTask<Void, Void, Void>{
@@ -202,17 +226,19 @@ public class AnalysisRatingView extends StatisticPageView {
 		protected Void doInBackground(Void... arg0) {
 			levelCollector = new UserLevelCollector(view.getContext());
 			historys = levelCollector.update();
+			historys_average = levelCollector.updateAverage();
 			return null;
 		}
 		
 		@Override
 		protected void onPostExecute(Void result){
-			if (historys == null)
+			if (historys == null || historys_average == null)
 				return;
 			db.cleanInteractionHistory();
-			for (int i=0;i<historys.length;++i){
+			for (int i=0;i<historys.length;++i)
 				db.insertInteractionHistory(historys[i]);
-			}
+			for (int i=0;i<historys_average.length;++i)
+				db.insertInteractionHistoryToday(historys_average[i]);
 			setPointer();
 		}
 		

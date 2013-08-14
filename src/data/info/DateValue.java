@@ -1,4 +1,4 @@
-package history.ui;
+package data.info;
 
 public class DateValue {
 	public int year,month,date;
@@ -18,6 +18,6 @@ public class DateValue {
 	}
 	
 	public int toClickValue(){
-		return month * 1000 + date * 10;
+		return (month+1) * 1000 + date * 10;
 	}
 }

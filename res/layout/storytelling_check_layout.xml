@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/record_bg" >
+    
+    <TextView
+        android:id="@+id/storytelling_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="@string/storytelling_message"
+        android:textAlignment="center"
+        android:textColor="#FF8a8b8b" />
+    
+    <TextView
+        android:id="@+id/storytelling_cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/storytelling_help"
+        android:gravity="center"
+        android:text="@string/no"
+        android:textColor="#FF8a8b8b" />
+    
+    <TextView
+        android:id="@+id/storytelling_ok_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/storytelling_help"
+        android:gravity="center"
+        android:text="@string/yes"
+        android:textColor="#FF8a8b8b" />
+
+</RelativeLayout>

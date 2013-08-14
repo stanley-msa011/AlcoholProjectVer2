@@ -29,6 +29,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
+import data.uploader.ServerUrl;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -59,16 +61,16 @@ public class ClickLogUploader {
 	public static class ClickLogUploaderThread extends AsyncTask<Void, Void, Void>{
 
 		private Context context;
-		private File rootDir;
 		private File logDir;
 		public static final int Nothing = 0; 
 		public static final int ERROR = -1;
 		public static final int SUCCESS = 1;
-		private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/clicklog_upload.php";
-		
+		private static String SERVER_URL;
 		
 		public ClickLogUploaderThread(Context context){
 			this.context = context;
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+			SERVER_URL = ServerUrl.SERVER_URL_CLICKLOG(sp.getBoolean("developer", false));
 		}
 		
 		@Override
@@ -76,13 +78,14 @@ public class ClickLogUploader {
 
 			String not_uploaded_files[] = getNotUploadedFiles();
 			if (not_uploaded_files == null){
-				Log.d("ALCOHOLDEBUG", "no logFile needed to upload");
+				Log.d("Click Log Uploader", "no logFile needed to upload");
 				return null;
 			}
 			
 			for (int i=0; i<not_uploaded_files.length; ++i){
 				File logFile = new File(logDir.getPath(), not_uploaded_files[i]);
 				if(logFile.exists()){
+					Log.d("Click Log Uploader", "file = "+logFile.getPath());
 					int result = connectingToServer(logFile);
 					if(result == ERROR)
 						break;
@@ -92,12 +95,8 @@ public class ClickLogUploader {
 		}
 		
 		private String[] getNotUploadedFiles() {
-			rootDir = new File(Environment.getExternalStorageDirectory(), "drunk_detection");
-			if(!rootDir.exists()){
-				return null;
-			}
-			
-			logDir = new File(rootDir, "sequence_log");
+			Log.d("Click Log Uploader","get not uploaded files");
+			logDir = new File(Environment.getExternalStorageDirectory(), "drunk_detection/sequence_log_binary");
 			if(!logDir.exists()){
 				return null;
 			}
@@ -109,21 +108,12 @@ public class ClickLogUploader {
 				    BufferedReader br = new BufferedReader(new FileReader(latestUploadFile));
 				    latestUpload = br.readLine();
 				}catch (IOException e) {
-				    Log.d("ClickLogUploader", "Error when reading latest_uploaded file");
+				    Log.d("Click Log Uploade", "Error when reading latest_uploaded file");
 				}
 			}
 			
 			String[] all_logs = logDir.list(new logFilter(latestUpload));
-			
-			if(all_logs == null){
-				return null;
-			}
-			else{
-				for(int i = 0; i < all_logs.length; i++){
-					Log.d("Eric", "upload:" + all_logs[i]);
-
-				}
-			}
+			Log.d("Click Log Uploader","get all logs");
 			
 			return all_logs;
 		}
@@ -160,7 +150,7 @@ public class ClickLogUploader {
 
 		private int connectingToServer(File logFile){
 			try {
-				Log.d("ALCOHOLDEBUG", "upload logFile connecting to server");
+				Log.d("Click Log Uploader", "upload logFile connecting to server");
 				DefaultHttpClient httpClient = new DefaultHttpClient();
 				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 				InputStream instream = context.getResources().openRawResource(R.raw.alcohol_certificate);
@@ -191,7 +181,7 @@ public class ClickLogUploader {
 				httpPost.setEntity(mpEntity);
 				int result = uploader(httpClient, httpPost,context);
 				if (result == 1){
-					Log.d("ALCOHOLDEBUG", "success upload logFile: " + logFile.getName());
+					Log.d("Click Log Uploader", "success upload logFile: " + logFile.getName());
 					set_uploaded_logfile(logFile.getName());
 				}
 				
@@ -216,7 +206,7 @@ public class ClickLogUploader {
 		}
 
 		private int uploader(HttpClient httpClient, HttpPost httpPost,Context context){
-			Log.d("ALCOHOLDEBUG","start upload");
+			Log.d("Click Log Uploader","start upload");
 			HttpResponse httpResponse;
 			int  result = -1;
 			try {

@@ -2,6 +2,7 @@ package ubicomp.drunk_detection.activities;
 
 import java.util.Calendar;
 
+import data.database.AudioDB;
 import data.database.HistoryDB;
 import data.database.QuestionDB;
 import data.restore.RestoreData;
@@ -30,6 +31,7 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 public class PreSettingActivity extends Activity {
@@ -38,7 +40,7 @@ public class PreSettingActivity extends Activity {
 	
 	private EditText connect_n0,connect_n1,connect_n2;
 	private EditText connect_p0,connect_p1,connect_p2;
-	private CheckBox uploadAudioCheckBox;
+	private CheckBox uploadAudioCheckBox, showSavingBox;
 	
 	private Button ok_button,clean_button,restoreButton,debugButton,debugTypeButton,dummyButton;
 	boolean debug,dummy,debug_type;
@@ -61,7 +63,9 @@ public class PreSettingActivity extends Activity {
 	
 	private ArrayAdapter<String> adapter; 
 	
-	static final int DATE_DIALOG_ID = 0;
+	private Switch developer_switch;
+	
+	private static final int DATE_DIALOG_ID = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +79,9 @@ public class PreSettingActivity extends Activity {
 		uid = (EditText) this.findViewById(R.id.uid_edit);
 		uid.setText(sp.getString("uid", ""));
 		
+		developer_switch = (Switch) this.findViewById(R.id.developer_switch);
+		developer_switch.setChecked(sp.getBoolean("developer", false));
+		
 		target_good = (EditText) this.findViewById(R.id.target_good_edit);
 		target_good.setText(String.valueOf(sp.getString("goal_good", "機車")));
 		
@@ -83,7 +90,6 @@ public class PreSettingActivity extends Activity {
 		
 		drink= (EditText) this.findViewById(R.id.target_drink_edit);
 		drink.setText(String.valueOf(sp.getInt("drink_cost", 200)));
-
 		
 		connect_n0 = (EditText) this.findViewById(R.id.connect_name_0);
 		connect_n0.setText(sp.getString("connect_n0", ""));
@@ -127,6 +133,9 @@ public class PreSettingActivity extends Activity {
 	    uploadAudioCheckBox = (CheckBox) findViewById(R.id.upload_audio_check_box);;
 	    uploadAudioCheckBox.setChecked(sp.getBoolean("upload_audio", true));
 	    
+	    showSavingBox = (CheckBox) findViewById(R.id.show_saving_box);;
+	    showSavingBox .setChecked(sp.getBoolean("show_saving", true));
+	    
 		ok_button = (Button) this.findViewById(R.id.uid_OK);
 		ok_button.setOnClickListener(new OKOnclickListener());
 		
@@ -154,13 +163,18 @@ public class PreSettingActivity extends Activity {
 	    builder.setMessage("確定?");
 	    builder.setPositiveButton("確定", new CleanListener());
 	    builder.setNegativeButton("取消",null );
-	    alertDialog = builder.create();
+	    AlertDialog cleanAlertDialog = builder.create();
 	    clean_button = (Button) this.findViewById(R.id.clean_OK);
-	    clean_button.setOnClickListener(new CleanOnClickListener());
-		
+	    clean_button.setOnClickListener(new AlertOnClickListener(cleanAlertDialog));
 	    
+	    builder = new AlertDialog.Builder(this);
+	    builder.setTitle("Restore?");
+	    builder.setMessage("確定?");
+	    builder.setPositiveButton("確定", new RestoreOnClickListener());
+	    builder.setNegativeButton("取消",null );
+	   AlertDialog  resotreAlertDialog = builder.create();
 	    restoreButton = (Button) this.findViewById(R.id.restore);
-	    restoreButton.setOnClickListener(new RestoreOnClickListener());
+	    restoreButton.setOnClickListener(new AlertOnClickListener( resotreAlertDialog));
 	    
 	    debug = sp.getBoolean("debug", false);
 	    debug_type = sp.getBoolean("debug_type", false);
@@ -193,9 +207,9 @@ public class PreSettingActivity extends Activity {
 	    dummyButton.setOnClickListener(new DummyOnClickListener());
 	}
 
-	private class RestoreOnClickListener implements View.OnClickListener{
+	private class RestoreOnClickListener implements DialogInterface.OnClickListener{
 		@Override
-		public void onClick(View v) {
+		public void onClick(DialogInterface dialog, int which) {
 			RestoreData rd = new RestoreData(uid.getText().toString(),activity);
 			rd.execute();
 		}
@@ -295,6 +309,7 @@ public class PreSettingActivity extends Activity {
 				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
 				SharedPreferences.Editor editor = sp.edit();
 				editor.putString("uid", text);
+				editor.putBoolean("developer", developer_switch.isChecked());
 				editor.putString("goal_good", target_g);
 				editor.putInt("goal_money", target_t);
 				editor.putInt("drink_cost", drink_t);
@@ -311,6 +326,7 @@ public class PreSettingActivity extends Activity {
 				editor.putInt("connect_s1", connectS1);
 				editor.putInt("connect_s2", connectS2);
 				editor.putBoolean("upload_audio", uploadAudioCheckBox.isChecked());
+				editor.putBoolean("show_saving", showSavingBox.isChecked());
 				editor.commit();
 				activity.finish();
 			}
@@ -319,9 +335,14 @@ public class PreSettingActivity extends Activity {
 		
 	}
 	
-	private AlertDialog alertDialog;
-	
-	private class CleanOnClickListener implements View.OnClickListener{
+	private class AlertOnClickListener implements View.OnClickListener{
+		
+		private AlertDialog alertDialog;
+		
+		public AlertOnClickListener(AlertDialog ad){
+			this.alertDialog = ad;
+		}
+		
 		@Override
 		public void onClick(View v) {
 			alertDialog.show();
@@ -333,8 +354,11 @@ public class PreSettingActivity extends Activity {
 		public void onClick(DialogInterface dialog, int which) {
 			HistoryDB hdb = new HistoryDB(activity);
 			QuestionDB qdb = new QuestionDB(activity);
-			hdb.cleanAcc();
-			qdb.cleanAcc();
+			AudioDB adb = new AudioDB(activity);
+			long ts = System.currentTimeMillis();
+			hdb.cleanAcc(ts);
+			qdb.cleanAcc(ts);
+			adb.cleanAcc(ts);
 			Reuploader.reuploader(activity);
 		}
 	}
@@ -342,7 +366,6 @@ public class PreSettingActivity extends Activity {
 	private void updateDisplay() {
 	    this.mDateDisplay.setText(
 	        new StringBuilder()
-	                // Month is 0 based so add 1
 	                .append(mMonth + 1).append("-")
 	                .append(mDay).append("-")
 	                .append(mYear).append(" "));

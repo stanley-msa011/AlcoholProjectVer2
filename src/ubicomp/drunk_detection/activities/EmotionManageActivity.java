@@ -1,6 +1,7 @@
 package ubicomp.drunk_detection.activities;
 
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
@@ -10,6 +11,8 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -24,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 public class EmotionManageActivity extends Activity {
@@ -70,7 +72,7 @@ public class EmotionManageActivity extends Activity {
 	private static String[] related_texts;
 	
 	QuestionDB db;
-	
+	private static final int TOTAL_BLOCK = 15;	
 	private int state = 0;
 	
 	@Override
@@ -136,7 +138,7 @@ public class EmotionManageActivity extends Activity {
 			mainLayout.addView(v);
 		}
 		
-		int rest_block = 12 - mainLayout.getChildCount();
+		int rest_block = TOTAL_BLOCK  - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -159,7 +161,7 @@ public class EmotionManageActivity extends Activity {
 			mainLayout.addView(vv);
 		}
 		
-		int rest_block = 12 - mainLayout.getChildCount();
+		int rest_block = TOTAL_BLOCK  - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -198,7 +200,7 @@ public class EmotionManageActivity extends Activity {
 			}
 		}
 		
-		int rest_block = 12 - mainLayout.getChildCount();
+		int rest_block = TOTAL_BLOCK  - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -220,7 +222,7 @@ public class EmotionManageActivity extends Activity {
 		View vv = createIconView(R.string.done,R.drawable.questionnaire_item_ok,new EndOnClickListener());
 		mainLayout.addView(vv);
 		
-		int rest_block = 12 - mainLayout.getChildCount();
+		int rest_block = TOTAL_BLOCK  - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -261,23 +263,29 @@ private View createTextView(int textStr){
 		return layout;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private View createEditView(int type){
 		
 		RelativeLayout layout = new RelativeLayout(mainLayout.getContext());
 		
 		EditText edit = new EditText(activity);
-		edit.setBackground(mainLayout.getContext().getResources().getDrawable(R.drawable.questionnaire_input));
+		if (Build.VERSION.SDK_INT>=16)
+			edit.setBackground(mainLayout.getContext().getResources().getDrawable(R.drawable.questionnaire_input));
+		else
+			edit.setBackgroundDrawable(mainLayout.getContext().getResources().getDrawable(R.drawable.questionnaire_input));
 		edit.setTextColor(0xFF000000);
 		edit.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize*4/3);
 		edit.setTypeface(wordTypefaceBold);
-		edit.setOnEditorActionListener(
-				new OnEditorActionListener(){
+		edit.addTextChangedListener(
+				new TextWatcher(){
 					@Override
-					public boolean onEditorAction(TextView arg0, int arg1,KeyEvent arg2) {
-						ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_EDIT);
-						return false;
+					public void afterTextChanged(Editable arg0) {	}
+					@Override
+					public void beforeTextChanged(CharSequence arg0, int arg1,int arg2, int arg3) {}
+					@Override
+					public void onTextChanged(CharSequence arg0, int arg1,	int arg2, int arg3) {
+						ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_EDIT);					
 					}
-			
 		});
 		
 		layout.addView(edit);
@@ -385,7 +393,11 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		@Override
 		public void onClick(View v) {
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
-			db.insertEmotionManage(emotion, r_type, reason);
+			boolean addAcc = db.insertEmotionManage(emotion, r_type, reason);
+			if (addAcc)
+				CustomToast.generateToast(activity, R.string.emotion_manage_end_toast, 1, screen);
+			else
+				CustomToast.generateToast(activity, R.string.emotion_manage_end_toast, 0, screen);
 			activity.finish();
 		}
 	}

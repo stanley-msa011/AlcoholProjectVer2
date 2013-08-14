@@ -19,9 +19,9 @@ public class EndOnClickListener extends QuestionnaireOnClickListener {
 		ClickLoggerLog.Log(msgBox.getContext(), ClickLogId.STATISTIC_QUESTION_NEXT);
 		if (aid >= 0)
 			seq.add(","+aid);
-		msgBox.insertSeq();
+		boolean addAcc = msgBox.insertSeq();
 		msgBox.closeBox();
-		msgBox.showEndOfQuestionnaire();
+		msgBox.showEndOfQuestionnaire(addAcc);
 		msgBox.updateSelfCounter();
 	}
 

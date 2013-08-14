@@ -72,6 +72,15 @@
     	    android:text="@string/start"
     	    android:textAlignment="center"
     	    android:textColor="#FF454545" />
+    	
+    	<TextView
+    	    android:id="@+id/test_start_count_down_text"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerInParent="true"
+    	    android:gravity="center"
+    	    android:textAlignment="center"
+    	    android:textColor="#FF2e2e2e" />
 
     </RelativeLayout>
     

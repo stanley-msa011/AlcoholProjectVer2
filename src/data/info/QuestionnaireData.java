@@ -1,6 +1,6 @@
 package data.info;
 
-public class QuestionnaireData {
+public class QuestionnaireData implements SelfHelpCounter{
 
 	public long ts;
 	public int type;

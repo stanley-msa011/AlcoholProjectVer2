@@ -34,6 +34,7 @@ import data.database.HistoryDB;
 import data.info.AccumulatedHistoryState;
 import data.info.DateBracDetectionState;
 import data.uploader.DataUploader;
+import data.uploader.ServerUrl;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -50,22 +51,24 @@ public class BracDataHandler {
 	private String devId;
 	protected double avg_result = 0;
 	protected HistoryDB db;
-	
+	private static String SERVER_URL;
 	
 	public BracDataHandler(String timestamp_string, TestFragment fragment){
 		ts = timestamp_string;
 		context = fragment.getActivity();
 		db = new HistoryDB(fragment.getActivity());
 		this.devId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		SERVER_URL = ServerUrl.SERVER_URL_TEST(sp.getBoolean("developer", false));
 	}
 	
 	public static final int Nothing = 0; 
 	public static final int ERROR = -1;
 	public static final int SUCCESS = 1;
-	public static final double THRESHOLD = 0.015;
+	public static final double THRESHOLD = 0.025;
 	public static final double THRESHOLD2 = 0.25;
 	
-	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload_2.php";
+	
 	
 	public int start(){
 		
@@ -108,9 +111,13 @@ public class BracDataHandler {
         DateBracDetectionState prevDetection = db.getLatestBracDetection();
         
     
+        boolean isAdd = false;
+        
     	if (detection.year != prevDetection.year || detection.month != prevDetection.month || detection.day != prevDetection.day || detection.timeblock != prevDetection.timeblock){
-    		if (avg_result >=0 && avg_result < THRESHOLD)
+    		if (avg_result >=0 && avg_result < THRESHOLD){
     				a_history.changeAcc(true, week, detection.timeblock);
+    				isAdd = true;
+    		}
     		else if (avg_result < 0)
     			result = ERROR;
     		else{
@@ -132,6 +139,7 @@ public class BracDataHandler {
     	}else{
     		editor.putInt("latest_result", 3);
     	}
+    	editor.putBoolean("latest_result_add", isAdd);
     	editor.putBoolean("tested", true);
     	editor.putBoolean("hourly_alarm", false);
     	editor.commit();

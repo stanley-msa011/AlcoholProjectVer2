@@ -2,6 +2,7 @@ package statistic.ui.statistic_page_view;
 
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,7 +10,8 @@ import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
-import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,7 +36,7 @@ public class AnalysisSavingView extends StatisticPageView {
 	
 	private RelativeLayout contentLayout;
 	
-	private Typeface wordTypeface;
+	private Typeface wordTypeface, digitTypefaceBold;
 	
 	private String[] helpStr;
 	private String money_sign;
@@ -43,6 +45,7 @@ public class AnalysisSavingView extends StatisticPageView {
 		super(context, R.layout.analysis_saving_view,statisticFragment);
 		db = new HistoryDB(context);
 		wordTypeface = Typefaces.getWordTypeface(context);
+		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		goalGood = sp.getString("goal_good", "機車");
 		goalMoney = sp.getInt("goal_money", 50000);
@@ -118,14 +121,31 @@ public class AnalysisSavingView extends StatisticPageView {
 
 	@Override
 	public void onPostTask() {
-		String text =  "<font color=#000000>"+helpStr[0]+" </font><font color=#f39700><strong>"+money_sign
-								+currentMoney
-								+"</strong></font><font color=#000000> "+helpStr[1]
-								+goalGood
-								+helpStr[2]+" </font><font color=#f39700><strong>"+money_sign
-								+goalMoney
-								+"</strong></font><font color=#000000></font><font color=#000000> "+helpStr[3]+"</font>";
-		help.setText(Html.fromHtml(text));
+		String cur_money = String.valueOf(currentMoney)+" ";
+		String goal_money = String.valueOf(goalMoney)+" ";
+		
+		
+		Spannable s = new SpannableString(helpStr[0]+" "+money_sign+cur_money+helpStr[1]+goalGood+helpStr[2]+" "+money_sign+goal_money+helpStr[3]);
+		int start = 0;
+		int end = helpStr[0].length();
+		s.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF000000), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+money_sign.length()+cur_money.length()+1;
+		s.setSpan(new CustomTypefaceSpan("custom2",digitTypefaceBold,0xFFF39700), start, end,Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+helpStr[1].length();
+		s.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF000000), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+goalGood.length()+helpStr[2].length();
+		s.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF000000), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+money_sign.length()+goal_money.length()+1;
+		s.setSpan(new CustomTypefaceSpan("custom2",digitTypefaceBold,0xFFF39700), start, end,Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+helpStr[3].length();
+		s.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF000000), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		
+		help.setText(s);
 		
 	}
 

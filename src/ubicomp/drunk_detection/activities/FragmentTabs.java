@@ -34,7 +34,7 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 import data.uploader.Reuploader;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLogUploader2;
+import debug.clicklog.ClickLogUploader;
 import debug.clicklog.ClickLoggerLog;
 
 public class FragmentTabs extends FragmentActivity {
@@ -88,6 +88,11 @@ public class FragmentTabs extends FragmentActivity {
 			screen_px = new Point();
 			display.getSize(screen_px);
 		}
+		if (screen_px.x > screen_px.y){
+			int tmp = screen_px.x;
+			screen_px.x = screen_px.y;
+			screen_px.y = tmp;
+		}
 
 		isWideScreen = ((float)screen_px.y/(float)screen_px.x)>1.67F;
 		
@@ -139,7 +144,7 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onStart(){
 		Reuploader.reuploader(this);
-		ClickLogUploader2.upload(this);
+		ClickLogUploader.upload(this);
 		Intent a_intent = new Intent(this,RegularCheckService.class);
 		this.startService(a_intent);
 		super.onStart();

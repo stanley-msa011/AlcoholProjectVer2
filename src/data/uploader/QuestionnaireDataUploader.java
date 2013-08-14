@@ -28,10 +28,13 @@ import org.apache.http.protocol.HTTP;
 import ubicomp.drunk_detection.activities.R;
 
 import data.calculate.WeekNum;
+import data.database.HistoryDB;
 import data.database.QuestionDB;
 import data.info.EmotionData;
 import data.info.EmotionManageData;
 import data.info.QuestionnaireData;
+import data.info.StorytellingUsage;
+import data.info.UsedDetection;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -39,13 +42,13 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
+public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 
-	private static EmotionDataUploader  reuploader = null;
+	private static QuestionnaireDataUploader  reuploader = null;
 	
 	public static void reuploader(Context context){
 		cancel();
-		reuploader = new EmotionDataUploader (context);
+		reuploader = new QuestionnaireDataUploader (context);
 		reuploader.execute();
 	}
 	
@@ -58,14 +61,25 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 	}
 	
 		private QuestionDB db;
+		private HistoryDB hdb;
 		private Context context;
-		private static final String SERVER_URL_EMOTION = "https://140.112.30.165/develop/drunk_detection/emotionDIY_upload_2.php";
-		private static final String SERVER_URL_EMOTION_MANAGE = "https://140.112.30.165/develop/drunk_detection/emotion_manage_upload_2.php";
-		private static final String SERVER_URL_QUESTIONNAIRE = "https://140.112.30.165/develop/drunk_detection/questionnaire_upload_2.php";
+		private static String SERVER_URL_EMOTION ;
+		private static String SERVER_URL_EMOTION_MANAGE;
+		private static String SERVER_URL_QUESTIONNAIRE;
+		private static String SERVER_URL_USED ;
+		private static String SERVER_URL_USAGE = "";
 		
-		public EmotionDataUploader (Context context){
+		public QuestionnaireDataUploader (Context context){
 			db = new QuestionDB(context);
+			hdb = new HistoryDB(context);
 			this.context = context;
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+			boolean developer = sp.getBoolean("developer", false);
+			SERVER_URL_EMOTION = ServerUrl.SERVER_URL_EMOTION(developer);
+			SERVER_URL_EMOTION_MANAGE = ServerUrl.SERVER_URL_EMOTION_MANAGE(developer);
+			SERVER_URL_QUESTIONNAIRE = ServerUrl.SERVER_URL_QUESTIONNAIRE(developer);
+			SERVER_URL_USED = ServerUrl.SERVER_URL_USED(developer);
+			SERVER_URL_USAGE = ServerUrl.SERVER_URL_USAGE(developer);
 		}
 		
 		@Override
@@ -95,6 +109,7 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			
 			QuestionnaireData[] q_data = db.getNotUploadedQuestionnaire();
 			if (q_data != null){
+				Log.d("EMOTION_UPLOADER","QUESTIONNAIRE "+q_data.length);
 				for (int i=0;i<q_data.length;++i){
 			       	int result = connectingToServer(q_data[i]);
 			        if (result == -1){
@@ -103,6 +118,33 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 			        }
 				}
 			}
+			
+			
+			long[] ts_data = db.getNotUploadSHCUpdate();
+			if (ts_data !=null){
+				Log.d("EMOTION_UPLOADER"," USED_TS START NOT NULL");
+				for (int i=0;i<ts_data.length;++i){
+					UsedDetection ud = hdb.getUsedState(ts_data[i]);
+			       	int result = connectingToServer(ts_data[i],ud);
+			        if (result == -1){
+			        	Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - USED_DATA");
+			        	return null;
+			        }
+				}
+			}
+			Log.d("EMOTION_UPLOADER"," STORYTELLING USAGE START");
+			StorytellingUsage[] usage = db.getNotUploadedStorytellingUsage();
+			if (usage !=null){
+				Log.d("EMOTION_UPLOADER"," STORYTELLING USAGE START NOT NULL");
+				for (int i=0;i<usage.length;++i){
+			       	int result = connectingToServer(usage[i]);
+			        if (result == -1){
+			        	Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - STORYTELLING USAGE");
+			        	return null;
+			        }
+				}
+			}
+			
 			return null;
 		}
 		
@@ -231,7 +273,7 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
 				mpEntity.addPart("questionnaireData[]", new StringBody(uid));
-				mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.ts/1000L)));
+				mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.ts)));
 				mpEntity.addPart("questionnaireData[]", new StringBody(q_data.seq));
 				int week = WeekNum.getWeek(context, q_data.ts);
 				mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(week)));
@@ -248,6 +290,93 @@ public class EmotionDataUploader extends AsyncTask<Void, Void, Void> {
 				}else{
 					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - QUESTIONNAIRE");
 				}
+				
+			} catch (Exception e) {
+				return -1;
+			} 
+			return 0;
+		}
+		
+		
+		private int connectingToServer(long ts,UsedDetection ud){
+			try {
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+				InputStream instream = context.getResources().openRawResource(R.raw.alcohol_certificate);
+				try{
+					trustStore.load(instream, null);
+				} finally{
+					instream.close();
+				}
+				SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
+				Scheme sch = new Scheme("https",socketFactory,443);
+				
+				httpClient.getConnectionManager().getSchemeRegistry().register(sch);
+				
+				HttpPost httpPost = new HttpPost(SERVER_URL_USED);
+				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+				MultipartEntity mpEntity = new MultipartEntity();
+				
+				Log.d("EMOTION_UPLOADER"," POST");
+				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+				String uid = sp.getString("uid", "");
+				mpEntity.addPart("usedData[]", new StringBody(uid));
+				mpEntity.addPart("usedData[]", new StringBody(String.valueOf(ts)));
+				for (int i=0;i<ud.test.length;++i)
+					mpEntity.addPart("usedDataTest[]",new StringBody(String.valueOf(ud.test[i])));
+				for (int i=0;i<ud.pass.length;++i)
+					mpEntity.addPart("usedDataPass[]",new StringBody(String.valueOf(ud.pass[i])));
+				
+				httpPost.setEntity(mpEntity);
+				int result = uploader(httpClient, httpPost,context);
+				if (result == 1){
+					Log.d("EMOTION_UPLOADER"," USED_TS SUCCESS");
+					db.updateNotUploadSHCUpdate(ts);
+				}else{
+					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - USED_TS");
+				}
+				
+			} catch (Exception e) {
+				return -1;
+			} 
+			return 0;
+		}
+		
+		private int connectingToServer(StorytellingUsage su){
+			try {
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+				InputStream instream = context.getResources().openRawResource(R.raw.alcohol_certificate);
+				try{
+					trustStore.load(instream, null);
+				} finally{
+					instream.close();
+				}
+				SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
+				Scheme sch = new Scheme("https",socketFactory,443);
+				
+				httpClient.getConnectionManager().getSchemeRegistry().register(sch);
+				
+				HttpPost httpPost = new HttpPost(SERVER_URL_USAGE);
+				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+				MultipartEntity mpEntity = new MultipartEntity();
+				
+				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+				String uid = sp.getString("uid", "");
+				mpEntity.addPart("usageData[]", new StringBody(uid));
+				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(su.ts)));
+				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(su.daily_usage)));
+				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(su.acc)));
+				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(su.used)));
+				int week = WeekNum.getWeek(context, su.ts);
+				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(week)));
+				httpPost.setEntity(mpEntity);
+				int result = uploader(httpClient, httpPost,context);
+				if (result == 1){
+					db.setStorytellingUsageUploaded(su.ts);
+				}
+				else
+					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - STORYTELLING USAGE");
 				
 			} catch (Exception e) {
 				return -1;

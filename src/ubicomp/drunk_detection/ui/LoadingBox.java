@@ -20,7 +20,7 @@ public class LoadingBox {
 			dialog.cancel();
 			dialog = new ProgressDialog(context);
 		}
-		dialog.setMessage(context.getResources().getString(R.string.loading));
+		dialog.setMessage(context.getString(R.string.loading));
 		dialog.setCancelable(true);
 		if (!dialog.isShowing())
 			dialog.show();

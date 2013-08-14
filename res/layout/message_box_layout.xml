@@ -46,6 +46,7 @@
     	            android:layout_width="wrap_content"
     	            android:layout_height="wrap_content"
     	            android:contentDescription="@string/msg_box_help1"
+    	            android:layout_centerVertical="true"
     	            android:scaleType="fitXY"
     	            android:src="@drawable/msg_bar_bg" />
     	        
@@ -55,6 +56,7 @@
     	    	    android:layout_height="wrap_content"
     	    	    android:max="4"
     	    	    android:progress="1"
+    	    	    android:layout_centerVertical="true"
     	    	    android:progressDrawable="@drawable/msg_bar_progress"
     	    	    android:thumb="@drawable/msg_bar_button" />
 
@@ -164,6 +166,7 @@
     	            android:layout_height="wrap_content"
     	            android:contentDescription="@string/msg_box_help2"
     	            android:scaleType="fitXY"
+    	            android:layout_centerVertical="true"
     	            android:src="@drawable/msg_bar_bg" />
     	        
     	    	<SeekBar
@@ -173,6 +176,7 @@
     	    	    android:max="9"
     	    	    android:progress="1"
     	    	    android:progressDrawable="@drawable/msg_bar_progress"
+    	    	    android:layout_centerVertical="true"
     	    	    android:thumb="@drawable/msg_bar_button" />
     	    	
     	    	<TextView 

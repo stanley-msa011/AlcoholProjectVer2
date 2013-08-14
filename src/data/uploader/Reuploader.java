@@ -54,7 +54,7 @@ public class Reuploader {
 				reuploader.cancel(true);
 			}
 		}
-		EmotionDataUploader.cancel();
+		QuestionnaireDataUploader.cancel();
 	}
 	
 	
@@ -66,7 +66,7 @@ public class Reuploader {
 		public static final int Nothing = 0; 
 		public static final int ERROR = -1;
 		public static final int SUCCESS = 1;
-		private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload_2.php";
+		private static String SERVER_URL;
 		private String devId;
 		
 		
@@ -74,6 +74,8 @@ public class Reuploader {
 			db = new HistoryDB(context);
 			this.context = context;
 			this.devId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+			SERVER_URL = ServerUrl.SERVER_URL_TEST(sp.getBoolean("developer", false));
 		}
 		
 		@Override
@@ -112,7 +114,7 @@ public class Reuploader {
 		
 		@Override
 		protected void onPostExecute(Void result ){
-			EmotionDataUploader.reuploader(context);
+			QuestionnaireDataUploader.reuploader(context);
 		}
 		
 		private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles, String ts){

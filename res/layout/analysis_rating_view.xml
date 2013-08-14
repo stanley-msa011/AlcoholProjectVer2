@@ -8,15 +8,8 @@
        	android:id="@+id/analysis_rating_title_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/analysis_title_bar" 
         >
-
-        <ImageView
-            android:id="@+id/analysis_rating_title_bg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/analysis_ranking"
-            android:scaleType="fitXY"
-            android:src="@drawable/analysis_title_bar" />
 
    		<TextView
    		    android:id="@+id/analysis_rating_title"

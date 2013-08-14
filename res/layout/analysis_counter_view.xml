@@ -8,16 +8,8 @@
        	android:id="@+id/analysis_counter_title_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/analysis_title_bar"
         >
-
-        <ImageView
-            android:id="@+id/analysis_counter_title_bg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/analysis_counter"
-            android:scaleType="fitXY"
-            android:src="@drawable/analysis_title_bar" />
-
    		<TextView
    		    android:id="@+id/analysis_counter_title"
    		    android:layout_width="wrap_content"
@@ -29,15 +21,14 @@
 
    </RelativeLayout>
 
-    <TextView
-        android:id ="@+id/analysis_counter_help"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FF000000"
-        android:textAlignment="center"
-        android:gravity="center"
-    	/>
    
+    	<TextView
+        	android:id="@+id/analysis_counter_help"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:gravity="left"
+        	android:textColor="#FF000000" />
+
     <RelativeLayout 
         android:id="@+id/analysis_counter_content_layout"
         android:layout_width="match_parent"

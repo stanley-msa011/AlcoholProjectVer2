@@ -170,7 +170,7 @@ public class TutorialActivity extends Activity {
 		RelativeLayout.LayoutParams aParam = (LayoutParams) arrow.getLayoutParams();
 		aParam.addRule(RelativeLayout.RIGHT_OF,0);
 		aParam.addRule(RelativeLayout.ABOVE,0);
-		aParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT,0);
+		aParam.addRule(RelativeLayout.CENTER_HORIZONTAL,0);
 		if (state == 0){
 			layout .setOnClickListener(new Listener(0));
 			replay.setOnClickListener(null);
@@ -202,7 +202,7 @@ public class TutorialActivity extends Activity {
 			replay.setVisibility(View.VISIBLE);
 			tab.setVisibility(View.INVISIBLE);
 			arrow.setImageDrawable(arrowDrawables[2]);
-			aParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+			aParam.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
 			if (isWideScreen)
 				aParam.topMargin = size.x * 377/480;
 			else

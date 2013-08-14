@@ -48,21 +48,22 @@ public class Bluetooth {
 	protected float prev_pressure;
 	protected float now_pressure;
 	protected boolean isPeak = false;
-	protected final static float PRESSURE_DIFF_MIN = 100.f;
+	protected final static float PRESSURE_DIFF_MIN = 360.f;
+	protected final static float MINUS_PRESSURE_DIFF_MIN = -60.f;
 	protected final static float PRESSURE_DIFF_MAX = 20000.f;
 	protected final static long IMAGE_MILLIS_0 = 500;
 	protected final static long IMAGE_MILLIS_1 = 2500;
 	protected final static long IMAGE_MILLIS_2 = 4900;
 	protected final static long MAX_DURATION_MILLIS = 5000;
 	
-	protected final static long MILLIS_1 = 1000;
-	protected final static long MILLIS_2 = 2000;
-	protected final static long MILLIS_3 = 3000;
-	protected final static long MILLIS_4 = 4000;
+	protected final static long MILLIS_1 = 600;
+	protected final static long MILLIS_2 = 1700;
+	protected final static long MILLIS_3 = 2800;
+	protected final static long MILLIS_4 = 3900;
 	protected final static long MILLIS_5 = 5000;
 	
 	protected final static long START_MILLIS = 2000;
-	protected final static long MAX_TEST_TIME = 15000;
+	protected final static long MAX_TEST_TIME = 12000;
 	
 	protected long start_time;
 	protected long end_time;
@@ -154,7 +155,8 @@ public class Bluetooth {
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				if (device == null)
 					return;
-				if (device.getName().equals(DEVICE_NAME)||device.getName().equals(DEVICE_NAME2)){ // add DEVICE_NAME2?
+				String name = device.getName();
+				if (name.equals(DEVICE_NAME)||name.equals(DEVICE_NAME2)){ // add DEVICE_NAME2?
 					btAdapter.cancelDiscovery();
 					sensor = device;
 				}
@@ -186,16 +188,46 @@ public class Bluetooth {
 	}
 	
 	
-	private final static byte[] sendStartMessage = {'y','y','y'};
-	private final static byte[] sendEndMessage = {'z','z','z'};
+	protected final static byte[] sendStartMessage = {'y','y','y'};
+	protected final static byte[] sendEndMessage = {'z','z','z'};
 	
-	private OutputStream out;
+	protected OutputStream out;
+	
+	protected boolean connected = false;
 	
 	public boolean sendStart(){
 		try {
-			Log.d("BT","SEND START");
-			out = socket.getOutputStream();
-			out.write(sendStartMessage);
+			int counter = 0;
+			while (true){
+				Log.e("BT","SEND START");
+				testFragment.showDebug("start_to_send 'y'");
+				out = socket.getOutputStream();
+				in = socket.getInputStream();
+				for (int i=0;i<5;++i)
+					out.write(sendStartMessage);
+				Thread t1 = new Thread(new SRunnable());
+				Thread t2 = new Thread(new SRunnable2());
+				t1.start();
+				t2.start();
+				
+				try {
+					t2.join();
+					if (!connected){
+						Log.e("BT","NO CONNECTION ACK");
+						testFragment.showDebug("no ack");
+						t1.join(1);
+						++counter;
+					}
+					else{
+						Log.e("BT","CONNECTION ACK");
+						testFragment.showDebug("ack");
+						t1.join();
+						break;
+					}
+					if (counter == 3)
+						return false;
+				} catch (InterruptedException e) {}
+			}
 			return true;
 		} catch (IOException e) {
 			Log.d("BT","SEND START FAIL "+ e.toString());
@@ -205,10 +237,35 @@ public class Bluetooth {
 		}
 	}
 	
+	protected class SRunnable implements Runnable{
+		@Override
+		public void run() {
+			try {
+				in = socket.getInputStream();
+				byte[] temp = new byte[1024];
+				int bytes = in.read(temp);
+				if (bytes > 0)
+					connected = true;
+			} catch (IOException e) {
+			}
+		}
+	}
+	
+	protected class SRunnable2 implements Runnable{
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+	
 	public boolean sendEnd(){
 		try {
 			Log.d("BT","SEND END");
-			out.write(sendEndMessage);
+			for (int i=0;i<5;++i)
+				out.write(sendEndMessage);
 			return true;
 		} catch (IOException e) {
 			Log.d("BT","SEND END FAIL "+ e.toString());
@@ -239,7 +296,8 @@ public class Bluetooth {
 		try {
 			in = socket.getInputStream();
 			bytes =in.read(temp);
-			while(bytes>0){
+			Log.d("BT","read data");
+			while(bytes>=0){
 				if (!start){
 					bytes =in.read(temp);
 					continue;
@@ -326,7 +384,7 @@ public class Bluetooth {
 						start_time = time;
 					}
 					
-					if (diff > -PRESSURE_DIFF_MIN/2 && isPeak){
+					if (diff >MINUS_PRESSURE_DIFF_MIN  && isPeak){
 							end_time = time;
 							duration += (end_time-start_time);
 							start_time = end_time;
@@ -367,7 +425,7 @@ public class Bluetooth {
 								return -1;
 							}
 							
-					}else if (diff <-PRESSURE_DIFF_MIN /2){
+					}else if (diff <MINUS_PRESSURE_DIFF_MIN ){
 						isPeak = false;
 						start_time = end_time = 0;
 					}
@@ -397,6 +455,11 @@ public class Bluetooth {
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();
+	}
+	
+	public void closeWithCamera(){
+		close();
+		cameraRunHandler.sendEmptyMessage(1);
 	}
 	
 	protected void write_to_file(String str){

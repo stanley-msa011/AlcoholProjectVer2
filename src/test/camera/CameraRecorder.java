@@ -95,7 +95,8 @@ public class CameraRecorder {
     		previewFrame.addView(preview);
     		preview.setVisibility(View.INVISIBLE);
     	}
-    	previewFrame.addView(previewCircleLayout);
+    	if (previewFrame!=null)
+    		previewFrame.addView(previewCircleLayout);
     	previewCircleLayout.addView(circle);
     	circle.setVisibility(View.INVISIBLE);
     	RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) circle.getLayoutParams();
@@ -147,10 +148,10 @@ public class CameraRecorder {
 		testFragment.updateDoneState(TestFragment._CAMERA);
     }
     
-    public void CloseFail(){
+    public void CloseFail(boolean connect){
     	close();
     	circle.setVisibility(View.INVISIBLE);
-    	testFragment.stopByFail();
+    	testFragment.stopByFail(connect);
     }
     
     public void drawFace(boolean detected){

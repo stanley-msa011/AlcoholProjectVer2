@@ -1,11 +1,11 @@
 package data.info;
 
-public class AudioInfo {
+public class AudioData {
 	
 	public int year,month,date;
 	public long ts;
 	public String filename;
-	public AudioInfo(int year, int month, int date, long ts, String filename){
+	public AudioData(int year, int month, int date, long ts, String filename){
 		this.year = year;
 		this.month = month;
 		this.date = date;

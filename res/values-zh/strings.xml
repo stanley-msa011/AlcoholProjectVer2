@@ -5,9 +5,12 @@
     <string name="loading">載入中</string>
     <string name="brac">酒精濃度</string>
     <string name="start">開始</string>
-    <string name="morning">早上\n0&#8211;12</string>
-    <string name="noon">中午\n12&#8211;18</string>
-    <string name="night">晚上\n18&#8211;24</string>
+    <string name="morning">早上</string>
+    <string name= "morning_time">0&#8211;12</string>
+    <string name="noon">中午</string>
+    <string name= "noon_time">12&#8211;18</string>
+    <string name="night">晚上</string>
+    <string name="night_time">18&#8211;24</string>
     <string name="today_test">今日測試</string>
     <string name="today_test_none">尚未測試</string>
     <string name="week_test">每周測試統計</string>
@@ -65,8 +68,8 @@
     <string name="send">寄送</string>
     <string name="cancel">取消</string>
     <string name="ok">確定</string>
-    <string name="msg_box_toast_cancel">確定不填寫？</string>
-    <string name="msg_box_toast_send">確定已完成？</string>
+    <string name="msg_box_toast_cancel">確定放棄填寫？</string>
+    <string name="msg_box_toast_send">確定完成自我了解？</string>
     <string name="notification_msg_1">該吹氣了！</string>
     <string name="notification_msg_2">您已停酒了一小時，請再繼續努力！</string>
     <string name="test_guide_not_turn_on">未啟動酒測裝置</string>
@@ -77,6 +80,7 @@
     <string name="test_guide_end">\n請點選按鈕以結束</string>
     <string name="test_guide_testing">請將臉對於螢幕中央，\n並開始吹氣</string>
     <string name="test_guide_test_fail">測試超時或酒測器沒電了</string>
+    <string name="test_guide_connect_fail">酒測器連接錯誤</string>
     <string name="tutorial_next">點擊進入下一步</string>
     <string-array name="tutorial_step">
         <item >按下開關，使指示燈亮起</item>
@@ -93,7 +97,7 @@
     </string-array>
     <string-array name="analysis_counter_help">
         <item >已累積</item>
-        <item >點數及</item>
+        <item >點數，回診時可兌換</item>
         <item >張禮卷</item>
     </string-array>
     <string-array name="analysis_saving_help">
@@ -103,19 +107,19 @@
         <item >元</item>
     </string-array>
     <string-array name="analysis_ranking_help">
-        <item >與其他戒酒朋友相比，您的排名為：</item>
-        <item >與表現較佳的成員相比，您的排名為：</item>
+        <item >與戒酒朋友相比，你參與表現的排名：</item>
+        <item >與戒酒朋友相比，你今日表現的排名：</item>
     </string-array>
     <string name="money_sign">$</string>
-    <string name="audio_box_toast_timeup">兩分鐘到了</string>
-    <string name="audio_box_toast_record_end">錄製完成</string>
+    <string name="audio_box_toast_timeup">一分鐘到了</string>
+    <string name="audio_box_toast_record_end">完成錄音</string>
     <string name="audio_box_toast_play_end">結束播放</string>
     <string name="audio_box_playing">播放中</string>
     <string name="audio_box_recording">錄音中</string>
     <string name="audio_box_preparing">準備中</string>
     <string-array name="audio_box_help">
         <item >錄下或聆聽在</item>
-        <item >的心情\n(最長可達兩分鐘)</item>
+        <item >的心情\n(最長可達一分鐘)</item>
     </string-array>
     <string-array name="quote_message">
         <item >酒精是一位可畏的敵人，但你相信不會被\n敵人擺布，也決不低頭認輸。</item>
@@ -131,7 +135,7 @@
         <item >就像一次一次的身體訓練，每一次都讓我\n們變得更強壯或更堅定。</item>
         <item >你發現別人的鼓勵讓我們更堅持下去，但\n若可以鼓勵他人，更能讓生活更有意義。</item>
     </string-array>
-    <string name="call_to">要打給誰？</string>
+    <string name="call_to">要聯絡誰？</string>
     <string name="next">下一步</string>
     <string name="question_type0_help">為了家人和不一樣的\n自己，請繼續加油，\n堅持下去</string>
     <string name="question_type0_next">我相信我做得到的</string>
@@ -174,7 +178,7 @@
 	</string-array>
 	<string name="emotion_connect_null">沒有聯絡對象\n請按返回鍵</string>
 	<string name="emotion_manage_title">情緒管理</string>
-	<string name="emotion_manage_toast">確定放棄填答情緒管理？</string>
+	<string name="emotion_manage_toast">確定放棄填寫情緒管理？</string>
 	<string-array name="emotion_manage_emotion">
 	    <item>喜</item>
 	   	<item>怒</item>
@@ -195,17 +199,34 @@
 	<string name="emotion_manage_help3">請寫下正在影響你的</string>
 	<string name="emotion_manage_help4">這是影響您停酒的因素\n但您仍可堅持停酒</string>
 	<string name="about_title">關於</string>
-	<string name="about_help">關於：</string>
+	<string name="about_help">詳細資料：</string>
 	<string-array name="about_message">
 		<item>此應用程式由</item>
 		<item>合作開發。</item>
 		<item>開發目為協助酗酒患者戒酒並自我控制使用。</item>
 		<item>此應用程式需搭配專用酒測器方可使用。</item>
+		<item>應用界面視覺設計：</item>
+		<item>插畫：吳善琪、黃尤嘉</item>
 	</string-array>
 	<string name="dot">、</string>
 	<string name="ntu">國立台灣大學</string>
 	<string name= "sinica">中央研究院</string>
 	<string name= "taipei_city_hospital">臺北市立聯合醫院</string>
+	<string name= "happ_design">happdesign.com</string>
 	<string name= "current_version">目前版本：</string>
 	<string name="testTimeCheckToast">吹氣測試的間隔請大於兩分鐘</string>
+	<string name= "self_help_counter_unit">點</string>
+	<string name= "get_self_help_counter">+1點</string>
+	<string name= "emotionDIY_end_toast">做好心情DIY</string>
+	<string name= "emotion_manage_end_toast">做好情緒管理</string>
+	<string name= "emotionDIY_help_case1">嘗試閉眼專注觀察呼吸？\n你可以聽從指示引導或直接去做</string>
+	<string name= "emotionDIY_help_case2">專心健走 10 ~ 30 分鐘？\n你可以聽從指示引導或直接去做</string>
+	<string name= "emotionDIY_help_case3">從事休閒活動？\n你可以聽從指示引導或直接去做</string>
+	<string name= "emotionDIY_help_guide">播放指示</string>
+	<string name="try_to_do">我會完成</string>
+	<string name= "emotion_box_playing">播放中</string>
+	<string name= "emotion_box_pause">暫停中</string>
+	<string name= "emotion_box_replay">重新撥放？</string>
+	<string name= "storytelling_message">你有分享你的酒測歷程嗎？</string>
+	<string name= "storytelling_end_toast">分享酒測歷程</string>
 </resources>

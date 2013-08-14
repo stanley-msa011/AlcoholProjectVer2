@@ -89,11 +89,9 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
 			next = Bitmap.createScaledBitmap(tmp2, screen.x, y_axis, true);
 			tmp2.recycle();
-			//next = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC]);
 			tmp2 = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
 			cur = Bitmap.createScaledBitmap(tmp2, screen.x, y_axis, true);
 			tmp2.recycle();
-			//cur = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[curC-1]);
 			
 			pageWidget.setBitmaps(cur, next);
 			pageWidget.setTouchPosition(to);

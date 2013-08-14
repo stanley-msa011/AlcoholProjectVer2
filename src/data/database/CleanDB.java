@@ -12,7 +12,6 @@ public class CleanDB {
 	public CleanDB(Context context){
 		dbHelper = new DBHelper(context);
 	}
-	
 	public void clean(){
 		db = dbHelper.getWritableDatabase();
 		String sql;
@@ -31,6 +30,8 @@ public class CleanDB {
 		sql = "DELETE FROM EmotionManage";
 		db.execSQL(sql);
 		sql = "DELETE FROM Questionnaire";
+		db.execSQL(sql);
+		sql = "DELETE FROM SelfHelpCounterUpdate";
 		db.execSQL(sql);
 		db.close();
 	}

@@ -2,8 +2,8 @@ package ubicomp.drunk_detection.fragments;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.LoadingBox;
-import ubicomp.drunk_detection.ui.Typefaces;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.statistic_page_view.AnalysisCounterView;
 import statistic.ui.statistic_page_view.AnalysisProgressView;
@@ -15,7 +15,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,7 +23,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,12 +30,10 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
 
@@ -57,12 +53,6 @@ public class StatisticFragment extends Fragment {
 	private StatisticFragment statisticFragment;
 	
 	private ImageView questionButton;
-	private FrameLayout shadow;
-	
-	private ImageView showImage;
-	private TextView showText;
-	
-	private ShowDismissHandler showDismissHandler;
 	private ScrollDismissHandler scrollDismissHandler;
 	
 	private static final int[] DOT_ID={0xFF0,0xFF1,0xFF2};
@@ -73,17 +63,12 @@ public class StatisticFragment extends Fragment {
 	
 	private ImageView firstScroll;
 	
-	private Typeface wordTypefaceBold;
-	
 	private Point screen;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this.getActivity();
-		wordTypefaceBold = Typefaces.getWordTypefaceBold(getActivity());
-		screen = FragmentTabs.getSize();
-		statistic_px = new Point(screen.x,screen.x*380/480);
 		dot_on = getResources().getDrawable(R.drawable.statistic_dot_on);
     	dot_off = getResources().getDrawable(R.drawable.statistic_dot_off);
     }
@@ -91,6 +76,8 @@ public class StatisticFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	view = inflater.inflate(R.layout.statistic_fragment, container,false);
+    	screen = FragmentTabs.getSize();
+		statistic_px = new Point(screen.x,screen.x*380/480);
     	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
     	analysisLayout  = (LinearLayout)  view.findViewById(R.id.brac_analysis_layout);
     	analysisView = (ScrollView) view.findViewById(R.id.brac_analysis);
@@ -98,11 +85,6 @@ public class StatisticFragment extends Fragment {
     	dots_layout = (RelativeLayout) view.findViewById(R.id.brac_statistics_dots);
 		questionButton = (ImageView) view.findViewById(R.id.question_background);
 		firstScroll = (ImageView) view.findViewById(R.id.statistic_first_scroll);
-		shadow = (FrameLayout) view.findViewById(R.id.statistic_shadow);
-		showImage = (ImageView) view.findViewById(R.id.statistic_show_picture);
-		showText = (TextView) view.findViewById(R.id.statistic_show_text);
-		showText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 24/480);
-		showText.setTypeface(wordTypefaceBold);
 		LayoutParams statisticViewLayoutParam =  statisticLayout.getLayoutParams();
     	statisticViewLayoutParam.height = statistic_px.y;
     	LayoutParams analysisViewLayoutParam =  analysisView.getLayoutParams();
@@ -138,15 +120,15 @@ public class StatisticFragment extends Fragment {
     	analysisViews = new StatisticPageView[4];
     	analysisViews[0] = new AnalysisProgressView(activity, statisticFragment);
     	analysisViews[1] = new AnalysisCounterView(activity, statisticFragment);
-    	analysisViews[2] = new AnalysisSavingView(activity, statisticFragment);
+    	SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+    	if (sp.getBoolean("show_saving", true))
+    		analysisViews[2] = new AnalysisSavingView(activity, statisticFragment);
 		analysisViews[3] = new AnalysisRatingView(activity,statisticFragment);
 		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
 		msgBox = new QuestionMsgBox(statisticFragment,(RelativeLayout) view);
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
 		
-		if (showDismissHandler == null)
-			showDismissHandler = new ShowDismissHandler();
 		if (scrollDismissHandler == null)
 			scrollDismissHandler = new ScrollDismissHandler();
 		loadHandler.sendEmptyMessage(0);
@@ -163,7 +145,8 @@ public class StatisticFragment extends Fragment {
     	
     	statisticViewAdapter.clear();
     	for (int i=0;i<analysisViews.length;++i){
-    		analysisViews[i].clear();
+    		if (analysisViews[i]!=null)
+    			analysisViews[i].clear();
     	}
     	if (analysisLayout!=null)
     		analysisLayout.removeAllViews();
@@ -237,20 +220,24 @@ public class StatisticFragment extends Fragment {
         	
         	questionButton.setOnClickListener(new QuestionOnClickListener());
         	for (int i=0;i<analysisViews.length;++i)
-    			analysisLayout.addView(analysisViews[i].getView());
-    		
+        		if (analysisViews[i]!=null)
+        			analysisLayout.addView(analysisViews[i].getView());
+        	
     		statisticViewAdapter.onPreTask();
     		for (int i=0;i<analysisViews.length;++i)
-    			analysisViews[i].onPreTask();
+    			if (analysisViews[i]!=null)
+    				analysisViews[i].onPreTask();
     		
 			statisticViewAdapter.onInBackground();
     		for (int i=0;i<analysisViews.length;++i)
-    			analysisViews[i].onInBackground();
+    			if (analysisViews[i]!=null)
+    				analysisViews[i].onInBackground();
 			
 	    	
 			statisticViewAdapter.onPostTask();
     		for (int i=0;i<analysisViews.length;++i)
-    			analysisViews[i].onPostTask();
+    			if (analysisViews[i]!=null)
+    				analysisViews[i].onPostTask();
     		
 	    	statisticView.setCurrentItem(0);
 	    
@@ -261,37 +248,38 @@ public class StatisticFragment extends Fragment {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			boolean tested = sp.getBoolean("tested", false);
 			int result = sp.getInt("latest_result", 0);
+			boolean isAdd = sp.getBoolean("latest_result_add", false);
 			
 			if (tested){
+				int add_self_help_counter = 0;
+				if (isAdd)
+					add_self_help_counter=1;
+				int show_text = 0;
+				int default_counter = 0;
 				if (result <=1){
-					showImage.setImageDrawable(getResources().getDrawable(R.drawable.statistic_show_pass));
-					showText.setText(R.string.after_test_pass);
+					show_text  = R.string.after_test_pass;
+					if(isAdd)
+						++add_self_help_counter;
 				}
 				else{
-					showImage.setImageDrawable(getResources().getDrawable(R.drawable.statistic_show_fail));
-					showText.setText(R.string.after_test_fail);
+					show_text  = R.string.after_test_fail;
+					default_counter = -1;
 				}
+				if (isAdd)
+					CustomToast.generateToast(activity, show_text, add_self_help_counter, screen);
+				else
+					CustomToast.generateToast(activity, show_text, default_counter, screen);
 				
-				shadow.setVisibility(View.VISIBLE);
-				showImage.setVisibility(View.VISIBLE);
-				showText.setVisibility(View.VISIBLE);
 				SharedPreferences.Editor editor = sp.edit();
 		    	editor.putBoolean("tested", false);
+		    	editor.putBoolean("latest_result_pass", false);
 		    	editor.commit();
-				Thread t = new Thread(new ShowTimer());
-				t.start();
 			}
-			else{
-				showImage.setVisibility(View.INVISIBLE);
-				showText.setVisibility(View.INVISIBLE);
-				shadow.setVisibility(View.INVISIBLE);
-				FragmentTabs.enableTab(true);
-				boolean fs = sp.getBoolean("first_scroll", true);
-				if (fs){
-					firstScroll.setVisibility(View.VISIBLE);
-					Thread t = new Thread(new ScrollTimer());
-					t.start();
-				}
+			boolean fs = sp.getBoolean("first_scroll", true);
+			if (fs){
+				firstScroll.setVisibility(View.VISIBLE);
+				Thread t = new Thread(new ScrollTimer());
+				t.start();
 			}
 			
 			if (msgBox!=null){
@@ -307,24 +295,8 @@ public class StatisticFragment extends Fragment {
 			
 			setQuestionAnimation();
 			
-			LoadingBox.dismiss();
-		}
-	}
-    
-	@SuppressLint("HandlerLeak")
-	private class ShowDismissHandler extends Handler{
-		public void handleMessage(Message msg){
-			showImage.setVisibility(View.INVISIBLE);
-			showText.setVisibility(View.INVISIBLE);
-			shadow.setVisibility(View.INVISIBLE);
 			FragmentTabs.enableTab(true);
-			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
-			boolean fs = sp.getBoolean("first_scroll", true);
-			if (fs){
-				firstScroll.setVisibility(View.VISIBLE);
-				Thread t = new Thread(new ScrollTimer());
-				t.start();
-			}
+			LoadingBox.dismiss();
 		}
 	}
 	
@@ -339,18 +311,6 @@ public class StatisticFragment extends Fragment {
 		}
 	}
 	
-	private class ShowTimer implements Runnable{
-
-		@Override
-		public void run() {
-			try {
-				Thread.sleep(2500);
-			} catch (InterruptedException e) {
-			}
-			showDismissHandler.sendEmptyMessage(0);
-		}
-	}
-	
 	
 	private class ScrollTimer implements Runnable{
 
@@ -358,8 +318,7 @@ public class StatisticFragment extends Fragment {
 		public void run() {
 			try {
 				Thread.sleep(2500);
-			} catch (InterruptedException e) {
-			}
+			} catch (InterruptedException e) {}
 			scrollDismissHandler.sendEmptyMessage(0);
 		}
 	}
@@ -410,14 +369,11 @@ public class StatisticFragment extends Fragment {
 		FragmentTabs.enableTab(enable);
 	}
 	
-	public void showEndOfQuestionnaire(){
-		showImage.setImageResource(R.drawable.statistic_show_pass);
-		shadow.setVisibility(View.VISIBLE);
-		showImage.setVisibility(View.VISIBLE);
-		showText.setVisibility(View.VISIBLE);
-		showText.setText(R.string.after_questionnaire);
-		Thread t = new Thread(new ShowTimer());
-		t.start();
+	public void showEndOfQuestionnaire(boolean addAcc){
+		if (addAcc)
+			CustomToast.generateToast(activity, R.string.after_questionnaire, 1, screen);
+		else
+			CustomToast.generateToast(activity, R.string.after_questionnaire, 0, screen);
 	}
 	
 	public void updateSelfHelpCounter(){

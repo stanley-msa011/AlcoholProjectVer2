@@ -17,6 +17,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
+import data.uploader.ServerUrl;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -34,12 +36,14 @@ public class RegularCheckService extends Service {
 		return null;
 	}
 
-	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/regular_check.php";
+	private static String SERVER_URL;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
 		super.onStartCommand(intent, flags, startId);
 		Thread t = new Thread(new NetworkRunnable());
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		SERVER_URL = ServerUrl.SERVER_URL_REGULAR_CHECK(sp.getBoolean("developer", false));
 		t.start();
 		return Service.START_REDELIVER_INTENT;
 	}

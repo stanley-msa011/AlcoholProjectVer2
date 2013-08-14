@@ -1,6 +1,6 @@
 package data.info;
 
-public class EmotionManageData {
+public class EmotionManageData  implements SelfHelpCounter{
 	public long ts;
 	public int emotion;
 	public int type;

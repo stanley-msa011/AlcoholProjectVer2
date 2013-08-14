@@ -1,6 +1,5 @@
 package data.info;
 
-import history.ui.DateValue;
 
 public class BarInfo{
 	public float emotion = 0.F,desire=0.F,brac=0.F;

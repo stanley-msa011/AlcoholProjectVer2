@@ -55,22 +55,6 @@
     android:visibility="invisible"
     />
 
-
-<ImageView
-    android:id = "@+id/statistic_show_picture"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerInParent="true"
-    />
-<TextView
-    android:id="@+id/statistic_show_text"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerHorizontal="true"
-    android:textColor="#FF727171"
-    android:layout_below="@+id/statistic_show_picture"
-    />
-
 <ImageView
     android:id="@+id/statistic_first_scroll"
     android:layout_width="wrap_content"

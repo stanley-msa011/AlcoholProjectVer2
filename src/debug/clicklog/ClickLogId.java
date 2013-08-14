@@ -66,10 +66,18 @@ public class ClickLogId {
 	public final static long STORYTELLING_RECORD_PLAY								=	4600000;
 	public final static long STORYTELLING_RECORD_CANCEL_PLAY			=	4600010;
 	
+	public final static long STORYTELLING_SHARE_OK										=	4700000;
+	public final static long STORYTELLING_SHARE_CANCEL							=	4800000;
+	
 	public final static long EMOTIONDIY_RETURN_BUTTON							=	5000004;
 	public final static long EMOTIONDIY_SELECTION										=	5100000;
 	public final static long EMOTIONDIY_CALL													=	5200000;
 	public final static long EMOTIONDIY_CANCEL_CALL									=	5300000;
+	public final static long EMOTIONDIY_OPEN_CALL_BOX							=	5100010;
+	public final static long EMOTIONDIY_OPEN_PLAY_BOX							=	5100020;
+	public final static long EMOTIONDIY_PAUSE_AUDIO									=	5400000;
+	public final static long EMOTIONDIY_PLAY_AUDIO									=	5400010;
+	public final static long EMOTIONDIY_CANCEL_AUDIO								= 5500000;
 	
 	public final static long EMOTIONMANAGE_RETURN_BUTTON				=	6000004;
 	public final static long EMOTIONMANAGE_SELECTION							=	6100000;

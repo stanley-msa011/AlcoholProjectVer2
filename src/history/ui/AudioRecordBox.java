@@ -7,6 +7,7 @@ import java.io.IOException;
 
 
 import data.database.AudioDB;
+import data.info.DateValue;
 import data.uploader.AudioUploader;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
@@ -14,7 +15,9 @@ import debug.clicklog.ClickLoggerLog;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
+import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.Typefaces;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -22,7 +25,10 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -66,13 +72,14 @@ public class AudioRecordBox {
 	private EndPlayListener endPlayListener= new EndPlayListener();
 	private EndListener endListener = new EndListener();
 	
-	private final static int MAX_MEDIA_DURATION = 120000;
+	private final static int MAX_MEDIA_DURATION = 60000;
 	
 	private Drawable playDrawable,playOffDrawable, recDrawable, stopDrawable;
 	
 	private String[] helpStr;
 	
 	private Toast toast;
+	private ChangeStateHandler changeStateHandler;
 	
 	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
 		this.historyFragment = historyFragment;
@@ -86,6 +93,7 @@ public class AudioRecordBox {
 		mediaPlayer = null;
 		helpStr = context.getResources().getStringArray(R.array.audio_box_help);
 		db = new AudioDB(context);
+		changeStateHandler = new ChangeStateHandler();
 		setting();
 	}
 	
@@ -160,6 +168,9 @@ public class AudioRecordBox {
 		if (backgroundLayout != null)
 			mainLayout.removeView(backgroundLayout);
 		
+		if (changeStateHandler!=null)
+			changeStateHandler.removeMessages(0);
+		
 		if (boxLayout!=null)
 			mainLayout.removeView(boxLayout);
 		
@@ -231,22 +242,26 @@ public class AudioRecordBox {
 	private class EndRecListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			setButtonState(STATE_BEFORE_INIT);
+			Thread t = new Thread (new WaitRunnable(STATE_INIT));
+			t.start();
+			
 			if (mediaRecorder != null){
 				try {
 					mediaRecorder.stop();
 					mediaRecorder.release();
 					mediaRecorder = null;
-					db.insertAudio(curDV);
+					boolean result = db.insertAudio(curDV);
 					if (toast != null)
 						toast.cancel();
-					toast = 	Toast.makeText(context, R.string.audio_box_toast_record_end, Toast.LENGTH_SHORT);
-					toast.show();
-				} catch (IllegalStateException e) {
-				}
+					if (result)
+						CustomToast.generateToast(context, R.string.audio_box_toast_record_end, 1, screen);
+					else
+						CustomToast.generateToast(context, R.string.audio_box_toast_record_end, 0, screen);
+				} catch (IllegalStateException e) {}
 			}
 			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
 			AudioUploader.upload(context);
-			setButtonState(STATE_INIT);
 		}
 	}
 	
@@ -298,6 +313,7 @@ public class AudioRecordBox {
 	private static final int STATE_ON_PLAY = 1;
 	private static final int STATE_ON_RECORD= 2;
 	private static final int STATE_PREPARING = 3;
+	private static final int STATE_BEFORE_INIT = 4;
 	
 	private void setButtonState(int state){
 		switch (state){
@@ -341,25 +357,37 @@ public class AudioRecordBox {
 			closeButton.setVisibility(View.INVISIBLE);
 			help.setText(R.string.audio_box_preparing);
 			break;
+		case STATE_BEFORE_INIT:
+			recButton.setOnClickListener(null);
+			playButton.setOnClickListener(null);
+			closeButton.setOnClickListener(null);
+			closeButton.setVisibility(View.INVISIBLE);
+			help.setText(R.string.wait);
+			break;
 		}
 	}
 	
 	private class EndPlayListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			setButtonState(STATE_BEFORE_INIT);
+			Thread t = new Thread (new WaitRunnable(STATE_INIT));
+			t.start();
 			if (mediaPlayer != null){
 				try {
 					mediaPlayer.stop();
 					mediaPlayer.release();
 					mediaPlayer = null;
 					if (toast !=null)
-						toast = 	Toast.makeText(context, R.string.audio_box_toast_play_end, Toast.LENGTH_SHORT);
+						toast.cancel();
+					toast = 	Toast.makeText(context, R.string.audio_box_toast_play_end, Toast.LENGTH_SHORT);
 					toast.show();
 				} catch (IllegalStateException e) {
 				}
 			}
 			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_PLAY);
-			setButtonState(STATE_INIT);
+			
+			//setButtonState(STATE_INIT);
 		}
 	}
 	
@@ -379,6 +407,37 @@ public class AudioRecordBox {
 				mediaPlayer = null;
 			} catch (IllegalStateException e) {
 			}
+		}
+	}
+	
+	private class WaitRunnable implements Runnable{
+		
+		private int state;
+		
+		public WaitRunnable(int state){
+			this.state = state;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
+			Message msg = new Message();
+			Bundle data = new Bundle();
+			data.putInt("STATE", state);
+			msg.setData(data);
+			msg.what = 0;
+			changeStateHandler.sendMessage(msg);
+		}
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class ChangeStateHandler extends Handler{
+		@Override
+		public void handleMessage(Message msg){
+			int state = msg.getData().getInt("STATE");
+			setButtonState(state);
 		}
 	}
 }

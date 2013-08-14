@@ -4,13 +4,15 @@ import java.util.Calendar;
 
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
-import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.TypedValue;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -26,7 +28,7 @@ public class AnalysisProgressView extends StatisticPageView {
 	private int currentWeek;
 	private int restWeek;
 	
-	private Typeface wordTypeface;
+	private Typeface wordTypeface,digitTypefaceBold;
 	
 	private String[] helpStr;
 	
@@ -34,6 +36,7 @@ public class AnalysisProgressView extends StatisticPageView {
 		super(context, R.layout.analysis_progress_view,statisticFragment);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		wordTypeface = Typefaces.getWordTypeface(context);
+		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_progress_help);
 		fromCal = Calendar.getInstance();
 		int year = sp.getInt("sYear", fromCal.get(Calendar.YEAR));
@@ -90,12 +93,27 @@ public class AnalysisProgressView extends StatisticPageView {
 
 	@Override
 	public void onPostTask() {
-		String text =  "<font color=#000000>"+helpStr[0]+" </font><font color=#f39700><strong>"
-				+currentWeek
-				+"</strong></font><font color=#000000> "+helpStr[1]+" </font><font color=#f39700><strong>"
-				+restWeek
-				+"</strong></font><font color=#000000></font><font color=#000000> "+helpStr[2]+"</font>";
-		help.setText(Html.fromHtml(text));
+		
+		String cur_week = " "+String.valueOf(currentWeek)+" ";
+		String rest_week = " "+String.valueOf(restWeek)+" ";
+		
+		Spannable s = new SpannableString(helpStr[0]+cur_week+helpStr[1]+rest_week+helpStr[2]);
+		int start = 0;
+		int end = helpStr[0].length();
+		s.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF000000), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+cur_week.length();
+		s.setSpan(new CustomTypefaceSpan("custom2",digitTypefaceBold,0xFFF39700), start, end,Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+helpStr[1].length();
+		s.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF000000), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+rest_week.length();
+		s.setSpan(new CustomTypefaceSpan("custom2",digitTypefaceBold,0xFFF39700), start, end,Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end =start+helpStr[2].length();
+		s.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF000000), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		help.setText(s);
 	}
 
 	@Override

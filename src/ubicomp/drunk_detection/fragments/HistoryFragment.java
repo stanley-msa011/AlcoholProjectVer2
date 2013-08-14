@@ -8,6 +8,7 @@ import java.util.Calendar;
 import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.LoadingBox;
 import ubicomp.drunk_detection.ui.Typefaces;
 
@@ -17,14 +18,15 @@ import data.database.HistoryDB;
 import data.info.AccumulatedHistoryState;
 import data.info.BarInfo;
 import data.info.DateBracDetectionState;
+import data.info.DateValue;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
-import history.ui.DateValue;
 import history.ui.HistoryStorytelling;
 import history.ui.AudioRecordBox;
 import history.ui.PageAnimationTaskVertical;
 import history.ui.PageAnimationTaskVertical2;
 import history.ui.PageWidgetVertical;
+import history.ui.StorytellingBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -42,12 +44,14 @@ import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.graphics.Paint.Align;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -56,6 +60,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -134,6 +139,8 @@ public class HistoryFragment extends Fragment {
 	private boolean chartTouchable = true;
 	
 	private AudioRecordBox recordBox;
+	private StorytellingBox storytellingBox;
+	
 	
 	private Drawable chartBg1Drawable, chartBg2Drawable, chartBg3Drawable, chartBg4Drawable;
 	private Bitmap chartCircleBmp;
@@ -146,6 +153,11 @@ public class HistoryFragment extends Fragment {
 	private static final int MAX_PAGE_WEEK = 11;
 	
 	private String doneStr;
+	
+	private ScrollToHandler scrollToHandler;
+	
+	private ImageView storytellingButton;
+	private StorytellingOnClickListener storytellingOnClickListener;
 	
 	 @Override
 	    public void onCreate(Bundle savedInstanceState) {
@@ -182,6 +194,8 @@ public class HistoryFragment extends Fragment {
 			format.setMinimumIntegerDigits(1);
 			format.setMinimumFractionDigits(0);
 			format.setMaximumFractionDigits(0);
+			
+			scrollToHandler = new ScrollToHandler();
 	    }
 	
     @Override
@@ -205,22 +219,21 @@ public class HistoryFragment extends Fragment {
     	
     	stageRateText = (TextView) view.findViewById(R.id.history_stage_rate);
     	stageRateText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-    	stageRateText.setTypeface(wordTypefaceBold);
     	
     	quoteText = (TextView) view.findViewById(R.id.history_quote);
     	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
     	quoteText.setTypeface(wordTypefaceBold);
+    	
+    	storytellingButton = (ImageView) view.findViewById(R.id.history_storytelling_button);
+    	storytellingOnClickListener = new StorytellingOnClickListener();
+    	storytellingButton.setOnClickListener(storytellingOnClickListener);
     	
     	LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
     	sParam.leftMargin = bg_x*10/480;
     	sParam.topMargin = bg_x * 60/480;
     	sParam.width = bg_x*70/480;
     	
-    	int quoteTopMargin;
-    	if (FragmentTabs.isWideScreen())
-    		quoteTopMargin = bg_x*430/480;
-    	else
-    		quoteTopMargin = bg_x * 380/480;
+    	int quoteTopMargin = page_height*430/509;
     	
     	LayoutParams rParam = (LayoutParams) stageRateText.getLayoutParams();
     	rParam.leftMargin = bg_x*20/480;
@@ -234,22 +247,24 @@ public class HistoryFragment extends Fragment {
     }
    
 	public void onResume(){
-		
 		super.onResume();
-		
-		
-			RelativeLayout r = (RelativeLayout) view;
-			recordBox = new AudioRecordBox(this,r);
+		RelativeLayout r = (RelativeLayout) view;
+		recordBox = new AudioRecordBox(this,r);
+		storytellingBox = new StorytellingBox(this,r);
 		if (loadHandler == null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);
 	}
     
-    public void onPause(){
+	public void onPause(){
     	if (recordBox!=null){
     		recordBox.OnPause();
     		recordBox.clear();
     	}
+    	if (storytellingBox!=null)
+    		storytellingBox.clear();
+    	if (scrollToHandler!=null)
+    		scrollToHandler.removeMessages(0);
     	selected_dates.clear();
     	selected_idx.clear();
     	historys.clear();
@@ -305,7 +320,8 @@ public class HistoryFragment extends Fragment {
     }
     
     
-    private void initView(){
+    @SuppressWarnings("deprecation")
+	private void initView(){
     	
     	scrollView.setSmoothScrollingEnabled(true);
     	pageWidget= new PageWidgetVertical(activity,page_width,page_height);
@@ -381,17 +397,29 @@ public class HistoryFragment extends Fragment {
 		chartLabelParam.topMargin = screen.x * 130/1080;
 		chartLabelParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		
-		if (chart_type == 0)
-			chartAreaLayout.setBackground(chartBg1Drawable);
-		else if (chart_type == 1)
-			chartAreaLayout.setBackground(chartBg2Drawable);
-		else if (chart_type == 2)
-			chartAreaLayout.setBackground(chartBg3Drawable);
-		else
-			chartAreaLayout.setBackground(chartBg4Drawable);
-		
+		if (Build.VERSION.SDK_INT>=16){
+			if (chart_type == 0)
+				chartAreaLayout.setBackground(chartBg1Drawable);
+			else if (chart_type == 1)
+				chartAreaLayout.setBackground(chartBg2Drawable);
+			else if (chart_type == 2)
+				chartAreaLayout.setBackground(chartBg3Drawable);
+			else
+				chartAreaLayout.setBackground(chartBg4Drawable);
+		}else{
+			if (chart_type == 0)
+				chartAreaLayout.setBackgroundDrawable(chartBg1Drawable);
+			else if (chart_type == 1)
+				chartAreaLayout.setBackgroundDrawable(chartBg2Drawable);
+			else if (chart_type == 2)
+				chartAreaLayout.setBackgroundDrawable(chartBg3Drawable);
+			else
+				chartAreaLayout.setBackgroundDrawable(chartBg4Drawable);
+		}
 		pageWidget.setOnTouchListener(gtListener);
 		
+		storytellingButton.setVisibility(View.VISIBLE);
+		storytellingButton.bringToFront();
     }
     
     private void setStorytellingTexts(){
@@ -402,8 +430,12 @@ public class HistoryFragment extends Fragment {
     	String stageText = String.valueOf(page_week+1);
     	
     	stageMessageText.setText(stageText);
-    	String progress_str =  "<font color=#e79100>"+ format.format(progress)+"%"+"</font><font color=#717071><br/>"+doneStr +"</font>";
-    	stageRateText.setText(Html.fromHtml(progress_str));
+    	
+    	String progress_str = format.format(progress)+"%\n";
+    	Spannable p_str = new SpannableString(progress_str+doneStr);
+    	p_str.setSpan(new CustomTypefaceSpan("c1",digitTypefaceBold,0xFFE79100), 0, progress_str.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+    	p_str.setSpan(new CustomTypefaceSpan("c2",wordTypefaceBold,0xFF717071), progress_str.length(), progress_str.length()+doneStr.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+    	stageRateText.setText(p_str);
     	quoteText.setText(QUOTE_STR[page_week]);
     	
     }
@@ -456,8 +488,21 @@ public class HistoryFragment extends Fragment {
     	int scroll_value = bar_left+( screen.x * 48 / 1080)*7*(page_week-1);
     	if (scroll_value <0)
     		scroll_value = 0;
-    	scrollView.smoothScrollTo(scroll_value, 0);
+    	Message msg = new Message();
+    	Bundle data = new Bundle();
+    	data.putInt("pos", scroll_value);
+    	msg.what = 0;
+    	scrollToHandler.sendMessage(msg);
     }
+    
+    @SuppressLint("HandlerLeak")
+	private class ScrollToHandler extends Handler{
+    	public void handleMessage(Message msg){
+    		int pos = msg.getData().getInt("pos",0);
+    		scrollView.smoothScrollTo(pos, 0);
+    	}
+    }
+    
     
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
@@ -591,7 +636,6 @@ public class HistoryFragment extends Fragment {
 				}
 				ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_FLING_DOWN);
 				setStageVisible(false);
-				
 				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,endIdx,0);
 				pageAnimationTask2.execute();
 			}
@@ -691,6 +735,7 @@ public class HistoryFragment extends Fragment {
 			title_str[3] = getResources().getString(R.string.total_result);
 		}
 		
+		@SuppressWarnings("deprecation")
 		@Override  
 	    public boolean onTouchEvent(MotionEvent event) {
 			if (!chartTouchable)
@@ -700,21 +745,33 @@ public class HistoryFragment extends Fragment {
 			if (event.getAction() == MotionEvent.ACTION_DOWN){
 				if (x < screen.x * 310/1080){
 					chart_type = 0;
-					chartAreaLayout.setBackground(chartBg1Drawable);
+					if (Build.VERSION.SDK_INT>=16)
+						chartAreaLayout.setBackground(chartBg1Drawable);
+					else
+						chartAreaLayout.setBackgroundDrawable(chartBg1Drawable);
 					ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE0);
 				}
 				else if (x < screen.x * 590/1080){
 					chart_type = 1;
-					chartAreaLayout.setBackground(chartBg2Drawable);
+					if (Build.VERSION.SDK_INT>=16)
+						chartAreaLayout.setBackground(chartBg2Drawable);
+					else
+						chartAreaLayout.setBackgroundDrawable(chartBg2Drawable);
 					ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE1);
 				}
 				else if (x < screen.x * 870/1080){
 					chart_type = 2;
-					chartAreaLayout.setBackground(chartBg3Drawable);
+					if (Build.VERSION.SDK_INT>=16)
+						chartAreaLayout.setBackground(chartBg3Drawable);
+					else
+						chartAreaLayout.setBackgroundDrawable(chartBg3Drawable);
 					ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE2);
 				}else{
 					chart_type = 3;
-					chartAreaLayout.setBackground(chartBg4Drawable);
+					if (Build.VERSION.SDK_INT>=16)
+						chartAreaLayout.setBackground(chartBg4Drawable);
+					else
+						chartAreaLayout.setBackgroundDrawable(chartBg4Drawable);
 					ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE3);
 				}
 				
@@ -1028,7 +1085,6 @@ public class HistoryFragment extends Fragment {
 			}
 			else
 				drawLineChart(canvas);
-			
 		}
 		
 		private void drawLineChart(Canvas canvas){
@@ -1129,7 +1185,6 @@ public class HistoryFragment extends Fragment {
 			
 			if (curX>0 && curY > 0)
 				canvas.drawCircle(curX, curY, RADIUS, focus_paint_len);
-			
 		}
 		
 		private void drawBarChart(Canvas canvas){
@@ -1163,7 +1218,6 @@ public class HistoryFragment extends Fragment {
 				int _bottom = chartHeight - bar_bottom;
 				int _top = _bottom - (int)height;
 				
-				
 				//Draw bars & annotation_circles
 				Point center = new Point(left+bar_half,_top - bar_gap - circle_radius);
 				
@@ -1184,7 +1238,6 @@ public class HistoryFragment extends Fragment {
 				// draw highlights
 				if (bar.week == page_week)
 					canvas.drawRect(left, _bottom-max_height - bar_width-circle_radius, right+bar_gap, _bottom, paint_highlight);
-				
 				
 				//Draw X axis Label
 				if (i%7 == 0){
@@ -1214,9 +1267,7 @@ public class HistoryFragment extends Fragment {
 				}
 				
 				int b_center_x = screen.x * 180/1080 + scrollView.getScrollX(); 
-				
 				int b_center_y = screen.x * 170/1080;
-				
 				int b_center_x_bak = b_center_x;
 				//Draw lines
 				for (int i=0;i<selected_centers.size();++i){
@@ -1247,6 +1298,7 @@ public class HistoryFragment extends Fragment {
 		scrollView.setEnabled(enable);
 		chart.setEnabled(enable);
 		FragmentTabs.enableTab(enable);
+		storytellingButton.setEnabled(enable);
 	}
 	
 	private void checkHasRecorder(){
@@ -1266,6 +1318,11 @@ public class HistoryFragment extends Fragment {
 			hasAudio.set(idx, adb.hasAudio(bars.get(idx).dv));
 	}
 	
-
 	
+	private class StorytellingOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			storytellingBox.showMsgBox();
+		}
+	}
 }

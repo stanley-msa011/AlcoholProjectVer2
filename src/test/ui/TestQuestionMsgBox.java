@@ -171,9 +171,13 @@ public class TestQuestionMsgBox {
 		emotionSeekBarLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_seek_bar_layout);
 		RelativeLayout.LayoutParams eSBParam = (LayoutParams) emotionSeekBarLayout.getLayoutParams();
 		eSBParam.width = screen.x * 260/480;
+		RelativeLayout.LayoutParams eSBgParam = (LayoutParams) emotionSeekBg.getLayoutParams();
+		eSBgParam.width = screen.x * 260/480;
 		desireSeekBarLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_desire_seek_bar_layout);
 		RelativeLayout.LayoutParams dSBParam = (LayoutParams) desireSeekBarLayout.getLayoutParams();
 		dSBParam.width = screen.x * 260/480;
+		RelativeLayout.LayoutParams dSBgParam = (LayoutParams) desireSeekBg.getLayoutParams();
+		dSBgParam.width = screen.x * 260/480;
 		
 		int num_size = screen.x * 26/480;
 		int num_size2 = screen.x * 90/480;
@@ -190,16 +194,23 @@ public class TestQuestionMsgBox {
 			eNum[i].setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 			eNum[i].setTypeface(digitTypeface);
 		}
+		
+		int topMarginOfText = screen.x * 5 /480;
 		eP = (LayoutParams) eNum[0].getLayoutParams();
 		eP.width =  num_size;
+		eP.topMargin =topMarginOfText;
 		eP = (LayoutParams) eNum[1].getLayoutParams();
 		eP.width =  num_size2;
+		eP.topMargin =topMarginOfText;
 		eP = (LayoutParams) eNum[2].getLayoutParams();
 		eP.width =  num_size3;
+		eP.topMargin =topMarginOfText;
 		eP = (LayoutParams) eNum[3].getLayoutParams();
 		eP.width =  num_size2;
+		eP.topMargin =topMarginOfText;
 		eP = (LayoutParams) eNum[4].getLayoutParams();
 		eP.width =  num_size;
+		eP.topMargin =topMarginOfText;
 		
 		dNum = new TextView[10];
 		dNum[0] = (TextView) boxLayout.findViewById(R.id.msg_desire_num0);
@@ -217,6 +228,7 @@ public class TestQuestionMsgBox {
 			dNum[i].setTypeface(digitTypeface);
 			dP = (LayoutParams) dNum[i].getLayoutParams();
 			dP.width =  num_size;
+			dP.topMargin = topMarginOfText;
 		}
 		
 		emotionLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_layout);
@@ -290,14 +302,8 @@ public class TestQuestionMsgBox {
 
 		RelativeLayout.LayoutParams esParam = (LayoutParams) emotionSeekBar.getLayoutParams();
 		esParam.width = screen.x * 260/480;
-		esParam.topMargin = screen.x * 13/480;
 		RelativeLayout.LayoutParams dsParam = (LayoutParams) desireSeekBar.getLayoutParams();
 		dsParam.width = screen.x * 260/480;
-		dsParam.topMargin = screen.x * 13/480;
-		RelativeLayout.LayoutParams esbgParam = (LayoutParams) emotionSeekBg.getLayoutParams();
-		esbgParam.topMargin = screen.x * 44/960;
-		RelativeLayout.LayoutParams dsbgParam = (LayoutParams) desireSeekBg.getLayoutParams();
-		dsbgParam.topMargin = screen.x * 44/960;
 		
 		LinearLayout.LayoutParams eParam = (LinearLayout.LayoutParams) emotionShowText.getLayoutParams();
 		eParam.width = screen.x * 90/480;

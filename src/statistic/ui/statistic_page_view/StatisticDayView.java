@@ -10,11 +10,14 @@ import data.info.BracDetectionState;
 import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.ImageView;
@@ -40,7 +43,10 @@ public class StatisticDayView extends StatisticPageView {
 	private ImageView emotion,desire;
 	private Drawable emotionDrawable, desireDrawable;
 	
-	private int[] blockHint = {R.string.morning,R.string.noon,R.string.night};
+	private static final int[] blockHint = {R.string.morning,R.string.noon,R.string.night,R.string.morning_time,R.string.noon_time,R.string.night_time};
+	private String[] blockHintStr = new String[3];
+	private String[] blockHintTime = new String[3];
+	
 	
 	private static final int nBlocks = 3;
 	
@@ -77,6 +83,10 @@ public class StatisticDayView extends StatisticPageView {
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
 		wordTypeface = Typefaces.getWordTypeface(context);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
+		for (int i=0;i<3;++i){
+			blockHintStr[i] = context.getString(blockHint[i]); 
+			blockHintTime[i] = context.getString(blockHint[i+3]); 
+		}
 	}
 	
 		@Override
@@ -127,8 +137,14 @@ public class StatisticDayView extends StatisticPageView {
 			circleValues[i] = new TextView(context); 
 			
 			circleTexts[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
-			circleTexts[i].setTextColor(0xFF727171);
-			circleTexts[i].setText(blockHint[i]);
+			Spannable s = new SpannableString(blockHintStr[i]+"\n"+blockHintTime[i]);
+			int start = 0;
+			int end = blockHintStr[i].length()+1;
+			s.setSpan(new CustomTypefaceSpan("custom1",wordTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			start = end;
+			end = start + blockHintTime[i].length();
+			s.setSpan(new CustomTypefaceSpan("custom2",digitTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			circleTexts[i].setText(s);
 			circleTexts[i].setGravity(Gravity.CENTER);
 			circleTexts[i].setTypeface(wordTypefaceBold);
 			
@@ -183,12 +199,12 @@ public class StatisticDayView extends StatisticPageView {
 		
 		int icon_size = screen.x*60/480;
 		RelativeLayout.LayoutParams emotionParam = (LayoutParams) emotion.getLayoutParams();
-		emotionParam.topMargin = screen.x * 23/480;
+		emotionParam.topMargin = screen.x * 10/480;
 		emotionParam.width = emotionParam.height = icon_size;
 		emotionParam.leftMargin = screen.x * 40/480;
 		
 		RelativeLayout.LayoutParams desireParam = (LayoutParams) desire.getLayoutParams();
-		desireParam.topMargin = screen.x * 23/480;
+		desireParam.topMargin = screen.x * 10/480;
 		desireParam.width = emotionParam.height = icon_size;
 		desireParam.leftMargin = screen.x * 10/480;
 		
@@ -220,7 +236,6 @@ public class StatisticDayView extends StatisticPageView {
 		valueCircle.setImageDrawable(valueCircleDrawable);
 		bracValue.setText(output);
 		
-		String time;
 		if (brac_time == 0){
 			bracTime.setText(R.string.today_test_none);
 		}
@@ -238,14 +253,37 @@ public class StatisticDayView extends StatisticPageView {
 			else
 				min_str = String.valueOf(min);
 			
-			String m_text = context.getResources().getString(R.string.month);
-			String d_text = context.getResources().getString(R.string.day);
+			String m_text = context.getString(R.string.month);
+			String d_text = context.getString(R.string.day);
+			
+			String month_str = String.valueOf(month);
+			String day_str = String.valueOf(day);
+			
+			String ampm = null;
 			
 			if (am_pm == Calendar.AM)
-				time = month+m_text+day+d_text+"\n"+hour+":"+min_str+" A.M";
+				ampm= " A.M";
 			else
-				time = month+m_text+day+d_text+"\n"+hour+":"+min_str+" P.M";
-			bracTime.setText(time);
+				ampm = "P.M";
+			String time_str = hour+":"+min_str+ampm;
+			
+			Spannable s = new SpannableString(month_str+m_text+day_str+d_text+"\n"+time_str);
+			int start = 0;
+			int end = month_str.length();
+			s.setSpan(new CustomTypefaceSpan("c1",digitTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			start = end;
+			end = start+m_text.length();
+			s.setSpan(new CustomTypefaceSpan("c2",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			start = end;
+			end = start+day_str.length();
+			s.setSpan(new CustomTypefaceSpan("c1",digitTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			start = end;
+			end = start+d_text.length()+1;
+			s.setSpan(new CustomTypefaceSpan("c2",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			start = end;
+			end = start+time_str.length();
+			s.setSpan(new CustomTypefaceSpan("c1",digitTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			bracTime.setText(s);
 		}
 
 		

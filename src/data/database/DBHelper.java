@@ -8,7 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 7; 
+	private static final int DB_VERSION = 11; 
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -73,6 +73,13 @@ public class DBHelper extends SQLiteOpenHelper {
         );
         
         db.execSQL(
+        		"CREATE TABLE RankingToday ("+
+        				" user_id CHAR[255] PRIMERY KEY," +
+        				" score INTEGER NOT NULL" +
+        				")"
+        );
+        
+        db.execSQL(
         		"CREATE TABLE Record ("+
         				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
         				" year INTEGER NOT NULL," +
@@ -80,7 +87,13 @@ public class DBHelper extends SQLiteOpenHelper {
         				" day INTEGER NOT NULL," +
         				" filename CHAR[255] NOT NULL," +
         				" upload INTEGER NOT NULL DEFAULT 0," +
-        				" ts INTEGER NOT NULL" +
+        				" ts INTEGER NOT NULL," +
+        				" acc1 INTEGER NOT NULL DEFAULT 0,"+
+        				" acc2 INTEGER NOT NULL DEFAULT 0,"+
+        				" acc3 INTEGER NOT NULL DEFAULT 0,"+
+        				" used1 INTEGER NOT NULL DEFAULT 0,"+
+        				" used2 INTEGER NOT NULL DEFAULT 0,"+
+        				" used3 INTEGER NOT NULL DEFAULT 0"+
         				")"
         		);
         
@@ -151,6 +164,25 @@ public class DBHelper extends SQLiteOpenHelper {
         				")"
         		);
         
+        
+        db.execSQL(
+        		"CREATE TABLE SelfHelpCounterUpdate ("+
+        				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        				" ts INTEGER NOT NULL," +
+        				" upload INTEGER NOT NULL  DEFAULT 0"+
+        				")"
+        		);
+        
+        db.execSQL(
+        		"CREATE TABLE StorytellingUsage (" +
+        		" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        		" ts INTEGER NOT NULL," +
+        		" daily_usage INTEGER NOT NULL DEFAULT 0," +
+        		" acc INTEGER NOT NULL," +
+        		" used INTEGER NOT NULL," +
+        		" upload INTEGER NOT NULL DEFAULT 0" +
+        		")"
+        		);
 	}
 
 	@Override
@@ -165,6 +197,44 @@ public class DBHelper extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS EmotionManageDB");
 			db.execSQL("DROP TABLE IF EXISTS QuestionnaireDB");
 			onCreate(db);
+		}
+		if (old_ver < 8){
+			db.execSQL(
+	        		"CREATE TABLE SelfHelpCounterUpdate ("+
+	        				" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+	        				" ts INTEGER NOT NULL," +
+	        				" upload INTEGER NOT NULL  DEFAULT 0"+
+	        				")"
+	        		);
+		}
+		if (old_ver < 9){
+			 db.execSQL(
+		        		"CREATE TABLE RankingToday ("+
+		        				" user_id CHAR[255] PRIMERY KEY," +
+		        				" score INTEGER NOT NULL" +
+		        				")"
+		        );
+		}
+		if (old_ver < 10){
+			db.execSQL("ALTER TABLE Record ADD acc1 INTEGER NOT NULL DEFAULT 0");
+			db.execSQL("ALTER TABLE Record ADD acc2 INTEGER NOT NULL DEFAULT 0");
+			db.execSQL("ALTER TABLE Record ADD acc3 INTEGER NOT NULL DEFAULT 0");
+			db.execSQL("ALTER TABLE Record ADD used1 INTEGER NOT NULL DEFAULT 0");
+			db.execSQL("ALTER TABLE Record ADD used2 INTEGER NOT NULL DEFAULT 0");
+			db.execSQL("ALTER TABLE Record ADD used3 INTEGER NOT NULL DEFAULT 0");
+		}
+		
+		if (old_ver < 11){
+			db.execSQL(
+	        		"CREATE TABLE StorytellingUsage (" +
+	        		" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+	        		" ts INTEGER NOT NULL," +
+	        		" daily_usage INTEGER NOT NULL DEFAULT 0," +
+	        		" acc INTEGER NOT NULL," +
+	        		" used INTEGER NOT NULL," +
+	        		" upload INTEGER NOT NULL DEFAULT 0" +
+	        		")"
+	        		);
 		}
 	}
 	

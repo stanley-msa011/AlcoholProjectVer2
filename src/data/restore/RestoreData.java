@@ -1,6 +1,5 @@
 package data.restore;
 
-import history.ui.DateValue;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -24,9 +23,11 @@ import data.database.HistoryDB;
 import data.database.QuestionDB;
 import data.info.AccumulatedHistoryState;
 import data.info.DateBracDetectionState;
+import data.info.DateValue;
 import data.info.EmotionData;
 import data.info.EmotionManageData;
 import data.info.QuestionnaireData;
+import data.info.StorytellingUsage;
 import data.info.UsedDetection;
 
 import android.annotation.SuppressLint;
@@ -91,6 +92,7 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 			 restoreUsedDetections();
 			 restoreQuestionnaires();
 			 restoreAudios();
+			 restoreStorytellingUsage();
 		}
 		return null;
 	}
@@ -352,8 +354,14 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 						int year = Integer.valueOf(dateInfo[0]);
 						int month = Integer.valueOf(dateInfo[1])-1;
 						int date = Integer.valueOf(dateInfo[2]);
+						int[] acc = new int[3];
+						int[] used = new int[3];
+						for (int i=0;i<3;++i){
+							acc[i] = Integer.valueOf(data[i+2]);
+							used[i] = Integer.valueOf(data[i+5]);
+						}
 						DateValue dv = new DateValue(year,month,date);
-						adb.restoreAudio(dv, ts);
+						adb.restoreAudio(dv, ts,acc,used);
 						
 						File src = new File(dir+"/"+uid+"/audio_records/"+dv.toFileString()+".3gp");
 						File audio_dir = new File(dir+"/audio_records");
@@ -370,6 +378,36 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 				Log.d("RESTORE","Used Audio FILE READ FAIL");
 			}
 		}
+		return 0;
+	}
+	
+	private int  restoreStorytellingUsage(){
+		File f;
+		StorytellingUsage su = null;
+		f = new File(dir+"/"+uid+"/storytelling.restore");
+		if (f.exists()){
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(f))));
+				String str = reader.readLine();
+				if (str==null)
+					Log.d("RESTORE","No Storytelling Usage Info");
+				else{
+					while((str = reader.readLine()) !=null){
+						String[] data = str.split(",");
+						long ts = Integer.valueOf(data[0])*1000L;
+						int acc = Integer.valueOf(data[1]);
+						int used= Integer.valueOf(data[2]);
+						su = new StorytellingUsage(ts,0,acc,used);
+					}
+				}
+				reader.close();
+			} catch (FileNotFoundException e) {
+				Log.d("RESTORE","NO Storytelling Usage FILE");
+			} catch (IOException e) {
+				Log.d("RESTORE","Storytelling Usage FILE READ FAIL");
+			}
+		}
+		qdb.restoreData(su);
 		return 0;
 	}
 	

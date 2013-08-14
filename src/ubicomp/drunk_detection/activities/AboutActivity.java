@@ -1,5 +1,6 @@
 package ubicomp.drunk_detection.activities;
 
+import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,7 +10,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Point;
 import android.graphics.Typeface;
-import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -28,9 +30,9 @@ public class AboutActivity extends Activity {
 	private ImageView logo,logo0,logo1,logo2;
 	private RelativeLayout titleLayout;
 	private Point screen;
-	private Typeface wordTypefaceBold,digitTypeface;
+	private Typeface wordTypeface,wordTypefaceBold,digitTypeface,digitTypefaceBold;
 	
-	private static final String COPYRIGHT  = "\u00a9 2013 National Taiwan University,\n Academia Sinica, Taipei City Hospital";
+	private static final String COPYRIGHT  = "\u00a9 2013 National Taiwan University,\nAcademia Sinica, and Taipei City Hospital";
 	
 	private int hidden_state;
 	private Activity activity;
@@ -45,8 +47,10 @@ public class AboutActivity extends Activity {
 		setContentView(R.layout.activity_about);
 		activity = this;
 		
+		wordTypeface = Typefaces.getWordTypeface(this);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(this);
 		digitTypeface = Typefaces.getDigitTypeface(this);
+		digitTypefaceBold = Typefaces.getDigitTypefaceBold(this);
 		titleLayout = (RelativeLayout) this.findViewById(R.id.about_title_layout );
 		titleText = (TextView) this.findViewById(R.id.about_title);
 		about = (TextView) this.findViewById(R.id.about_about);
@@ -102,15 +106,16 @@ public class AboutActivity extends Activity {
 		RelativeLayout.LayoutParams lParam = (RelativeLayout.LayoutParams) logoLayout.getLayoutParams();
 		lParam.topMargin = screen.x * 60/480; 
 		
-		int gap = screen.x * 18/480;
+		int gap = screen.x * 9/480;
 		LinearLayout.LayoutParams l0Param = (LinearLayout.LayoutParams) logo0.getLayoutParams();
-		l0Param.height = icon_size;
+		l0Param.height = l0Param.width = icon_size;
 		l0Param.leftMargin = l0Param.rightMargin = gap; 
 		LinearLayout.LayoutParams l1Param = (LinearLayout.LayoutParams) logo1.getLayoutParams();
-		l1Param.height = icon_size;
+		l1Param.height = l1Param.width = icon_size;
 		l1Param.leftMargin = l1Param.rightMargin = gap; 
 		LinearLayout.LayoutParams l2Param = (LinearLayout.LayoutParams) logo2.getLayoutParams();
-		l2Param.height = icon_size;
+		l2Param.height = l2Param.width = icon_size;
+		l2Param.leftMargin = l2Param.rightMargin = gap; 
 		
 		RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) copyrightText.getLayoutParams();
 		cParam.leftMargin = screen.x * 26/480;
@@ -178,34 +183,56 @@ public class AboutActivity extends Activity {
 					}
 				}
 				);
-		StringBuilder sb = new StringBuilder();
+		
+		
+		
 		
 		String[] message = getResources().getStringArray(R.array.about_message);
-		sb.append(message[0]);
-		sb.append("<br/><strong>");
-		sb.append(getResources().getString(R.string.ntu));
-		sb.append(getResources().getString(R.string.dot));
-		sb.append("</strong><br/><strong>");
-		sb.append(getResources().getString(R.string.sinica));
-		sb.append(getResources().getString(R.string.dot));
-		sb.append("</strong><br/><strong>");
-		sb.append(getResources().getString(R.string.taipei_city_hospital));
-		sb.append("</strong>");
-		sb.append(message[1]);
-		sb.append("<br/><br/>");
-		sb.append(message[2]);
-		sb.append("<br/>");
-		sb.append(message[3]);
-		sb.append("<br/><br/>");
+		String ntu = getString(R.string.ntu);
+		String dot = getString(R.string.dot);
+		String sinica = getString(R.string.sinica);
+		String taipei_city_hospital = getString(R.string.taipei_city_hospital);
+		String happ_design = getString(R.string.happ_design);
 		
+		String curVersion = getString(R.string.current_version);
+		String versionName =" unknown";
 		PackageInfo pinfo;
 		try {
 			pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-			String versionName = pinfo.versionName;
-			sb.append(getResources().getString(R.string.current_version));
-			sb.append(versionName);
+			versionName = pinfo.versionName;
 		} catch (NameNotFoundException e) {}
-		aboutText.setText(Html.fromHtml(sb.toString()));
+		
+    	Spannable helpSpannable = new SpannableString(
+    			message[0]+"\n"+
+    			ntu+dot+"\n"+sinica+dot+"\n"+taipei_city_hospital+
+    			message[1]+"\n\n"+message[2]+"\n"+message[3]+"\n"+curVersion+
+    			versionName+"\n\n"+
+    			message[4]+
+    			happ_design+"\n"+
+    			message[5]
+    			);
+		int start= 0;
+		int end =message[0].length()+1;
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start=end;
+		end = start+ntu.length()+dot.length()+1+sinica.length()+dot.length()+1+taipei_city_hospital.length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom2",wordTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start+message[1].length()+2+message[2].length()+1+message[3].length()+1+curVersion.length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start + versionName.length()+2;
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom3",digitTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start + message[4].length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start + happ_design.length()+1;
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom3",digitTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start + message[5].length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		aboutText.setText(helpSpannable);
 		
 	}
 

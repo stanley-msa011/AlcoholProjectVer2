@@ -23,7 +23,7 @@ import org.apache.http.params.CoreProtocolPNames;
 import ubicomp.drunk_detection.activities.R;
 
 import data.database.AudioDB;
-import data.info.AudioInfo;
+import data.info.AccAudioData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -33,17 +33,17 @@ import android.util.Log;
 
 public class AudioUploader extends AsyncTask<Void, Void, Void> {
 
+	private static String SERVER_URL;
+	
 	private static AudioUploader uploader;
 	public static void upload(Context context){
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-		boolean upload = sp.getBoolean("upload_audio", true);
-		if (!upload)
-			return;
-		
-		Log.d("AUDIO UPLOADER","START UPLOADER");
+		//if (!upload)
+		//	return;
 		if (uploader != null)
 			return;
 		else{
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+			SERVER_URL = ServerUrl.SERVER_URL_AUDIO(sp.getBoolean("developer", false));
 			uploader  = new AudioUploader(context);
 			uploader.execute();
 		}
@@ -52,10 +52,13 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	private AudioDB db;
 	private Context context;
 	private File mainDirectory;
+	private boolean upload;
 	
 	private AudioUploader(Context context){
 		db = new AudioDB(context);
 		this.context = context;
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		upload = sp.getBoolean("upload_audio", true);
 	}
 	
 	@Override
@@ -81,10 +84,11 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	
 	@Override
 	protected Void doInBackground(Void... arg0) {
-		AudioInfo[] ais = db.getNotUploadedInfo();
+		AccAudioData[] ais = db.getNotUploadedInfo();
 		if (ais == null)
 			return null;
 		for (int i=0;i<ais.length;++i){
+			Log.d("AUDIO UPLOADER","ais= "+ais[i].toString());
 			int result = connectingToServer(ais[i]);
 			if (result == 0) // pass
 				db.uploadedAudio(ais[i]);
@@ -102,9 +106,7 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 		uploader = null;
 	}
 	
-	private static final String SERVER_URL = "https://140.112.30.165/develop/drunk_detection/audio_upload.php";
-	
-	private int connectingToServer(AudioInfo info){
+	private int connectingToServer(AccAudioData info){
 		try {
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -132,15 +134,29 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.year)));
 			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.month+1)));
 			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.date)));
+			int upload_data = 0;
+			if (upload)
+				upload_data = 1;
+			mpEntity.addPart("userData[]", new StringBody(String.valueOf(upload_data)));
+			
+			for (int i=0;i<3;++i)
+				mpEntity.addPart("accData[]",new StringBody(String.valueOf(info.acc[i])));
+			for (int i=0;i<3;++i)
+				mpEntity.addPart("usedData[]",new StringBody(String.valueOf(info.used[i])));
 			
 			File audio = new File(mainDirectory,info.filename+".3gp");
 			if (!audio.exists()){
-				Log.d("AUDIO UPLOADER","cannot find the file "+audio.getAbsolutePath());
-				return -2;
+				if ( info.year == 0 && info.month == 0 && info.date == 0);
+				else{
+					Log.d("AUDIO UPLOADER","cannot find the file "+audio.getAbsolutePath());
+					return -2;
+				}
+			}else{
+				if (upload){
+					ContentBody aFile = new FileBody(audio, "application/octet-stream");
+					mpEntity.addPart("userfile[]", aFile);
+				}
 			}
-			ContentBody aFile = new FileBody(audio, "application/octet-stream");
-			mpEntity.addPart("userfile[]", aFile);
-			
 			httpPost.setEntity(mpEntity);
 			int result = uploader(httpClient, httpPost,context);
 			if (result == -1){

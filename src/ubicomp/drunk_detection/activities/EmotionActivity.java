@@ -2,10 +2,12 @@ package ubicomp.drunk_detection.activities;
 
 import statistic.ui.questionnaire.content.ConnectSocialInfo;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -42,10 +45,16 @@ public class EmotionActivity extends Activity {
 	private RelativeLayout bgLayout;
 	private LinearLayout mainLayout;
 	private RelativeLayout callLayout;
+	private RelativeLayout playLayout;
 	private View shadowBg;
 	private TextView callOK,callCancel,callHelp;
+	private TextView playCancel,playHelp;
+	private ImageView playPause;
+	private Drawable playPauseDrawable, playPlayDrawable;
 	
 	private Activity activity;
+	
+	private MediaPlayer mediaPlayer;
 	
 	private ItemOnTouchListener onTouchListener;
 	
@@ -57,7 +66,7 @@ public class EmotionActivity extends Activity {
 		R.drawable.questionnaire_item_sol_5
 	};
 	
-	
+	private static final int TOTAL_BLOCK = 15;	
 	private static String[] texts;
 	
 	private OnClickListener[] clickListeners = {
@@ -107,17 +116,36 @@ public class EmotionActivity extends Activity {
 		shadowBg = new View(this);
 		shadowBg.setBackgroundColor(0x99000000);
 		callLayout = (RelativeLayout) inflater.inflate(R.layout.call_check_layout, null);
+		playLayout = (RelativeLayout) inflater.inflate(R.layout.play_guide_layout, null);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(this);
 		setCallCheckBox();
+		setPlayGuideBox();
 		db = new QuestionDB(activity);
 	}
 
 	@Override
 	protected void onResume(){
 		super.onResume();
+		enableBack = true;
 		setQuestionStart();
 	}
 	
+	
+	@Override
+	protected void onPause(){
+		if (shadowBg!=null)
+			bgLayout.removeView(shadowBg);
+		if (callLayout!=null)
+			bgLayout.removeView(callLayout);
+		if (playLayout!=null)
+			bgLayout.removeView(playLayout);
+		if (mediaPlayer != null)
+			mediaPlayer.release();
+		int item_count = mainLayout.getChildCount();
+		for (int i=0;i<item_count;++i)
+			mainLayout.getChildAt(i).setEnabled(true);
+		super.onPause();
+	}
 	
 	private RelativeLayout.LayoutParams shadowParam;
 	private RelativeLayout.LayoutParams boxParam;
@@ -135,6 +163,10 @@ public class EmotionActivity extends Activity {
 		hParam.width = screen.x * 349/480;
 		hParam.height = screen.x * 114/480;
 		
+		callOK.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callOK.setTypeface(wordTypefaceBold);
+		callCancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callCancel.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams rParam = (LayoutParams) callOK.getLayoutParams();
 		rParam.width = screen.x * 154/480;
@@ -142,6 +174,36 @@ public class EmotionActivity extends Activity {
 		rParam.topMargin = screen.x * 5/480;
 		rParam.rightMargin = screen.x * 15/480; 
 		RelativeLayout.LayoutParams pParam = (LayoutParams) callCancel.getLayoutParams();
+		pParam.width = screen.x * 154/480;
+		pParam.height = screen.x * 60/480;
+		pParam.topMargin = screen.x * 5/480;
+		pParam.leftMargin = screen.x * 35/1480; 
+	}
+	
+private void setPlayGuideBox(){
+		
+		playPause = (ImageView) playLayout.findViewById(R.id.play_pause_button);
+		playCancel = (TextView) playLayout.findViewById(R.id.play_cancel_button);
+		playHelp = (TextView) playLayout.findViewById(R.id.play_help);
+		
+		playPauseDrawable = getResources().getDrawable(R.drawable.record_stop);
+		playPlayDrawable = getResources().getDrawable(R.drawable.record_play);
+		
+		playHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		playHelp.setTypeface(wordTypefaceBold);
+		RelativeLayout.LayoutParams hParam = (LayoutParams) playHelp.getLayoutParams();
+		hParam.width = screen.x * 349/480;
+		hParam.height = screen.x * 114/480;
+		
+		playCancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		playCancel.setTypeface(wordTypefaceBold);
+		
+		RelativeLayout.LayoutParams rParam = (LayoutParams) playPause.getLayoutParams();
+		rParam.width = screen.x * 154/480;
+		rParam.height = screen.x * 60/480;
+		rParam.topMargin = screen.x * 5/480;
+		rParam.rightMargin = screen.x * 15/480; 
+		RelativeLayout.LayoutParams pParam = (LayoutParams) playCancel.getLayoutParams();
 		pParam.width = screen.x * 154/480;
 		pParam.height = screen.x * 60/480;
 		pParam.topMargin = screen.x * 5/480;
@@ -169,7 +231,7 @@ public class EmotionActivity extends Activity {
 			mainLayout.addView(v);
 		}
 		
-		int rest_block = 12 - mainLayout.getChildCount();
+		int rest_block = TOTAL_BLOCK - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -225,6 +287,7 @@ public class EmotionActivity extends Activity {
 			}
 		}
 		if (counter == 0){
+			mainLayout.removeAllViews();
 			mainLayout.addView(title);
 			titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 			titleparam.height = screen.x*230/1080;
@@ -233,7 +296,7 @@ public class EmotionActivity extends Activity {
 			mainLayout.addView(tv2);
 		}
 		
-		int rest_block = 12 - mainLayout.getChildCount();
+		int rest_block = TOTAL_BLOCK - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View vv = createBlankView();
 			mainLayout.addView(vv);
@@ -249,12 +312,20 @@ public class EmotionActivity extends Activity {
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
 		titleparam.height = screen.x*230/1080;
 		
-		View tv = createTextView(R.string.emotion_end_message);
+		View tv;
+		if (selection == 0)
+			tv = createTextView(R.string.emotionDIY_help_case1);
+		else if (selection == 1)
+			tv = createTextView(R.string.emotionDIY_help_case2);
+		else
+			tv = createTextView(R.string.emotionDIY_help_case3);
 		mainLayout.addView(tv);
-		View vv = createIconView(R.string.done,R.drawable.questionnaire_item_ok,new EndOnClickListener(selection));
+		View pv = createIconView(R.string.emotionDIY_help_guide,R.drawable.questionnaire_item_ok,new PlayGuideOnClickListener(selection));
+		mainLayout.addView(pv);
+		View vv = createIconView(R.string.try_to_do,R.drawable.questionnaire_item_ok,new EndOnClickListener(selection));
 		mainLayout.addView(vv);
 		
-		int rest_block = 12 - mainLayout.getChildCount();
+		int rest_block = TOTAL_BLOCK - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
 			View v = createBlankView();
 			mainLayout.addView(v);
@@ -363,7 +434,11 @@ private View createTextView(int textStr){
 		public void onClick(View v) {
 			
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
-			db.insertEmotion(in,null);
+			boolean addAcc = db.insertEmotion(in,null);
+			if (addAcc)
+				CustomToast.generateToast(activity, R.string.emotionDIY_end_toast, 1, screen);
+			else
+				CustomToast.generateToast(activity, R.string.emotionDIY_end_toast, 0, screen);
 			activity.finish();
 		}
 	}
@@ -382,11 +457,11 @@ private View createTextView(int textStr){
 		
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_OPEN_CALL_BOX);
 			int item_count = mainLayout.getChildCount();
 			for (int i=0;i<item_count;++i)
 				mainLayout.getChildAt(i).setEnabled(false);
-			
+			enableBack = false;
 			
 			bgLayout.addView(shadowBg);
 			bgLayout.addView(callLayout);
@@ -407,6 +482,107 @@ private View createTextView(int textStr){
 		
 	}
 	
+	private class PlayGuideOnClickListener  implements View.OnClickListener{
+
+		private int type;
+		
+		public PlayGuideOnClickListener(int type){
+			this.type =type;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_OPEN_PLAY_BOX);
+			int item_count = mainLayout.getChildCount();
+			for (int i=0;i<item_count;++i)
+				mainLayout.getChildAt(i).setEnabled(false);
+			enableBack = false;
+			
+			bgLayout.addView(shadowBg);
+			bgLayout.addView(playLayout);
+			shadowParam = (LayoutParams) shadowBg.getLayoutParams();
+			shadowParam.width = shadowParam.height = LayoutParams.MATCH_PARENT;
+			
+			boxParam = (LayoutParams) playLayout.getLayoutParams();
+			boxParam.width = screen.x * 349/480;
+			boxParam.height = screen.x * 189/480;
+			boxParam.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+			
+			playHelp.setText(R.string.emotion_box_playing);
+			if (mediaPlayer!=null)
+				mediaPlayer.release();
+			switch (type){
+			case 0:
+				mediaPlayer = MediaPlayer.create(activity, R.raw.emotion1);
+				break;
+			case 1:
+				mediaPlayer = MediaPlayer.create(activity, R.raw.emotion2);
+				break;
+			case 2:
+				mediaPlayer = MediaPlayer.create(activity, R.raw.emotion3);
+				break;
+			default:
+				mediaPlayer = MediaPlayer.create(activity, R.raw.emotion1);
+			}
+			mediaPlayer.start();
+			mediaPlayer.setOnCompletionListener(new PlayOnCompletionListener());
+			playPause.setOnClickListener(new PlayOnClickListener());
+			playPause.setImageDrawable(playPauseDrawable);
+			playCancel.setOnClickListener(new PlayCancelOnClickListener());
+		}
+		
+	}
+	
+	
+	private class PlayOnCompletionListener implements MediaPlayer.OnCompletionListener{
+
+		@Override
+		public void onCompletion(MediaPlayer mp) {
+			playPause.setImageDrawable(playPlayDrawable);
+			playHelp.setText(R.string.emotion_box_replay);
+		}
+		
+	}
+	
+	private class PlayOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View arg0) {
+			if (mediaPlayer == null)
+				return;
+			if (mediaPlayer.isPlaying()){
+				ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_PAUSE_AUDIO);
+				mediaPlayer.pause();
+				playPause.setImageDrawable(playPlayDrawable);
+				playHelp.setText(R.string.emotion_box_pause);
+			}
+			else{
+				ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_PLAY_AUDIO);
+				mediaPlayer.start();
+				playPause.setImageDrawable(playPauseDrawable);
+				playHelp.setText(R.string.emotion_box_playing);
+			}
+		}
+	}
+	
+	private class PlayCancelOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CANCEL_AUDIO);
+			if (mediaPlayer != null){
+				mediaPlayer.release();
+				mediaPlayer = null;
+			}
+			bgLayout.removeView(shadowBg);
+			bgLayout.removeView(playLayout);
+			int item_count = mainLayout.getChildCount();
+			for (int i=0;i<item_count;++i)
+				mainLayout.getChildAt(i).setEnabled(true);
+			enableBack = true;
+		}
+		
+	}
+	
+	
 	private class CallCancelOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
@@ -416,6 +592,7 @@ private View createTextView(int textStr){
 			int item_count = mainLayout.getChildCount();
 			for (int i=0;i<item_count;++i)
 				mainLayout.getChildAt(i).setEnabled(true);
+			enableBack = true;
 		}
 		
 	}
@@ -491,9 +668,13 @@ private View createTextView(int textStr){
 		}
 	}
 	
+	
+	private boolean enableBack = true;
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event){
 		if (keyCode == KeyEvent.KEYCODE_BACK){
+			if (!enableBack)
+				return false;
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_RETURN_BUTTON);
 			if (state == 0){
 				if (endToast!=null)

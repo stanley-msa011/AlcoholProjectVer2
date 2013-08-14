@@ -115,18 +115,15 @@ public class TestFragment extends Fragment {
 	private CountDownHandler countDownHandler;
 	
 	private RelativeLayout startLayout;
-	private ImageView bg, startButton;
+	private ImageView bg, startButton,stroke,testCircle;
 	private TextView bracText;
 	private TextView brac;
 	private TextView startText;
-	
 	
 	private FrameLayout preview_layout;
 	
 	private RelativeLayout helpLayout;
 	private ImageView helpButton;
-	
-	private ImageView testCircle;
 	
 	private static Object init_lock  = new Object();
 	private static Object done_lock  = new Object();
@@ -141,8 +138,7 @@ public class TestFragment extends Fragment {
 	
 	private QuestionFile questionFile;
 	
-	private Typeface digitTypeface;
-	private Typeface wordTypefaceBold;
+	private Typeface digitTypeface, digitTypefaceBold, wordTypefaceBold;
 	
 	private DecimalFormat format;
 	
@@ -151,6 +147,12 @@ public class TestFragment extends Fragment {
 	private Point screen;
 	
 	private int count_down_sec = 0;
+	private TextView countDownText;
+	
+	private String test_guide_end;
+	private String test_guide_not_turn_on;
+	private String test_guide_test_fail;
+	private String test_guide_connect_fail;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -162,11 +164,18 @@ public class TestFragment extends Fragment {
 		format.setMinimumFractionDigits(2);
 		format.setMaximumFractionDigits(2);
 		digitTypeface = Typefaces.getDigitTypeface(getActivity());
+		digitTypefaceBold = Typefaces.getDigitTypeface(getActivity());
 		wordTypefaceBold  = Typefaces.getWordTypefaceBold(getActivity());
 		screen = FragmentTabs.getSize();
+		test_guide_end = getString(R.string.test_guide_end);
+		test_guide_not_turn_on=getString(R.string.test_guide_not_turn_on);
+		test_guide_test_fail = getString(R.string.test_guide_test_fail);
+		test_guide_connect_fail = getString(R.string.test_guide_connect_fail);
 	}
 	
 	public void onPause(){
+		if (count_down_thread!=null && count_down_thread.isAlive())
+			count_down_thread.interrupt();
 		if (!isKeepMsgBox()){
 			stop();
 			clear();
@@ -232,6 +241,7 @@ public class TestFragment extends Fragment {
 		bracText =(TextView) view.findViewById(R.id.test_brac_value_text);
 		brac = (TextView) view.findViewById(R.id.test_brac_text);
 		startText = (TextView) view.findViewById(R.id.test_start_button_text);
+		stroke = (ImageView)view.findViewById(R.id.test_start_stroke);
 		
 		helpLayout = (RelativeLayout) view.findViewById(R.id.help_layout);
 		helpButton = (ImageView) view.findViewById(R.id.help_background);
@@ -247,6 +257,10 @@ public class TestFragment extends Fragment {
 		
 		startText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 42/480);
 		startText.setTypeface(wordTypefaceBold);
+		
+		countDownText = (TextView) view.findViewById(R.id.test_start_count_down_text);
+		countDownText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 65/480);
+		countDownText.setTypeface(digitTypefaceBold);
 		
 		brac.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 22/480);
 		brac.setTypeface(wordTypefaceBold);
@@ -264,11 +278,20 @@ public class TestFragment extends Fragment {
 		
 		RelativeLayout.LayoutParams bParam = (RelativeLayout.LayoutParams)bg.getLayoutParams();
 		bParam.width = screen.x;
-		bParam.height = bParam.width*1709/1080;
+		bParam.height = bParam.width*1712/1080;
 		
+		
+		int start_size = screen.x * 255/480;
 		RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
 		startLayoutParam.topMargin = screen.x * 192/480;
-		startLayoutParam.width = startLayoutParam.height = screen.x * 255/480;
+		startLayoutParam.width = startLayoutParam.height = start_size;
+		RelativeLayout.LayoutParams startButtonParam = (LayoutParams) startButton.getLayoutParams();
+		startButtonParam.width = startButtonParam.height = screen.x*208/480;
+		RelativeLayout.LayoutParams startStrokeParam = (LayoutParams) stroke.getLayoutParams();
+		startStrokeParam.width = startStrokeParam.height = start_size;
+		RelativeLayout.LayoutParams testCircleParam = (LayoutParams) testCircle.getLayoutParams();
+		testCircleParam.width = testCircleParam.height = start_size;
+		
 		
 		RelativeLayout.LayoutParams previewParam = (LayoutParams) preview_layout.getLayoutParams();
 		previewParam.width =screen.x *254/480;
@@ -334,7 +357,7 @@ public class TestFragment extends Fragment {
 		clear();
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg",getString(R.string.test_guide_not_turn_on));
+		data.putString("msg",test_guide_not_turn_on);
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
@@ -361,14 +384,15 @@ public class TestFragment extends Fragment {
 			else{
 				long lastTime = sp.getLong("LatestTestTime", 0);
 				long curTime = System.currentTimeMillis();
-				if (curTime - lastTime > 120000){
+				Boolean debug = sp.getBoolean("debug", false);
+				if (curTime - lastTime > 120000 || debug){
+					bg.setOnTouchListener(null);
 					startButton.setOnClickListener(null);
-					startButton.setVisibility(View.INVISIBLE);
-					startText.setText("");
+					startText.setVisibility(View.INVISIBLE);
 					bracText.setText("0.00");
 					reset();
 					messageView.setText(R.string.test_guide_show_turn_on);
-					Thread t = new Thread(new TimeUpRunnable(0,1500));
+					Thread t = new Thread(new TimeUpRunnable(0,3000));
 					t.start();
 				}else{
 					if (startToast !=null)
@@ -419,6 +443,9 @@ public class TestFragment extends Fragment {
 		questionFile = new QuestionFile(mainDirectory);
 	}
 	
+	
+	private Thread count_down_thread;
+	
 	public void updateInitState(int type){
 		synchronized(init_lock){
 			if (INIT_PROGRESS[type]==true)
@@ -431,8 +458,14 @@ public class TestFragment extends Fragment {
 				btRunTask.execute();
 				messageView.setText(R.string.test_guide_turn_on);
 				showDebug("Device launched");
-				Thread t = new Thread(new CountDownRunnable(1,10));
-				t.start();
+				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+				Boolean debug = sp.getBoolean("debug", false);
+				
+				if (debug)
+					count_down_thread = new Thread(new CountDownRunnable(1,2)) ;
+				else
+					count_down_thread = new Thread(new CountDownRunnable(1,10));
+				count_down_thread.start();
 			}
 	}
 	}
@@ -547,8 +580,7 @@ public class TestFragment extends Fragment {
 			messageView.setText(R.string.test_guide_start);
 			startButton.setOnClickListener(new StartOnClickListener());
 			startButton.setVisibility(View.VISIBLE);
-			startText.setText(R.string.start);
-			startText.setTextColor(0xFF454545);
+			startText.setVisibility(View.VISIBLE);
 			helpButton.setOnClickListener(new TutorialOnClickListener());
 			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
 			face.setVisibility(View.INVISIBLE);
@@ -574,7 +606,6 @@ public class TestFragment extends Fragment {
     
 	@SuppressLint("HandlerLeak")
 	private class FailBgHandler extends Handler{
-		
 	
 		public void handleMessage(Message msg){
 			if (msgLoadingHandler !=null){
@@ -590,11 +621,12 @@ public class TestFragment extends Fragment {
 			startButton.setOnClickListener(new EndTestOnClickListener());
 			startButton.setVisibility(View.VISIBLE);
 			face.setVisibility(View.INVISIBLE);
-			msgStr = msgStr.concat(getString(R.string.test_guide_end));
+			msgStr = msgStr.concat(test_guide_end);
 			messageView.setText(msgStr);
-			
+			bg.setOnTouchListener(new BackgroundDoubleOnTouchListener());
 		}
 	}
+	
 	@SuppressLint("HandlerLeak")
 	private class TestHandler extends Handler{
 		public void handleMessage(Message msg){
@@ -624,10 +656,13 @@ public class TestFragment extends Fragment {
 			testCircle.setImageDrawable(blowDrawables[time]);
 	}
 	
-	public void stopByFail(){
+	public void stopByFail(boolean connect_fail){
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		data.putString("msg",getResources().getString(R.string.test_guide_test_fail));
+		if (connect_fail)
+			data.putString("msg", test_guide_connect_fail);
+		else
+			data.putString("msg",test_guide_test_fail);
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
@@ -651,8 +686,8 @@ public class TestFragment extends Fragment {
 				startBT();
 			}
 			else if (t == 1){
-				messageView.setVisibility(View.VISIBLE);
-				startText.setText("");
+				startButton.setVisibility(View.INVISIBLE);
+				countDownText.setText("");
 				showDebug(">Start to run the  device");
 				runBT();
 			}
@@ -692,12 +727,8 @@ public class TestFragment extends Fragment {
 		public void run() {
 			try {
 				for (int i=0;i<sec;++i){
-					Thread.sleep(500);
-					if (countDownHandler!=null)
-						countDownHandler.sendEmptyMessage(0);
-					Thread.sleep(500);
-					if (countDownHandler!=null)
-						countDownHandler.sendEmptyMessage(0);
+					Thread.sleep(1000);
+					countDownHandler.sendEmptyMessage(0);
 				}
 				timeUpHandler.sendEmptyMessage(msg);
 			} catch (InterruptedException e) {}
@@ -707,14 +738,8 @@ public class TestFragment extends Fragment {
 	@SuppressLint("HandlerLeak")
 	private class CountDownHandler extends Handler{
 		public void handleMessage(Message msg){
-			if (messageView.getVisibility() == View.VISIBLE)
-				messageView.setVisibility(View.INVISIBLE);
-			else{
-				messageView.setVisibility(View.VISIBLE);
-				--count_down_sec;
-				startText.setTextColor(0xFFc98123);
-				startText.setText(String.valueOf(count_down_sec));
-			}
+			--count_down_sec;
+			countDownText.setText(String.valueOf(count_down_sec));
 		}
 	}
 	
@@ -837,12 +862,10 @@ public class TestFragment extends Fragment {
 		private int cond;
 		public ConditionOnClickListener(int cond){
 			this.cond = cond;
-			
 		}
 		
 		@Override
 		public void onClick(View v) {
-			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			SharedPreferences.Editor editor = sp.edit();
 	    	editor.putInt("latest_result", cond);
@@ -851,7 +874,6 @@ public class TestFragment extends Fragment {
 	    	editor.commit();
 	    	FragmentTabs.changeTab(1);
 		}
-		
 	}
 	
 	

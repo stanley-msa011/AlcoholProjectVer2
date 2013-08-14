@@ -35,6 +35,14 @@
 
   	    </EditText>
 
+    	<Switch
+    	    android:id="@+id/developer_switch"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:textOn="yes"
+    	    android:textOff="no"
+    	    android:text="Is Developer?" />
+
     	<TextView
 	        android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
@@ -187,6 +195,12 @@
      	    android:layout_width="wrap_content"
      	    android:layout_height="wrap_content"
      	    android:text="Upload Audio File" />
+     	
+     	<CheckBox
+     	    android:id="@+id/show_saving_box"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="Show saving" />
      	
     	<Button
 	        android:id="@+id/uid_OK"

@@ -1,7 +1,7 @@
 package data.info;
 
 
-public class AccumulatedHistoryState extends HistoryState {
+public class AccumulatedHistoryState extends HistoryState  implements SelfHelpCounter {
 
 	private int[] empty_array = {0,0,0};
 	
