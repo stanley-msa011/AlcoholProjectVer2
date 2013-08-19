@@ -349,16 +349,24 @@
     		    android:textColor="#FF898989" />
 
     	</LinearLayout>
-    	<LinearLayout 
+    	<RelativeLayout 
     	    android:layout_width="match_parent"
     	    android:layout_height="wrap_content"
-    	    android:orientation="horizontal">
+    	    >
+    		
+    	    <View 
+    	        android:id="@+id/msg_divider"
+    	        android:layout_width="0dp"
+    	        android:layout_height="0dp"
+    	        android:layout_centerInParent="true"
+    	        />
 
     	    <TextView
     	        android:id="@+id/msg_not_send"
     	        android:layout_width="wrap_content"
     	        android:layout_height="wrap_content"
-    	        android:layout_weight="1"
+    	        android:layout_toLeftOf="@+id/msg_divider"
+    	        android:layout_centerVertical="true"
     	        android:gravity="center"
     	        android:text="@string/cancel"
     	        android:textColor="#FF898989" />
@@ -367,12 +375,13 @@
     	        android:id="@+id/msg_send"
     	        android:layout_width="wrap_content"
     	        android:layout_height="wrap_content"
-    	        android:layout_weight="1"
+    	        android:layout_toRightOf="@+id/msg_divider"
+    	        android:layout_centerVertical="true"
     	        android:gravity="center"
     	        android:text="@string/send"
     	        android:textColor="#FF898989" />
 
-    	</LinearLayout>
+    	</RelativeLayout>
     	
 	</LinearLayout>
 	<TextView 

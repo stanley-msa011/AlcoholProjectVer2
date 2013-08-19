@@ -12,6 +12,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
@@ -19,6 +20,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
@@ -93,7 +95,7 @@ public class Reuploader {
 			for (int i=0;i<state.length;++i){
 				String _ts =String.valueOf(state[i].timestamp/1000L);
 				File[]  imageFiles;
-				File textFile, geoFile,stateFile;
+				File textFile, geoFile,stateFile, questionFile;
 				imageFiles = new File[3];
 				
 				textFile = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + _ts + ".txt");
@@ -104,8 +106,9 @@ public class Reuploader {
 		        imageFiles[2] = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + "IMG_" + _ts + "_3.jpg");
 		        
 		    	stateFile = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + "state.txt");
+		    	questionFile = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + "question.txt");
 		    	
-		       	int result = connectingToServer(textFile,geoFile,stateFile,imageFiles,_ts);
+		       	int result = connectingToServer(textFile,geoFile,stateFile,imageFiles,questionFile,_ts);
 		        if (result == ERROR)
 		        	break;
 			}
@@ -117,7 +120,7 @@ public class Reuploader {
 			QuestionnaireDataUploader.reuploader(context);
 		}
 		
-		private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles, String ts){
+		private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles, File questionFile, String ts){
 			try {
 				DefaultHttpClient httpClient = new DefaultHttpClient();
 				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -170,6 +173,10 @@ public class Reuploader {
 					ContentBody cbStateFile = new FileBody(stateFile, "application/octet-stream");
 					mpEntity.addPart("userfile[]", cbStateFile);
 				}
+				if (questionFile.exists()){
+					ContentBody cbQuestionFile = new FileBody(questionFile, "application/octet-stream");
+					mpEntity.addPart("userfile[]", cbQuestionFile);
+				}
 				
 				if (imageFiles[0].exists())
 					mpEntity.addPart("userfile[]", new FileBody(imageFiles[0], "image/jpeg"));
@@ -179,8 +186,7 @@ public class Reuploader {
 					mpEntity.addPart("userfile[]", new FileBody(imageFiles[2], "image/jpeg"));
 				
 				httpPost.setEntity(mpEntity);
-				int result = uploader(httpClient, httpPost,ts,context);
-				if (result == 1){
+				if (uploader(httpClient, httpPost,ts,context)){
 					db.updateDetectionUploaded(Long.valueOf(ts)*1000L);
 				}
 				
@@ -191,16 +197,20 @@ public class Reuploader {
 			return SUCCESS;
 		}
 		
-		private int uploader(HttpClient httpClient, HttpPost httpPost,String ts,Context context){
+		private boolean uploader(HttpClient httpClient, HttpPost httpPost,String ts,Context context){
 			HttpResponse httpResponse;
-			int  result = -1;
+			ResponseHandler <String> res=new BasicResponseHandler();  
+			boolean  result = false;
 			try {
 				httpResponse = httpClient.execute(httpPost);
 				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-				if (httpStatusCode == HttpStatus.SC_OK)
-					result = 1;
-				else
-					result = -1;
+				result = (httpStatusCode == HttpStatus.SC_OK);
+				if (result){
+					String response = res.handleResponse(httpResponse).toString();
+					Log.d("UPLOADER","response = " + response);
+					result &= (response.equals("10111") || response.equals("11111"));
+				}
+				Log.d("UPLOADER","result = "+result);
 			} catch (ClientProtocolException e) {
 			} catch (IOException e) {
 			} finally{

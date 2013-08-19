@@ -64,7 +64,7 @@
     android:src="@drawable/statistic_scroll" />
 
 <ImageView
-    android:id="@+id/question_background"
+    android:id="@+id/question_button"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentRight="true"

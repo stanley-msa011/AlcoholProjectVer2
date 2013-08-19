@@ -68,6 +68,7 @@ public class ClickLogId {
 	
 	public final static long STORYTELLING_SHARE_OK										=	4700000;
 	public final static long STORYTELLING_SHARE_CANCEL							=	4800000;
+	public final static long STORYTELLING_SHARE_BUTTON							=	4900000;
 	
 	public final static long EMOTIONDIY_RETURN_BUTTON							=	5000004;
 	public final static long EMOTIONDIY_SELECTION										=	5100000;

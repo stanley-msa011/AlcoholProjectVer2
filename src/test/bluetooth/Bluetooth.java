@@ -43,23 +43,23 @@ public class Bluetooth {
 	protected InputStream in;
 	protected Context context;
 	
-	protected float local_min;
+	protected float absolute_min;
 	protected float prev_prev_pressure;
 	protected float prev_pressure;
 	protected float now_pressure;
 	protected boolean isPeak = false;
-	protected final static float PRESSURE_DIFF_MIN = 360.f;
-	protected final static float MINUS_PRESSURE_DIFF_MIN = -60.f;
-	protected final static float PRESSURE_DIFF_MAX = 20000.f;
+	protected final static float PRESSURE_DIFF_MIN =360.f;
+	protected final static float MINUS_PRESSURE_DIFF_MIN = -80.f;
+	protected final static float MAX_PRESSURE = Float.MAX_VALUE;
 	protected final static long IMAGE_MILLIS_0 = 500;
 	protected final static long IMAGE_MILLIS_1 = 2500;
 	protected final static long IMAGE_MILLIS_2 = 4900;
 	protected final static long MAX_DURATION_MILLIS = 5000;
 	
-	protected final static long MILLIS_1 = 600;
-	protected final static long MILLIS_2 = 1700;
-	protected final static long MILLIS_3 = 2800;
-	protected final static long MILLIS_4 = 3900;
+	protected final static long MILLIS_1 = 400;
+	protected final static long MILLIS_2 = 1550;
+	protected final static long MILLIS_3 = 2700;
+	protected final static long MILLIS_4 = 3850;
 	protected final static long MILLIS_5 = 5000;
 	
 	protected final static long START_MILLIS = 2000;
@@ -105,7 +105,6 @@ public class Bluetooth {
 		btAdapter =  BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null)
 			Log.e("BT","NOT SUPPORT BT");
-		local_min = 0.f;
 		prev_prev_pressure = 0.f;
 		prev_pressure = 0.f;
 		now_pressure = 0.f;
@@ -199,7 +198,7 @@ public class Bluetooth {
 		try {
 			int counter = 0;
 			while (true){
-				Log.e("BT","SEND START");
+				Log.d("BT","SEND START");
 				testFragment.showDebug("start_to_send 'y'");
 				out = socket.getOutputStream();
 				in = socket.getInputStream();
@@ -213,13 +212,13 @@ public class Bluetooth {
 				try {
 					t2.join();
 					if (!connected){
-						Log.e("BT","NO CONNECTION ACK");
+						Log.d("BT","NO CONNECTION ACK");
 						testFragment.showDebug("no ack");
 						t1.join(1);
 						++counter;
 					}
 					else{
-						Log.e("BT","CONNECTION ACK");
+						Log.d("BT","CONNECTION ACK");
 						testFragment.showDebug("ack");
 						t1.join();
 						break;
@@ -268,7 +267,7 @@ public class Bluetooth {
 				out.write(sendEndMessage);
 			return true;
 		} catch (IOException e) {
-			Log.d("BT","SEND END FAIL "+ e.toString());
+			Log.e("BT","SEND END FAIL "+ e.toString());
 			close();
 			return false;
 		}
@@ -277,12 +276,12 @@ public class Bluetooth {
 	public void read(){
 		
 		int end=0;
-		byte[] temp = new byte[512];
+		byte[] temp = new byte[1024];
 		int bytes;
 		String msg = "";
 		isPeak=false;
 		success = false;
-		local_min = 0;
+		absolute_min =MAX_PRESSURE;
 		now_pressure = 0;
 		prev_prev_pressure = 0;
 		prev_pressure = 0;
@@ -298,10 +297,6 @@ public class Bluetooth {
 			bytes =in.read(temp);
 			Log.d("BT","read data");
 			while(bytes>=0){
-				if (!start){
-					bytes =in.read(temp);
-					continue;
-				}
 				long time = System.currentTimeMillis();
 				long time_gap = time - first_start_time;
 				if (first_start_time == -1)
@@ -353,7 +348,6 @@ public class Bluetooth {
 			else if (msg.charAt(0)=='a'){
 				if (isPeak){
 					long timeStamp = System.currentTimeMillis()/1000L;
-					
 					float alcohol = Float.valueOf(msg.substring(1));
 					String output = timeStamp+"\t"+alcohol+"\n";
 					if (start_recorder){
@@ -366,8 +360,7 @@ public class Bluetooth {
 			else if (msg.charAt(0)=='m'){
 				
 				if (prev_pressure == 0.f){
-					prev_pressure = Float.valueOf(msg.substring(1));
-					prev_prev_pressure = Float.valueOf(msg.substring(1));
+					prev_pressure = prev_prev_pressure = now_pressure = Float.valueOf(msg.substring(1));
 				}
 				else {
 					prev_prev_pressure = prev_pressure;
@@ -376,15 +369,21 @@ public class Bluetooth {
 					float diff = now_pressure - prev_pressure;
 					
 					long time = System.currentTimeMillis();
-					if(prev_pressure < prev_prev_pressure && prev_pressure < now_pressure && !isPeak){
-						local_min = prev_pressure;
+					if(now_pressure < absolute_min && !start){
+						absolute_min = now_pressure;
+					//	Log.d("BT","absolute min setting: "+absolute_min);
 					}
-					if(local_min > 1 && now_pressure > local_min +PRESSURE_DIFF_MIN && !isPeak){
+					
+					//Log.d("BT",diff+"/"+absolute_min+"/"+now_pressure);
+					if (!start)
+						return 0;
+					
+					if(now_pressure > absolute_min +PRESSURE_DIFF_MIN && !isPeak){
 						isPeak = true;
 						start_time = time;
 					}
 					
-					if (diff >MINUS_PRESSURE_DIFF_MIN  && isPeak){
+					if (diff >MINUS_PRESSURE_DIFF_MIN  && now_pressure > absolute_min +PRESSURE_DIFF_MIN && isPeak){
 							end_time = time;
 							duration += (end_time-start_time);
 							start_time = end_time;
@@ -425,7 +424,7 @@ public class Bluetooth {
 								return -1;
 							}
 							
-					}else if (diff <MINUS_PRESSURE_DIFF_MIN ){
+					}else{
 						isPeak = false;
 						start_time = end_time = 0;
 					}

@@ -31,7 +31,7 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 		String msg = "";
 		isPeak=false;
 		success = false;
-		local_min = 0;
+		absolute_min = 0;
 		now_pressure = 0;
 		prev_prev_pressure = 0;
 		prev_pressure = 0;
@@ -46,11 +46,6 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 			in = socket.getInputStream();
 			bytes =in.read(temp);
 			while(bytes>0){
-				if (!start){
-					bytes =in.read(temp);
-					testFragment.showDebug("read before start");
-					continue;
-				}
 				long time = System.currentTimeMillis();
 				long time_gap = time - first_start_time;
 				if (first_start_time == -1){
@@ -191,17 +186,24 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 					float diff = now_pressure - prev_pressure;
 					
 					long time = System.currentTimeMillis();
-					if(prev_pressure < prev_prev_pressure && prev_pressure < now_pressure && !isPeak){
-						local_min = prev_pressure;
+					if(now_pressure < absolute_min && !start){
+						absolute_min = now_pressure;
+						testFragment.showDebug("absolute min setting: "+absolute_min );
 					}
-					if(local_min > 1 && now_pressure > local_min + PRESSURE_DIFF_MIN && !isPeak){
+					
+					if (!start){
+						testFragment.showDebug("read before start" );
+						return 0;
+					}
+					
+					if(now_pressure > absolute_min + PRESSURE_DIFF_MIN && !isPeak){
 						testFragment.showDebug("P_PeakStart" );
 						isPeak = true;
 						start_time = time;
 					}
 					
 					testFragment.showDebug("P_diff: "+diff );
-					if (diff > MINUS_PRESSURE_DIFF_MIN&& isPeak){
+					if (diff > MINUS_PRESSURE_DIFF_MIN && now_pressure > absolute_min + PRESSURE_DIFF_MIN && isPeak){
 							testFragment.showDebug("P_Peak" );
 							end_time = time;
 							duration += (end_time-start_time);

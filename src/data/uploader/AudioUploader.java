@@ -10,6 +10,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
@@ -17,6 +18,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
@@ -37,8 +39,6 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	
 	private static AudioUploader uploader;
 	public static void upload(Context context){
-		//if (!upload)
-		//	return;
 		if (uploader != null)
 			return;
 		else{
@@ -88,7 +88,6 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 		if (ais == null)
 			return null;
 		for (int i=0;i<ais.length;++i){
-			Log.d("AUDIO UPLOADER","ais= "+ais[i].toString());
 			int result = connectingToServer(ais[i]);
 			if (result == 0) // pass
 				db.uploadedAudio(ais[i]);
@@ -158,8 +157,7 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 				}
 			}
 			httpPost.setEntity(mpEntity);
-			int result = uploader(httpClient, httpPost,context);
-			if (result == -1){
+			if (!uploader(httpClient, httpPost,context)){
 				Log.d("AUDIO UPLOADER","fail to upload");
 				return -1;
 			}
@@ -171,16 +169,21 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 		return 0;
 	}
 	
-	private int uploader(HttpClient httpClient, HttpPost httpPost,Context context){
+	private boolean uploader(HttpClient httpClient, HttpPost httpPost,Context context){
 		HttpResponse httpResponse;
-		int  result = -1;
+		ResponseHandler <String> res=new BasicResponseHandler();  
+		boolean  result = false;
 		try {
 			httpResponse = httpClient.execute(httpPost);
 			int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-			if (httpStatusCode == HttpStatus.SC_OK)
-				result = 1;
-			else
-				result = -1;
+			result = (httpStatusCode == HttpStatus.SC_OK);
+			if (result){
+				String response = res.handleResponse(httpResponse).toString();
+				Log.d("UPLOADER","audio response="+response);
+				result &= (response.contains("upload success"));
+				Log.d("UPLOADER","audio result="+result);
+			}
+			
 		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
 		} finally{

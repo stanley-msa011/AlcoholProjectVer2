@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
@@ -48,8 +49,8 @@ public class EmotionActivity extends Activity {
 	private RelativeLayout playLayout;
 	private View shadowBg;
 	private TextView callOK,callCancel,callHelp;
-	private TextView playCancel,playHelp;
-	private ImageView playPause;
+	private TextView playHelp;
+	private ImageView playCancel,playPause;
 	private Drawable playPauseDrawable, playPlayDrawable;
 	
 	private Activity activity;
@@ -183,7 +184,7 @@ public class EmotionActivity extends Activity {
 private void setPlayGuideBox(){
 		
 		playPause = (ImageView) playLayout.findViewById(R.id.play_pause_button);
-		playCancel = (TextView) playLayout.findViewById(R.id.play_cancel_button);
+		playCancel = (ImageView) playLayout.findViewById(R.id.play_cancel_button);
 		playHelp = (TextView) playLayout.findViewById(R.id.play_help);
 		
 		playPauseDrawable = getResources().getDrawable(R.drawable.record_stop);
@@ -194,9 +195,6 @@ private void setPlayGuideBox(){
 		RelativeLayout.LayoutParams hParam = (LayoutParams) playHelp.getLayoutParams();
 		hParam.width = screen.x * 349/480;
 		hParam.height = screen.x * 114/480;
-		
-		playCancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
-		playCancel.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams rParam = (LayoutParams) playPause.getLayoutParams();
 		rParam.width = screen.x * 154/480;
@@ -320,7 +318,7 @@ private void setPlayGuideBox(){
 		else
 			tv = createTextView(R.string.emotionDIY_help_case3);
 		mainLayout.addView(tv);
-		View pv = createIconView(R.string.emotionDIY_help_guide,R.drawable.questionnaire_item_ok,new PlayGuideOnClickListener(selection));
+		View pv = createIconView(R.string.emotionDIY_help_guide,R.drawable.questionnaire_item_play,new PlayGuideOnClickListener(selection));
 		mainLayout.addView(pv);
 		View vv = createIconView(R.string.try_to_do,R.drawable.questionnaire_item_ok,new EndOnClickListener(selection));
 		mainLayout.addView(vv);
@@ -647,21 +645,22 @@ private View createTextView(int textStr){
 	
 	private class ItemOnTouchListener implements View.OnTouchListener{
 
+		private Rect rect;
+		
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			int e = event.getAction();
 			switch(e){
-				case MotionEvent.ACTION_OUTSIDE:
-					v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
-					break;
 				case MotionEvent.ACTION_MOVE:
-					v.setBackgroundResource(R.drawable.questionnaire_bar_selected);
+					if(!rect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY()))
+						v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 					break;
 				case MotionEvent.ACTION_UP:
 					v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 					break;
 				case MotionEvent.ACTION_DOWN:
 					v.setBackgroundResource(R.drawable.questionnaire_bar_selected);
+					rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
 					break;
 			}
 			return false;

@@ -14,12 +14,14 @@ import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.CoreProtocolPNames;
@@ -109,7 +111,6 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 			
 			QuestionnaireData[] q_data = db.getNotUploadedQuestionnaire();
 			if (q_data != null){
-				Log.d("EMOTION_UPLOADER","QUESTIONNAIRE "+q_data.length);
 				for (int i=0;i<q_data.length;++i){
 			       	int result = connectingToServer(q_data[i]);
 			        if (result == -1){
@@ -122,7 +123,6 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 			
 			long[] ts_data = db.getNotUploadSHCUpdate();
 			if (ts_data !=null){
-				Log.d("EMOTION_UPLOADER"," USED_TS START NOT NULL");
 				for (int i=0;i<ts_data.length;++i){
 					UsedDetection ud = hdb.getUsedState(ts_data[i]);
 			       	int result = connectingToServer(ts_data[i],ud);
@@ -132,7 +132,6 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 			        }
 				}
 			}
-			Log.d("EMOTION_UPLOADER"," STORYTELLING USAGE START");
 			StorytellingUsage[] usage = db.getNotUploadedStorytellingUsage();
 			if (usage !=null){
 				Log.d("EMOTION_UPLOADER"," STORYTELLING USAGE START NOT NULL");
@@ -189,8 +188,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				}
 				
 				httpPost.setEntity(mpEntity);
-				int result = uploader(httpClient, httpPost,context);
-				if (result == 1){
+				if (uploader(httpClient, httpPost,context)){
 					db.setEmotionUploaded(e_data.ts);
 				}else{
 					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - EMOTION DIY");
@@ -237,8 +235,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 					nvps.add(new BasicNameValuePair("emotionManageUsed[]",String.valueOf(em_data.used[i])));
 				}
 				httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-				int result = uploader(httpClient, httpPost,context);
-				if (result == 1){
+				if (uploader(httpClient, httpPost,context)){
 					db.setEmotionManageUploaded(em_data.ts);
 				}else{
 					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - EMOTION MANAGEMENT");
@@ -284,8 +281,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				}
 				
 				httpPost.setEntity(mpEntity);
-				int result = uploader(httpClient, httpPost,context);
-				if (result == 1){
+				if (uploader(httpClient, httpPost,context)){
 					db.setQuestionnaireUploaded(q_data.ts);
 				}else{
 					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - QUESTIONNAIRE");
@@ -328,8 +324,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 					mpEntity.addPart("usedDataPass[]",new StringBody(String.valueOf(ud.pass[i])));
 				
 				httpPost.setEntity(mpEntity);
-				int result = uploader(httpClient, httpPost,context);
-				if (result == 1){
+				if (uploader(httpClient, httpPost,context)){
 					Log.d("EMOTION_UPLOADER"," USED_TS SUCCESS");
 					db.updateNotUploadSHCUpdate(ts);
 				}else{
@@ -371,8 +366,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				int week = WeekNum.getWeek(context, su.ts);
 				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(week)));
 				httpPost.setEntity(mpEntity);
-				int result = uploader(httpClient, httpPost,context);
-				if (result == 1){
+				if (uploader(httpClient, httpPost,context)){
 					db.setStorytellingUsageUploaded(su.ts);
 				}
 				else
@@ -384,16 +378,20 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 			return 0;
 		}
 		
-		private int uploader(HttpClient httpClient, HttpPost httpPost,Context context){
+		private boolean uploader(HttpClient httpClient, HttpPost httpPost,Context context){
 			HttpResponse httpResponse;
-			int  result = -1;
+			ResponseHandler <String> res=new BasicResponseHandler();  
+			boolean  result = false;
 			try {
 				httpResponse = httpClient.execute(httpPost);
 				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-				if (httpStatusCode == HttpStatus.SC_OK)
-					result = 1;
-				else
-					result = -1;
+				result =  (httpStatusCode == HttpStatus.SC_OK);
+				if (result){
+					String response = res.handleResponse(httpResponse).toString();
+					Log.d("UPLOADER","ques response="+response);
+					result &= (response.contains("upload success"));
+					Log.d("UPLOADER","ques result="+result);
+				}
 			} catch (ClientProtocolException e) {
 			} catch (IOException e) {
 			} finally{

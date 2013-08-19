@@ -1,5 +1,7 @@
 package data.info;
 
+import test.data.BracDataHandler;
+
 
 public class BarInfo{
 	public float emotion = 0.F,desire=0.F,brac=0.F;
@@ -12,8 +14,11 @@ public class BarInfo{
 			this.emotion = emotion;
 		if (desire > 0)
 			this.desire = desire;
-		if (brac > 0.F)
+		if (brac < BracDataHandler.THRESHOLD)
+			this.brac = 0;
+		else
 			this.brac = brac;
+		
 		this.week = week;
 		this.hasData = hasData;
 		this.dv = dv;

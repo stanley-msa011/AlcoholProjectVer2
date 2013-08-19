@@ -14,15 +14,15 @@
         android:gravity="center"
         />
     
-    <TextView
+    <ImageView
         android:id="@+id/play_cancel_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/play_help"
         android:gravity="center"
-        android:text="@string/cancel"
-        android:textColor="#FF8a8b8b" />
+        android:scaleType="center" 
+        android:src="@drawable/cancel" />
     
     <ImageView
         android:id="@+id/play_pause_button"

@@ -16,6 +16,7 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.CustomToast;
+import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -26,9 +27,12 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -45,14 +49,14 @@ public class AudioRecordBox {
 	private HistoryFragment historyFragment;
 	private Context context;
 	private LayoutInflater inflater;
-	private RelativeLayout boxLayout = null;
+	private RelativeLayout boxLayout ,contentLayout;
 	private FrameLayout backgroundLayout;
 	private TextView help;
 	private ImageView closeButton,recButton,playButton;
 	
 	private RelativeLayout mainLayout;
 	
-	private Typeface wordTypefaceBold;
+	private Typeface wordTypefaceBold,digitTypefaceBold;
 	
 	private Point screen;
 	
@@ -78,8 +82,14 @@ public class AudioRecordBox {
 	
 	private String[] helpStr;
 	
+	private CountDownTimer countDownTimer;
+	
+	private String record_str,second_str;
+	
 	private Toast toast;
 	private ChangeStateHandler changeStateHandler;
+	
+	private Spannable helpSpannable;
 	
 	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
 		this.historyFragment = historyFragment;
@@ -94,6 +104,8 @@ public class AudioRecordBox {
 		helpStr = context.getResources().getStringArray(R.array.audio_box_help);
 		db = new AudioDB(context);
 		changeStateHandler = new ChangeStateHandler();
+		record_str = context.getString(R.string.audio_box_recording);
+		second_str = context.getString(R.string.second);
 		setting();
 	}
 	
@@ -117,9 +129,12 @@ public class AudioRecordBox {
 		backgroundLayout.setVisibility(View.INVISIBLE);
 		
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
+		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.rec_layout,null);
 		boxLayout.setVisibility(View.INVISIBLE);
+		
+		contentLayout = (RelativeLayout) boxLayout.findViewById(R.id.rec_box_layout);
 		
 		help = (TextView) boxLayout.findViewById(R.id.rec_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
@@ -135,12 +150,21 @@ public class AudioRecordBox {
 		bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
 		
 		RelativeLayout.LayoutParams param = (LayoutParams) boxLayout.getLayoutParams();
-		param.width = screen.x * 349/480;
-		param.height = screen.x * 189/480;
+		param.width = screen.x * 359/480;
+		param.height = screen.x * 199/480;
 		param.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+		
+		RelativeLayout.LayoutParams bparam = (LayoutParams) contentLayout.getLayoutParams();
+		bparam.width = screen.x * 349/480;
+		bparam.height = screen.x * 189/480;
+		bparam.topMargin = screen.x *10/480;
 		
 		closeButton = (ImageView) boxLayout.findViewById(R.id.rec_close_button);
 		closeButton.setOnClickListener(endListener);
+		
+		int padding = screen.x * 20/480;
+		closeButton.setPadding(padding, 0, 0, padding);
+		
 		
 		recButton = (ImageView) boxLayout.findViewById(R.id.rec_rec_button);
 		RelativeLayout.LayoutParams rParam = (LayoutParams) recButton.getLayoutParams();
@@ -191,6 +215,17 @@ public class AudioRecordBox {
 		this.curIdx = idx;
 		curDV = dv;
 		historyFragment.enablePage(false);
+		String cur_date = curDV.toString();
+		helpSpannable = new SpannableString(helpStr[0]+cur_date+helpStr[1]);
+		int start = 0;
+		int end = helpStr[0].length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("c1",wordTypefaceBold,0xFF8a8b8b), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start+cur_date.length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("c2",digitTypefaceBold,0xFF8a8b8b), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start+helpStr[1].length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("c1",wordTypefaceBold,0xFF8a8b8b), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		setButtonState(STATE_INIT);
 		backgroundLayout.setVisibility(View.VISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
@@ -229,11 +264,22 @@ public class AudioRecordBox {
 		@Override
 		public void onInfo(MediaRecorder mr, int what, int extra) {
 			if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
-				mediaRecorder.release();
-				if (toast != null)
-					toast.cancel();
-				toast = 	Toast.makeText(context, R.string.audio_box_toast_timeup, Toast.LENGTH_SHORT);
-				toast.show();
+				if (mediaRecorder != null){
+					try {
+						mediaRecorder.stop();
+						mediaRecorder.release();
+						mediaRecorder = null;
+						boolean result = db.insertAudio(curDV);
+						if (toast != null)
+							toast.cancel();
+						if (result)
+							CustomToast.generateToast(context, R.string.audio_box_toast_timeup, 1, screen);
+						else
+							CustomToast.generateToast(context, R.string.audio_box_toast_timeup, 0, screen);
+					} catch (IllegalStateException e) {}
+				}
+				ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
+				AudioUploader.upload(context);
 				setButtonState(STATE_INIT);
 			}
 		}
@@ -316,6 +362,10 @@ public class AudioRecordBox {
 	private static final int STATE_BEFORE_INIT = 4;
 	
 	private void setButtonState(int state){
+		if (countDownTimer !=null){
+			countDownTimer.cancel();
+			countDownTimer = null;
+		}
 		switch (state){
 		case STATE_INIT:
 			recButton.setImageDrawable(recDrawable);
@@ -348,7 +398,8 @@ public class AudioRecordBox {
 			playButton.setOnClickListener(null);
 			closeButton.setOnClickListener(null);
 			closeButton.setVisibility(View.INVISIBLE);
-			help.setText(R.string.audio_box_recording);
+			countDownTimer = new RecordCountDownTimer(MAX_MEDIA_DURATION,1000);
+			countDownTimer.start();
 			break;
 		case STATE_PREPARING:
 			recButton.setOnClickListener(null);
@@ -386,8 +437,6 @@ public class AudioRecordBox {
 				}
 			}
 			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_PLAY);
-			
-			//setButtonState(STATE_INIT);
 		}
 	}
 	
@@ -438,6 +487,24 @@ public class AudioRecordBox {
 		public void handleMessage(Message msg){
 			int state = msg.getData().getInt("STATE");
 			setButtonState(state);
+		}
+	}
+	
+	private class RecordCountDownTimer extends CountDownTimer{
+		
+		public RecordCountDownTimer(long millisInFuture, long countDownInterval) {
+			super(millisInFuture, countDownInterval);
+		}
+
+		@Override
+		public void onFinish() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onTick(long millisUntilFinished) {
+			help.setText(record_str+" "+millisUntilFinished/1000+" "+second_str);
 		}
 	}
 }

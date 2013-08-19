@@ -16,7 +16,7 @@ public class BTRunTask extends AsyncTask<Void, Void, Void> {
 	
 	@Override
 	protected Void doInBackground(Void... params) {
-		Log.e("BT","Run in background");
+		Log.d("BT","Run in background");
 		if(bt.sendStart())
 			bt.read();
 		else

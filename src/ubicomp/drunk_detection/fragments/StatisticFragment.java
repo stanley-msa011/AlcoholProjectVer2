@@ -4,6 +4,7 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.statistic_page_view.AnalysisCounterView;
 import statistic.ui.statistic_page_view.AnalysisProgressView;
@@ -83,7 +84,7 @@ public class StatisticFragment extends Fragment {
     	analysisView = (ScrollView) view.findViewById(R.id.brac_analysis);
     	statisticView = (ViewPager) view.findViewById(R.id.brac_statistics);
     	dots_layout = (RelativeLayout) view.findViewById(R.id.brac_statistics_dots);
-		questionButton = (ImageView) view.findViewById(R.id.question_background);
+		questionButton = (ImageView) view.findViewById(R.id.question_button);
 		firstScroll = (ImageView) view.findViewById(R.id.statistic_first_scroll);
 		LayoutParams statisticViewLayoutParam =  statisticLayout.getLayoutParams();
     	statisticViewLayoutParam.height = statistic_px.y;
@@ -107,8 +108,12 @@ public class StatisticFragment extends Fragment {
     	dot2Param.addRule(RelativeLayout.RIGHT_OF,DOT_ID[1]);
     	dot2Param.leftMargin = dot_gap;
     	RelativeLayout.LayoutParams questionParam = (RelativeLayout.LayoutParams) questionButton.getLayoutParams();
-		questionParam.topMargin =  screen.x * 23 / 480;
-		questionParam.rightMargin =  screen.x * 23 / 480;
+		questionParam.topMargin =  screen.x * 3 / 480;
+		questionParam.rightMargin =  screen.x * 3 / 480;
+		int padding = screen.x * 20/480;
+		questionButton.setPadding(padding, padding, padding, padding);
+		questionButton.setOnTouchListener(new ScaleOnTouchListener());
+		
 		RelativeLayout.LayoutParams fsParam = (RelativeLayout.LayoutParams) firstScroll.getLayoutParams();
 		fsParam.topMargin = screen.x;
         return view;
@@ -116,6 +121,7 @@ public class StatisticFragment extends Fragment {
     
     public void onResume(){
     	super.onResume();
+    	enablePage(true);
     	statisticFragment = this;
     	analysisViews = new StatisticPageView[4];
     	analysisViews[0] = new AnalysisProgressView(activity, statisticFragment);
@@ -252,17 +258,15 @@ public class StatisticFragment extends Fragment {
 			
 			if (tested){
 				int add_self_help_counter = 0;
-				if (isAdd)
-					add_self_help_counter=1;
 				int show_text = 0;
 				int default_counter = 0;
 				if (result <=1){
 					show_text  = R.string.after_test_pass;
-					if(isAdd)
-						++add_self_help_counter;
+					add_self_help_counter = 2;
 				}
 				else{
 					show_text  = R.string.after_test_fail;
+					add_self_help_counter = 1;
 					default_counter = -1;
 				}
 				if (isAdd)

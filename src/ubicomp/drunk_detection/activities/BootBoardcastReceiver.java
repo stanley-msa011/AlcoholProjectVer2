@@ -18,6 +18,8 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		
+		Log.d("ALARM","BootBroadcastReceiver");
 		Log.d("ALARM",intent.getAction());
 		
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -51,9 +53,12 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 			}
 		}
 		
-		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		
+		//c = Calendar.getInstance();
+		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarm.cancel(pending);
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(),2*AlarmManager.INTERVAL_HOUR,pending);
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis()+10,2*AlarmManager.INTERVAL_HOUR,pending);
+		
 		
 		
 		Intent check_intent = new Intent();
@@ -62,7 +67,8 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		
 		PendingIntent pending2 = PendingIntent.getBroadcast(context, requestCode2, check_intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarm.cancel(pending2);
-		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+10000, 4*AlarmManager.INTERVAL_HOUR, pending2);
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+10000, AlarmManager.INTERVAL_HALF_HOUR, pending2);
+		
 	}
 
 }

@@ -5,7 +5,9 @@ package data.uploader;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
 
 import data.database.HistoryDB;
 
@@ -13,12 +15,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class DataUploader extends AsyncTask<Void, Void, Integer> {
+public class DataUploader extends AsyncTask<Void, Void,Boolean> {
 
 	private HttpPost httpPost;
 	private HttpClient httpClient;
 	private String ts;
-	private AsyncTask<Void, Void, Integer> mTask;
+	private AsyncTask<Void, Void, Boolean> mTask;
 	private Context context;
 	
 	public DataUploader(HttpClient httpClient, HttpPost httpPost,String ts,Context context){
@@ -30,19 +32,23 @@ public class DataUploader extends AsyncTask<Void, Void, Integer> {
 	}
 	
 	@Override
-	protected Integer doInBackground(Void... arg0) {
+	protected Boolean doInBackground(Void... arg0) {
 		HttpResponse httpResponse;
-		Integer result = -1;
+		ResponseHandler <String> res=new BasicResponseHandler();  
+		Boolean result = false;
 		Timer timer = new Timer();
 		Thread thread = new Thread(timer);
 		thread.start();
 		try {
 			httpResponse = httpClient.execute(httpPost);
 			int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-			if (httpStatusCode == HttpStatus.SC_OK)
-				result = 1;
-			else
-				result = -1;
+			result = (httpStatusCode == HttpStatus.SC_OK);
+			if (result){
+				String response = res.handleResponse(httpResponse).toString();
+				Log.d("UPLOADER","response = " + response);
+				result &= (response.equals("10111") || response.equals("11111"));
+			}
+			Log.d("UPLOADER","result = "+result);
 		} catch (Exception e) {
 			Log.d("DATA UPLOADER","EXCEPTION:"+e.toString());
 		} finally{
@@ -52,8 +58,8 @@ public class DataUploader extends AsyncTask<Void, Void, Integer> {
 	}
 
 	@Override
-	 protected void onPostExecute(Integer result) {
-		if (result == -1){
+	 protected void onPostExecute(Boolean result) {
+		if (!result.booleanValue()){
 			Log.d("DATA UPLOADER","UPLOAD FAILED");
 		}
 		else{

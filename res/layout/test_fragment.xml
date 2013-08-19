@@ -115,21 +115,13 @@
 	   	    android:textAlignment="center"
 	   	    android:textColor="#FFc98123" />
 	
-	<RelativeLayout
-        android:id="@+id/help_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-    >
 		<ImageView
 		    android:id="@+id/help_background"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
-		    android:layout_centerInParent="true"
+		    android:layout_alignParentRight="true"
 		    android:scaleType="fitXY"
 		    android:src="@drawable/test_tutorial_button" />
-
-	</RelativeLayout>
 	
 	<!--  Used for Debugging -->
 	<ScrollView

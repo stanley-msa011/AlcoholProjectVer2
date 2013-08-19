@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
@@ -67,7 +68,7 @@ public class TestQuestionMsgBox {
 	private Typeface wordTypeface;
 	private Typeface wordTypefaceBold;
 	
-	private int textSize, textSizeLarge;
+	private int textSize, textSizeLarge, textSizeXLarge;
 	
 	private Drawable[] emotionDrawables;
 	private Drawable[] desireDrawables;
@@ -76,9 +77,10 @@ public class TestQuestionMsgBox {
 	private RelativeLayout emotionLayout;
 	private RelativeLayout  desireLayout;
 	
+	private View divider;
 	private TextView send,notSend;
 	
-	
+	private EndOnTouchListener endOnTouchListener;
 	
 	private boolean done,doneByDoubleClick;
 	
@@ -109,6 +111,7 @@ public class TestQuestionMsgBox {
 		
 		textSize = screen.x * 21/480;
 		textSizeLarge = screen.x * 32/480;
+		textSizeXLarge = screen.x * 48/480;
 		title = (TextView)boxLayout.findViewById(R.id.msg_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSizeLarge);
 		title.setTypeface(wordTypefaceBold);
@@ -247,11 +250,16 @@ public class TestQuestionMsgBox {
 		LinearLayout.LayoutParams sParam =  (LinearLayout.LayoutParams)gpsSwitch.getLayoutParams();
 		sParam.bottomMargin = screen.x * 16/480;
 		
+		divider = boxLayout.findViewById(R.id.msg_divider);
+		
+		endOnTouchListener = new EndOnTouchListener();
 		send = (TextView) boxLayout.findViewById(R.id.msg_send);
 		send.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSizeLarge);
+		send.setOnTouchListener(endOnTouchListener);
 		send.setTypeface(wordTypefaceBold);
 		notSend = (TextView) boxLayout.findViewById(R.id.msg_not_send);
 		notSend.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSizeLarge);
+		notSend.setOnTouchListener(endOnTouchListener);
 		notSend.setTypeface(wordTypefaceBold);
 	}
 	
@@ -318,6 +326,18 @@ public class TestQuestionMsgBox {
 		gParam.height = screen.x * 80/480;
 		gParam = (LinearLayout.LayoutParams) gpsYes.getLayoutParams();
 		gParam.height = screen.x * 80/480;
+		
+		RelativeLayout.LayoutParams divParam = (LayoutParams) divider.getLayoutParams();
+		divParam.width = screen.x * 25/480;
+		divParam.height = screen.x * 48/480;
+		
+		RelativeLayout.LayoutParams sendParam = (LayoutParams) send.getLayoutParams();
+		sendParam.width = screen.x * 205/480;
+		sendParam.height = screen.x * 48/480;
+		RelativeLayout.LayoutParams nsendParam = (LayoutParams) notSend.getLayoutParams();
+		nsendParam.width = screen.x * 205/480;
+		nsendParam.height = screen.x * 48/480;
+		
 	}
 	
 	public  void settingPostTask(){
@@ -417,7 +437,7 @@ public class TestQuestionMsgBox {
 		}
 	}
 	
-	public void generateInitializingBox(){
+	public void generateWaitingBox(){
 		send.setOnClickListener(null);
 		notSend.setOnClickListener(null);
 		help.setText(R.string.wait);
@@ -483,4 +503,30 @@ public class TestQuestionMsgBox {
 		
 	}
 	
+	
+	private class EndOnTouchListener implements View.OnTouchListener{
+
+		private Rect rect;
+		
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			int e = event.getAction();
+			TextView tv =(TextView)v;
+			switch(e){
+				case MotionEvent.ACTION_MOVE:
+					if(!rect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())){
+						tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeLarge);
+			        }
+					break;
+				case MotionEvent.ACTION_UP:
+					tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeLarge);
+					break;
+				case MotionEvent.ACTION_DOWN:
+					tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeXLarge);
+					rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+					break;
+			}
+			return false;
+		}
+	}
 }

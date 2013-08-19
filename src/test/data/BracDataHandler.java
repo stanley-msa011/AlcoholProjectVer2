@@ -116,13 +116,13 @@ public class BracDataHandler {
     	if (detection.year != prevDetection.year || detection.month != prevDetection.month || detection.day != prevDetection.day || detection.timeblock != prevDetection.timeblock){
     		if (avg_result >=0 && avg_result < THRESHOLD){
     				a_history.changeAcc(true, week, detection.timeblock);
-    				isAdd = true;
     		}
     		else if (avg_result < 0)
     			result = ERROR;
     		else{
     			a_history.changeAcc(false, week, detection.timeblock);
     		}
+    		isAdd = true;
     	}
     	
     	db.insertNewState(detection,a_history);
@@ -275,8 +275,8 @@ public class BracDataHandler {
 				mpEntity.addPart("userfile[]", cbStateFile);
 			}
 			if (questionFile.exists()){
-				ContentBody cbStateFile = new FileBody(questionFile, "application/octet-stream");
-				mpEntity.addPart("userfile[]", cbStateFile);
+				ContentBody cbQuestionFile = new FileBody(questionFile, "application/octet-stream");
+				mpEntity.addPart("userfile[]", cbQuestionFile);
 			}
 			
 			if (imageFiles[0].exists())

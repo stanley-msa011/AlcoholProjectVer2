@@ -115,7 +115,7 @@
     <string name="audio_box_toast_record_end">完成錄音</string>
     <string name="audio_box_toast_play_end">結束播放</string>
     <string name="audio_box_playing">播放中</string>
-    <string name="audio_box_recording">錄音中</string>
+    <string name="audio_box_recording">錄音中，剩餘</string>
     <string name="audio_box_preparing">準備中</string>
     <string-array name="audio_box_help">
         <item >錄下或聆聽在</item>

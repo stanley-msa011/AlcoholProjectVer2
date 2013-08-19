@@ -2,7 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/record_bg" >
+	>    
+    <RelativeLayout 
+        android:id="@+id/rec_box_layout"
+        android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"
+    	android:background="@drawable/record_bg" 
+        >
     
     <TextView 
         android:id="@+id/rec_help"
@@ -13,13 +19,6 @@
         android:textAlignment="center"
         android:gravity="center"
         />
-    
-    <ImageView
-        android:id="@+id/rec_close_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/question_close" />
     
     <ImageView
         android:id="@+id/rec_play_button"
@@ -36,5 +35,12 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/rec_help"
         android:scaleType="center" />
-
+</RelativeLayout>
+	<ImageView
+        android:id="@+id/rec_close_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/question_close" />
 </RelativeLayout>

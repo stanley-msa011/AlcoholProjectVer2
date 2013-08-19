@@ -30,11 +30,11 @@ public class AnalysisCounterView extends StatisticPageView {
 	private HistoryDB hdb;
 	private QuestionDB qdb;
 	private AudioDB adb;
-	//private RelativeLayout titleLayout;
+	private RelativeLayout titleLayout;
 	
 	private Typeface wordTypeface,digitTypefaceBold;
 	private String[] helpStr;
-	private AlphaAnimation animation,animation2;
+	private AlphaAnimation animation;
 	private Spannable helpSpannable;
 	
 	public AnalysisCounterView(Context context,StatisticFragment statisticFragment){
@@ -48,12 +48,7 @@ public class AnalysisCounterView extends StatisticPageView {
 		animation = new AlphaAnimation(1.F,0.F);
 		animation.setDuration(1000);
 		animation.setRepeatMode(Animation.REVERSE);
-		animation.setRepeatCount(3);
-		//animation.setStartOffset(1000);
-		animation2 = new AlphaAnimation(0.5F,1.F);
-		animation2.setDuration(500);
-		animation2.setRepeatMode(Animation.RESTART);
-		animation2.setRepeatCount(1);
+		animation.setRepeatCount(5);
 	}
 	
 	@Override
@@ -69,7 +64,7 @@ public class AnalysisCounterView extends StatisticPageView {
 		title = (TextView) view.findViewById(R.id.analysis_counter_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 21/480);
 		title.setTypeface(wordTypeface);
-		//titleLayout = (RelativeLayout) view.findViewById(R.id.analysis_counter_title_layout);
+		titleLayout = (RelativeLayout) view.findViewById(R.id.analysis_counter_title_layout);
 		help = (TextView) view.findViewById(R.id.analysis_counter_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
 		help.setTypeface(wordTypeface);
@@ -113,11 +108,11 @@ public class AnalysisCounterView extends StatisticPageView {
     	if (prev_coupon <coupon){
     		animation.setAnimationListener(new CouponAnimationListener(prev_coupon,coupon,counter));
     		setHelp(counter,prev_coupon);
+    		titleLayout.setBackground(context.getResources().getDrawable(R.drawable.analysis_title_bar_highlight));
     		help.setAnimation(animation);
-    		//titleLayout.setAnimation(animation2);
     		return;
-    	}
-    	
+    	}else
+    		titleLayout.setBackground(context.getResources().getDrawable(R.drawable.analysis_title_bar));
     	setHelp(counter,coupon);
 	}
 	

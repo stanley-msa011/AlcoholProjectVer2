@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="46"
-    android:versionName="2.79" >
+    android:versionCode="52"
+    android:versionName="2.90" >
 
     <uses-sdk
         android:maxSdkVersion="18"
@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <supports-screens
         android:xlargeScreens="false"
@@ -41,11 +42,11 @@
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="ubicomp.drunk_detection.activities.BootBoardcastReceiver" >
+        
+        <receiver android:name="ubicomp.drunk_detection.activities.BootBoardcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIME_SET" />
@@ -61,7 +62,7 @@
                 <action android:name="com.android.alarmclock.ALARM_ALERT" />
             </intent-filter>
         </receiver>
-
+        
         <service android:name="ubicomp.drunk_detection.activities.AlarmService" >
         </service>
         <service android:name="ubicomp.drunk_detection.activities.HourlyAlarmService" >

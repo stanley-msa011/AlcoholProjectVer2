@@ -10,7 +10,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
@@ -71,9 +73,12 @@ public class EmotionManageActivity extends Activity {
 	
 	private static String[] related_texts;
 	
-	QuestionDB db;
+	private QuestionDB db;
 	private static final int TOTAL_BLOCK = 15;	
 	private int state = 0;
+	
+	private ImageView updown;
+	private Drawable upDrawable,downDrawable;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +119,8 @@ public class EmotionManageActivity extends Activity {
 		textSize = screen.x * 24/480;
 		iconMargin = screen.x * 33/480;
 		
+		upDrawable = getResources().getDrawable(R.drawable.questionnaire_item_up);
+		downDrawable = getResources().getDrawable(R.drawable.questionnaire_item_down);
 	}
 
 	@Override
@@ -173,6 +180,8 @@ public class EmotionManageActivity extends Activity {
 	private void setQuestionEdit(){
 		mainLayout.removeAllViews();
 
+		select_item = db.getInsertedReason(r_type);
+		
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
@@ -191,14 +200,6 @@ public class EmotionManageActivity extends Activity {
 		
 		View vv=createIconView(R.string.ok,R.drawable.questionnaire_item_ok,new EditedOnClickListener());
 		mainLayout.addView(vv);
-		
-		select_item = db.getInsertedReason(r_type);
-		if (select_item != null){
-			for (int i=0;i<select_item.length;++i){
-				View v = createIconView(select_item[i], 0,new ChangeTextOnClickListener(select_item[i]));
-				mainLayout.addView(v);
-			}
-		}
 		
 		int rest_block = TOTAL_BLOCK  - mainLayout.getChildCount();
 		for (int i=0;i<rest_block;++i){
@@ -287,14 +288,25 @@ private View createTextView(int textStr){
 						ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_EDIT);					
 					}
 		});
-		
+		edit.setId(0x1999);
 		layout.addView(edit);
 		RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams)edit.getLayoutParams();
 		param.addRule(RelativeLayout.CENTER_VERTICAL);
+		param.leftMargin = screen.x * 10/480;
 		
+		if (select_item != null){
+			updown = new ImageView(this);
+			isShow = false;
+			layout.addView(updown);
+			updown.setImageDrawable(downDrawable);
+			RelativeLayout.LayoutParams uparam = (RelativeLayout.LayoutParams)updown.getLayoutParams();
+			uparam.addRule(RelativeLayout.CENTER_VERTICAL);
+			uparam.addRule(RelativeLayout.RIGHT_OF,0x1999);
+			layout.setOnTouchListener(onTouchListener);
+			layout.setOnClickListener(new SelectionOnClickListener());
+		}
 		r_texts = edit;
 		layout.setBackgroundResource(R.drawable.questionnaire_bar_normal);
-		
 		return layout;
 	}
 	
@@ -325,7 +337,7 @@ private View createTextView(int textStr){
 	
 	private class ChangeTextOnClickListener implements View.OnClickListener{
 
-		String str;
+		private String str;
 		public ChangeTextOnClickListener(String str){
 			this.str = str;
 		}
@@ -334,6 +346,11 @@ private View createTextView(int textStr){
 		public void onClick(View v) {
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			r_texts.setText(str);
+			isShow = false;
+			if (select_item != null){
+				mainLayout.removeViews(3,select_item.length);
+				updown.setImageDrawable(downDrawable);
+			}
 		}
 		
 	}
@@ -445,21 +462,22 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	
 	private class ItemOnTouchListener implements View.OnTouchListener{
 
+		private Rect rect;
+		
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			int e = event.getAction();
 			switch(e){
-				case MotionEvent.ACTION_OUTSIDE:
-					v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
-					break;
 				case MotionEvent.ACTION_MOVE:
-					v.setBackgroundResource(R.drawable.questionnaire_bar_selected);
+					if(!rect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY()))
+						v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 					break;
 				case MotionEvent.ACTION_UP:
 					v.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 					break;
 				case MotionEvent.ACTION_DOWN:
 					v.setBackgroundResource(R.drawable.questionnaire_bar_selected);
+					rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
 					break;
 			}
 			return false;
@@ -494,5 +512,31 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		}
 		
 		return false;
+	}
+	
+	
+	private boolean isShow = false;
+	private class SelectionOnClickListener implements View.OnClickListener{
+
+		
+		
+		@Override
+		public void onClick(View v) {
+			if (select_item == null)
+				return;
+			if (isShow){
+				mainLayout.removeViews(3,select_item.length);
+				updown.setImageDrawable(downDrawable);
+			}else{
+				for (int i=0;i<select_item.length;++i){
+					View vv = createIconView(select_item[i], 0,new ChangeTextOnClickListener(select_item[i]));
+					mainLayout.addView(vv, 3+i);
+				}
+				updown.setImageDrawable(upDrawable);
+			}
+			isShow = !isShow;
+			
+		}
+		
 	}
 }

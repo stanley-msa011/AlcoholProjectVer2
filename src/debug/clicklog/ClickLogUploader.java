@@ -19,6 +19,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
@@ -26,6 +27,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
@@ -179,8 +181,7 @@ public class ClickLogUploader {
 				}
 				
 				httpPost.setEntity(mpEntity);
-				int result = uploader(httpClient, httpPost,context);
-				if (result == 1){
+				if (uploader(httpClient, httpPost,context)){
 					Log.d("Click Log Uploader", "success upload logFile: " + logFile.getName());
 					set_uploaded_logfile(logFile.getName());
 				}
@@ -205,17 +206,21 @@ public class ClickLogUploader {
 			}
 		}
 
-		private int uploader(HttpClient httpClient, HttpPost httpPost,Context context){
+		private boolean uploader(HttpClient httpClient, HttpPost httpPost,Context context){
 			Log.d("Click Log Uploader","start upload");
 			HttpResponse httpResponse;
-			int  result = -1;
+			ResponseHandler <String> res=new BasicResponseHandler();  
+			boolean  result = false;
 			try {
 				httpResponse = httpClient.execute(httpPost);
 				int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-				if (httpStatusCode == HttpStatus.SC_OK)
-					result = 1;
-				else
-					result = -1;
+				result = (httpStatusCode == HttpStatus.SC_OK);
+				if (result){
+					String response = res.handleResponse(httpResponse).toString();
+					Log.d("CLICKLOG UPLOADER","clicklog response="+response);
+					result &= (response.contains("upload success"));
+					Log.d("CLICKLOG UPLOADER","clicklog result="+result);
+				}
 			} catch (ClientProtocolException e) {
 			} catch (IOException e) {
 			} finally{

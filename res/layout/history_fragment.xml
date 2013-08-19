@@ -15,10 +15,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:src="@drawable/history_storytelling_button" 
             android:scaleType="fitXY"
-            android:visibility="invisible"
-            />
+            android:src="@drawable/storytelling_button_selector"
+            android:visibility="invisible" />
         
     	<RelativeLayout 
         	android:id="@+id/history_book_layout"

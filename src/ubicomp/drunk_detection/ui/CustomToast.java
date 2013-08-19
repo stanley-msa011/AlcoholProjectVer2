@@ -9,6 +9,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +41,8 @@ public class CustomToast {
 			toastCounter.setTypeface(Typefaces.getWordTypefaceBold(context));
 			toastCounter.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x /24);
 			toastImage = (ImageView) layout.findViewById(R.id.custom_toast_main_picture);
+			RelativeLayout.LayoutParams iParam = (LayoutParams) toastImage.getLayoutParams();
+			iParam.topMargin = screen.x * 280/480;
 			c1Drawable = context.getResources().getDrawable(R.drawable.toast_counter_1);
 			c2Drawable = context.getResources().getDrawable(R.drawable.toast_counter_2);
 			okDrawable = context.getResources().getDrawable(R.drawable.statistic_show_pass);

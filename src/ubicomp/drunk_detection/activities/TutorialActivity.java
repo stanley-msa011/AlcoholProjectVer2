@@ -3,6 +3,7 @@ package ubicomp.drunk_detection.activities;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.os.Build;
 import android.os.Bundle;
@@ -75,6 +76,7 @@ public class TutorialActivity extends Activity {
 		wordTypefaceBold  = Typefaces.getWordTypefaceBold(this);
 		
 		replay = (ImageView) this.findViewById(R.id.tutorial_reply);
+		replay.setOnTouchListener(new ScaleOnTouchListener());
 		arrow = (ImageView) this.findViewById(R.id.tutorial_arrow);
 		
 		RelativeLayout.LayoutParams rParam = (RelativeLayout.LayoutParams) replay.getLayoutParams();

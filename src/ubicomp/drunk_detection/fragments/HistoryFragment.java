@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 
-import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
@@ -52,6 +51,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -227,6 +227,8 @@ public class HistoryFragment extends Fragment {
     	storytellingButton = (ImageView) view.findViewById(R.id.history_storytelling_button);
     	storytellingOnClickListener = new StorytellingOnClickListener();
     	storytellingButton.setOnClickListener(storytellingOnClickListener);
+    	//storytellingButton.setOnTouchListener(new StoryOnTouchListener());
+    	//storytellingButton.setImageDrawable(storytellingDrawable);
     	
     	LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
     	sParam.leftMargin = bg_x*10/480;
@@ -490,7 +492,9 @@ public class HistoryFragment extends Fragment {
     		scroll_value = 0;
     	Message msg = new Message();
     	Bundle data = new Bundle();
+    	Log.d("Scroll","Scroll to "+scroll_value);
     	data.putInt("pos", scroll_value);
+    	msg.setData(data);
     	msg.what = 0;
     	scrollToHandler.sendMessage(msg);
     }
@@ -498,7 +502,9 @@ public class HistoryFragment extends Fragment {
     @SuppressLint("HandlerLeak")
 	private class ScrollToHandler extends Handler{
     	public void handleMessage(Message msg){
+    		
     		int pos = msg.getData().getInt("pos",0);
+    		Log.d("Scroll","!Scroll to "+pos);;
     		scrollView.smoothScrollTo(pos, 0);
     	}
     }
@@ -568,12 +574,14 @@ public class HistoryFragment extends Fragment {
 	
 	public void setStageVisible(boolean t){
 		if (t){
+			storytellingButton.setVisibility(View.VISIBLE);
 			stageMessageText.setVisibility(View.VISIBLE);
 			stageMessage.setVisibility(View.VISIBLE);
 			stageRateText.setVisibility(View.VISIBLE);
 			quoteText.setVisibility(View.VISIBLE);
 		}
 		else{
+			storytellingButton.setVisibility(View.INVISIBLE);
 			stageMessageText.setVisibility(View.INVISIBLE);
 			stageMessage.setVisibility(View.INVISIBLE);
 			stageRateText.setVisibility(View.INVISIBLE);
@@ -1022,10 +1030,13 @@ public class HistoryFragment extends Fragment {
 			RADIUS_SQUARE = RADIUS *RADIUS ;
 			BUTTON_RADIUS = chartCircleBmp.getWidth()/2;
 			BUTTON_RADIUS_SQUARE = BUTTON_RADIUS*BUTTON_RADIUS;
-			BUTTON_GAPS = BUTTON_RADIUS * 4;
+			BUTTON_GAPS = BUTTON_RADIUS * 9/2;
 			
 			top_touch = screen.x * 180/1080;
 		}
+		
+		private boolean onButton = false;
+		private int buttonNum = -1;
 		
 	    @Override  
 	    public boolean onTouchEvent(MotionEvent event) {  
@@ -1034,28 +1045,22 @@ public class HistoryFragment extends Fragment {
 	    		return true;
 	    	
 	    	int action = event.getAction();
-	    	if (action == MotionEvent.ACTION_DOWN){
+	    	if (action == MotionEvent.ACTION_DOWN ){
 	    		int x= (int)event.getX();
 	    		int y = (int) event.getY();
 	    	
-	    		boolean onButton = false;
-	    		int buttonNum = 0;
+	    		onButton = false;
+	    		buttonNum = -1;
 	    		for (int i=0;i<button_centers.size();++i){
 	    			Point c = button_centers.get(i);
 	    			int distance_square = (c.x - x)*(c.x - x) + (c.y - y)*(c.y - y);
-	    			if (distance_square < BUTTON_RADIUS_SQUARE){
+	    			if (distance_square < BUTTON_RADIUS_SQUARE*2.25F){
 	    				onButton = true;
 	    				buttonNum = i;
 	    				break;
 	    			}
 	    		}
-	    		
-	    		if (onButton){
-	    			DateValue tdv = selected_dates.get(buttonNum);
-	    			ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_BUTTON+tdv.toClickValue());
-	    			recordBox.showMsgBox(tdv,selected_idx.get(buttonNum));
-	    		}
-	    		else{
+	    		if (!onButton){
 	    			float ty = event.getY();
 	    			if (ty>= top_touch){
 	    				curX = (int) event.getX();  
@@ -1063,6 +1068,20 @@ public class HistoryFragment extends Fragment {
 	    				ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TOUCH);
 	    			}
 	    		}
+	    	}
+	    	else if (action == MotionEvent.ACTION_UP  && onButton && buttonNum>=0 && buttonNum <selected_dates.size()){
+	    		int x= (int)event.getX();
+	    		int y = (int) event.getY();
+	    	
+    			Point c = button_centers.get(buttonNum);
+    			int distance_square = (c.x - x)*(c.x - x) + (c.y - y)*(c.y - y);
+    			if (distance_square < BUTTON_RADIUS_SQUARE*2.25F){
+    				DateValue tdv = selected_dates.get(buttonNum);
+	    			ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_BUTTON+tdv.toClickValue());
+	    			recordBox.showMsgBox(tdv,selected_idx.get(buttonNum));
+    			}
+	    		onButton=false;
+	    		buttonNum = -1;
 	    	}
 	    	invalidate();
 	        return true;
@@ -1228,10 +1247,10 @@ public class HistoryFragment extends Fragment {
 					canvas.drawBitmap(chartPlayBmp, center.x - playW, center.y - playH, null);
 				
 				if (!bar.hasData);
-				else if (bar.brac <BracDataHandler.THRESHOLD)
-					canvas.drawRect(left, _top, right, _bottom, paint_pass);
-				else
+				else if (bar.brac > 0F)
 					canvas.drawRect(left, _top, right, _bottom, paint_fail);
+				else
+					canvas.drawRect(left, _top, right, _bottom, paint_pass);
 				
 				circle_centers.add(center);
 
@@ -1266,7 +1285,7 @@ public class HistoryFragment extends Fragment {
 					}
 				}
 				
-				int b_center_x = screen.x * 180/1080 + scrollView.getScrollX(); 
+				int b_center_x = screen.x * 100/1080 + scrollView.getScrollX(); 
 				int b_center_y = screen.x * 170/1080;
 				int b_center_x_bak = b_center_x;
 				//Draw lines
@@ -1322,7 +1341,9 @@ public class HistoryFragment extends Fragment {
 	private class StorytellingOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_SHARE_BUTTON);
 			storytellingBox.showMsgBox();
 		}
 	}
+	
 }

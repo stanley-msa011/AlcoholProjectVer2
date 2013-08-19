@@ -8,6 +8,7 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.activities.TutorialActivity;
 import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
 import ubicomp.drunk_detection.ui.Typefaces;
 
 import test.bluetooth.BTInitHandler;
@@ -76,6 +77,9 @@ public class TestFragment extends Fragment {
 	public static final int _BT = 1;
 	public static final int _CAMERA = 2;
 	
+	private static final int TEST_GAP_DURATION = 120000;
+	private static final int COUNT_DOWN_SECOND = 10;
+	
 	private boolean keepMsgBox;
 	
 	//GPS
@@ -116,13 +120,14 @@ public class TestFragment extends Fragment {
 	
 	private RelativeLayout startLayout;
 	private ImageView bg, startButton,stroke,testCircle;
+	private Drawable startButtonDrawable,startButtonDownDrawable;
+	private StartButtonOnTouchListener startButtonOnTouchListener;
 	private TextView bracText;
 	private TextView brac;
 	private TextView startText;
 	
 	private FrameLayout preview_layout;
 	
-	private RelativeLayout helpLayout;
 	private ImageView helpButton;
 	
 	private static Object init_lock  = new Object();
@@ -171,6 +176,9 @@ public class TestFragment extends Fragment {
 		test_guide_not_turn_on=getString(R.string.test_guide_not_turn_on);
 		test_guide_test_fail = getString(R.string.test_guide_test_fail);
 		test_guide_connect_fail = getString(R.string.test_guide_connect_fail);
+		startButtonDrawable = getResources().getDrawable(R.drawable.test_start_button);
+		startButtonDownDrawable = getResources().getDrawable(R.drawable.test_start_button);
+		startButtonOnTouchListener = new StartButtonOnTouchListener();
 	}
 	
 	public void onPause(){
@@ -243,7 +251,6 @@ public class TestFragment extends Fragment {
 		startText = (TextView) view.findViewById(R.id.test_start_button_text);
 		stroke = (ImageView)view.findViewById(R.id.test_start_stroke);
 		
-		helpLayout = (RelativeLayout) view.findViewById(R.id.help_layout);
 		helpButton = (ImageView) view.findViewById(R.id.help_background);
 		
 		face = (ImageView) view.findViewById(R.id.test_face);
@@ -280,7 +287,6 @@ public class TestFragment extends Fragment {
 		bParam.width = screen.x;
 		bParam.height = bParam.width*1712/1080;
 		
-		
 		int start_size = screen.x * 255/480;
 		RelativeLayout.LayoutParams startLayoutParam = (LayoutParams) startLayout.getLayoutParams();
 		startLayoutParam.topMargin = screen.x * 192/480;
@@ -298,9 +304,13 @@ public class TestFragment extends Fragment {
 		previewParam.height = screen.x * 254/480;
 		previewParam.topMargin = screen.x * 180/480;
 		
-		RelativeLayout.LayoutParams helpLayoutParam = (LayoutParams) helpLayout.getLayoutParams();
-		helpLayoutParam.topMargin =screen.x * 26/480;
-		helpLayoutParam.rightMargin = screen.x * 26/480;
+		RelativeLayout.LayoutParams helpLayoutParam = (LayoutParams) helpButton.getLayoutParams();
+		helpLayoutParam.topMargin =screen.x * 6/480;
+		helpLayoutParam.rightMargin = screen.x * 6/480;
+		
+		int padding = screen.x * 20/480;
+		helpButton.setPadding(padding, padding, padding, padding);
+		helpButton.setOnTouchListener(new ScaleOnTouchListener());
 		
 		RelativeLayout.LayoutParams bracVParam = (LayoutParams) bracText.getLayoutParams();
 		bracVParam.topMargin =screen.x * 95/480;
@@ -312,7 +322,7 @@ public class TestFragment extends Fragment {
     }
 	
 	public void startGPS(boolean enable){
-		msgBox.generateInitializingBox();
+		msgBox.generateWaitingBox();
 		if (enable){
 			gps_state = true;
 			Object[] gps_enable={gps_state};
@@ -385,9 +395,11 @@ public class TestFragment extends Fragment {
 				long lastTime = sp.getLong("LatestTestTime", 0);
 				long curTime = System.currentTimeMillis();
 				Boolean debug = sp.getBoolean("debug", false);
-				if (curTime - lastTime > 120000 || debug){
+				if (curTime - lastTime > TEST_GAP_DURATION || debug){
 					bg.setOnTouchListener(null);
 					startButton.setOnClickListener(null);
+					startButton.setOnTouchListener(null);
+					startButton.setImageDrawable(startButtonDownDrawable);
 					startText.setVisibility(View.INVISIBLE);
 					bracText.setText("0.00");
 					reset();
@@ -464,7 +476,7 @@ public class TestFragment extends Fragment {
 				if (debug)
 					count_down_thread = new Thread(new CountDownRunnable(1,2)) ;
 				else
-					count_down_thread = new Thread(new CountDownRunnable(1,10));
+					count_down_thread = new Thread(new CountDownRunnable(1,COUNT_DOWN_SECOND ));
 				count_down_thread.start();
 			}
 	}
@@ -579,10 +591,11 @@ public class TestFragment extends Fragment {
 			bracText.setVisibility(View.VISIBLE);
 			messageView.setText(R.string.test_guide_start);
 			startButton.setOnClickListener(new StartOnClickListener());
+			startButton.setOnTouchListener(startButtonOnTouchListener);
+			startButton.setImageDrawable(startButtonDrawable);
 			startButton.setVisibility(View.VISIBLE);
 			startText.setVisibility(View.VISIBLE);
 			helpButton.setOnClickListener(new TutorialOnClickListener());
-			helpButton.setOnLongClickListener(new TutorialOnLongClickListener());
 			face.setVisibility(View.INVISIBLE);
 			
 			bg.setOnTouchListener(new BackgroundDoubleOnTouchListener());
@@ -594,6 +607,7 @@ public class TestFragment extends Fragment {
 	private class MsgLoadingHandler extends Handler{
 		public void handleMessage(Message msg){
 			startButton.setOnClickListener(null);
+			startButton.setOnTouchListener(null);
 			if (msgBox==null)
 				msgBox = new TestQuestionMsgBox(testFragment,main_layout);
 			msgBox.settingPreTask();
@@ -619,7 +633,9 @@ public class TestFragment extends Fragment {
 			String msgStr = msg.getData().getString("msg");
 			
 			startButton.setOnClickListener(new EndTestOnClickListener());
+			startButton.setOnTouchListener(startButtonOnTouchListener);
 			startButton.setVisibility(View.VISIBLE);
+			startButton.setImageDrawable(startButtonDrawable);
 			face.setVisibility(View.INVISIBLE);
 			msgStr = msgStr.concat(test_guide_end);
 			messageView.setText(msgStr);
@@ -631,7 +647,7 @@ public class TestFragment extends Fragment {
 	private class TestHandler extends Handler{
 		public void handleMessage(Message msg){
 			startButton.setOnClickListener(null);
-
+			startButton.setOnTouchListener(null);
 			if (blowDrawables == null){
 				blowDrawables = new Drawable[BLOW_RESOURCE.length];
 				for (int i=1;i<blowDrawables.length;++i)
@@ -756,12 +772,6 @@ public class TestFragment extends Fragment {
 		public void onClick(View v) {
 			ClickLoggerLog.Log(getActivity(), ClickLogId.TEST_TUTORIAL_BUTTON);
 			showTutorial();
-		}
-	}
-	private class TutorialOnLongClickListener implements View.OnLongClickListener{
-		public boolean onLongClick(View v) {
-				activity.openOptionsMenu();
-				return true;
 		}
 	}
 	
@@ -901,5 +911,28 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
+	private class StartButtonOnTouchListener implements View.OnTouchListener{
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			int e = event.getAction();
+			ImageView iv = (ImageView) v;
+			switch(e){
+				case MotionEvent.ACTION_OUTSIDE:
+					iv.setImageDrawable(startButtonDrawable);
+					break;
+				case MotionEvent.ACTION_MOVE:
+					iv.setImageDrawable(startButtonDownDrawable);
+					break;
+				case MotionEvent.ACTION_UP:
+					iv.setImageDrawable(startButtonDrawable);
+					break;
+				case MotionEvent.ACTION_DOWN:
+					iv.setImageDrawable(startButtonDownDrawable);
+					break;
+			}
+			return false;
+		}
+	}
 
 }

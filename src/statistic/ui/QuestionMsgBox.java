@@ -45,7 +45,7 @@ public class QuestionMsgBox {
 	private RelativeLayout mainLayout;
 	private View shadow;
 	private LinearLayout questionLayout, questionAllLayout;
-	private ImageView exitView;
+	private ImageView closeButton;
 	private TextView help,next;
 	private Drawable choiceDrawable, choiceSelectedDrawable;
 	private Resources r;
@@ -88,7 +88,9 @@ public class QuestionMsgBox {
 		help = (TextView) boxLayout.findViewById(R.id.question_text);
 		next = (TextView) boxLayout.findViewById(R.id.question_next);
 		
-		exitView = (ImageView) boxLayout.findViewById(R.id.question_exit);
+		closeButton = (ImageView) boxLayout.findViewById(R.id.question_exit);
+		int padding = screen.x * 20/480;
+		closeButton.setPadding(padding, 0, 0, padding);
 	}
 	
 	public void settingPreTask(){
@@ -126,7 +128,7 @@ public class QuestionMsgBox {
 	}
 	
 	public  void settingPostTask(){
-		exitView.setOnClickListener(new ExitListener());
+		closeButton.setOnClickListener(new ExitListener());
 	}
 	
 	public void clear(){

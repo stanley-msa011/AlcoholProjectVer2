@@ -107,6 +107,7 @@ public class CameraRecorder {
     
     
     public void takePicture(){
+    	if (camera!=null)
     		camera.takePicture(null,null, pictureCallback);
     }
     
