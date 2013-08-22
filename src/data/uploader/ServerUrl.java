@@ -93,8 +93,8 @@ public class ServerUrl {
 			return SERVER_URL_REGULAR_CHECK  ;
 	}
 	
-	private static final String SERVER_URL_USAGE = "https://140.112.30.165/drunk_detection_ubicomp/storytelling_usage.php";
-	private static final String DEVELOPER_SERVER_URL_USAGE = "https://140.112.30.165/develop/drunk_detection/storytelling_usage.php";
+	private static final String SERVER_URL_USAGE = "https://140.112.30.165/drunk_detection_ubicomp/storytelling_usage_2.php";
+	private static final String DEVELOPER_SERVER_URL_USAGE = "https://140.112.30.165/develop/drunk_detection/storytelling_usage_2.php";
 	
 	public static String SERVER_URL_USAGE(boolean develop){
 		if (develop)

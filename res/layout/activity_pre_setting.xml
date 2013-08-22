@@ -190,6 +190,37 @@
      	    android:ems="12"
      	    android:inputType="phone" />
 
+     	<TextView
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="休閒娛樂：" />
+
+     	<EditText
+     	    android:id="@+id/recreation0"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:ems="16" />
+     	<EditText
+     	    android:id="@+id/recreation1"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:ems="16" />
+     	<EditText
+     	    android:id="@+id/recreation2"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:ems="16" />
+     	<EditText
+     	    android:id="@+id/recreation3"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:ems="16" />
+     	<EditText
+     	    android:id="@+id/recreation4"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:ems="16" />
+
      	<CheckBox
      	    android:id="@+id/upload_audio_check_box"
      	    android:layout_width="wrap_content"

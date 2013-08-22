@@ -79,7 +79,8 @@ public class CameraRecorder {
     }
     
     public void start(){
-    	preview.setVisibility(View.VISIBLE);
+    	if (preview!=null)
+    		preview.setVisibility(View.VISIBLE);
     }
     
     public void setSurfaceCallback(){

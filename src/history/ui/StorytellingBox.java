@@ -1,17 +1,15 @@
 package history.ui;
 
-
-
-import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.activities.StorytellingSharingActivity;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
-import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.util.TypedValue;
@@ -40,15 +38,12 @@ public class StorytellingBox {
 	private OKListener okListener = new OKListener();
 	private EndListener endListener = new EndListener();
 	
-	private QuestionDB qdb;
-	
 	public StorytellingBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
 		this.historyFragment = historyFragment;
 		this.context = historyFragment.getActivity();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
 		background = new FrameLayout(context);
-		qdb = new QuestionDB(context);
 		background.setBackgroundColor(0x99000000);
 		screen = FragmentTabs.getSize();
 		setting();
@@ -125,18 +120,14 @@ public class StorytellingBox {
 	private class OKListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			
 			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_SHARE_OK);
-			
-			boolean getSHC = qdb.insertStorytellingUsage();
-			
-			if (getSHC)
-				CustomToast.generateToast(context, R.string.storytelling_end_toast, 1,FragmentTabs.getSize());
-			else
-				CustomToast.generateToast(context, R.string.storytelling_end_toast, 0,FragmentTabs.getSize());
-			
 			background.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
 			historyFragment.enablePage(true);
+			Intent questionIntent = new Intent(context,StorytellingSharingActivity.class);
+			context.startActivity(questionIntent);
+			
 		}
 	}
 	

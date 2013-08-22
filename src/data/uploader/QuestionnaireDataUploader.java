@@ -170,24 +170,24 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				
 				HttpPost httpPost = new HttpPost(SERVER_URL_EMOTION);
 				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-				MultipartEntity mpEntity = new MultipartEntity();
 				
+				List <NameValuePair> nvps = new ArrayList <NameValuePair>();
 				
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
-				mpEntity.addPart("emotionDIYData[]", new StringBody(uid));
-				mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.ts)));
-				mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.selection)));
+				nvps.add(new BasicNameValuePair("emotionDIYData[]",uid));
+				nvps.add(new BasicNameValuePair("emotionDIYData[]",String.valueOf(e_data.ts)));
+				nvps.add(new BasicNameValuePair("emotionDIYData[]",String.valueOf(e_data.selection)));
 				int week = WeekNum.getWeek(context, e_data.ts);
-				mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(week)));
-				if (e_data.call !=null)
-					mpEntity.addPart("emotionDIYData[]", new StringBody(String.valueOf(e_data.call)));
+				nvps.add(new BasicNameValuePair("emotionDIYData[]",String.valueOf(week)));
+				if (e_data.call != null)
+					nvps.add(new BasicNameValuePair("emotionDIYData[]",e_data.call));
 				for (int i=0;i<e_data.acc.length;++i){
-					mpEntity.addPart("emotionDIYAcc[]", new StringBody(String.valueOf(e_data.acc[i])));
-					mpEntity.addPart("emotionDIYUsed[]", new StringBody(String.valueOf(e_data.used[i])));
+					nvps.add(new BasicNameValuePair("emotionDIYAcc[]",String.valueOf(e_data.acc[i])));
+					nvps.add(new BasicNameValuePair("emotionDIYUsed[]",String.valueOf(e_data.used[i])));
 				}
+				httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 				
-				httpPost.setEntity(mpEntity);
 				if (uploader(httpClient, httpPost,context)){
 					db.setEmotionUploaded(e_data.ts);
 				}else{
@@ -219,7 +219,6 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 				
 				List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-				
 				
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
@@ -354,18 +353,23 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				
 				HttpPost httpPost = new HttpPost(SERVER_URL_USAGE);
 				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-				MultipartEntity mpEntity = new MultipartEntity();
+				
+				List <NameValuePair> nvps = new ArrayList <NameValuePair>();
 				
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
-				mpEntity.addPart("usageData[]", new StringBody(uid));
-				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(su.ts)));
-				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(su.daily_usage)));
-				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(su.acc)));
-				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(su.used)));
+				nvps.add(new BasicNameValuePair("usageData[]",uid));
+				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(su.ts)));
+				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(su.daily_usage)));
+				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(su.acc)));
+				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(su.used)));
 				int week = WeekNum.getWeek(context, su.ts);
-				mpEntity.addPart("usageData[]", new StringBody(String.valueOf(week)));
-				httpPost.setEntity(mpEntity);
+				Log.d("EMOTION_UPLOADER","UPLOAD - STORYTELLING USAGE "+su.name+" "+su.minutes);
+				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(week)));
+				nvps.add(new BasicNameValuePair("usageData[]",su.name));
+				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(su.minutes)));
+				httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+				
 				if (uploader(httpClient, httpPost,context)){
 					db.setStorytellingUsageUploaded(su.ts);
 				}

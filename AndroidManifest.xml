@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="52"
-    android:versionName="2.90" >
+    android:versionCode="57"
+    android:versionName="3.03" >
 
     <uses-sdk
         android:maxSdkVersion="18"
@@ -97,6 +97,12 @@
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.DeveloperActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait"
+            >
+        </activity>
+        <activity
+            android:name="ubicomp.drunk_detection.activities.StorytellingSharingActivity"
             android:noHistory="true"
             android:screenOrientation="portrait"
             >

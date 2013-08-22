@@ -318,7 +318,7 @@ public class QuestionDB {
 				acc[j] = cursor.getInt(j+5);
 				used[j] = cursor.getInt(j+8);
 			}
-			if (selection < 4)
+			if (selection !=3)
 				data[i] = new EmotionData(ts,selection,null,acc,used);
 			else{
 				call = cursor.getString(3);
@@ -628,7 +628,7 @@ public class QuestionDB {
     
     private static final int DATE_USAGE_LIMIT = 3; 
     
-    public boolean insertStorytellingUsage(){
+    public boolean insertStorytellingUsage(String name, int minutes){
     	Log.d("STORYTELLING","INSERT");
     	boolean addAcc = false;
 		Calendar cal = Calendar.getInstance();
@@ -673,8 +673,8 @@ public class QuestionDB {
 			++acc;
 		}
 		
-		sql = "INSERT INTO StorytellingUsage (ts, daily_usage, acc, used) VALUES (" +
-				ts+","+usage+","+acc+","+used+
+		sql = "INSERT INTO StorytellingUsage (ts, daily_usage, acc, used, name, minutes) VALUES (" +
+				ts+","+usage+","+acc+","+used+","+"'"+name+"'"+","+minutes+
 				" )";
 		db.execSQL(sql);
 		
@@ -705,7 +705,9 @@ public class QuestionDB {
 			int acc = cursor.getInt(cursor.getColumnIndex("acc"));
 			int usage = cursor.getInt(cursor.getColumnIndex("daily_usage"));
 			int used = cursor.getInt(cursor.getColumnIndex("used"));
-			data[i] = new StorytellingUsage(ts,usage,acc,used);
+			String name = cursor.getString(cursor.getColumnIndex("name"));
+			int minutes = cursor.getInt(cursor.getColumnIndex("minutes"));
+			data[i] = new StorytellingUsage(ts,usage,acc,used,name,minutes);
 		}
 		return data;
     }
@@ -720,16 +722,18 @@ public class QuestionDB {
 		if (count == 0){
 			cursor.close();
 			db.close();
-			return new StorytellingUsage(0,0,0,0);
+			return new StorytellingUsage(0,0,0,0,"NONE",-1);
 		}
 		cursor.moveToFirst();
 		long ts = cursor.getLong(cursor.getColumnIndex("ts"));
 		int acc = cursor.getInt(cursor.getColumnIndex("acc"));
 		int usage = cursor.getInt(cursor.getColumnIndex("daily_usage"));
 		int used = cursor.getInt(cursor.getColumnIndex("used"));
+		String name = cursor.getString(cursor.getColumnIndex("name"));
+		int minutes = cursor.getInt(cursor.getColumnIndex("minutes"));
 		cursor.close();
 		db.close();
-		return new StorytellingUsage(ts,usage,acc,used);
+		return new StorytellingUsage(ts,usage,acc,used,name,minutes);
 	}
     
     public void setStorytellingUsageUploaded(long ts){

@@ -42,6 +42,8 @@ public class PreSettingActivity extends Activity {
 	private EditText connect_p0,connect_p1,connect_p2;
 	private CheckBox uploadAudioCheckBox, showSavingBox;
 	
+	private EditText recreation0,recreation1,recreation2,recreation3,recreation4;
+	
 	private Button ok_button,clean_button,restoreButton,debugButton,debugTypeButton,dummyButton;
 	boolean debug,dummy,debug_type;
 	private Activity activity;
@@ -140,6 +142,18 @@ public class PreSettingActivity extends Activity {
 		ok_button.setOnClickListener(new OKOnclickListener());
 		
 		versionText = (TextView) this.findViewById(R.id.version);
+		
+		recreation0 =(EditText) this.findViewById(R.id.recreation0);
+		recreation1 =(EditText) this.findViewById(R.id.recreation1); 
+		recreation2 =(EditText) this.findViewById(R.id.recreation2); 
+		recreation3 =(EditText) this.findViewById(R.id.recreation3); 
+		recreation4 =(EditText) this.findViewById(R.id.recreation4); 
+		
+		recreation0.setText(sp.getString("recreation0", ""));
+		recreation1.setText(sp.getString("recreation1", ""));
+		recreation2.setText(sp.getString("recreation2", ""));
+		recreation3.setText(sp.getString("recreation3", ""));
+		recreation4.setText(sp.getString("recreation4", ""));
 		
 		PackageInfo pinfo;
 		try {
@@ -297,6 +311,13 @@ public class PreSettingActivity extends Activity {
 			connectS1 = connect_s1.getSelectedItemPosition();
 			connectS2 = connect_s2.getSelectedItemPosition();
 			
+			String recreation_0,recreation_1,recreation_2,recreation_3,recreation_4;
+			recreation_0 = recreation0.getText().toString();
+			recreation_1 = recreation1.getText().toString();
+			recreation_2 = recreation2.getText().toString();
+			recreation_3 = recreation3.getText().toString();
+			recreation_4 = recreation4.getText().toString();
+			
 			if (drink.getText().toString().length()==0)
 				check = false;
 			else{
@@ -322,6 +343,11 @@ public class PreSettingActivity extends Activity {
 				editor.putString("connect_p0", connectP0);
 				editor.putString("connect_p1", connectP1);
 				editor.putString("connect_p2", connectP2);
+				editor.putString("recreation0", recreation_0);
+				editor.putString("recreation1", recreation_1);
+				editor.putString("recreation2", recreation_2);
+				editor.putString("recreation3", recreation_3);
+				editor.putString("recreation4", recreation_4);
 				editor.putInt("connect_s0", connectS0);
 				editor.putInt("connect_s1", connectS1);
 				editor.putInt("connect_s2", connectS2);

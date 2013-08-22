@@ -397,7 +397,13 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 						long ts = Integer.valueOf(data[0])*1000L;
 						int acc = Integer.valueOf(data[1]);
 						int used= Integer.valueOf(data[2]);
-						su = new StorytellingUsage(ts,0,acc,used);
+						String name = "NONE";
+						int minutes = -1;
+						if (data.length ==5){
+							name = data[3];
+							minutes = Integer.valueOf(data[4]);
+						}
+						su = new StorytellingUsage(ts,0,acc,used,name,minutes);
 					}
 				}
 				reader.close();

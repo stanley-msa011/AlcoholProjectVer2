@@ -87,4 +87,9 @@ public class ClickLogId {
 	public final static long MENU_EMOTIONDIY													=	7000000;
 	public final static long MENU_EMOTIONMANAGE										=	7100000;
 	public final static long MENU_ABOUT																=	7200000;
+	
+	public final static long STORYTELLING_SHARE_EDIT_NAME					=	8000005;
+	public final static long STORYTELLING_SHARE_EDIT_TIME						=	8100005;
+	public final static long STORYTELLING_SHARE_RETURN_BUTTON		=	8200004;
+	public final static long STORYTELLING_SHARE_END									=	8300000;
 }

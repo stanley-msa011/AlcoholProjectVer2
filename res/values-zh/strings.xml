@@ -222,7 +222,9 @@
 	<string name= "emotion_manage_end_toast">做好情緒管理</string>
 	<string name= "emotionDIY_help_case1">嘗試閉眼專注觀察呼吸？\n你可以聽從指示引導或直接去做</string>
 	<string name= "emotionDIY_help_case2">專心健走 10 ~ 30 分鐘？\n你可以聽從指示引導或直接去做</string>
-	<string name= "emotionDIY_help_case3">從事休閒活動？\n你可以聽從指示引導或直接去做</string>
+	<string name= "emotionDIY_help_case3">從事休閒活動？\n你可以選擇以下內容</string>
+	<string name= "emotionDIY_help_case3_2">未設定休閒活動，\n請按返回鍵</string>
+	<string name= "emotionDIY_help_case4">你將要去做</string>
 	<string name= "emotionDIY_help_guide">播放指示</string>
 	<string name="try_to_do">我會完成</string>
 	<string name= "emotion_box_playing">播放中</string>
@@ -230,4 +232,11 @@
 	<string name= "emotion_box_replay">重新撥放？</string>
 	<string name= "storytelling_message">你是否已分享你的戒酒過程？</string>
 	<string name= "storytelling_end_toast">分享酒測歷程</string>
+	<string name= "storytelling_help1">你所分享的對象是：</string>
+	<string name= "storytelling_help2">你所分享的時間為﹝分鐘﹞：</string>
+	<string name= "storytelling_leave_toast">你確定要離開嗎？</string>
+	<string name= "storytelling_share_title">填寫分享資料</string>
+	<string name= "storytelling_check_toast1">分享對象未填寫</string>
+	<string name= "storytelling_check_toast2">分享時間未填寫</string>
+	<string name= "storytelling_check_toast3">請填寫分享對象及時間</string>
 </resources>

@@ -73,7 +73,7 @@ public class EmotionActivity extends Activity {
 	private OnClickListener[] clickListeners = {
 			new NormalSelectionOnClickListener(0),
 			new NormalSelectionOnClickListener(1),
-			new NormalSelectionOnClickListener(2),
+			new RecreationOnClickListener(),
 			new HelpOnClickListener(3),
 			new HelpOnClickListener(4)
 	};
@@ -330,7 +330,84 @@ private void setPlayGuideBox(){
 		}
 	}
 	
-private View createTextView(int textStr){
+	private void setRecreationEnd(String selected){
+		state = 2;
+		
+		mainLayout.removeAllViews();
+		View title = createTitleView();
+		mainLayout.addView(title);
+		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
+		titleparam.height = screen.x*230/1080;
+		
+		String text=  getString(R.string.emotionDIY_help_case4) +selected;
+		View tv;
+			tv = createTextView(text);
+		mainLayout.addView(tv);
+		View vv = createIconView(R.string.try_to_do,R.drawable.questionnaire_item_ok,new EndOnClickListener(2,selected));
+		mainLayout.addView(vv);
+		
+		int rest_block = TOTAL_BLOCK - mainLayout.getChildCount();
+		for (int i=0;i<rest_block;++i){
+			View v = createBlankView();
+			mainLayout.addView(v);
+		}
+	}
+	
+	private void setQuestionRecreation(){
+		state = 1;
+		
+		mainLayout.removeAllViews();
+		View title = createTitleView();
+		mainLayout.addView(title);
+		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
+		titleparam.height = screen.x*230/1080;
+		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
+		
+		String[] recreation = new String[5];
+		
+		recreation[0] = sp.getString("recreation0", "");
+		recreation[1] = sp.getString("recreation1", "");
+		recreation[2] = sp.getString("recreation2", "");
+		recreation[3] = sp.getString("recreation3", "");
+		recreation[4] = sp.getString("recreation4", "");
+		
+		boolean[] has_value = {
+				recreation[0].length()>0,
+				recreation[1].length()>0,
+				recreation[2].length()>0,
+				recreation[3].length()>0,
+				recreation[4].length()>0
+		};
+		
+		boolean exist = false;
+		
+		for (int i=0;i<has_value.length;++i)
+			exist|=has_value[i];
+		
+		View tv;
+		if (exist)
+			tv = createTextView(R.string.emotionDIY_help_case3);
+		else
+			tv = createTextView(R.string.emotionDIY_help_case3_2);
+		mainLayout.addView(tv);
+		
+		for (int i=0;i<has_value.length;++i){
+			if (has_value[i]){
+				View v = createIconView(recreation[i],0,new RecreationSelectionOnClickListener(recreation[i]));
+				mainLayout.addView(v);
+			}
+		}
+		
+		
+		int rest_block = TOTAL_BLOCK - mainLayout.getChildCount();
+		for (int i=0;i<rest_block;++i){
+			View v = createBlankView();
+			mainLayout.addView(v);
+		}
+	}
+	
+	private View createTextView(int textStr){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
@@ -347,6 +424,22 @@ private View createTextView(int textStr){
 		return layout;
 	}
 	
+private View createTextView(String textStr){
+		
+		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
+		TextView text = (TextView) layout.findViewById(R.id.question_description);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTypeface(wordTypefaceBold);
+		text.setTextColor(0xFF777777);
+		text.setText(textStr);
+		
+		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
+		tParam.leftMargin = textSize;
+		
+		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
+		
+		return layout;
+	}
 	
 	private View createIconView(String textStr, int DrawableId ,OnClickListener listener){
 		
@@ -361,7 +454,8 @@ private View createTextView(int textStr){
 		tParam.leftMargin = textSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
-		icon.setImageDrawable(getResources().getDrawable(DrawableId));
+		if (DrawableId>0)
+			icon.setImageDrawable(getResources().getDrawable(DrawableId));
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
 		iParam.rightMargin = iconMargin;
 		
@@ -385,7 +479,8 @@ private View createTextView(int textStr){
 		tParam.leftMargin = textSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
-		icon.setImageDrawable(getResources().getDrawable(DrawableId));
+		if (DrawableId>0)
+			icon.setImageDrawable(getResources().getDrawable(DrawableId));
 		LinearLayout.LayoutParams iParam =(LinearLayout.LayoutParams) icon.getLayoutParams();
 		iParam.rightMargin = iconMargin;
 		
@@ -423,16 +518,21 @@ private View createTextView(int textStr){
 	
 	private class EndOnClickListener implements View.OnClickListener{
 		int in;
-		
+		String selected = null;
 		EndOnClickListener(int in){
 			this.in = in+1;
+		}
+		
+		EndOnClickListener(int in,String selected){
+			this.in = in+1;
+			this.selected = selected;
 		}
 		
 		@Override
 		public void onClick(View v) {
 			
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
-			boolean addAcc = db.insertEmotion(in,null);
+			boolean addAcc = db.insertEmotion(in,selected);
 			if (addAcc)
 				CustomToast.generateToast(activity, R.string.emotionDIY_end_toast, 1, screen);
 			else
@@ -440,6 +540,8 @@ private View createTextView(int textStr){
 			activity.finish();
 		}
 	}
+	
+	
 	
 	private class CallCheckOnClickListener  implements View.OnClickListener{
 
@@ -516,9 +618,6 @@ private View createTextView(int textStr){
 			case 1:
 				mediaPlayer = MediaPlayer.create(activity, R.raw.emotion2);
 				break;
-			case 2:
-				mediaPlayer = MediaPlayer.create(activity, R.raw.emotion3);
-				break;
 			default:
 				mediaPlayer = MediaPlayer.create(activity, R.raw.emotion1);
 			}
@@ -528,9 +627,24 @@ private View createTextView(int textStr){
 			playPause.setImageDrawable(playPauseDrawable);
 			playCancel.setOnClickListener(new PlayCancelOnClickListener());
 		}
-		
 	}
 	
+	
+	private class RecreationSelectionOnClickListener  implements View.OnClickListener{
+
+		private String recreation;
+		
+		public RecreationSelectionOnClickListener(String recreation){
+			this.recreation = recreation;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
+			setRecreationEnd(recreation);
+		}
+		
+	}
 	
 	private class PlayOnCompletionListener implements MediaPlayer.OnCompletionListener{
 
@@ -629,6 +743,14 @@ private View createTextView(int textStr){
 		}
 	}
 	
+	private class RecreationOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
+			setQuestionRecreation();
+		}
+	}
+	
 	private class HelpOnClickListener implements View.OnClickListener{
 		int type;
 		HelpOnClickListener( int type){
@@ -687,9 +809,10 @@ private View createTextView(int textStr){
 				--state;
 				if (state == 0)
 					setQuestionStart();
+				else if (state ==1)
+					setQuestionRecreation();
 			}
 		}
-		
 		return false;
 	}
 }

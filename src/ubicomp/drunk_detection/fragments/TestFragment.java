@@ -159,6 +159,9 @@ public class TestFragment extends Fragment {
 	private String test_guide_test_fail;
 	private String test_guide_connect_fail;
 	
+	private Thread start_thread = null;
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -184,6 +187,8 @@ public class TestFragment extends Fragment {
 	public void onPause(){
 		if (count_down_thread!=null && count_down_thread.isAlive())
 			count_down_thread.interrupt();
+		if (start_thread!=null && start_thread.isAlive())
+			start_thread.interrupt();
 		if (!isKeepMsgBox()){
 			stop();
 			clear();
@@ -383,7 +388,6 @@ public class TestFragment extends Fragment {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
 			boolean firstTime = sp.getBoolean("first", true);
 			helpButton.setOnClickListener(null);
-			helpButton.setOnLongClickListener(null);
 			if (firstTime){
 				messageView.setText("");
 				SharedPreferences.Editor editor = sp.edit();
@@ -404,8 +408,8 @@ public class TestFragment extends Fragment {
 					bracText.setText("0.00");
 					reset();
 					messageView.setText(R.string.test_guide_show_turn_on);
-					Thread t = new Thread(new TimeUpRunnable(0,3000));
-					t.start();
+					start_thread = new Thread(new TimeUpRunnable(0,3000));
+					start_thread.start();
 				}else{
 					if (startToast !=null)
 						startToast.cancel();
@@ -518,8 +522,10 @@ public class TestFragment extends Fragment {
 	public void stopDueToInit(){
 		if (cameraRecorder!=null)
 			cameraRecorder.close();
+		
 		if (bt!=null)
-			bt.close();
+			//bt.close();
+			bt = null;
 		if (gpsInitTask!=null)
 			gpsInitTask.cancel(true);
 		if (btInitHandler!=null)
@@ -531,7 +537,12 @@ public class TestFragment extends Fragment {
 		if (gpsRunTask!=null){
 			gpsRunTask.cancel(true);
 		}
-		
+		if (timeUpHandler!=null){
+			timeUpHandler.removeMessages(0);
+			timeUpHandler.removeMessages(1);
+		}
+		if (testHandler!=null)
+			testHandler.removeMessages(0);
 	}
 	
 	public void stop(){
@@ -573,6 +584,10 @@ public class TestFragment extends Fragment {
 		if (countDownHandler!=null){
 			countDownHandler.removeMessages(0);
 			countDownHandler = null;
+		}
+		if (timeUpHandler!=null){
+			timeUpHandler.removeMessages(0);
+			timeUpHandler.removeMessages(1);
 		}
 	}
 	
@@ -630,6 +645,11 @@ public class TestFragment extends Fragment {
 				testHandler.removeMessages(0);
 				testHandler = null;
 			}
+			
+			if (count_down_thread!= null &&count_down_thread.isAlive())
+				count_down_thread.interrupt();
+			countDownText.setText("");
+			
 			String msgStr = msg.getData().getString("msg");
 			
 			startButton.setOnClickListener(new EndTestOnClickListener());
@@ -814,6 +834,31 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
+	
+	private class StartButtonOnTouchListener implements View.OnTouchListener{
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			int e = event.getAction();
+			ImageView iv = (ImageView) v;
+			switch(e){
+				case MotionEvent.ACTION_OUTSIDE:
+					iv.setImageDrawable(startButtonDrawable);
+					break;
+				case MotionEvent.ACTION_MOVE:
+					iv.setImageDrawable(startButtonDownDrawable);
+					break;
+				case MotionEvent.ACTION_UP:
+					iv.setImageDrawable(startButtonDrawable);
+					break;
+				case MotionEvent.ACTION_DOWN:
+					iv.setImageDrawable(startButtonDownDrawable);
+					break;
+			}
+			return false;
+		}
+	}
+	
 	//Debug --------------------------------------------------------------------------------------------------------
 	private void checkDebug(){
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
@@ -911,28 +956,6 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
-	private class StartButtonOnTouchListener implements View.OnTouchListener{
 
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			int e = event.getAction();
-			ImageView iv = (ImageView) v;
-			switch(e){
-				case MotionEvent.ACTION_OUTSIDE:
-					iv.setImageDrawable(startButtonDrawable);
-					break;
-				case MotionEvent.ACTION_MOVE:
-					iv.setImageDrawable(startButtonDownDrawable);
-					break;
-				case MotionEvent.ACTION_UP:
-					iv.setImageDrawable(startButtonDrawable);
-					break;
-				case MotionEvent.ACTION_DOWN:
-					iv.setImageDrawable(startButtonDownDrawable);
-					break;
-			}
-			return false;
-		}
-	}
 
 }
