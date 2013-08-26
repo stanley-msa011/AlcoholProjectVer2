@@ -1,4 +1,4 @@
-package debug.clicklog;
+package data.uploader;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import ubicomp.drunk_detection.activities.R;
+
+import network.NetworkCheck;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -31,7 +33,6 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
-import data.uploader.ServerUrl;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -46,9 +47,15 @@ public class ClickLogUploader {
 	private static ClickLogUploaderThread clickUploader = null;
 	
 	public static void upload(Context context){
-		cancel();
-		clickUploader = new ClickLogUploaderThread(context);
-		clickUploader.execute();
+		if(!NetworkCheck.networkCheck(context))
+			return;
+		if (clickUploader!=null)
+			return;
+		if(SynchronizedLock.sharedLock.tryLock()){
+			SynchronizedLock.sharedLock.lock();
+			clickUploader = new ClickLogUploaderThread(context);
+			clickUploader.execute();
+		}
 	}
 	
 	public static void cancel(){
@@ -78,6 +85,8 @@ public class ClickLogUploader {
 		@Override
 		protected Void doInBackground(Void... arg0) {
 
+			Log.d("Click Log Uploader", "START");
+			
 			String not_uploaded_files[] = getNotUploadedFiles();
 			if (not_uploaded_files == null){
 				Log.d("Click Log Uploader", "no logFile needed to upload");
@@ -94,6 +103,20 @@ public class ClickLogUploader {
 				}
 			}
 			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void result){
+			clickUploader = null;
+			SynchronizedLock.sharedLock.unlock();
+			Log.d("Click Log Uploader", "END");
+		}
+		
+		@Override
+		protected void onCancelled(){
+			clickUploader = null;
+			SynchronizedLock.sharedLock.unlock();
+			Log.d("Click Log Uploader", "CANCEL");
 		}
 		
 		private String[] getNotUploadedFiles() {

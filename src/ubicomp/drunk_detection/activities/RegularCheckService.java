@@ -3,22 +3,26 @@ package ubicomp.drunk_detection.activities;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.Calendar;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
 import data.uploader.ServerUrl;
 
+import android.app.AlarmManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +31,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.Settings.Secure;
 import android.util.Log;
 
 public class RegularCheckService extends Service {
@@ -36,15 +41,25 @@ public class RegularCheckService extends Service {
 		return null;
 	}
 
+	private static final long time_gap = AlarmManager.INTERVAL_HOUR;
+	
 	private static String SERVER_URL;
+	
+	private static Thread runThread = null;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
 		super.onStartCommand(intent, flags, startId);
-		Thread t = new Thread(new NetworkRunnable());
+		
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		SERVER_URL = ServerUrl.SERVER_URL_REGULAR_CHECK(sp.getBoolean("developer", false));
-		t.start();
+		long latest_time= sp.getLong("latest_regular_check", 0L);
+		if(time_gap > System.currentTimeMillis() - latest_time)
+			return Service.START_REDELIVER_INTENT;
+		if (runThread !=null && runThread.isAlive())
+			return Service.START_REDELIVER_INTENT;
+		runThread  = new Thread(new NetworkRunnable());
+		runThread .start();
 		return Service.START_REDELIVER_INTENT;
 	}
 	
@@ -69,6 +84,8 @@ public class RegularCheckService extends Service {
 			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 			String uid = sp.getString("uid", "");
+			if (uid.length() == 0)
+				return -1;
 			mpEntity.addPart("user[]", new StringBody(uid));
 			
 			String app_version = "unknown";
@@ -81,9 +98,26 @@ public class RegularCheckService extends Service {
 			
 			mpEntity.addPart("user[]", new StringBody(app_version));
 			
+			String devId = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
+			mpEntity.addPart("user[]", new StringBody(devId));
+			
+			Calendar c = Calendar.getInstance();
+			
+		    int mYear = sp.getInt("sYear", c.get(Calendar.YEAR));
+		    int mMonth = sp.getInt("sMonth", c.get(Calendar.MONTH));
+		    int mDay = sp.getInt("sDate", c.get(Calendar.DATE));
+		    
+		    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
+		    mpEntity.addPart("user[]", new StringBody(joinDate));
+			
 			httpPost.setEntity(mpEntity);
-			int result = uploader(httpClient, httpPost,this);
-			if (result == -1){
+			if (uploader(httpClient, httpPost,this)){
+				Log.d("REGULAR CHECK", "SUCCESS");
+				SharedPreferences.Editor edit = sp.edit();
+				edit.putLong("latest_regular_check", System.currentTimeMillis());
+				edit.commit();
+			}
+			else{
 				Log.d("REGULAR CHECK", "FAIL TO CONNECT");
 				return -1;
 			}
@@ -105,16 +139,19 @@ public class RegularCheckService extends Service {
 	}
 	
 	
-	private int uploader(HttpClient httpClient, HttpPost httpPost,Context context){
+	private boolean uploader(HttpClient httpClient, HttpPost httpPost,Context context){
 		HttpResponse httpResponse;
-		int  result = -1;
+		ResponseHandler <String> res=new BasicResponseHandler();  
+		boolean  result = false;
 		try {
 			httpResponse = httpClient.execute(httpPost);
 			int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
-			if (httpStatusCode == HttpStatus.SC_OK)
-				result = 1;
-			else
-				result = -1;
+			result =  (httpStatusCode == HttpStatus.SC_OK);{
+				if (result){
+					String response = res.handleResponse(httpResponse).toString();
+					result &= (response.contains("regular check pass"));
+				}
+			}
 		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
 		} finally{

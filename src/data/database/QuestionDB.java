@@ -662,7 +662,7 @@ public class QuestionDB {
 		if (usage < 0)//for used condition
 			usage = 0;
 		
-		if (year==_year || month == _month || day == _day)
+		if (year==_year && month == _month && day == _day)
 			++usage;
 		else
 			usage = 1;

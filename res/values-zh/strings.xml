@@ -207,13 +207,16 @@
 		<item>開發目為協助酗酒患者戒酒並自我控制使用。</item>
 		<item>此應用程式需搭配專用酒測器方可使用。</item>
 		<item>應用界面視覺設計：</item>
-		<item>插畫：吳善琪、黃尤嘉</item>
+		<item>插畫：</item>
+		<item>著色：</item>
 	</string-array>
 	<string name="dot">、</string>
 	<string name="ntu">國立台灣大學</string>
 	<string name= "sinica">中央研究院</string>
 	<string name= "taipei_city_hospital">臺北市立聯合醫院</string>
 	<string name= "happ_design">happdesign.com</string>
+	<string name= "rickie_wu">Rickie Wu</string>
+	<string name="yuda_huang">Yuga Huang</string>
 	<string name= "current_version">目前版本：</string>
 	<string name="testTimeCheckToast">吹氣測試的間隔請大於兩分鐘</string>
 	<string name= "self_help_counter_unit">點</string>

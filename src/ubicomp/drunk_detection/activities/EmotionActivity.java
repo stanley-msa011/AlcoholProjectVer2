@@ -219,7 +219,7 @@ private void setPlayGuideBox(){
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		View tv = createTextView(R.string.emotionDIY_help);
 		mainLayout.addView(tv);
@@ -244,7 +244,7 @@ private void setPlayGuideBox(){
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		View tv = createTextView(R.string.call_to);
 		mainLayout.addView(tv);
@@ -288,7 +288,7 @@ private void setPlayGuideBox(){
 			mainLayout.removeAllViews();
 			mainLayout.addView(title);
 			titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-			titleparam.height = screen.x*230/1080;
+			titleparam.height = screen.x*245/1080;
 			
 			View tv2 = createTextView(R.string.emotion_connect_null);
 			mainLayout.addView(tv2);
@@ -308,7 +308,7 @@ private void setPlayGuideBox(){
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		View tv;
 		if (selection == 0)
@@ -337,7 +337,7 @@ private void setPlayGuideBox(){
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		String text=  getString(R.string.emotionDIY_help_case4) +selected;
 		View tv;
@@ -360,7 +360,7 @@ private void setPlayGuideBox(){
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
 		

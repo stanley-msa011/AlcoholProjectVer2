@@ -65,7 +65,7 @@ public class BracDataHandler {
 	public static final int Nothing = 0; 
 	public static final int ERROR = -1;
 	public static final int SUCCESS = 1;
-	public static final double THRESHOLD = 0.025;
+	public static final double THRESHOLD = 0.05;
 	public static final double THRESHOLD2 = 0.25;
 	
 	

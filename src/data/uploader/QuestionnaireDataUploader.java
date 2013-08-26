@@ -8,6 +8,8 @@ import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 
+import network.NetworkCheck;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
@@ -46,18 +48,24 @@ import android.util.Log;
 
 public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 
-	private static QuestionnaireDataUploader  reuploader = null;
+	private static QuestionnaireDataUploader  questionnaire_uploader = null;
 	
-	public static void reuploader(Context context){
-		cancel();
-		reuploader = new QuestionnaireDataUploader (context);
-		reuploader.execute();
+	public static void uploader(Context context){
+		if(!NetworkCheck.networkCheck(context))
+			return;
+		if (questionnaire_uploader!=null)
+			return;
+		if(SynchronizedLock.sharedLock.tryLock()){
+			SynchronizedLock.sharedLock.lock();
+			questionnaire_uploader = new QuestionnaireDataUploader (context);
+			questionnaire_uploader.execute();
+		}
 	}
 	
 	public static void cancel(){
-		if (reuploader!=null){
-			if (!reuploader.isCancelled()){
-				reuploader.cancel(true);
+		if (questionnaire_uploader!=null){
+			if (!questionnaire_uploader.isCancelled()){
+				questionnaire_uploader.cancel(true);
 			}
 		}
 	}
@@ -87,12 +95,14 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			
+			Log.d("QUESTIONNAIRE UPLOADER","START");
+			
 			EmotionData e_data[] = db.getNotUploadedEmotion();
 			if (e_data != null){
 				for (int i=0;i<e_data.length;++i){
 			       	int result = connectingToServer(e_data[i]);
 			        if (result == -1){
-			        	Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - EMOTION DIY");
+			        	Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - EMOTION DIY");
 			        	return null;
 			        }
 				}
@@ -103,7 +113,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				for (int i=0;i<em_data.length;++i){
 			       	int result = connectingToServer(em_data[i]);
 			        if (result == -1){
-			        	Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - EMOTION MANAGEMENT");
+			        	Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - EMOTION MANAGEMENT");
 			        	return null;
 			        }
 				}
@@ -114,7 +124,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				for (int i=0;i<q_data.length;++i){
 			       	int result = connectingToServer(q_data[i]);
 			        if (result == -1){
-			        	Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - QUESTIONNAIRE");
+			        	Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - QUESTIONNAIRE");
 			        	return null;
 			        }
 				}
@@ -127,18 +137,18 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 					UsedDetection ud = hdb.getUsedState(ts_data[i]);
 			       	int result = connectingToServer(ts_data[i],ud);
 			        if (result == -1){
-			        	Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - USED_DATA");
+			        	Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - USED_DATA");
 			        	return null;
 			        }
 				}
 			}
 			StorytellingUsage[] usage = db.getNotUploadedStorytellingUsage();
 			if (usage !=null){
-				Log.d("EMOTION_UPLOADER"," STORYTELLING USAGE START NOT NULL");
+				Log.d("QUESTIONNAIRE UPLOADER"," STORYTELLING USAGE START NOT NULL");
 				for (int i=0;i<usage.length;++i){
 			       	int result = connectingToServer(usage[i]);
 			        if (result == -1){
-			        	Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - STORYTELLING USAGE");
+			        	Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - STORYTELLING USAGE");
 			        	return null;
 			        }
 				}
@@ -149,9 +159,19 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 		
 		@Override
 		protected void onPostExecute(Void result ){
+			questionnaire_uploader = null;
+			SynchronizedLock.sharedLock.unlock();
+			Log.d("QUESTIONNAIRE UPLOADER","END");
 			AudioUploader.upload(context);
+			
 		}
 		
+		@Override
+		protected void onCancelled(){
+			questionnaire_uploader = null;
+			SynchronizedLock.sharedLock.unlock();
+			Log.d("QUESTIONNAIRE UPLOADER","CANCEL");
+		}
 		
 		private int connectingToServer(EmotionData e_data){
 			try {
@@ -191,7 +211,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				if (uploader(httpClient, httpPost,context)){
 					db.setEmotionUploaded(e_data.ts);
 				}else{
-					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - EMOTION DIY");
+					Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - EMOTION DIY");
 				}
 				
 			} catch (Exception e) {
@@ -237,7 +257,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				if (uploader(httpClient, httpPost,context)){
 					db.setEmotionManageUploaded(em_data.ts);
 				}else{
-					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - EMOTION MANAGEMENT");
+					Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - EMOTION MANAGEMENT");
 				}
 				
 			} catch (Exception e) {
@@ -283,7 +303,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				if (uploader(httpClient, httpPost,context)){
 					db.setQuestionnaireUploaded(q_data.ts);
 				}else{
-					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - QUESTIONNAIRE");
+					Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - QUESTIONNAIRE");
 				}
 				
 			} catch (Exception e) {
@@ -312,7 +332,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 				MultipartEntity mpEntity = new MultipartEntity();
 				
-				Log.d("EMOTION_UPLOADER"," POST");
+				Log.d("QUESTIONNAIRE UPLOADER"," POST");
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
 				mpEntity.addPart("usedData[]", new StringBody(uid));
@@ -324,10 +344,10 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				
 				httpPost.setEntity(mpEntity);
 				if (uploader(httpClient, httpPost,context)){
-					Log.d("EMOTION_UPLOADER"," USED_TS SUCCESS");
+					Log.d("QUESTIONNAIRE UPLOADER"," USED_TS SUCCESS");
 					db.updateNotUploadSHCUpdate(ts);
 				}else{
-					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - USED_TS");
+					Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - USED_TS");
 				}
 				
 			} catch (Exception e) {
@@ -364,7 +384,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(su.acc)));
 				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(su.used)));
 				int week = WeekNum.getWeek(context, su.ts);
-				Log.d("EMOTION_UPLOADER","UPLOAD - STORYTELLING USAGE "+su.name+" "+su.minutes);
+				Log.d("QUESTIONNAIRE UPLOADER","UPLOAD - STORYTELLING USAGE "+su.name+" "+su.minutes);
 				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(week)));
 				nvps.add(new BasicNameValuePair("usageData[]",su.name));
 				nvps.add(new BasicNameValuePair("usageData[]",String.valueOf(su.minutes)));
@@ -374,7 +394,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 					db.setStorytellingUsageUploaded(su.ts);
 				}
 				else
-					Log.d("EMOTION_UPLOADER","FAIL TO UPLOAD - STORYTELLING USAGE");
+					Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - STORYTELLING USAGE");
 				
 			} catch (Exception e) {
 				return -1;
@@ -392,9 +412,9 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				result =  (httpStatusCode == HttpStatus.SC_OK);
 				if (result){
 					String response = res.handleResponse(httpResponse).toString();
-					Log.d("UPLOADER","ques response="+response);
+					Log.d("QUESTIONNAIRE UPLOADER","ques response="+response);
 					result &= (response.contains("upload success"));
-					Log.d("UPLOADER","ques result="+result);
+					Log.d("QUESTIONNAIRE UPLOADER","ques result="+result);
 				}
 			} catch (ClientProtocolException e) {
 			} catch (IOException e) {

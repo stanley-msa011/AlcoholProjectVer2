@@ -282,6 +282,8 @@ public class PreSettingActivity extends Activity {
 			boolean check = true;
 			if (text.length() <MIN_NAME_LENGTH)
 				check = false;
+			if (!text.startsWith("sober"))
+				check = false;
 			
 			target_g = target_good.getText().toString();
 			if (target_g.length()==0)

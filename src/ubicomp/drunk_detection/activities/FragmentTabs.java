@@ -32,9 +32,9 @@ import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
+import data.uploader.ClickLogUploader;
 import data.uploader.Reuploader;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLogUploader;
 import debug.clicklog.ClickLoggerLog;
 
 public class FragmentTabs extends FragmentActivity {
@@ -68,12 +68,13 @@ public class FragmentTabs extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		context = this;
-		fragmentTabs = this;
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.tab_layout);
 
+		context = this;
+		fragmentTabs = this;
+		
 		Typefaces.initAll(this);
 		
 		loading_page = (ImageView) this.findViewById(R.id.loading_page);

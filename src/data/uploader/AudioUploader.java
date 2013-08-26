@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 
+import network.NetworkCheck;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
@@ -39,11 +41,14 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	
 	private static AudioUploader uploader;
 	public static void upload(Context context){
+		if(!NetworkCheck.networkCheck(context))
+			return;
 		if (uploader != null)
 			return;
-		else{
-			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-			SERVER_URL = ServerUrl.SERVER_URL_AUDIO(sp.getBoolean("developer", false));
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		SERVER_URL = ServerUrl.SERVER_URL_AUDIO(sp.getBoolean("developer", false));
+		if(SynchronizedLock.sharedLock.tryLock()){
+			SynchronizedLock.sharedLock.lock();
 			uploader  = new AudioUploader(context);
 			uploader.execute();
 		}
@@ -84,6 +89,8 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	
 	@Override
 	protected Void doInBackground(Void... arg0) {
+		
+		Log.d("AUDIO UPLOADER","START");
 		AccAudioData[] ais = db.getNotUploadedInfo();
 		if (ais == null)
 			return null;
@@ -98,11 +105,15 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	@Override
 	protected void onPostExecute(Void result){
 		uploader = null;
+		SynchronizedLock.sharedLock.unlock();
+		Log.d("AUDIO UPLOADER","END");
 	}
 	
 	@Override
 	protected void onCancelled(){
 		uploader = null;
+		SynchronizedLock.sharedLock.unlock();
+		Log.d("AUDIO UPLOADER","CANCEL");
 	}
 	
 	private int connectingToServer(AccAudioData info){

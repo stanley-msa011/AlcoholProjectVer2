@@ -105,7 +105,7 @@ public class StorytellingSharingActivity extends Activity {
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		String str = getResources().getString(R.string.storytelling_help1);;
 

@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.Calendar;
 
+import network.NetworkCheck;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
@@ -45,9 +47,16 @@ public class Reuploader {
 	private static DataReuploader reuploader = null;
 	
 	public static void reuploader(Context context){
-		cancel();
-		reuploader = new DataReuploader(context);
-		reuploader.execute();
+		if(!NetworkCheck.networkCheck(context))
+			return;
+		if (reuploader!=null){
+				return;
+		}
+		if(SynchronizedLock.sharedLock.tryLock()){
+			SynchronizedLock.sharedLock.lock();
+			reuploader = new DataReuploader(context);
+			reuploader.execute();
+		}
 	}
 	
 	public static void cancel(){
@@ -82,6 +91,9 @@ public class Reuploader {
 		
 		@Override
 		protected Void doInBackground(Void... arg0) {
+			
+			Log.d("REUPLOADER","START");
+			
 			 if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 		        	mainStorageDir = new File(Environment.getExternalStorageDirectory(), "drunk_detection");
 		        else
@@ -117,7 +129,17 @@ public class Reuploader {
 		
 		@Override
 		protected void onPostExecute(Void result ){
-			QuestionnaireDataUploader.reuploader(context);
+			reuploader = null;
+			SynchronizedLock.sharedLock.unlock();
+			Log.d("REUPLOADER","END");
+			QuestionnaireDataUploader.uploader(context);
+		}
+		
+		@Override
+		protected void onCancelled(){
+			reuploader = null;
+			SynchronizedLock.sharedLock.unlock();
+			Log.d("REUPLOADER","CANCEL");
 		}
 		
 		private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles, File questionFile, String ts){

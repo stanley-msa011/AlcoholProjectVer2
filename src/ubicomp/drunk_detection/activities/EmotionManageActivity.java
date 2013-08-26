@@ -135,7 +135,7 @@ public class EmotionManageActivity extends Activity {
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		View tv = createTextView(R.string.emotion_manage_help1);
 		mainLayout.addView(tv);
@@ -158,7 +158,7 @@ public class EmotionManageActivity extends Activity {
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		View tv = createTextView(R.string.emotion_manage_help2);
 		mainLayout.addView(tv);
@@ -185,7 +185,7 @@ public class EmotionManageActivity extends Activity {
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		String str = getResources().getString(R.string.emotion_manage_help3)+related_texts[r_type-1];
 
@@ -216,7 +216,7 @@ public class EmotionManageActivity extends Activity {
 		View title = createTitleView();
 		mainLayout.addView(title);
 		LinearLayout.LayoutParams titleparam =(LinearLayout.LayoutParams) title.getLayoutParams();
-		titleparam.height = screen.x*230/1080;
+		titleparam.height = screen.x*245/1080;
 		
 		View tv = createTextView(R.string.emotion_end_message);
 		mainLayout.addView(tv);

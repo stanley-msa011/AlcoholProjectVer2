@@ -2,6 +2,8 @@ package data.uploader;
 
 
 
+import network.NetworkCheck;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -24,6 +26,8 @@ public class DataUploader extends AsyncTask<Void, Void,Boolean> {
 	private Context context;
 	
 	public DataUploader(HttpClient httpClient, HttpPost httpPost,String ts,Context context){
+		if(!NetworkCheck.networkCheck(context))
+			return;
 		mTask = this;
 		this.ts = ts;
 		this.httpClient = httpClient;
@@ -33,6 +37,8 @@ public class DataUploader extends AsyncTask<Void, Void,Boolean> {
 	
 	@Override
 	protected Boolean doInBackground(Void... arg0) {
+		
+		Log.d("UPLOADER","START");
 		HttpResponse httpResponse;
 		ResponseHandler <String> res=new BasicResponseHandler();  
 		Boolean result = false;

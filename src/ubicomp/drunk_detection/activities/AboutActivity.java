@@ -26,7 +26,7 @@ import android.widget.TextView;
 public class AboutActivity extends Activity {
 
 	private TextView titleText,aboutText, copyrightText, about;
-	private LinearLayout logoLayout;
+	private RelativeLayout logoLayout;
 	private ImageView logo,logo0,logo1,logo2;
 	private RelativeLayout titleLayout;
 	private Point screen;
@@ -55,7 +55,7 @@ public class AboutActivity extends Activity {
 		titleText = (TextView) this.findViewById(R.id.about_title);
 		about = (TextView) this.findViewById(R.id.about_about);
 		aboutText = (TextView) this.findViewById(R.id.about_content);
-		logoLayout = (LinearLayout) this.findViewById(R.id.about_logos);
+		logoLayout = (RelativeLayout) this.findViewById(R.id.about_logos);
 		logo = (ImageView) this.findViewById(R.id.about_logo);
 		logo0 = (ImageView) this.findViewById(R.id.about_logo0);
 		logo1 = (ImageView) this.findViewById(R.id.about_logo1);
@@ -77,19 +77,19 @@ public class AboutActivity extends Activity {
 		int titleSize = screen.x * 24/480;
 		textSize =  screen.x * 21/480;
 		
-		int icon_size = screen.x * 104/480;
+		int icon_size = screen.x * 106/480;
 		
 		RelativeLayout.LayoutParams logoParam = (RelativeLayout.LayoutParams) logo.getLayoutParams();
 		logoParam.leftMargin =  screen.x * 26/480;
 		
 		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams) titleText.getLayoutParams();
-		tParam.leftMargin =  screen.x * 26/480;
+		tParam.leftMargin =  screen.x * 27/480;
 		titleText.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleSize);
 		titleText.setTypeface(wordTypefaceBold);
 		titleText.setText(R.string.app_name);
 		
 		LinearLayout.LayoutParams ttParam = (LinearLayout.LayoutParams) titleLayout.getLayoutParams();
-		ttParam.height = screen.x*230/1080;
+		ttParam.height = screen.x*245/1080;
 		
 		RelativeLayout.LayoutParams aaParam = (RelativeLayout.LayoutParams) about.getLayoutParams();
 		aaParam.leftMargin = screen.x * 26/480;
@@ -97,7 +97,7 @@ public class AboutActivity extends Activity {
 		about.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams aParam = (RelativeLayout.LayoutParams) aboutText.getLayoutParams();
-		aParam.leftMargin = aParam.rightMargin = screen.x * 26/480;
+		aParam.leftMargin = aParam.rightMargin = screen.x * 27/480;
 		aParam.topMargin = screen.x * 38/480;
 		aboutText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		aboutText.setTypeface(wordTypefaceBold);
@@ -106,20 +106,20 @@ public class AboutActivity extends Activity {
 		RelativeLayout.LayoutParams lParam = (RelativeLayout.LayoutParams) logoLayout.getLayoutParams();
 		lParam.topMargin = screen.x * 60/480; 
 		
-		int gap = screen.x * 9/480;
-		LinearLayout.LayoutParams l0Param = (LinearLayout.LayoutParams) logo0.getLayoutParams();
-		l0Param.height = l0Param.width = icon_size;
-		l0Param.leftMargin = l0Param.rightMargin = gap; 
-		LinearLayout.LayoutParams l1Param = (LinearLayout.LayoutParams) logo1.getLayoutParams();
+		RelativeLayout.LayoutParams l0Param = (RelativeLayout.LayoutParams) logo0.getLayoutParams();
+		l0Param.height = l0Param.width =icon_size;
+		l0Param.leftMargin = screen.x * 27/480;
+		l0Param.rightMargin = screen.x * 90/1080; 
+		RelativeLayout.LayoutParams l1Param = (RelativeLayout.LayoutParams) logo1.getLayoutParams();
 		l1Param.height = l1Param.width = icon_size;
-		l1Param.leftMargin = l1Param.rightMargin = gap; 
-		LinearLayout.LayoutParams l2Param = (LinearLayout.LayoutParams) logo2.getLayoutParams();
-		l2Param.height = l2Param.width = icon_size;
-		l2Param.leftMargin = l2Param.rightMargin = gap; 
+		RelativeLayout.LayoutParams l2Param = (RelativeLayout.LayoutParams) logo2.getLayoutParams();
+		l2Param.height = icon_size;
+		l2Param.leftMargin = screen.x *60/1080;
+		l2Param.rightMargin = screen.x * 27/480;
 		
 		RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) copyrightText.getLayoutParams();
-		cParam.leftMargin = screen.x * 26/480;
-		cParam.topMargin = screen.x *100/480;
+		cParam.leftMargin = screen.x * 27/480;
+		cParam.bottomMargin = screen.x *27/480;
 		copyrightText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 16/480);
 		copyrightText.setTypeface(digitTypeface);
 		copyrightText.setText(COPYRIGHT);
@@ -195,6 +195,8 @@ public class AboutActivity extends Activity {
 		String happ_design = getString(R.string.happ_design);
 		
 		String curVersion = getString(R.string.current_version);
+		String rickie_wu = getString(R.string.rickie_wu);
+		String yuga_huang = getString(R.string.yuda_huang);
 		String versionName =" unknown";
 		PackageInfo pinfo;
 		try {
@@ -204,18 +206,19 @@ public class AboutActivity extends Activity {
 		
     	Spannable helpSpannable = new SpannableString(
     			message[0]+"\n"+
-    			ntu+dot+"\n"+sinica+dot+"\n"+taipei_city_hospital+
+    			ntu+dot+sinica+dot+taipei_city_hospital+
     			message[1]+"\n\n"+message[2]+"\n"+message[3]+"\n"+curVersion+
     			versionName+"\n\n"+
     			message[4]+
     			happ_design+"\n"+
-    			message[5]
+    			message[5]+rickie_wu+"\n"+
+    			message[6]+yuga_huang
     			);
 		int start= 0;
 		int end =message[0].length()+1;
 		helpSpannable.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		start=end;
-		end = start+ntu.length()+dot.length()+1+sinica.length()+dot.length()+1+taipei_city_hospital.length();
+		end = start+ntu.length()+dot.length()+sinica.length()+dot.length()+taipei_city_hospital.length();
 		helpSpannable.setSpan(new CustomTypefaceSpan("custom2",wordTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		start = end;
 		end = start+message[1].length()+2+message[2].length()+1+message[3].length()+1+curVersion.length();
@@ -232,6 +235,16 @@ public class AboutActivity extends Activity {
 		start = end;
 		end = start + message[5].length();
 		helpSpannable.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start + rickie_wu.length()+1;
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom3",digitTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start + message[6].length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		start = end;
+		end = start + yuga_huang.length();
+		helpSpannable.setSpan(new CustomTypefaceSpan("custom3",digitTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		
 		aboutText.setText(helpSpannable);
 		
 	}

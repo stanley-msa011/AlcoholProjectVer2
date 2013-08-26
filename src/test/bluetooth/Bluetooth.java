@@ -154,7 +154,9 @@ public class Bluetooth {
 				if (device == null)
 					return;
 				String name = device.getName();
-				if (name.equals(DEVICE_NAME)||name.equals(DEVICE_NAME2)){ // add DEVICE_NAME2?
+				if (	name.equals(DEVICE_NAME)
+						||name.equals(DEVICE_NAME2)
+						||name.startsWith(DEVICE_NAME_FORMAL)){
 					btAdapter.cancelDiscovery();
 					sensor = device;
 				}
