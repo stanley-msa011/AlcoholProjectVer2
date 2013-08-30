@@ -3,6 +3,7 @@ package ubicomp.drunk_detection.activities;
 import statistic.ui.questionnaire.content.ConnectSocialInfo;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
+import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
@@ -32,7 +33,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 
 public class EmotionActivity extends Activity {
@@ -86,8 +86,6 @@ public class EmotionActivity extends Activity {
 	
 	private int state = 0;
 	
-	private Toast endToast;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -115,6 +113,7 @@ public class EmotionActivity extends Activity {
 		mainLayout = (LinearLayout) this.findViewById(R.id.emotion_main_layout);
 		inflater = LayoutInflater.from(this);
 		shadowBg = new View(this);
+		shadowBg.setKeepScreenOn(true);
 		shadowBg.setBackgroundColor(0x99000000);
 		callLayout = (RelativeLayout) inflater.inflate(R.layout.call_check_layout, null);
 		playLayout = (RelativeLayout) inflater.inflate(R.layout.play_guide_layout, null);
@@ -798,10 +797,7 @@ private View createTextView(String textStr){
 				return false;
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_RETURN_BUTTON);
 			if (state == 0){
-				if (endToast!=null)
-					endToast.cancel();
-				endToast = Toast.makeText(this, R.string.emotionDIY_toast, Toast.LENGTH_SHORT);
-				endToast.show();
+				CustomToastSmall.generateToast(this, R.string.emotionDIY_toast);
 				--state;
 			}else if (state == -1)
 				return super.onKeyDown(keyCode, event);

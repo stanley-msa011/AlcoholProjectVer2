@@ -9,9 +9,11 @@ import data.info.BracDetectionState;
 import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.GridLayout;
@@ -50,11 +52,21 @@ public class StatisticWeekView extends StatisticPageView {
 	private Typeface digitTypefaceBold;
 	private Typeface wordTypefaceBold;
 	
+	private Calendar startDate;
+	
+	private static final float ALPHA = 0.4F;
+	
 	public StatisticWeekView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.statistic_week_view, statisticFragment);
 		db = new HistoryDB(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
+		startDate = Calendar.getInstance();
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		int mYear = sp.getInt("sYear", startDate.get(Calendar.YEAR));
+	    int mMonth = sp.getInt("sMonth", startDate.get(Calendar.MONTH));
+	    int mDay = sp.getInt("sDate", startDate.get(Calendar.DATE));
+	    startDate.set(mYear, mMonth, mDay, 0, 0, 0);
 	}
 
 
@@ -190,7 +202,7 @@ public class StatisticWeekView extends StatisticPageView {
 			if (historys[i] == null){
 				circles[idx].setImageDrawable(circleDrawables[0]);
 				if (i >= historys.length - nBlocks && TimeBlock.isEmpty(i%nBlocks, cur_hour))
-						circles[idx].setAlpha(0.5F);
+						circles[idx].setAlpha(ALPHA);
 			}
 			else if (historys[i].brac < BracDataHandler.THRESHOLD)
 				circles[idx].setImageDrawable(circleDrawables[2]);
@@ -203,7 +215,19 @@ public class StatisticWeekView extends StatisticPageView {
 			int date = cal.get(Calendar.DAY_OF_MONTH);
 			String label = String.valueOf(date);
 			date_labels[i].setText(label);
+			if (cal.before(startDate)){
+				int max = i+21;
+				for (int j=i;j<max;j+=7){
+					circles[j].setAlpha(ALPHA);
+				}
+			}
 			cal.add(Calendar.DAY_OF_MONTH, -1);
+		}
+		
+		if (cal.before(startDate)){
+			for (int j=0;j<21;j+=7){
+				circles[j].setAlpha(ALPHA);
+			}
 		}
 		
 		int month = cal.get(Calendar.MONTH)+1;

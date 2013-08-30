@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
@@ -18,7 +19,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 		String action = intent.getAction();
 		Log.d("NETWORK",action);
 		
-		if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION))
+		if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION) && !action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION))
 			return;
 		
 		if(!NetworkCheck.networkCheck(context)){

@@ -74,8 +74,8 @@
     <string name="notification_msg_2">您已停酒了一小時，請再繼續努力！</string>
     <string name="test_guide_not_turn_on">未啟動酒測裝置</string>
     <string name="test_guide_turn_on">已啟用酒測裝置\n請稍待酒測器準備</string>
-    <string name="test_guide_show_turn_on">請按酒測裝置黑色按鈕\n以啟用酒測裝置</string>
-    <string name="test_guide_start">請點選\'開始\'以進行測試</string>
+    <string name="test_guide_show_turn_on">請按酒測裝置右下角按鈕\n以啟用酒測裝置</string>
+    <string name="test_guide_start">請點選\'開始\'進行測試</string>
     <string name="test_guide_msg_box">請依對話框指示進行操作</string>
     <string name="test_guide_end">\n請點選按鈕以結束</string>
     <string name="test_guide_testing">請將臉對於螢幕中央，\n並開始吹氣</string>
@@ -117,6 +117,7 @@
     <string name="audio_box_playing">播放中</string>
     <string name="audio_box_recording">錄音中，剩餘</string>
     <string name="audio_box_preparing">準備中</string>
+    <string name= "second">秒</string>
     <string-array name="audio_box_help">
         <item >錄下或聆聽在</item>
         <item >的心情\n(最長可達一分鐘)</item>
@@ -206,13 +207,16 @@
 		<item>開發目為協助酗酒患者戒酒並自我控制使用。</item>
 		<item>此應用程式需搭配專用酒測器方可使用。</item>
 		<item>應用界面視覺設計：</item>
-		<item>插畫：吳善琪、黃尤嘉</item>
+		<item>插畫：</item>
+		<item>著色：</item>
 	</string-array>
 	<string name="dot">、</string>
 	<string name="ntu">國立台灣大學</string>
 	<string name= "sinica">中央研究院</string>
 	<string name= "taipei_city_hospital">臺北市立聯合醫院</string>
 	<string name= "happ_design">happdesign.com</string>
+	<string name= "rickie_wu">Rickie Wu</string>
+	<string name="yuda_huang">Yuga Huang</string>
 	<string name= "current_version">目前版本：</string>
 	<string name="testTimeCheckToast">吹氣測試的間隔請大於兩分鐘</string>
 	<string name= "self_help_counter_unit">點</string>
@@ -221,12 +225,21 @@
 	<string name= "emotion_manage_end_toast">做好情緒管理</string>
 	<string name= "emotionDIY_help_case1">嘗試閉眼專注觀察呼吸？\n你可以聽從指示引導或直接去做</string>
 	<string name= "emotionDIY_help_case2">專心健走 10 ~ 30 分鐘？\n你可以聽從指示引導或直接去做</string>
-	<string name= "emotionDIY_help_case3">從事休閒活動？\n你可以聽從指示引導或直接去做</string>
+	<string name= "emotionDIY_help_case3">從事休閒活動？\n你可以選擇以下內容</string>
+	<string name= "emotionDIY_help_case3_2">未設定休閒活動，\n請按返回鍵</string>
+	<string name= "emotionDIY_help_case4">你將要去做</string>
 	<string name= "emotionDIY_help_guide">播放指示</string>
 	<string name="try_to_do">我會完成</string>
 	<string name= "emotion_box_playing">播放中</string>
 	<string name= "emotion_box_pause">暫停中</string>
 	<string name= "emotion_box_replay">重新撥放？</string>
-	<string name= "storytelling_message">你有分享你的酒測歷程嗎？</string>
+	<string name= "storytelling_message">你是否已分享你的戒酒過程？</string>
 	<string name= "storytelling_end_toast">分享酒測歷程</string>
+	<string name= "storytelling_help1">你所分享的對象是：</string>
+	<string name= "storytelling_help2">你所分享的時間為﹝分鐘﹞：</string>
+	<string name= "storytelling_leave_toast">你確定要離開嗎？</string>
+	<string name= "storytelling_share_title">填寫分享資料</string>
+	<string name= "storytelling_check_toast1">分享對象未填寫</string>
+	<string name= "storytelling_check_toast2">分享時間未填寫</string>
+	<string name= "storytelling_check_toast3">請填寫分享對象及時間</string>
 </resources>

@@ -221,7 +221,7 @@ public class BluetoothDebugMode extends Bluetooth {
 
 				long time = System.currentTimeMillis();
 	
-				if(!start && now_pressure < absolute_min){
+				if(!start&&now_pressure < absolute_min){
 					absolute_min = now_pressure;
 					testFragment.showDebug("absolute min setting: "+absolute_min );
 				}

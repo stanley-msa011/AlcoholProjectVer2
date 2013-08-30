@@ -7,7 +7,8 @@ import java.text.DecimalFormat;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.activities.TutorialActivity;
-import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.CustomToastSmall;
+import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
 import ubicomp.drunk_detection.ui.Typefaces;
 
@@ -47,7 +48,6 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -55,7 +55,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -77,8 +76,9 @@ public class TestFragment extends Fragment {
 	public static final int _BT = 1;
 	public static final int _CAMERA = 2;
 	
-	private static final int TEST_GAP_DURATION = 120000;
+	private static final long TEST_GAP_DURATION = 120*1000L;
 	private static final int COUNT_DOWN_SECOND = 10;
+	private static final int COUNT_DOWN_SECOND_DEVELOP= 4;
 	
 	private boolean keepMsgBox;
 	
@@ -120,8 +120,6 @@ public class TestFragment extends Fragment {
 	
 	private RelativeLayout startLayout;
 	private ImageView bg, startButton,stroke,testCircle;
-	private Drawable startButtonDrawable,startButtonDownDrawable;
-	private StartButtonOnTouchListener startButtonOnTouchListener;
 	private TextView bracText;
 	private TextView brac;
 	private TextView startText;
@@ -146,8 +144,6 @@ public class TestFragment extends Fragment {
 	private Typeface digitTypeface, digitTypefaceBold, wordTypefaceBold;
 	
 	private DecimalFormat format;
-	
-	private Toast startToast;
 	
 	private Point screen;
 	
@@ -179,9 +175,6 @@ public class TestFragment extends Fragment {
 		test_guide_not_turn_on=getString(R.string.test_guide_not_turn_on);
 		test_guide_test_fail = getString(R.string.test_guide_test_fail);
 		test_guide_connect_fail = getString(R.string.test_guide_connect_fail);
-		startButtonDrawable = getResources().getDrawable(R.drawable.test_start_button);
-		startButtonDownDrawable = getResources().getDrawable(R.drawable.test_start_button);
-		startButtonOnTouchListener = new StartButtonOnTouchListener();
 	}
 	
 	public void onPause(){
@@ -249,6 +242,7 @@ public class TestFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	view = inflater.inflate(R.layout.test_fragment, container,false);
     	bg = (ImageView) view.findViewById(R.id.test_background);
+    	bg.setKeepScreenOn(true);
 		startLayout = (RelativeLayout) view.findViewById(R.id.test_start_layout);
 		startButton = (ImageView) view.findViewById(R.id.test_start_button);
 		bracText =(TextView) view.findViewById(R.id.test_brac_value_text);
@@ -384,6 +378,9 @@ public class TestFragment extends Fragment {
 		@Override
 		public void onClick(View v) {
 			
+			if (!FragmentTabs.getClickable())
+				return;
+			
 			ClickLoggerLog.Log(getActivity(), ClickLogId.TEST_START_BUTTON);
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
 			boolean firstTime = sp.getBoolean("first", true);
@@ -402,8 +399,7 @@ public class TestFragment extends Fragment {
 				if (curTime - lastTime > TEST_GAP_DURATION || debug){
 					bg.setOnTouchListener(null);
 					startButton.setOnClickListener(null);
-					startButton.setOnTouchListener(null);
-					startButton.setImageDrawable(startButtonDownDrawable);
+					startButton.setEnabled(false);
 					startText.setVisibility(View.INVISIBLE);
 					bracText.setText("0.00");
 					reset();
@@ -411,10 +407,7 @@ public class TestFragment extends Fragment {
 					start_thread = new Thread(new TimeUpRunnable(0,3000));
 					start_thread.start();
 				}else{
-					if (startToast !=null)
-						startToast.cancel();
-					startToast = Toast.makeText(getActivity(), R.string.testTimeCheckToast, Toast.LENGTH_SHORT);
-					startToast.show();
+					CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToast);
 				}
 			}
 		}
@@ -478,7 +471,7 @@ public class TestFragment extends Fragment {
 				Boolean debug = sp.getBoolean("debug", false);
 				
 				if (debug)
-					count_down_thread = new Thread(new CountDownRunnable(1,2)) ;
+					count_down_thread = new Thread(new CountDownRunnable(1,COUNT_DOWN_SECOND_DEVELOP)) ;
 				else
 					count_down_thread = new Thread(new CountDownRunnable(1,COUNT_DOWN_SECOND ));
 				count_down_thread.start();
@@ -606,15 +599,14 @@ public class TestFragment extends Fragment {
 			bracText.setVisibility(View.VISIBLE);
 			messageView.setText(R.string.test_guide_start);
 			startButton.setOnClickListener(new StartOnClickListener());
-			startButton.setOnTouchListener(startButtonOnTouchListener);
-			startButton.setImageDrawable(startButtonDrawable);
+			startButton.setEnabled(true);
 			startButton.setVisibility(View.VISIBLE);
 			startText.setVisibility(View.VISIBLE);
 			helpButton.setOnClickListener(new TutorialOnClickListener());
 			face.setVisibility(View.INVISIBLE);
 			
-			bg.setOnTouchListener(new BackgroundDoubleOnTouchListener());
-			LoadingBox.dismiss();
+			//bg.setOnTouchListener(new BackgroundDoubleOnTouchListener());
+			LoadingDialogControl.dismiss();
 		}
 	}
     
@@ -622,7 +614,7 @@ public class TestFragment extends Fragment {
 	private class MsgLoadingHandler extends Handler{
 		public void handleMessage(Message msg){
 			startButton.setOnClickListener(null);
-			startButton.setOnTouchListener(null);
+			startButton.setEnabled(false);
 			if (msgBox==null)
 				msgBox = new TestQuestionMsgBox(testFragment,main_layout);
 			msgBox.settingPreTask();
@@ -653,13 +645,11 @@ public class TestFragment extends Fragment {
 			String msgStr = msg.getData().getString("msg");
 			
 			startButton.setOnClickListener(new EndTestOnClickListener());
-			startButton.setOnTouchListener(startButtonOnTouchListener);
+			startButton.setEnabled(true);
 			startButton.setVisibility(View.VISIBLE);
-			startButton.setImageDrawable(startButtonDrawable);
 			face.setVisibility(View.INVISIBLE);
 			msgStr = msgStr.concat(test_guide_end);
 			messageView.setText(msgStr);
-			bg.setOnTouchListener(new BackgroundDoubleOnTouchListener());
 		}
 	}
 	
@@ -667,7 +657,7 @@ public class TestFragment extends Fragment {
 	private class TestHandler extends Handler{
 		public void handleMessage(Message msg){
 			startButton.setOnClickListener(null);
-			startButton.setOnTouchListener(null);
+			startButton.setEnabled(false);
 			if (blowDrawables == null){
 				blowDrawables = new Drawable[BLOW_RESOURCE.length];
 				for (int i=1;i<blowDrawables.length;++i)
@@ -790,6 +780,8 @@ public class TestFragment extends Fragment {
 	
 	private class TutorialOnClickListener implements View.OnClickListener{
 		public void onClick(View v) {
+			if (!FragmentTabs.getClickable())
+				return;
 			ClickLoggerLog.Log(getActivity(), ClickLogId.TEST_TUTORIAL_BUTTON);
 			showTutorial();
 		}
@@ -806,58 +798,6 @@ public class TestFragment extends Fragment {
 		questionFile.write(emotion, desire);
 	}
 	
-	private boolean doubleClickState = false;
-	
-	private class BackgroundDoubleOnTouchListener implements View.OnTouchListener{
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			if (!doubleClickState){
-				doubleClickState = true;
-				Thread t = new Thread(new BackgroundDoubleOnTouchRunnable());
-				t.start();
-			}
-			else
-				activity.openOptionsMenu();
-			return false;
-		}
-	}
-	
-	private class BackgroundDoubleOnTouchRunnable implements Runnable{
-		@Override
-		public void run() {
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-			}finally{
-				doubleClickState = false;
-			}
-		}
-	}
-	
-	
-	private class StartButtonOnTouchListener implements View.OnTouchListener{
-
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			int e = event.getAction();
-			ImageView iv = (ImageView) v;
-			switch(e){
-				case MotionEvent.ACTION_OUTSIDE:
-					iv.setImageDrawable(startButtonDrawable);
-					break;
-				case MotionEvent.ACTION_MOVE:
-					iv.setImageDrawable(startButtonDownDrawable);
-					break;
-				case MotionEvent.ACTION_UP:
-					iv.setImageDrawable(startButtonDrawable);
-					break;
-				case MotionEvent.ACTION_DOWN:
-					iv.setImageDrawable(startButtonDownDrawable);
-					break;
-			}
-			return false;
-		}
-	}
 	
 	//Debug --------------------------------------------------------------------------------------------------------
 	private void checkDebug(){

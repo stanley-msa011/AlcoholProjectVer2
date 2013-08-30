@@ -8,7 +8,7 @@ import java.util.Calendar;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
-import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.Typefaces;
 
 import data.calculate.WeekNum;
@@ -446,7 +446,7 @@ public class HistoryFragment extends Fragment {
     public void endAnimation(){
     	setStorytellingTexts();
     	setStageVisible(true);
-    	FragmentTabs.enableTab(true);
+    	FragmentTabs.enableTabAndClick(true);
     	isAnimation = false;
     	chart.invalidate();
     }
@@ -456,7 +456,7 @@ public class HistoryFragment extends Fragment {
     	setStorytellingTexts();
     	setStageVisible(true);
     	pageWidget.setOnTouchListener(gtListener);
-    	FragmentTabs.enableTab(true);
+    	FragmentTabs.enableTabAndClick(true);
     	isAnimation = false;
     	chart.invalidate();
     }
@@ -492,7 +492,6 @@ public class HistoryFragment extends Fragment {
     		scroll_value = 0;
     	Message msg = new Message();
     	Bundle data = new Bundle();
-    	Log.d("Scroll","Scroll to "+scroll_value);
     	data.putInt("pos", scroll_value);
     	msg.setData(data);
     	msg.what = 0;
@@ -548,7 +547,7 @@ public class HistoryFragment extends Fragment {
 			recordBox.setImage();
 			endAnimation();
 			
-			LoadingBox.dismiss();
+			LoadingDialogControl.dismiss();
 			startAnim();
 		}
 	}
@@ -560,7 +559,7 @@ public class HistoryFragment extends Fragment {
 			return;
 		}
 			isAnimation = true;
-			FragmentTabs.enableTab(false);
+			FragmentTabs.enableTabAndClick(false);
 			
 			int[] aBgs = HistoryStorytelling.getAnimationBgs(page_states);
 			int pageIdx = page_week;
@@ -614,7 +613,7 @@ public class HistoryFragment extends Fragment {
 			float y2 = e2.getY();
 			if (y1 - y2 > 0){//UP
 				pageWidget.setOnTouchListener(null);
-				FragmentTabs.enableTab(false);
+				FragmentTabs.enableTabAndClick(false);
 				int[] aBgs = HistoryStorytelling.getAnimationBgs(page_states);
 				int pageIdx = page_week;
 				int startIdx = pageIdx;
@@ -622,7 +621,7 @@ public class HistoryFragment extends Fragment {
 				if (endIdx > max_week){
 					isAnimation = false;
 					pageWidget.setOnTouchListener(gtListener);
-					FragmentTabs.enableTab(true);
+					FragmentTabs.enableTabAndClick(true);
 					return true;
 				}
 				ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_FLING_UP);
@@ -631,7 +630,7 @@ public class HistoryFragment extends Fragment {
 				pageAnimationTask2.execute();
 			}else if (y2 - y1 >  0){//DOWN
 				pageWidget.setOnTouchListener(null);
-				FragmentTabs.enableTab(false);
+				FragmentTabs.enableTabAndClick(false);
 				int[] aBgs = HistoryStorytelling.getAnimationBgs(page_states);
 				int pageIdx = page_week;
 				int startIdx = pageIdx;
@@ -639,7 +638,7 @@ public class HistoryFragment extends Fragment {
 				if (endIdx < 0){
 					isAnimation = false;
 					pageWidget.setOnTouchListener(gtListener);
-					FragmentTabs.enableTab(true);
+					FragmentTabs.enableTabAndClick(true);
 					return true;
 				}
 				ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_FLING_DOWN);
@@ -1316,7 +1315,7 @@ public class HistoryFragment extends Fragment {
 		pageWidget.setEnabled(enable);
 		scrollView.setEnabled(enable);
 		chart.setEnabled(enable);
-		FragmentTabs.enableTab(enable);
+		FragmentTabs.enableTabAndClick(enable);
 		storytellingButton.setEnabled(enable);
 	}
 	

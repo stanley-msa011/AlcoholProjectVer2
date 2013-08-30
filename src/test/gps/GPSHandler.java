@@ -23,9 +23,9 @@ public class GPSHandler extends Handler {
 		boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 		
 		if (gps_enabled)
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,1000,locationListener);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,500,10,locationListener);
 		if(network_enabled)
-			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,1000,locationListener);
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,500,10,locationListener);
 		
 	}
 	

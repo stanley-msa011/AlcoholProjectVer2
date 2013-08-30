@@ -12,7 +12,7 @@ public class DeveloperActivity extends Activity {
 	private EditText password;
 	private Button enter;
 	
-	private static final String PASSWORD = "UBICOMP"; 
+	private static final String PASSWORD = "UBICOMP_MLL336_2013"; 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

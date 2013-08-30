@@ -18,7 +18,7 @@ public class CustomTab {
 	private LayoutInflater inflater;
 	
 	private ImageView bg,icon;
-	private Drawable onDrawable;
+	private Drawable onDrawable,offDrawable;
 	private Drawable iconDrawable, iconOnDrawable;
 	
 	public CustomTab(Context context, int id, int onId){
@@ -45,6 +45,7 @@ public class CustomTab {
 		iconParam.height = width*58/1080;
 		icon.setImageDrawable(iconDrawable);
 		onDrawable = context.getResources().getDrawable(R.drawable.tabs_down);
+		offDrawable =context.getResources().getDrawable(R.drawable.tabs_selector);
 	}
 	
 	public View getTab(){
@@ -56,7 +57,7 @@ public class CustomTab {
 			bg.setImageDrawable(onDrawable);
 			icon.setImageDrawable(iconOnDrawable);
 		}else{
-			bg.setImageDrawable(null);
+			bg.setImageDrawable(offDrawable);
 			icon.setImageDrawable(iconDrawable);
 		}
 	}

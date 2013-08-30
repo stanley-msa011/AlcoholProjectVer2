@@ -19,6 +19,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -419,7 +420,11 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 			} catch (ClientProtocolException e) {
 			} catch (IOException e) {
 			} finally{
-				httpClient.getConnectionManager().shutdown();
+				if ( httpClient!=null){
+					ClientConnectionManager ccm= httpClient.getConnectionManager();
+						if (ccm!=null)
+							ccm.shutdown();
+					}
 			}
 			return result;
 		}

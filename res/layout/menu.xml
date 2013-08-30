@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:divider="@drawable/divider"
+    android:measureWithLargestChild="false"
+    android:orientation="horizontal"
+    android:splitMotionEvents="false"
+    android:showDividers="middle" >
+    
+    <RelativeLayout
+        android:id="@+id/menu_0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/menu_button_selector" >
+
+        <TextView
+            android:id="@+id/menu_text_0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#FF454545"
+            android:text="@string/emotionDIY_title" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/menu_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/menu_button_selector" >
+
+        <TextView
+            android:id="@+id/menu_text_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#FF454545"
+            android:text="@string/emotion_manage_title" />
+
+    </RelativeLayout>    
+
+    <RelativeLayout
+        android:id="@+id/menu_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/menu_button_selector" >
+
+        <TextView
+            android:id="@+id/menu_text_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#FF454545"
+            android:text="@string/about_title" />
+
+    </RelativeLayout>
+</LinearLayout>

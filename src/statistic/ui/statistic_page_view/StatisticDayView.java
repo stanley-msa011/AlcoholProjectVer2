@@ -263,8 +263,11 @@ public class StatisticDayView extends StatisticPageView {
 			
 			if (am_pm == Calendar.AM)
 				ampm= " A.M";
-			else
+			else{
 				ampm = "P.M";
+				if (hour == 0)
+					hour = 12;
+			}
 			String time_str = hour+":"+min_str+ampm;
 			
 			Spannable s = new SpannableString(month_str+m_text+day_str+d_text+"\n"+time_str);
@@ -323,7 +326,7 @@ public class StatisticDayView extends StatisticPageView {
 				circleValues[i].setText("");
 				circleImages[i].setImageDrawable(circleDrawables[0]);
 				if (TimeBlock.isEmpty(i, cur_hour))
-					circleImages[i].setAlpha(0.5F);
+					circleImages[i].setAlpha(0.4F);
 			}
 			else{
 				String value =format.format(historys[i].brac);

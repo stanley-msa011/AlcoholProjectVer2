@@ -121,7 +121,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
     }
 	@Override
 	protected void onCancelled(){
-		FragmentTabs.enableTab(true);
+		FragmentTabs.enableTabAndClick(true);
 		if (cur!=null && !cur.isRecycled()){
 			cur.recycle();
 			cur = null;

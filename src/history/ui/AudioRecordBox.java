@@ -16,6 +16,7 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.CustomToast;
+import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
@@ -37,12 +38,10 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class AudioRecordBox {
 
@@ -50,7 +49,7 @@ public class AudioRecordBox {
 	private Context context;
 	private LayoutInflater inflater;
 	private RelativeLayout boxLayout ,contentLayout;
-	private FrameLayout backgroundLayout;
+	private View backgroundLayout;
 	private TextView help;
 	private ImageView closeButton,recButton,playButton;
 	
@@ -86,7 +85,6 @@ public class AudioRecordBox {
 	
 	private String record_str,second_str;
 	
-	private Toast toast;
 	private ChangeStateHandler changeStateHandler;
 	
 	private Spannable helpSpannable;
@@ -96,7 +94,7 @@ public class AudioRecordBox {
 		this.context = historyFragment.getActivity();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
-		backgroundLayout = new FrameLayout(context);
+		backgroundLayout = new View(context);
 		backgroundLayout.setBackgroundColor(0x99000000);
 		screen = FragmentTabs.getSize();
 		mediaRecorder = null;
@@ -127,6 +125,7 @@ public class AudioRecordBox {
 	private void setting(){
 		
 		backgroundLayout.setVisibility(View.INVISIBLE);
+		backgroundLayout.setKeepScreenOn(false);
 		
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
@@ -205,6 +204,7 @@ public class AudioRecordBox {
 		public void onClick(View v) {
 			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL);
 			backgroundLayout.setVisibility(View.INVISIBLE);
+			backgroundLayout.setKeepScreenOn(false);
 			boxLayout.setVisibility(View.INVISIBLE);
 			historyFragment.updateHasRecorder(curIdx);
 			historyFragment.enablePage(true);
@@ -228,6 +228,7 @@ public class AudioRecordBox {
 		helpSpannable.setSpan(new CustomTypefaceSpan("c1",wordTypefaceBold,0xFF8a8b8b), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		setButtonState(STATE_INIT);
 		backgroundLayout.setVisibility(View.VISIBLE);
+		backgroundLayout.setKeepScreenOn(true);
 		boxLayout.setVisibility(View.VISIBLE);
 	}
 	
@@ -270,8 +271,7 @@ public class AudioRecordBox {
 						mediaRecorder.release();
 						mediaRecorder = null;
 						boolean result = db.insertAudio(curDV);
-						if (toast != null)
-							toast.cancel();
+						
 						if (result)
 							CustomToast.generateToast(context, R.string.audio_box_toast_timeup, 1, screen);
 						else
@@ -298,8 +298,6 @@ public class AudioRecordBox {
 					mediaRecorder.release();
 					mediaRecorder = null;
 					boolean result = db.insertAudio(curDV);
-					if (toast != null)
-						toast.cancel();
 					if (result)
 						CustomToast.generateToast(context, R.string.audio_box_toast_record_end, 1, screen);
 					else
@@ -336,6 +334,7 @@ public class AudioRecordBox {
 										mediaPlayer.release();
 										mediaPlayer = null;
 										setButtonState(STATE_INIT);
+										CustomToastSmall.generateToast(context, R.string.audio_box_toast_play_end);
 									} catch (IllegalStateException e) {
 									}
 								}
@@ -429,10 +428,7 @@ public class AudioRecordBox {
 					mediaPlayer.stop();
 					mediaPlayer.release();
 					mediaPlayer = null;
-					if (toast !=null)
-						toast.cancel();
-					toast = 	Toast.makeText(context, R.string.audio_box_toast_play_end, Toast.LENGTH_SHORT);
-					toast.show();
+					CustomToastSmall.generateToast(context, R.string.audio_box_toast_play_end);
 				} catch (IllegalStateException e) {
 				}
 			}

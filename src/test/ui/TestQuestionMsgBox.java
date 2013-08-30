@@ -5,6 +5,7 @@ import debug.clicklog.ClickLoggerLog;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.TestFragment;
+import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -152,7 +152,8 @@ public class TestQuestionMsgBox {
 		desireSeekBg = (ImageView) boxLayout.findViewById(R.id.msg_desire_bar_bg);
 		
 		gpsSwitch = (Switch) boxLayout.findViewById(R.id.msg_gps_switch);
-		gpsSwitch.setHeight(screen.x * 40/480);
+		gpsSwitch.setHeight(screen.x * 80/480);
+		gpsSwitch.setSwitchMinWidth(screen.x*52/480);
 		gpsSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 40/480 );
 		
 		emotionShow = (ImageView) boxLayout.findViewById(R.id.msg_emotion_show);
@@ -323,9 +324,9 @@ public class TestQuestionMsgBox {
 		LinearLayout.LayoutParams gParam = (LinearLayout.LayoutParams) gpsSwitch.getLayoutParams();
 		gParam.height = screen.x * 80/480;
 		gParam = (LinearLayout.LayoutParams) gpsNo.getLayoutParams();
-		gParam.height = screen.x * 80/480;
+		gParam.height = screen.x * 72/480;
 		gParam = (LinearLayout.LayoutParams) gpsYes.getLayoutParams();
-		gParam.height = screen.x * 80/480;
+		gParam.height = screen.x * 72/480;
 		
 		RelativeLayout.LayoutParams divParam = (LayoutParams) divider.getLayoutParams();
 		divParam.width = screen.x * 25/480;
@@ -397,7 +398,7 @@ public class TestQuestionMsgBox {
 		@Override
 		public void onClick(View v) {
 			if (!done){
-				Toast.makeText(mainLayout.getContext(),R.string.msg_box_toast_send, Toast.LENGTH_SHORT).show();
+				CustomToastSmall.generateToast(mainLayout.getContext(),R.string.msg_box_toast_send);
 				enableSend(true,true);
 				return;
 			}
@@ -421,7 +422,7 @@ public class TestQuestionMsgBox {
 		@Override
 		public void onClick(View v) {
 			if (!done){
-				Toast.makeText(mainLayout.getContext(),R.string.msg_box_toast_cancel, Toast.LENGTH_LONG).show();
+				CustomToastSmall.generateToast(mainLayout.getContext(),R.string.msg_box_toast_cancel);
 				enableSend(true);
 				return;
 			}

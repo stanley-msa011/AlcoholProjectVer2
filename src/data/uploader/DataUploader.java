@@ -9,6 +9,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.BasicResponseHandler;
 
 import data.database.HistoryDB;
@@ -58,7 +59,11 @@ public class DataUploader extends AsyncTask<Void, Void,Boolean> {
 		} catch (Exception e) {
 			Log.d("DATA UPLOADER","EXCEPTION:"+e.toString());
 		} finally{
-			httpClient.getConnectionManager().shutdown();
+			if ( httpClient!=null){
+			ClientConnectionManager ccm= httpClient.getConnectionManager();
+				if (ccm!=null)
+					ccm.shutdown();
+			}
 		}
 		return result;
 	}
@@ -80,7 +85,8 @@ public class DataUploader extends AsyncTask<Void, Void,Boolean> {
 		public void run() {
 			try {
 				Thread.sleep(16000);
-				mTask.cancel(true);
+				if (mTask!=null)
+					mTask.cancel(true);
 			} catch (InterruptedException e) {}
 		}
 	}

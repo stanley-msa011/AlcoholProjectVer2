@@ -355,6 +355,7 @@ public class PreSettingActivity extends Activity {
 				editor.putInt("connect_s2", connectS2);
 				editor.putBoolean("upload_audio", uploadAudioCheckBox.isChecked());
 				editor.putBoolean("show_saving", showSavingBox.isChecked());
+				//editor.putBoolean("first_setting", true);
 				editor.commit();
 				activity.finish();
 			}

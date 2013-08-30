@@ -29,7 +29,9 @@ public class SynchronizedLock implements  java.util.concurrent.locks.Lock {
 
 	@Override
 	public boolean tryLock() {
-		return lock_integer == 0;
+		synchronized(lock_integer ){
+			return lock_integer == 0;
+		}
 	}
 
 	@Override

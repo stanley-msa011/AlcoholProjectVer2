@@ -3,7 +3,7 @@ package ubicomp.drunk_detection.fragments;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
-import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.statistic_page_view.AnalysisCounterView;
@@ -210,7 +210,7 @@ public class StatisticFragment extends Fragment {
 	@SuppressLint("HandlerLeak")
 	private class LoadingHandler extends Handler{
 		public void handleMessage(Message msg){
-			FragmentTabs.enableTab(false);
+			FragmentTabs.enableTabAndClick(false);
         	statisticView.setAdapter(statisticViewAdapter);
         	statisticView.setOnPageChangeListener(new StatisticOnPageChangeListener());
         	statisticView.setSelected(true);
@@ -299,8 +299,8 @@ public class StatisticFragment extends Fragment {
 			
 			setQuestionAnimation();
 			
-			FragmentTabs.enableTab(true);
-			LoadingBox.dismiss();
+			FragmentTabs.enableTabAndClick(true);
+			LoadingDialogControl.dismiss();
 		}
 	}
 	
@@ -370,7 +370,7 @@ public class StatisticFragment extends Fragment {
 		statisticView.setEnabled(enable);
 		analysisView.setEnabled(enable);
 		questionButton.setEnabled(enable);
-		FragmentTabs.enableTab(enable);
+		FragmentTabs.enableTabAndClick(enable);
 	}
 	
 	public void showEndOfQuestionnaire(boolean addAcc){

@@ -11,7 +11,8 @@
         	android:title="@string/emotion_manage_title"
         	android:showAsAction="ifRoom"
         	/>
-    </group><item android:id="@+id/menu_about" android:title="@string/about_title" android:showAsAction="always" android:menuCategory="system"/>
+    </group>
+    <item android:id="@+id/menu_about" android:title="@string/about_title" android:showAsAction="always" android:menuCategory="system"/>
 	
 	
 </menu>

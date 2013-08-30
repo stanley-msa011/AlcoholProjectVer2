@@ -2,6 +2,7 @@ package ubicomp.drunk_detection.activities;
 
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
+import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
@@ -31,7 +32,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class StorytellingSharingActivity extends Activity {
 
@@ -49,8 +49,6 @@ public class StorytellingSharingActivity extends Activity {
 	private ItemOnTouchListener onTouchListener;
 	
 	private EditText who_texts, time_texts;
-	
-	private Toast endToast;
 	
 	private QuestionDB db;
 	private static final int TOTAL_BLOCK = 15;	
@@ -268,21 +266,16 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 			String time_str = time_texts.getText().toString();
 
 			
-			if (endToast!=null)
-				endToast.cancel();
 			if (who.length() == 0 && time_str.length() == 0){
-				endToast = Toast.makeText(getBaseContext(),R.string.storytelling_check_toast3, Toast.LENGTH_SHORT);
-				endToast.show();
+				CustomToastSmall.generateToast(getBaseContext(),R.string.storytelling_check_toast3);
 				state = 0;
 				return;
 			}else if (who.length() == 0){
-				endToast = Toast.makeText(getBaseContext(),R.string.storytelling_check_toast1, Toast.LENGTH_SHORT);
-				endToast.show();
+				CustomToastSmall.generateToast(getBaseContext(),R.string.storytelling_check_toast1);
 				state = 0;
 				return;
 			}else if (time_str.length() == 0){
-				endToast = Toast.makeText(getBaseContext(),R.string.storytelling_check_toast2, Toast.LENGTH_SHORT);
-				endToast.show();
+				CustomToastSmall.generateToast(getBaseContext(),R.string.storytelling_check_toast2);
 				state = 0;
 				return;
 			}
@@ -328,10 +321,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		if (keyCode == KeyEvent.KEYCODE_BACK){
 			ClickLoggerLog.Log(getBaseContext(), ClickLogId.STORYTELLING_SHARE_RETURN_BUTTON);
 			if (state == 0){
-				if (endToast!=null)
-					endToast.cancel();
-				endToast = Toast.makeText(this,R.string.storytelling_leave_toast, Toast.LENGTH_SHORT);
-				endToast.show();
+				CustomToastSmall.generateToast(this,R.string.storytelling_leave_toast);
 				--state;
 			}else if (state == -1)
 				return super.onKeyDown(keyCode, event);

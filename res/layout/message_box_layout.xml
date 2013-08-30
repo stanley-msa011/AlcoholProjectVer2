@@ -3,13 +3,15 @@
     android:id="@+id/msg_box_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/msg_bg" >
+    android:background="@drawable/msg_bg" 
+    android:splitMotionEvents="false">
     
     <LinearLayout 
         android:id="@+id/msg_question_layout"
         android:layout_width="wrap_content"
     	android:layout_height="wrap_content" 
     	android:layout_centerHorizontal="true"
+    	android:splitMotionEvents="false"
     	android:orientation="vertical">
     	
         <TextView
@@ -24,6 +26,7 @@
     	    android:layout_width= "match_parent"
     	    android:layout_height="wrap_content"
     	    android:orientation="horizontal"
+    	    android:splitMotionEvents="false"
     	    >
 
     	    <TextView
@@ -39,6 +42,7 @@
     	        android:layout_width="wrap_content"
     	        android:layout_height="wrap_content"
     	        android:layout_below="@+id/msg_emotion_text"
+    	        android:splitMotionEvents="false"
     	        >
 
     	        <ImageView
@@ -116,6 +120,7 @@
     	    	android:layout_height="wrap_content"
     	    	android:layout_alignParentRight="true"
     	    	android:orientation="vertical"
+    	    	android:splitMotionEvents="false"
     	        >
 
     	        <ImageView

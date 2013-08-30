@@ -46,19 +46,18 @@ public class Bluetooth {
 	protected float absolute_min;
 	protected float now_pressure;
 	protected boolean isPeak = false;
-	protected final static float PRESSURE_DIFF_MIN_RANGE =400.f;
-	protected final static float PRESSURE_DIFF_MIN =700.f;
-	protected final static float MINUS_PRESSURE_DIFF_MIN = -100.f;
+	protected final static float PRESSURE_DIFF_MIN_RANGE =150.f;
+	protected final static float PRESSURE_DIFF_MIN =150.f;
 	protected final static float MAX_PRESSURE = Float.MAX_VALUE;
 	protected final static long IMAGE_MILLIS_0 = 500;
 	protected final static long IMAGE_MILLIS_1 = 2500;
-	protected final static long IMAGE_MILLIS_2 = 4950;
+	protected final static long IMAGE_MILLIS_2 = 4900;
 	protected final static long MAX_DURATION_MILLIS = 5000;
 	
-	protected final static long MILLIS_1 = 600;
-	protected final static long MILLIS_2 = 1700;
+	protected final static long MILLIS_1 = 500;
+	protected final static long MILLIS_2 = 1650;
 	protected final static long MILLIS_3 = 2800;
-	protected final static long MILLIS_4 = 3900;
+	protected final static long MILLIS_4 = 3850;
 	protected final static long MILLIS_5 = 5000;
 	
 	protected final static long START_MILLIS = 2000;
@@ -367,7 +366,7 @@ public class Bluetooth {
 				now_pressure = Float.valueOf(msg.substring(1));
 				
 				long time = System.currentTimeMillis();
-				if(!start && now_pressure < absolute_min){
+				if(!start&&now_pressure < absolute_min){
 					absolute_min = now_pressure;
 					Log.d("BT","absolute min setting: "+absolute_min);
 				}

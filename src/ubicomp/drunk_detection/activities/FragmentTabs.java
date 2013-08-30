@@ -5,7 +5,8 @@ import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.fragments.TestFragment;
 import ubicomp.drunk_detection.ui.CustomTab;
-import ubicomp.drunk_detection.ui.LoadingBox;
+import ubicomp.drunk_detection.ui.LoadingDialogControl;
+import ubicomp.drunk_detection.ui.CustomMenu;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,9 +22,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -50,7 +54,7 @@ public class FragmentTabs extends FragmentActivity {
 	static private CustomTab[] customTabs;
 	
 	private static final String[] tabName ={"Test","Record","History"}; 
-	private static final int[] iconId ={R.drawable.tabs_test,R.drawable.tabs_statistic,R.drawable.tabs_history}; 
+	private static final int[] iconId ={R.drawable.tabs_test_selector,R.drawable.tabs_statistic_selector,R.drawable.tabs_history_selector}; 
 	private static final int[] iconOnId ={R.drawable.tabs_test_on,R.drawable.tabs_statistic_on,R.drawable.tabs_history_on}; 
 	
 	static private Fragment[] fragments;
@@ -64,6 +68,8 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private Thread t;
 	
+	private CustomMenu menu;
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -71,10 +77,8 @@ public class FragmentTabs extends FragmentActivity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.tab_layout);
-
 		context = this;
 		fragmentTabs = this;
-		
 		Typefaces.initAll(this);
 		
 		loading_page = (ImageView) this.findViewById(R.id.loading_page);
@@ -140,9 +144,10 @@ public class FragmentTabs extends FragmentActivity {
 		widgetParam.width = tab_px.x;
 		widgetParam.height = tab_px.y;
 		
+		 enableTabAndClick(false);
 	}
 	
-	
+	@Override
 	protected void onStart(){
 		Reuploader.reuploader(this);
 		ClickLogUploader.upload(this);
@@ -152,13 +157,14 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	protected void onResume(){
 		super.onResume();
-		enableTab(true);
+		//enableTab(true);
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
+		//boolean first_setting = sp.getBoolean("first_setting", false);
 		if (uid.length() == 0){
 			loading_page.setVisibility(View.INVISIBLE);
-			Intent newIntent = new Intent(this, PreSettingActivity.class);
+			Intent newIntent = new Intent(this, DeveloperActivity.class);
 			this.startActivity(newIntent);
 			return;
 		}
@@ -171,6 +177,7 @@ public class FragmentTabs extends FragmentActivity {
 	
 	
 	protected void onPause(){
+		closeOptionsMenu();
 		Reuploader.cancel();
 		super.onPause();
 	}
@@ -184,11 +191,11 @@ public class FragmentTabs extends FragmentActivity {
 		}
 	}
 	
-	static public int getScreenWidth(){
+	public static int getScreenWidth(){
 		return screen_px.x;
 	}
 	
-	static public Point getSize(){
+	public static Point getSize(){
 		if (screen_px == null)
 			return null;
 		Point size = new Point();
@@ -199,17 +206,17 @@ public class FragmentTabs extends FragmentActivity {
 		return size;
 	}
 	
-	static public Point getTabSize(){
+	public static Point getTabSize(){
 		if (tab_px != null)
 			return tab_px;
 		return null;
 	}
 	
-	static public boolean isWideScreen(){
+	public static boolean isWideScreen(){
 		return isWideScreen;
 	}
 	
-	static public void changeTab(int pos){
+	public static void changeTab(int pos){
 		TabWidget tabWidget = tabHost.getTabWidget();
 		int count  = tabWidget.getChildCount();
 		if (pos>=0 && pos < count){
@@ -262,7 +269,7 @@ public class FragmentTabs extends FragmentActivity {
 			if (lastTabId.equals(tabId))
 				return;
 			
-			LoadingBox.show(fragmentTabs);
+			LoadingDialogControl.show(fragmentTabs);
 			
 			long tab = -1;
 			if (tabId.equals(tabName[0]))
@@ -323,7 +330,13 @@ public class FragmentTabs extends FragmentActivity {
 		}
 		
 	}
-	static public void enableTab(boolean enable){
+	
+	public static void enableTabAndClick(boolean enable){
+		enableTab(enable);
+		setClickable(enable);
+	}
+	
+	private static void enableTab(boolean enable){
 		if (tabHost==null || tabHost.getTabWidget()==null)
 			return;
 		
@@ -333,7 +346,15 @@ public class FragmentTabs extends FragmentActivity {
 		}
 	}
 	
-	static public Context getContext(){
+	private static void setClickable(boolean enable){
+		clickable = enable;
+	}
+	
+	public static boolean getClickable(){
+		return clickable;
+	}
+	
+	public static Context getContext(){
 		if (context !=null)
 			return context;
 		return null;
@@ -354,12 +375,78 @@ public class FragmentTabs extends FragmentActivity {
 	@SuppressLint("HandlerLeak")
 	private class LoadingPageHandler extends Handler{
 		public void handleMessage(Message msg){
-			if(msg.what == 0)
+			if(msg.what == 0){
 				loading_page.setVisibility(View.INVISIBLE);
+				enableTabAndClick(true);
+			}
 			else
 				loading_page.setVisibility(View.VISIBLE);
 		}
 	}
 	
+	
+	private static boolean clickable = false;
+	
+	private boolean doubleClickState = false;
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if (!clickable)
+			return super.onTouchEvent(event);
+		if (event.getAction() ==MotionEvent.ACTION_DOWN){
+			if (!doubleClickState){
+				doubleClickState = true;
+				new Thread(new BackgroundDoubleOnTouchRunnable()).start();
+			}
+			else{
+				openOptionsMenu();
+				doubleClickState = false;
+			}
+			return false;
+		}
+		return super.onTouchEvent(event);
+	}
+	
+	private class BackgroundDoubleOnTouchRunnable implements Runnable{
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e) {
+			}finally{
+				doubleClickState = false;
+			}
+		}
+	}
+	
+	
+	@Override
+	public void openOptionsMenu(){
+		if (menu == null)
+			menu = new CustomMenu(this,this.getLayoutInflater());
+		if (!menu.isShowing() && clickable)
+			menu.showAtLocation(this.getWindow().getDecorView(), Gravity.BOTTOM,0, 0);
+	}
+	
+	@Override
+	public void closeOptionsMenu(){
+		if (menu!=null && menu.isShowing())
+			menu.dismiss();
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event){
+		if (keyCode == KeyEvent.KEYCODE_MENU){
+			if (menu!=null && menu.isShowing())
+				closeOptionsMenu();
+			else
+				openOptionsMenu();
+			return true;
+		}else if (keyCode == KeyEvent.KEYCODE_BACK ){
+			closeOptionsMenu();
+			return true;
+		}
+		return super.onKeyUp(keyCode, event);
+	}
 	
 }

@@ -3,7 +3,9 @@
     android:id="@+id/statistic_fragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/statistic_background_all" >
+    android:background="@drawable/statistic_background_all" 
+    android:splitMotionEvents="false"
+    >
 
 <LinearLayout 
     android:layout_width="match_parent"

@@ -77,6 +77,7 @@ public class QuestionMsgBox {
 		
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(getContext());
 		shadow.setVisibility(View.INVISIBLE);
+		shadow.setKeepScreenOn(false);
 		
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.question_box_layout,null);
 		boxLayout.setVisibility(View.INVISIBLE);
@@ -180,6 +181,7 @@ public class QuestionMsgBox {
 	public void openBox(){
 		statisticFragment.enablePage(false);
 		shadow.setVisibility(View.VISIBLE);
+		shadow.setKeepScreenOn(true);
 		boxLayout.setVisibility(View.VISIBLE);
 		return;
 }
@@ -191,6 +193,7 @@ public class QuestionMsgBox {
     	editor.commit();
     	statisticFragment.enablePage(true);
     	shadow.setVisibility(View.INVISIBLE);
+    	shadow.setKeepScreenOn(false);
 		boxLayout.setVisibility(View.INVISIBLE);
 		statisticFragment.setQuestionAnimation();
 		return;
@@ -199,6 +202,7 @@ public class QuestionMsgBox {
 	public void closeBoxNull(){
     	statisticFragment.enablePage(true);
     	shadow.setVisibility(View.INVISIBLE);
+    	shadow.setKeepScreenOn(false);
 		boxLayout.setVisibility(View.INVISIBLE);
 		return;
 	}
@@ -287,6 +291,7 @@ public class QuestionMsgBox {
 			contentSequence.clear();
 			statisticFragment.enablePage(true);
 			shadow.setVisibility(View.INVISIBLE);
+			shadow.setKeepScreenOn(false);
 			boxLayout.setVisibility(View.INVISIBLE);
 		}
 		

@@ -3,6 +3,7 @@
     android:id="@+id/question_box_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:splitMotionEvents="false"
     >
 
    		<LinearLayout 
@@ -10,11 +11,13 @@
         		android:layout_width="wrap_content"
     			android:layout_height="wrap_content" 
     			android:orientation="vertical"
+    			android:splitMotionEvents="false"
    		    >
 
    		    <RelativeLayout 
    		        android:layout_width="match_parent"
    		        android:layout_height="wrap_content"
+   		        android:splitMotionEvents="false"
    		        >
    		    	<ImageView
    		        	android:id="@+id/question_top"
@@ -35,11 +38,13 @@
         		    android:layout_width="match_parent"
         		    android:layout_height="wrap_content"
         		    android:background="@drawable/question_bg_content"
-        		    android:orientation="vertical" />
+        		    android:orientation="vertical" 
+        		    android:splitMotionEvents="false"/>
 
         		<RelativeLayout 
         		    android:layout_width="match_parent"
    		        	android:layout_height="wrap_content"
+   		        	android:splitMotionEvents="false"
         		    >
         		<ImageView
 	        	    android:id="@+id/question_bottom"

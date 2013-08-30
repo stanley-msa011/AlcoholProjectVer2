@@ -16,6 +16,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -103,6 +104,8 @@ public class Reuploader {
 			BracDetectionState state[] = db.getAllNotUploadedDetection();
 			if (state == null)
 				return null;
+			
+			Log.d("REUPLOADER","state.length "+state.length);
 			
 			for (int i=0;i<state.length;++i){
 				String _ts =String.valueOf(state[i].timestamp/1000L);
@@ -236,7 +239,11 @@ public class Reuploader {
 			} catch (ClientProtocolException e) {
 			} catch (IOException e) {
 			} finally{
-				httpClient.getConnectionManager().shutdown();
+				if ( httpClient!=null){
+					ClientConnectionManager ccm= httpClient.getConnectionManager();
+						if (ccm!=null)
+							ccm.shutdown();
+					}
 			}
 			return result;
 		}

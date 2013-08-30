@@ -2,12 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:splitMotionEvents="false"
 	>    
     <RelativeLayout 
         android:id="@+id/rec_box_layout"
         android:layout_width="wrap_content"
     	android:layout_height="wrap_content"
-    	android:background="@drawable/record_bg" 
+    	android:background="@drawable/record_bg"
+    	android:splitMotionEvents="false" 
         >
     
     <TextView 

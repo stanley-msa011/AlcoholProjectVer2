@@ -4,6 +4,7 @@
     android:layout_height="match_parent" 
     android:id="@+id/test_fragment_main_layout"
     android:background="#FF000000"
+    android:splitMotionEvents="false"
     >
     
     <FrameLayout
@@ -34,8 +35,8 @@
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
     	    android:scaleType="fitXY"
-    	    android:visibility="invisible"
-    	    android:src="@drawable/test_start_button" />
+    	    android:src="@drawable/start_button_selector"
+    	    android:visibility="invisible" />
     
     	<ImageView
     	    android:id="@+id/test_start_stroke"
