@@ -443,8 +443,15 @@ public class FragmentTabs extends FragmentActivity {
 				openOptionsMenu();
 			return true;
 		}else if (keyCode == KeyEvent.KEYCODE_BACK ){
-			closeOptionsMenu();
-			return true;
+			if (menu != null && menu.isShowing()){
+				closeOptionsMenu();
+				return true;
+			}else{
+				if (clickable)
+					return super.onKeyUp(keyCode, event);
+				else
+					return true;
+			}
 		}
 		return super.onKeyUp(keyCode, event);
 	}

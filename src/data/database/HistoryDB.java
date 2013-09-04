@@ -601,7 +601,6 @@ public class HistoryDB {
     public void cleanAcc(long timestamp){
     	db = dbHelper.getWritableDatabase();
     	String sql;
-    	Log.d("EMOTION_UPLOADER","insert");
     	sql = "INSERT INTO SelfHelpCounterUpdate (ts) VALUES ("+timestamp+")";
     	db.execSQL(sql);
     	sql = "SELECT morning,noon,night,morning_pass,noon_pass,night_pass FROM AccDetection ORDER BY id DESC LIMIT 1";

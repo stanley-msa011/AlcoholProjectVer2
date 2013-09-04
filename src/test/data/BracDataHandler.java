@@ -31,6 +31,7 @@ import ubicomp.drunk_detection.fragments.TestFragment;
 
 import data.calculate.WeekNum;
 import data.database.HistoryDB;
+import data.database.StartDateCheck;
 import data.info.AccumulatedHistoryState;
 import data.info.DateBracDetectionState;
 import data.uploader.DataUploader;
@@ -65,7 +66,7 @@ public class BracDataHandler {
 	public static final int Nothing = 0; 
 	public static final int ERROR = -1;
 	public static final int SUCCESS = 1;
-	public static final double THRESHOLD = 0.05;
+	public static final double THRESHOLD = 0.03;
 	public static final double THRESHOLD2 = 0.25;
 	
 	
@@ -113,6 +114,7 @@ public class BracDataHandler {
     
         boolean isAdd = false;
         
+        if (StartDateCheck.check(context))
     	if (detection.year != prevDetection.year || detection.month != prevDetection.month || detection.day != prevDetection.day || detection.timeblock != prevDetection.timeblock){
     		if (avg_result >=0 && avg_result < THRESHOLD){
     				a_history.changeAcc(true, week, detection.timeblock);

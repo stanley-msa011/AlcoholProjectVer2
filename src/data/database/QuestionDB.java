@@ -9,9 +9,11 @@ import data.info.QuestionnaireData;
 import data.info.StorytellingUsage;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class QuestionDB {
@@ -19,8 +21,10 @@ public class QuestionDB {
 	
 	private SQLiteOpenHelper dbHelper = null;
     private SQLiteDatabase db = null;
+    private Context context;
     
 	public QuestionDB(Context context){
+		this.context = context;
 		dbHelper = new DBHelper(context);
 	}
 	
@@ -33,7 +37,6 @@ public class QuestionDB {
 		int day = cal.get(Calendar.DAY_OF_MONTH);
 		int tb = TimeBlock.getTimeBlock(cal.get(Calendar.HOUR_OF_DAY));
 		
-		
 		String sql;
 		Cursor cursor;
 		db = dbHelper.getWritableDatabase();
@@ -43,14 +46,21 @@ public class QuestionDB {
 		int[] acc = new int[12];
 		int[] used = new int[12];
 		long _ts = 0L;
-		if (cursor.getCount() > 0){
-			cursor.moveToFirst();
-			_ts = cursor.getLong(1);
+		if (cursor.moveToFirst()){
+			//_ts = cursor.getLong(1);
 			for (int i=0;i<12;++i){
 				acc[i] = cursor.getInt(i+5);
 				used[i] = cursor.getInt(i+17);
 			}
 		}
+		cursor.close();
+		
+		sql = "SELECT * FROM Questionnaire WHERE type >= 0 ORDER BY id DESC LIMIT 1";
+		cursor  = db.rawQuery(sql, null);
+		if (cursor.moveToFirst())
+			_ts = cursor.getLong(1);
+		cursor.close();
+		
 		Calendar cal2 = Calendar.getInstance();
 		cal2.setTimeInMillis(_ts);
 		int _year = cal2.get(Calendar.YEAR);
@@ -59,7 +69,7 @@ public class QuestionDB {
 		int _tb = TimeBlock.getTimeBlock(cal2.get(Calendar.HOUR_OF_DAY));
 		
 		
-		
+		if (StartDateCheck.check(context))
 		if (year!=_year || month != _month || day != _day || tb != _tb)
 			if (type >=0 && type < 4){
 				++acc[type*3 + tb];
@@ -79,7 +89,6 @@ public class QuestionDB {
 				")";
 		db.execSQL(sql);
 		
-		cursor.close();
 		db.close();
 		return addAcc;
 	}
@@ -178,15 +187,21 @@ public class QuestionDB {
 		int[] acc = new int[3];
 		int[] used = new int[3];
 		long _ts = 0L;
-		if (cursor.getCount() > 0){
-			cursor.moveToFirst();
-			_ts = cursor.getLong(1);
+		if (cursor.moveToFirst()){
+			//_ts = cursor.getLong(1);
 			for (int i=0;i<3;++i){
 				acc[i] = cursor.getInt(i+5);
 				used[i] = cursor.getInt(i+8);
 			}
 		}
 		cursor.close();
+		
+		sql ="SELECT  * FROM Emotion WHERE selection <> -1 ORDER BY id DESC LIMIT 1";
+		cursor  = db.rawQuery(sql, null);
+		if (cursor.moveToFirst())
+			_ts = cursor.getLong(1);
+		cursor.close();
+		
 		Calendar cal2 = Calendar.getInstance();
 		cal2.setTimeInMillis(_ts);
 		int _year = cal2.get(Calendar.YEAR);
@@ -194,6 +209,7 @@ public class QuestionDB {
 		int _day = cal2.get(Calendar.DAY_OF_MONTH);
 		int _tb = TimeBlock.getTimeBlock(cal2.get(Calendar.HOUR_OF_DAY));
 		
+		if (StartDateCheck.check(context))
 		if (year!=_year || month != _month || day != _day || tb != _tb){
 			addAcc = true;
 			++acc[tb];
@@ -233,15 +249,21 @@ public class QuestionDB {
 		int[] acc = new int[3];
 		int[] used = new int[3];
 		long _ts = 0L;
-		if (cursor.getCount() > 0){
-			cursor.moveToFirst();
-			_ts = cursor.getLong(1);
+		if (cursor.moveToFirst()){
+			//_ts = cursor.getLong(1);
 			for (int i=0;i<3;++i){
 				acc[i] = cursor.getInt(i+6);
 				used[i] = cursor.getInt(i+9);
 			}
 		}
 		cursor.close();
+		
+		sql ="SELECT  * FROM EmotionManage WHERE emotion <> -1 AND type <> -1 ORDER BY id DESC LIMIT 1";
+		cursor  = db.rawQuery(sql, null);
+		if (cursor.moveToFirst())
+			_ts = cursor.getLong(1);
+		cursor.close();
+		
 		Calendar cal2 = Calendar.getInstance();
 		cal2.setTimeInMillis(_ts);
 		int _year = cal2.get(Calendar.YEAR);
@@ -249,6 +271,7 @@ public class QuestionDB {
 		int _day = cal2.get(Calendar.DAY_OF_MONTH);
 		int _tb = TimeBlock.getTimeBlock(cal2.get(Calendar.HOUR_OF_DAY));
 		
+		if (StartDateCheck.check(context))
 		if (year!=_year || month != _month || day != _day || tb != _tb){
 			++acc[tb];
 			addAcc = true;
@@ -627,6 +650,8 @@ public class QuestionDB {
     }
     
     private static final int DATE_USAGE_LIMIT = 3; 
+    private static final long FIVE_MINS = 5*60*1000L;
+    
     
     public boolean insertStorytellingUsage(String name, int minutes){
     	Log.d("STORYTELLING","INSERT");
@@ -667,12 +692,18 @@ public class QuestionDB {
 		else
 			usage = 1;
 		
-		if (usage <= DATE_USAGE_LIMIT ){
-			Log.d("STORYTELLING","ADD ACC");
-			addAcc = true;
-			++acc;
+		if (StartDateCheck.check(context)){
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			long share_time = sp.getLong("share_storytelling_time", 0);
+			long cur_time = System.currentTimeMillis();
+			if (cur_time - share_time > FIVE_MINS){
+				if (usage <= DATE_USAGE_LIMIT ){
+					Log.d("STORYTELLING","ADD ACC");
+					addAcc = true;
+					++acc;
+				}
+			}
 		}
-		
 		sql = "INSERT INTO StorytellingUsage (ts, daily_usage, acc, used, name, minutes) VALUES (" +
 				ts+","+usage+","+acc+","+used+","+"'"+name+"'"+","+minutes+
 				" )";

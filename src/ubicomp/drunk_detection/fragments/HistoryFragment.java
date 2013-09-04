@@ -7,6 +7,7 @@ import java.util.Calendar;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.Typefaces;
@@ -180,15 +181,6 @@ public class HistoryFragment extends Fragment {
 	    	doneStr = getResources().getString(R.string.done);
 	    	QUOTE_STR = getResources().getStringArray(R.array.quote_message);
 	    	
-	    	screen = FragmentTabs.getSize();
-	    	
-	    	bg_x = screen.x;
-	    	page_width = bg_x;
-	    	page_height = screen.y - bg_x * 574/1080;
-	    	from = new PointF(page_width,page_height);
-	    	to = new PointF(page_width/2,-page_height);
-	    	touchPoint = new PointF(from.x,from.y);
-	    	
 	    	format = new DecimalFormat();
 			format.setMaximumIntegerDigits(3);
 			format.setMinimumIntegerDigits(1);
@@ -202,6 +194,20 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	this.historyFragment = this;
     	view = inflater.inflate(R.layout.history_fragment, container,false);
+    	
+    	screen = FragmentTabs.getSize();
+    	if (screen == null){
+    		if (activity!=null)
+    			activity.finish();
+    		else
+    			return view;
+    	}
+    	bg_x = screen.x;
+    	page_width = bg_x;
+    	page_height = screen.y - bg_x * 574/1080;
+    	from = new PointF(page_width,page_height);
+    	to = new PointF(page_width/2,-page_height);
+    	touchPoint = new PointF(from.x,from.y);
     	
     	pageLayout = (RelativeLayout) view.findViewById(R.id.history_book_layout);
     	chartLayout = (RelativeLayout) view.findViewById(R.id.history_content_layout);
@@ -288,11 +294,11 @@ public class HistoryFragment extends Fragment {
     	if (loadHandler !=null)
     		loadHandler.removeMessages(0);
     	
-    	if (pageAnimationTask!=null){
+    	if (pageAnimationTask!=null && !pageAnimationTask.isCancelled()){
     		pageAnimationTask.cancel(true);
     		pageAnimationTask = null;
     	}
-    	if (pageAnimationTask2!=null){
+    	if (pageAnimationTask2!=null && !pageAnimationTask2.isCancelled()){
     		pageAnimationTask2.cancel(true);
     		pageAnimationTask2 = null;
     	}
@@ -1335,7 +1341,6 @@ public class HistoryFragment extends Fragment {
 		if (idx >=0 && idx < bars.size())
 			hasAudio.set(idx, adb.hasAudio(bars.get(idx).dv));
 	}
-	
 	
 	private class StorytellingOnClickListener implements View.OnClickListener{
 		@Override

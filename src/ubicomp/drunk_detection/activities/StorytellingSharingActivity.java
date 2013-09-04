@@ -9,7 +9,9 @@ import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLoggerLog;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -288,6 +290,12 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 				CustomToast.generateToast(getBaseContext(), R.string.storytelling_end_toast, 1,FragmentTabs.getSize());
 			else
 				CustomToast.generateToast(getBaseContext(), R.string.storytelling_end_toast, 0,FragmentTabs.getSize());
+			
+			long cur_time = System.currentTimeMillis();
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+			SharedPreferences.Editor edit= sp.edit();
+			edit.putLong("share_storytelling_time", cur_time);
+			edit.commit();
 			activity.finish();
 		}
 	}

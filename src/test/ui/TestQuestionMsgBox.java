@@ -391,6 +391,7 @@ public class TestQuestionMsgBox {
 		boxLayout.setVisibility(View.VISIBLE);
 		send.setOnClickListener(endListener);
 		notSend.setOnClickListener(cancelListener);
+		FragmentTabs.enableTabAndClick(false);
 	}
 	
 	private class EndOnClickListener implements View.OnClickListener{
@@ -448,6 +449,7 @@ public class TestQuestionMsgBox {
 	
 	public void closeInitializingBox(){
 			boxLayout.setVisibility(View.INVISIBLE);
+			FragmentTabs.enableTabAndClick(true);
 			return;
 	}
 	

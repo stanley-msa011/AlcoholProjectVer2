@@ -113,8 +113,13 @@ public class BluetoothDebugMode extends Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR: " +e.toString());
 			close();
-			testFragment.showDebug("Close by exception or timeout" );
-			cameraRunHandler.sendEmptyMessage(1);
+			if (e.getMessage()!=null && e.getMessage().equals("TIMEOUT")){
+				testFragment.showDebug("Close by timeout" );
+				cameraRunHandler.sendEmptyMessage(3);
+			}else{
+				testFragment.showDebug("Close by exception" );
+				cameraRunHandler.sendEmptyMessage(2);
+			}
 		}
 	}
 	

@@ -14,10 +14,12 @@ public class CameraRunHandler extends Handler {
 	public void handleMessage(Message msg){
 		if (msg.what == 0)
 			cameraRecorder.takePicture();
-		else if (msg.what == 1)
-			cameraRecorder.CloseFail(false);
-		else if (msg.what == 2)
-			cameraRecorder.CloseFail(true);
+		else if (msg.what == 1)//on connection
+			cameraRecorder.CloseFail(0);
+		else if (msg.what == 2)//No battery
+			cameraRecorder.CloseFail(1);
+		else if (msg.what == 3)//timeout
+			cameraRecorder.CloseFail(2);
 	}
 	
 	public void takePicture(){

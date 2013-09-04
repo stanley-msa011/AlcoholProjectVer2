@@ -150,10 +150,10 @@ public class CameraRecorder {
 		testFragment.updateDoneState(TestFragment._CAMERA);
     }
     
-    public void CloseFail(boolean connect){
+    public void CloseFail(int type){
     	close();
     	circle.setVisibility(View.INVISIBLE);
-    	testFragment.stopByFail(connect);
+    	testFragment.stopByFail(type);
     }
     
     public void drawFace(boolean detected){

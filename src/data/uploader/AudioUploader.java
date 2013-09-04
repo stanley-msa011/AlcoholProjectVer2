@@ -140,7 +140,7 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 			String uid = sp.getString("uid", "");
 			mpEntity.addPart("userData[]", new StringBody(uid));
-			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.ts/1000L)));
+			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.ts)));
 			
 			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.year)));
 			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.month+1)));

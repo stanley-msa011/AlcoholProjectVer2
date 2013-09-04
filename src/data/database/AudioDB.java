@@ -15,8 +15,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class AudioDB {
 	private SQLiteOpenHelper dbHelper = null;
     private SQLiteDatabase db = null;
+    private Context context;
     
     public AudioDB(Context context){
+    	this.context = context;
     	dbHelper = new DBHelper(context);
     }
     
@@ -80,17 +82,24 @@ public class AudioDB {
     	db = dbHelper.getWritableDatabase();
     	String sql;
     	Cursor cursor;
-    	sql = "SELECT * FROM Record ORDER BY ts DESC LIMIT 1";
+    	sql = "SELECT * FROM Record ORDER BY id DESC LIMIT 1";
     	cursor = db.rawQuery(sql,null);
     	int[] acc = new int[3];
     	int[] used = new int[3];
     	long prev_ts = 0;
     	if (cursor.moveToFirst()){
-    		prev_ts = cursor.getLong(cursor.getColumnIndex("ts"));
+    		//prev_ts = cursor.getLong(cursor.getColumnIndex("ts"));
     		for (int i=0;i<3;++i){
     			acc[i] = cursor.getInt(i+7);
     			used[i] = cursor.getInt(i+10);
     		}
+    	}
+    	cursor.close();
+    	
+    	sql = "SELECT * FROM Record WHERE year<>0 ORDER BY id DESC LIMIT 1";
+    	cursor = db.rawQuery(sql,null);
+    	if (cursor.moveToFirst()){
+    		prev_ts = cursor.getLong(cursor.getColumnIndex("ts"));
     	}
     	cursor.close();
     	sql = "SELECT * FROM Record WHERE " +
@@ -115,6 +124,7 @@ public class AudioDB {
     	int cur_day = cur_c.get(Calendar.DAY_OF_MONTH);
     	int cur_tb = TimeBlock.getTimeBlock(cur_c.get(Calendar.HOUR_OF_DAY));
     	
+    	if (StartDateCheck.check(context))
     	if (prev_year != cur_year || prev_month != cur_month || prev_day!=cur_day || prev_tb!= cur_tb){
     		++acc[cur_tb];
     		result = true;

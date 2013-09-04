@@ -78,6 +78,12 @@ public class StatisticFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	view = inflater.inflate(R.layout.statistic_fragment, container,false);
     	screen = FragmentTabs.getSize();
+    	if (screen == null){
+    		if (activity!=null)
+    			activity.finish();
+    		else
+    			return view;
+    	}
 		statistic_px = new Point(screen.x,screen.x*380/480);
     	statisticLayout = (RelativeLayout) view.findViewById(R.id.brac_statistics_layout);
     	analysisLayout  = (LinearLayout)  view.findViewById(R.id.brac_analysis_layout);

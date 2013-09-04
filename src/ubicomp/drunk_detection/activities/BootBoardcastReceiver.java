@@ -33,6 +33,7 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 			SharedPreferences.Editor edit = sp.edit();
 			edit.putLong("latest_regular_check", 0L);
 			edit.putLong("LatestTestTime", 0L);
+			edit.putLong("share_storytelling_time", 0);
 			edit.commit();
 		}
 		

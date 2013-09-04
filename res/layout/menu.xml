@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textColor="#FF454545"
+            android:textColor="#FF989898"
             android:text="@string/emotionDIY_title" />
 
     </RelativeLayout>
@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textColor="#FF454545"
+            android:textColor="#FF989898"
             android:text="@string/emotion_manage_title" />
 
     </RelativeLayout>    
@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textColor="#FF454545"
+            android:textColor="#FF989898"
             android:text="@string/about_title" />
 
     </RelativeLayout>

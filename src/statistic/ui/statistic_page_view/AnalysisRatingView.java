@@ -1,6 +1,7 @@
 package statistic.ui.statistic_page_view;
 
 import data.database.HistoryDB;
+import data.database.StartDateCheck;
 import data.info.RankHistory;
 import statistic.data.UserLevelCollector;
 import ubicomp.drunk_detection.activities.R;
@@ -11,6 +12,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -57,6 +59,13 @@ public class AnalysisRatingView extends StatisticPageView {
 
 	private void setPointer(){
 		
+		if (!StartDateCheck.check(context)){
+			pointer.setVisibility(View.INVISIBLE);
+			pointer2.setVisibility(View.INVISIBLE);
+			return;
+		}
+		pointer.setVisibility(View.VISIBLE);
+		pointer2.setVisibility(View.VISIBLE);
 		int nPeople ,rank;
 		int nPeopleToday, rankToday;
 		

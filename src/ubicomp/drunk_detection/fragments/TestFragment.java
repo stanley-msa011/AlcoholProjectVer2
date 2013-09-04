@@ -153,6 +153,7 @@ public class TestFragment extends Fragment {
 	private String test_guide_end;
 	private String test_guide_not_turn_on;
 	private String test_guide_test_fail;
+	private String test_guide_test_timeout;
 	private String test_guide_connect_fail;
 	
 	private Thread start_thread = null;
@@ -170,10 +171,10 @@ public class TestFragment extends Fragment {
 		digitTypeface = Typefaces.getDigitTypeface(getActivity());
 		digitTypefaceBold = Typefaces.getDigitTypeface(getActivity());
 		wordTypefaceBold  = Typefaces.getWordTypefaceBold(getActivity());
-		screen = FragmentTabs.getSize();
 		test_guide_end = getString(R.string.test_guide_end);
 		test_guide_not_turn_on=getString(R.string.test_guide_not_turn_on);
 		test_guide_test_fail = getString(R.string.test_guide_test_fail);
+		test_guide_test_timeout = getString(R.string.test_guide_test_timeout);
 		test_guide_connect_fail = getString(R.string.test_guide_connect_fail);
 	}
 	
@@ -241,6 +242,13 @@ public class TestFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	view = inflater.inflate(R.layout.test_fragment, container,false);
+    	screen = FragmentTabs.getSize();
+    	if (screen == null){
+    		if (activity!=null)
+    			activity.finish();
+    		else
+    			return view;
+    	}
     	bg = (ImageView) view.findViewById(R.id.test_background);
     	bg.setKeepScreenOn(true);
 		startLayout = (RelativeLayout) view.findViewById(R.id.test_start_layout);
@@ -682,13 +690,15 @@ public class TestFragment extends Fragment {
 			testCircle.setImageDrawable(blowDrawables[time]);
 	}
 	
-	public void stopByFail(boolean connect_fail){
+	public void stopByFail(int fail){
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		if (connect_fail)
+		if (fail==0)
 			data.putString("msg", test_guide_connect_fail);
-		else
+		else if(fail==1)
 			data.putString("msg",test_guide_test_fail);
+		else
+			data.putString("msg",test_guide_test_timeout);
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)

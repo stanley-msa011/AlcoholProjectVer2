@@ -128,6 +128,7 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	}
 	@Override
 	 protected void onPostExecute(Void result) {
+		Log.d("PAGE_ANIMATION","END ANIMATION");
 		historyFragment.resetPage(0);
 		if (end_type == -1)
 			historyFragment.endAnimation();
@@ -136,6 +137,7 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
     }
 	@Override
 	protected void onCancelled(){
+		Log.d("PAGE_ANIMATION","CANCEL ANIMATION");
 		FragmentTabs.enableTabAndClick(true);
 		if (cur!=null && !cur.isRecycled()){
 			cur.recycle();

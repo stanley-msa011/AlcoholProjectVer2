@@ -332,7 +332,6 @@ public class Bluetooth {
 					zero_end_time = System.currentTimeMillis();
 					zero_duration += ( zero_end_time - zero_start_time);
 					zero_start_time = zero_end_time;
-					//Log.i("BT","zero duration "+zero_duration);
 					if (zero_duration > MAX_ZERO_DURATION)
 						throw new Exception("NO BETTARY");
 					Thread.sleep(50);
@@ -342,7 +341,10 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR: " +e.toString());
 			close();
-			cameraRunHandler.sendEmptyMessage(1);
+			if (e.getMessage()!=null && e.getMessage().equals("TIMEOUT"))
+				cameraRunHandler.sendEmptyMessage(3);
+			else
+				cameraRunHandler.sendEmptyMessage(2);
 		}
 	}
 	

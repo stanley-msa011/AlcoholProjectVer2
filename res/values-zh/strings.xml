@@ -60,8 +60,8 @@
     </string-array>
     <string name="wait">請稍待</string>
     <string name="msg_box_title">自我了解</string>
-    <string name="msg_box_help1">你的心情量尺：</string>
-    <string name="msg_box_help2">你的渴癮程度：</string>
+    <string name="msg_box_help1">您的心情量尺：</string>
+    <string name="msg_box_help2">您的渴癮程度：</string>
     <string name="msg_box_help3">是否回報現在位置？</string>
     <string name="yes">是</string>
     <string name="no">否</string>
@@ -79,7 +79,8 @@
     <string name="test_guide_msg_box">請依對話框指示進行操作</string>
     <string name="test_guide_end">\n請點選按鈕以結束</string>
     <string name="test_guide_testing">請將臉對於螢幕中央，\n並開始吹氣</string>
-    <string name="test_guide_test_fail">測試超時或酒測器沒電了</string>
+    <string name="test_guide_test_fail">酒測器沒電了</string>
+     <string name="test_guide_test_timeout">測試超時</string>
     <string name="test_guide_connect_fail">酒測器連接錯誤</string>
     <string name="tutorial_next">點擊進入下一步</string>
     <string-array name="tutorial_step">
@@ -107,8 +108,8 @@
         <item >元</item>
     </string-array>
     <string-array name="analysis_ranking_help">
-        <item >與戒酒朋友相比，你參與表現的排名：</item>
-        <item >與戒酒朋友相比，你今日表現的排名：</item>
+        <item >與戒酒朋友相比，您參與表現的排名：</item>
+        <item >與戒酒朋友相比，您今日表現的排名：</item>
     </string-array>
     <string name="money_sign">$</string>
     <string name="audio_box_toast_timeup">一分鐘到了</string>
@@ -123,26 +124,26 @@
         <item >的心情\n(最長可達一分鐘)</item>
     </string-array>
     <string-array name="quote_message">
-        <item >酒精是一位可畏的敵人，但你相信不會被\n敵人擺布，也決不低頭認輸。</item>
-        <item >想踏上戒酒這條路已經很久了，你正在這\n路上。珍惜每一天，會感覺愈來愈好。</item>
-        <item >你發現不能空等你的船來到，而是你得自\n己游向它。</item>
-        <item >你清楚你可以從過去的失敗中，要如何讓\n自己現在更好，更珍惜戒酒的日子。</item>
-        <item >你開始懂得好好善待自己，並且”自愛”\n是一生最重要的一場戀愛。</item>
-        <item >對過去憤怒，或對未來恐懼，只是讓你的\n生活變得更無力，更容易錯過現在。</item>
+        <item >酒精是一位可畏的敵人，但您相信不會被\n敵人擺布，也決不低頭認輸。</item>
+        <item >想踏上戒酒這條路已經很久了，您正在這\n路上。珍惜每一天，會感覺愈來愈好。</item>
+        <item >您發現不能空等您的船來到，而是您得自\n己游向它。</item>
+        <item >您清楚您可以從過去的失敗中，要如何讓\n自己現在更好，更珍惜戒酒的日子。</item>
+        <item >您開始懂得好好善待自己，並且”自愛”\n是一生最重要的一場戀愛。</item>
+        <item >對過去憤怒，或對未來恐懼，只是讓您的\n生活變得更無力，更容易錯過現在。</item>
         <item >我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。</item>
         <item >我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。</item>
-        <item >你發現當你越認真努力戒酒，生活變得更\n順，運氣也會跟著變好。</item>
-        <item >你相信自己一步一步在走你自己所創造的\n不一樣中。</item>
+        <item >您發現當您越認真努力戒酒，生活變得更\n順，運氣也會跟著變好。</item>
+        <item >您相信自己一步一步在走您自己所創造的\n不一樣中。</item>
         <item >就像一次一次的身體訓練，每一次都讓我\n們變得更強壯或更堅定。</item>
-        <item >你發現別人的鼓勵讓我們更堅持下去，但\n若可以鼓勵他人，更能讓生活更有意義。</item>
+        <item >您發現別人的鼓勵讓我們更堅持下去，但\n若可以鼓勵他人，更能讓生活更有意義。</item>
     </string-array>
     <string name="call_to">要聯絡誰？</string>
     <string name="next">下一步</string>
     <string name="question_type0_help">為了家人和不一樣的\n自己，請繼續加油，\n堅持下去</string>
     <string name="question_type0_next">我相信我做得到的</string>
-    <string name="question_type1_help">重新整理浮動的心，\n堅持持續戒酒的決心，\n建議你可以：</string>
-    <string name="question_type2_help">你似乎開始喝酒了，\n現在啟用一小時停酒提醒，\n同時建議你可以：</string>
-    <string name="question_type3_help">您似乎喝了不少酒，\n建議你可以：</string>
+    <string name="question_type1_help">重新整理浮動的心，\n堅持持續戒酒的決心，\n建議您可以：</string>
+    <string name="question_type2_help">您似乎開始喝酒了，\n現在啟用一小時停酒提醒，\n同時建議您可以：</string>
+    <string name="question_type3_help">您似乎喝了不少酒，\n建議您可以：</string>
     <string name="self_help">自行處理與面對</string>
     <string name="go_home">回家休息</string>
     <string name="connect_to_family">跟親友聊天</string>
@@ -197,7 +198,7 @@
 	</string-array>
 	<string name="emotion_manage_help1">您現在的情緒是：</string>
 	<string name="emotion_manage_help2">這個感覺跟什麼有關：</string>
-	<string name="emotion_manage_help3">請寫下正在影響你的</string>
+	<string name="emotion_manage_help3">請寫下正在影響您的</string>
 	<string name="emotion_manage_help4">這是影響您停酒的因素\n但您仍可堅持停酒</string>
 	<string name="about_title">關於</string>
 	<string name="about_help">詳細資料：</string>
@@ -223,21 +224,21 @@
 	<string name= "get_self_help_counter">+1點</string>
 	<string name= "emotionDIY_end_toast">做好心情DIY</string>
 	<string name= "emotion_manage_end_toast">做好情緒管理</string>
-	<string name= "emotionDIY_help_case1">嘗試閉眼專注觀察呼吸？\n你可以聽從指示引導或直接去做</string>
-	<string name= "emotionDIY_help_case2">專心健走 10 ~ 30 分鐘？\n你可以聽從指示引導或直接去做</string>
-	<string name= "emotionDIY_help_case3">從事休閒活動？\n你可以選擇以下內容</string>
+	<string name= "emotionDIY_help_case1">嘗試閉眼專注觀察呼吸？\n您可以聽從指示引導或直接去做</string>
+	<string name= "emotionDIY_help_case2">專心健走 10 ~ 30 分鐘？\n您可以聽從指示引導或直接去做</string>
+	<string name= "emotionDIY_help_case3">從事休閒活動？\n您可以選擇以下內容</string>
 	<string name= "emotionDIY_help_case3_2">未設定休閒活動，\n請按返回鍵</string>
-	<string name= "emotionDIY_help_case4">你將要去做</string>
+	<string name= "emotionDIY_help_case4">您將要去做</string>
 	<string name= "emotionDIY_help_guide">播放指示</string>
 	<string name="try_to_do">我會完成</string>
 	<string name= "emotion_box_playing">播放中</string>
 	<string name= "emotion_box_pause">暫停中</string>
 	<string name= "emotion_box_replay">重新撥放？</string>
-	<string name= "storytelling_message">你是否已分享你的戒酒過程？</string>
+	<string name= "storytelling_message">您是否已分享您的戒酒過程？</string>
 	<string name= "storytelling_end_toast">分享酒測歷程</string>
-	<string name= "storytelling_help1">你所分享的對象是：</string>
-	<string name= "storytelling_help2">你所分享的時間為﹝分鐘﹞：</string>
-	<string name= "storytelling_leave_toast">你確定要離開嗎？</string>
+	<string name= "storytelling_help1">您所分享的對象是：</string>
+	<string name= "storytelling_help2">您所分享的時間為﹝分鐘﹞：</string>
+	<string name= "storytelling_leave_toast">您確定要離開嗎？</string>
 	<string name= "storytelling_share_title">填寫分享資料</string>
 	<string name= "storytelling_check_toast1">分享對象未填寫</string>
 	<string name= "storytelling_check_toast2">分享時間未填寫</string>
