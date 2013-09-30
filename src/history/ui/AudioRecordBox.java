@@ -10,28 +10,31 @@ import data.database.AudioDB;
 import data.info.DateValue;
 import data.uploader.AudioUploader;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 
-import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.Log;
@@ -96,7 +99,7 @@ public class AudioRecordBox {
 		this.mainLayout = mainLayout;
 		backgroundLayout = new View(context);
 		backgroundLayout.setBackgroundColor(0x99000000);
-		screen = FragmentTabs.getSize();
+		screen = ScreenSize.getScreenSize(context);
 		mediaRecorder = null;
 		mediaPlayer = null;
 		helpStr = context.getResources().getStringArray(R.array.audio_box_help);
@@ -122,6 +125,8 @@ public class AudioRecordBox {
 			}
 	}
 	
+	@SuppressLint("InlinedApi")
+	@SuppressWarnings("deprecation")
 	private void setting(){
 		
 		backgroundLayout.setVisibility(View.INVISIBLE);
@@ -146,7 +151,10 @@ public class AudioRecordBox {
 		mainLayout.addView(boxLayout);
 		
 		RelativeLayout.LayoutParams bgParam = (LayoutParams) backgroundLayout.getLayoutParams();
-		bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
+		if (Build.VERSION.SDK_INT >=8)
+			bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
+		else
+			bgParam.width = bgParam.height = LayoutParams.FILL_PARENT;
 		
 		RelativeLayout.LayoutParams param = (LayoutParams) boxLayout.getLayoutParams();
 		param.width = screen.x * 359/480;
@@ -202,7 +210,7 @@ public class AudioRecordBox {
 	private class EndListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL);
+			ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL);
 			backgroundLayout.setVisibility(View.INVISIBLE);
 			backgroundLayout.setKeepScreenOn(false);
 			boxLayout.setVisibility(View.INVISIBLE);
@@ -212,6 +220,11 @@ public class AudioRecordBox {
 	}
 	
 	public void showMsgBox(DateValue dv, int idx){
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor edit = sp.edit();
+		edit.putLong("LatestStorytellingRecordingTime", System.currentTimeMillis());
+		edit.commit();
+		
 		this.curIdx = idx;
 		curDV = dv;
 		historyFragment.enablePage(false);
@@ -254,7 +267,7 @@ public class AudioRecordBox {
 			} catch (IOException e) {
 				setButtonState(STATE_INIT);
 			}
-			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_RECORD);
+			ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_RECORD);
 			mediaRecorder.start();
 			setButtonState(STATE_ON_RECORD);
 		}
@@ -273,12 +286,14 @@ public class AudioRecordBox {
 						boolean result = db.insertAudio(curDV);
 						
 						if (result)
-							CustomToast.generateToast(context, R.string.audio_box_toast_timeup, 1, screen);
+							CustomToast.generateToast(context, R.string.audio_box_toast_timeup, 1);
 						else
-							CustomToast.generateToast(context, R.string.audio_box_toast_timeup, 0, screen);
+							CustomToast.generateToast(context, R.string.audio_box_toast_timeup, 0);
+						
+						historyFragment.updateHasRecorder(curIdx);
 					} catch (IllegalStateException e) {}
 				}
-				ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
+				ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
 				AudioUploader.upload(context);
 				setButtonState(STATE_INIT);
 			}
@@ -299,12 +314,12 @@ public class AudioRecordBox {
 					mediaRecorder = null;
 					boolean result = db.insertAudio(curDV);
 					if (result)
-						CustomToast.generateToast(context, R.string.audio_box_toast_record_end, 1, screen);
+						CustomToast.generateToast(context, R.string.audio_box_toast_record_end, 1);
 					else
-						CustomToast.generateToast(context, R.string.audio_box_toast_record_end, 0, screen);
+						CustomToast.generateToast(context, R.string.audio_box_toast_record_end, 0);
 				} catch (IllegalStateException e) {}
 			}
-			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
+			ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
 			AudioUploader.upload(context);
 		}
 	}
@@ -348,7 +363,7 @@ public class AudioRecordBox {
 				} catch (IOException e) {
 					setButtonState(STATE_INIT);
 				}
-				ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_PLAY);
+				ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_PLAY);
 				setButtonState(STATE_ON_PLAY);
 			}
 		}
@@ -432,7 +447,7 @@ public class AudioRecordBox {
 				} catch (IllegalStateException e) {
 				}
 			}
-			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_PLAY);
+			ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_PLAY);
 		}
 	}
 	

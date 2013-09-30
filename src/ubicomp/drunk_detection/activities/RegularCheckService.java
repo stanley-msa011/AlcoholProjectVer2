@@ -20,6 +20,8 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
+import ubicomp.drunk_detection.check.DefaultCheck;
+
 import data.uploader.ServerUrl;
 
 import android.app.AlarmManager;
@@ -50,6 +52,9 @@ public class RegularCheckService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
 		super.onStartCommand(intent, flags, startId);
+		
+		if(DefaultCheck.check(getBaseContext()))
+			return Service.START_REDELIVER_INTENT;
 		
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		SERVER_URL = ServerUrl.SERVER_URL_REGULAR_CHECK(sp.getBoolean("developer", false));
@@ -110,6 +115,7 @@ public class RegularCheckService extends Service {
 		    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
 		    mpEntity.addPart("user[]", new StringBody(joinDate));
 			
+		    
 			httpPost.setEntity(mpEntity);
 			if (uploader(httpClient, httpPost,this)){
 				Log.d("REGULAR CHECK", "SUCCESS");

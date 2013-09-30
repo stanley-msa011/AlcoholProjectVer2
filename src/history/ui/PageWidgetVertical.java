@@ -12,6 +12,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Region;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.view.View;
 
 @SuppressLint("ViewConstructor")
@@ -57,7 +58,8 @@ public class PageWidgetVertical extends View {
 	
 	public PageWidgetVertical(Context context, int _width, int _height) {
 		super(context);
-		this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		if (Build.VERSION.SDK_INT >= 11)
+			this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		this.width = _width;
 		this.height = _height;
 		this.maxLength = (float) Math.hypot(_width, _height);

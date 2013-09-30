@@ -31,7 +31,6 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 
 public class PreSettingActivity extends Activity {
@@ -65,7 +64,7 @@ public class PreSettingActivity extends Activity {
 	
 	private ArrayAdapter<String> adapter; 
 	
-	private Switch developer_switch;
+	private CheckBox developer_switch;
 	
 	private static final int DATE_DIALOG_ID = 0;
 	
@@ -81,11 +80,11 @@ public class PreSettingActivity extends Activity {
 		uid = (EditText) this.findViewById(R.id.uid_edit);
 		uid.setText(sp.getString("uid", ""));
 		
-		developer_switch = (Switch) this.findViewById(R.id.developer_switch);
+		developer_switch = (CheckBox) this.findViewById(R.id.developer_switch);
 		developer_switch.setChecked(sp.getBoolean("developer", false));
 		
 		target_good = (EditText) this.findViewById(R.id.target_good_edit);
-		target_good.setText(String.valueOf(sp.getString("goal_good", "機車")));
+		target_good.setText(String.valueOf(sp.getString("goal_good",getString(R.string.default_goal_good))));
 		
 		target = (EditText) this.findViewById(R.id.target_money_edit);
 		target.setText(String.valueOf(sp.getInt("goal_money", 50000)));
@@ -149,9 +148,9 @@ public class PreSettingActivity extends Activity {
 		recreation3 =(EditText) this.findViewById(R.id.recreation3); 
 		recreation4 =(EditText) this.findViewById(R.id.recreation4); 
 		
-		recreation0.setText(sp.getString("recreation0", ""));
-		recreation1.setText(sp.getString("recreation1", ""));
-		recreation2.setText(sp.getString("recreation2", ""));
+		recreation0.setText(sp.getString("recreation0",getString(R.string.default_recreation_1)));
+		recreation1.setText(sp.getString("recreation1",getString(R.string.default_recreation_2)));
+		recreation2.setText(sp.getString("recreation2",getString(R.string.default_recreation_3)));
 		recreation3.setText(sp.getString("recreation3", ""));
 		recreation4.setText(sp.getString("recreation4", ""));
 		
@@ -355,8 +354,8 @@ public class PreSettingActivity extends Activity {
 				editor.putInt("connect_s2", connectS2);
 				editor.putBoolean("upload_audio", uploadAudioCheckBox.isChecked());
 				editor.putBoolean("show_saving", showSavingBox.isChecked());
-				//editor.putBoolean("first_setting", true);
 				editor.commit();
+				
 				activity.finish();
 			}
 			

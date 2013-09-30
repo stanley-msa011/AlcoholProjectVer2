@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 
+import test.ui.NotificationBox;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
-import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 
 import data.calculate.WeekNum;
@@ -20,7 +21,7 @@ import data.info.BarInfo;
 import data.info.DateBracDetectionState;
 import data.info.DateValue;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import history.ui.HistoryStorytelling;
 import history.ui.AudioRecordBox;
 import history.ui.PageAnimationTaskVertical;
@@ -59,6 +60,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -160,6 +163,11 @@ public class HistoryFragment extends Fragment {
 	private ImageView storytellingButton;
 	private StorytellingOnClickListener storytellingOnClickListener;
 	
+	private int received_msg = 0;
+	private boolean read_arg = false;
+	
+	private AlphaAnimation shareAnimation;
+	
 	 @Override
 	    public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
@@ -195,7 +203,18 @@ public class HistoryFragment extends Fragment {
     	this.historyFragment = this;
     	view = inflater.inflate(R.layout.history_fragment, container,false);
     	
-    	screen = FragmentTabs.getSize();
+    	received_msg = 0;
+    	if (!read_arg){
+    		Bundle data = getArguments();
+    		if (data != null){
+    			received_msg = data.getInt("action");
+    		}
+    		read_arg = true;
+    	}
+    	
+    	Log.d("Notify","receive "+received_msg);
+    	
+    	screen = ScreenSize.getScreenSize(getActivity());
     	if (screen == null){
     		if (activity!=null)
     			activity.finish();
@@ -233,15 +252,13 @@ public class HistoryFragment extends Fragment {
     	storytellingButton = (ImageView) view.findViewById(R.id.history_storytelling_button);
     	storytellingOnClickListener = new StorytellingOnClickListener();
     	storytellingButton.setOnClickListener(storytellingOnClickListener);
-    	//storytellingButton.setOnTouchListener(new StoryOnTouchListener());
-    	//storytellingButton.setImageDrawable(storytellingDrawable);
     	
     	LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
     	sParam.leftMargin = bg_x*10/480;
     	sParam.topMargin = bg_x * 60/480;
     	sParam.width = bg_x*70/480;
     	
-    	int quoteTopMargin = page_height*430/509;
+    	int quoteTopMargin = page_height*428/509;
     	
     	LayoutParams rParam = (LayoutParams) stageRateText.getLayoutParams();
     	rParam.leftMargin = bg_x*20/480;
@@ -278,6 +295,11 @@ public class HistoryFragment extends Fragment {
     	historys.clear();
     	bars.clear();
     	hasAudio.clear();
+    	if (storytellingButton!=null){
+    		if (Build.VERSION.SDK_INT >= 8 && shareAnimation!=null)
+				shareAnimation.cancel();
+    		storytellingButton.setAnimation(null);
+    	}
     	clear();
     	super.onPause();
     }
@@ -455,6 +477,12 @@ public class HistoryFragment extends Fragment {
     	FragmentTabs.enableTabAndClick(true);
     	isAnimation = false;
     	chart.invalidate();
+    	if (received_msg == NotificationBox.TYPE_STORYTELLING_RECORDING){
+    		received_msg = 0;
+    		Calendar cal = Calendar.getInstance();
+    		DateValue dv =new DateValue(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
+    		recordBox.showMsgBox(dv,bars.size()-1);
+    	}
     }
     
     
@@ -465,6 +493,12 @@ public class HistoryFragment extends Fragment {
     	FragmentTabs.enableTabAndClick(true);
     	isAnimation = false;
     	chart.invalidate();
+    	if (received_msg == NotificationBox.TYPE_STORYTELLING_RECORDING){
+    		received_msg = 0;
+    		Calendar cal = Calendar.getInstance();
+    		DateValue dv =new DateValue(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
+    		recordBox.showMsgBox(dv,bars.size()-1);
+    	}
     }
     
     public void resetPage(int change){
@@ -555,6 +589,18 @@ public class HistoryFragment extends Fragment {
 			
 			LoadingDialogControl.dismiss();
 			startAnim();
+			
+			
+			if (received_msg == NotificationBox.TYPE_STORYTELLING_SHARING){
+				shareAnimation = new AlphaAnimation(1.0F,0.0F);
+				shareAnimation.setDuration(200);
+				shareAnimation.setRepeatCount(Animation.INFINITE);
+				shareAnimation.setRepeatMode(Animation.REVERSE);
+				storytellingButton.setAnimation(shareAnimation);
+				received_msg = 0;
+			}
+			
+			
 		}
 	}
 
@@ -630,7 +676,7 @@ public class HistoryFragment extends Fragment {
 					FragmentTabs.enableTabAndClick(true);
 					return true;
 				}
-				ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_FLING_UP);
+				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_UP);
 				setStageVisible(false);
 				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx,1);
 				pageAnimationTask2.execute();
@@ -647,7 +693,7 @@ public class HistoryFragment extends Fragment {
 					FragmentTabs.enableTabAndClick(true);
 					return true;
 				}
-				ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_FLING_DOWN);
+				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_DOWN);
 				setStageVisible(false);
 				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,endIdx,0);
 				pageAnimationTask2.execute();
@@ -762,7 +808,7 @@ public class HistoryFragment extends Fragment {
 						chartAreaLayout.setBackground(chartBg1Drawable);
 					else
 						chartAreaLayout.setBackgroundDrawable(chartBg1Drawable);
-					ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE0);
+					ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE0);
 				}
 				else if (x < screen.x * 590/1080){
 					chart_type = 1;
@@ -770,7 +816,7 @@ public class HistoryFragment extends Fragment {
 						chartAreaLayout.setBackground(chartBg2Drawable);
 					else
 						chartAreaLayout.setBackgroundDrawable(chartBg2Drawable);
-					ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE1);
+					ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE1);
 				}
 				else if (x < screen.x * 870/1080){
 					chart_type = 2;
@@ -778,14 +824,14 @@ public class HistoryFragment extends Fragment {
 						chartAreaLayout.setBackground(chartBg3Drawable);
 					else
 						chartAreaLayout.setBackgroundDrawable(chartBg3Drawable);
-					ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE2);
+					ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE2);
 				}else{
 					chart_type = 3;
 					if (Build.VERSION.SDK_INT>=16)
 						chartAreaLayout.setBackground(chartBg4Drawable);
 					else
 						chartAreaLayout.setBackgroundDrawable(chartBg4Drawable);
-					ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE3);
+					ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TYPE3);
 				}
 				
 				invalidate();
@@ -1070,7 +1116,7 @@ public class HistoryFragment extends Fragment {
 	    			if (ty>= top_touch){
 	    				curX = (int) event.getX();  
 	    				curY = (int) event.getY();
-	    				ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TOUCH);
+	    				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TOUCH);
 	    			}
 	    		}
 	    	}
@@ -1082,7 +1128,7 @@ public class HistoryFragment extends Fragment {
     			int distance_square = (c.x - x)*(c.x - x) + (c.y - y)*(c.y - y);
     			if (distance_square < BUTTON_RADIUS_SQUARE*2.25F){
     				DateValue tdv = selected_dates.get(buttonNum);
-	    			ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_CHART_BUTTON+tdv.toClickValue());
+	    			ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_CHART_BUTTON+tdv.toClickValue());
 	    			recordBox.showMsgBox(tdv,selected_idx.get(buttonNum));
     			}
 	    		onButton=false;
@@ -1345,8 +1391,13 @@ public class HistoryFragment extends Fragment {
 	private class StorytellingOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getActivity(), ClickLogId.STORYTELLING_SHARE_BUTTON);
+			ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_SHARE_BUTTON);
 			storytellingBox.showMsgBox();
+			if (storytellingButton!=null){
+	    		if (Build.VERSION.SDK_INT >= 8 && shareAnimation!=null)
+					shareAnimation.cancel();
+	    		storytellingButton.setAnimation(null);
+	    	}
 		}
 	}
 	

@@ -31,6 +31,7 @@ import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.HTTP;
 
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.check.DefaultCheck;
 
 import data.calculate.WeekNum;
 import data.database.HistoryDB;
@@ -52,6 +53,9 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 	private static QuestionnaireDataUploader  questionnaire_uploader = null;
 	
 	public static void uploader(Context context){
+		if(DefaultCheck.check(context))
+			return;
+		
 		if(!NetworkCheck.networkCheck(context))
 			return;
 		if (questionnaire_uploader!=null)

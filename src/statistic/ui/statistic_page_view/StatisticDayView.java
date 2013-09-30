@@ -16,6 +16,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.TypedValue;
@@ -262,9 +263,9 @@ public class StatisticDayView extends StatisticPageView {
 			String ampm = null;
 			
 			if (am_pm == Calendar.AM)
-				ampm= " A.M";
+				ampm= " A.M.";
 			else{
-				ampm = "P.M";
+				ampm = "P.M.";
 				if (hour == 0)
 					hour = 12;
 			}
@@ -325,8 +326,8 @@ public class StatisticDayView extends StatisticPageView {
 			if (historys[i]==null){
 				circleValues[i].setText("");
 				circleImages[i].setImageDrawable(circleDrawables[0]);
-				if (TimeBlock.isEmpty(i, cur_hour))
-					circleImages[i].setAlpha(0.4F);
+				if (TimeBlock.isEmpty(i, cur_hour) && Build.VERSION.SDK_INT>=11)
+						circleImages[i].setAlpha(0.4F);
 			}
 			else{
 				String value =format.format(historys[i].brac);

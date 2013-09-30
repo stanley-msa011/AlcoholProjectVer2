@@ -17,7 +17,6 @@
    		    android:layout_height="wrap_content"
    		    android:gravity="center"
    		    android:text="@string/analysis_ranking"
-   		    android:textAlignment="center"
    		    android:textColor="#FFFFFFFF" />
 
    </RelativeLayout>
@@ -27,7 +26,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FF000000"
-        android:textAlignment="center"
         android:gravity="center"
     	/>
    
@@ -64,7 +62,6 @@
             android:layout_toLeftOf="@+id/analysis_rating_bar"
             android:gravity="center"
             android:text="@string/low"
-            android:textAlignment="center"
             android:textColor="#FF000000" />
         
          <TextView
@@ -75,7 +72,6 @@
              android:layout_toRightOf="@+id/analysis_rating_bar"
              android:gravity="center"
              android:text="@string/high"
-             android:textAlignment="center"
              android:textColor="#FF000000" />
         
        </RelativeLayout>
@@ -85,7 +81,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FF000000"
-        android:textAlignment="center"
         android:gravity="center"
     	/>
            <RelativeLayout 
@@ -121,7 +116,6 @@
             android:layout_toLeftOf="@+id/analysis_rating_bar2"
             android:gravity="center"
             android:text="@string/low"
-            android:textAlignment="center"
             android:textColor="#FF000000" />
         
          <TextView
@@ -132,7 +126,6 @@
              android:layout_toRightOf="@+id/analysis_rating_bar2"
              android:gravity="center"
              android:text="@string/high"
-             android:textAlignment="center"
              android:textColor="#FF000000" />
         
        </RelativeLayout>

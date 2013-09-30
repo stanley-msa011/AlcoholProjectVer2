@@ -1,6 +1,7 @@
 package ubicomp.drunk_detection.ui;
 
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -10,6 +11,9 @@ public class ScaleOnTouchListener implements View.OnTouchListener{
 	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
+		if (Build.VERSION.SDK_INT <11)
+			return false;
+		
 		int e = event.getActionMasked();
 		switch(e){
 			case MotionEvent.ACTION_MOVE:

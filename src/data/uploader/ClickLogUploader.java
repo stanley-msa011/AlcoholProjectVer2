@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.check.DefaultCheck;
 
 import network.NetworkCheck;
 
@@ -48,6 +49,9 @@ public class ClickLogUploader {
 	private static ClickLogUploaderThread clickUploader = null;
 	
 	public static void upload(Context context){
+		if(DefaultCheck.check(context))
+			return;
+		
 		if(!NetworkCheck.networkCheck(context))
 			return;
 		if (clickUploader!=null)

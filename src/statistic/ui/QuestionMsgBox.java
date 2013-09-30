@@ -5,15 +5,15 @@ import java.util.ArrayList;
 
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import statistic.ui.questionnaire.content.QuestionnaireContent;
 import statistic.ui.questionnaire.content.Type0Content;
 import statistic.ui.questionnaire.content.Type1Content;
 import statistic.ui.questionnaire.content.Type2Content;
 import statistic.ui.questionnaire.content.Type3Content;
-import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -64,7 +65,7 @@ public class QuestionMsgBox {
 		this.mainLayout = mainLayout;
 		shadow = new View(context);
 		shadow.setBackgroundColor(0x99000000);
-		screen = FragmentTabs.getSize();
+		screen = ScreenSize.getScreenSize(getContext());
 		db = new QuestionDB(context);
 		clickSequence = new ArrayList<String>();
 		contentSequence = new ArrayList<QuestionnaireContent>();
@@ -94,14 +95,17 @@ public class QuestionMsgBox {
 		closeButton.setPadding(padding, 0, 0, padding);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void settingPreTask(){
 		
 		mainLayout.addView(shadow);
 		mainLayout.addView(boxLayout);
 		
 		RelativeLayout.LayoutParams bgParam = (LayoutParams) shadow.getLayoutParams();
-		bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
-		
+		if (Build.VERSION.SDK_INT>=8)
+			bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
+		else
+			bgParam.width = bgParam.height = LayoutParams.FILL_PARENT;
 		RelativeLayout.LayoutParams boxParam = (LayoutParams) boxLayout.getLayoutParams();
 		boxParam.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
 		boxParam.width = screen.x * 348/480;
@@ -286,7 +290,7 @@ public class QuestionMsgBox {
 
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getContext(), ClickLogId.STATISTIC_QUESTION_CANCEL);
+			ClickLogger.Log(getContext(), ClickLogId.STATISTIC_QUESTION_CANCEL);
 			clickSequence.clear();
 			contentSequence.clear();
 			statisticFragment.enablePage(true);

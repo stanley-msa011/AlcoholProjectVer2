@@ -3,10 +3,11 @@ package ubicomp.drunk_detection.activities;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,7 +22,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -66,18 +66,7 @@ public class StorytellingSharingActivity extends Activity {
 		who_texts = null;
 		time_texts = null;
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		if (Build.VERSION.SDK_INT<13){
-			@SuppressWarnings("deprecation")
-			int w = display.getWidth();
-			@SuppressWarnings("deprecation")
-			int h = display.getHeight();
-			screen = new Point(w,h);
-		}
-		else{
-			screen = new Point();
-			display.getSize(screen);
-		}
+		screen = ScreenSize.getScreenSize(getBaseContext());
 		
 		this.activity = this;
 		db = new QuestionDB(activity);
@@ -90,6 +79,11 @@ public class StorytellingSharingActivity extends Activity {
 		
 		textSize = screen.x * 24/480;
 		iconMargin = screen.x * 33/480;
+		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		SharedPreferences.Editor edit = sp.edit();
+		edit.putLong("LatestStorytellingSharingTime", System.currentTimeMillis());
+		edit.commit();
 		
 	}
 
@@ -191,7 +185,7 @@ private View createTextView(int textStr){
 				public void beforeTextChanged(CharSequence arg0, int arg1,int arg2, int arg3) {}
 				@Override
 				public void onTextChanged(CharSequence arg0, int arg1,	int arg2, int arg3) {
-					ClickLoggerLog.Log(getBaseContext(), ClickLog);					
+					ClickLogger.Log(getBaseContext(), ClickLog);					
 				}
 			});
 		
@@ -263,7 +257,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	private class EndOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.STORYTELLING_SHARE_END);
+			ClickLogger.Log(getBaseContext(), ClickLogId.STORYTELLING_SHARE_END);
 			String who = who_texts.getText().toString();
 			String time_str = time_texts.getText().toString();
 
@@ -287,9 +281,9 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 			boolean getSHC = db.insertStorytellingUsage(who,time);
 			
 			if (getSHC)
-				CustomToast.generateToast(getBaseContext(), R.string.storytelling_end_toast, 1,FragmentTabs.getSize());
+				CustomToast.generateToast(getBaseContext(), R.string.storytelling_end_toast, 1);
 			else
-				CustomToast.generateToast(getBaseContext(), R.string.storytelling_end_toast, 0,FragmentTabs.getSize());
+				CustomToast.generateToast(getBaseContext(), R.string.storytelling_end_toast, 0);
 			
 			long cur_time = System.currentTimeMillis();
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -327,7 +321,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event){
 		if (keyCode == KeyEvent.KEYCODE_BACK){
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.STORYTELLING_SHARE_RETURN_BUTTON);
+			ClickLogger.Log(getBaseContext(), ClickLogId.STORYTELLING_SHARE_RETURN_BUTTON);
 			if (state == 0){
 				CustomToastSmall.generateToast(this,R.string.storytelling_leave_toast);
 				--state;

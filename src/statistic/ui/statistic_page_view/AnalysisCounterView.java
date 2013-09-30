@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -86,6 +87,7 @@ public class AnalysisCounterView extends StatisticPageView {
 		updateCounter();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void updateCounter(){
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
@@ -108,11 +110,18 @@ public class AnalysisCounterView extends StatisticPageView {
     	if (prev_coupon <coupon){
     		animation.setAnimationListener(new CouponAnimationListener(prev_coupon,coupon,counter));
     		setHelp(counter,prev_coupon);
-    		titleLayout.setBackground(context.getResources().getDrawable(R.drawable.analysis_title_bar_highlight));
+    		if (Build.VERSION.SDK_INT < 16)
+    			titleLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.analysis_title_bar_highlight));
+    		else
+    			titleLayout.setBackground(context.getResources().getDrawable(R.drawable.analysis_title_bar_highlight));
     		help.setAnimation(animation);
     		return;
-    	}else
-    		titleLayout.setBackground(context.getResources().getDrawable(R.drawable.analysis_title_bar));
+    	}else{
+    		if (Build.VERSION.SDK_INT < 16)
+    			titleLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.analysis_title_bar));
+    		else
+    			titleLayout.setBackground(context.getResources().getDrawable(R.drawable.analysis_title_bar));
+    	}
     	setHelp(counter,coupon);
 	}
 	

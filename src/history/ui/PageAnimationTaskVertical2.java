@@ -2,6 +2,7 @@ package history.ui;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -36,7 +37,7 @@ public class PageAnimationTaskVertical2 extends AsyncTask<Void, Void, Void> {
 		this.startImageIdx = startImageIdx;
 		
 		this.historyFragment = historyFragment;
-		screen = FragmentTabs.getSize();
+		screen = ScreenSize.getScreenSize(historyFragment.getActivity());
 		width_gap_1 = (to.x - from.x)/(float)gaps;
 		height_gap_1 = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;

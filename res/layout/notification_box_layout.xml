@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notification_box_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/alert_dialog_bg"
+    android:orientation="vertical"
+    android:splitMotionEvents="false" >
+
+    <TextView 
+        android:id="@+id/notification_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF000000" 
+        android:gravity="center"
+        />
+    
+   	<RelativeLayout 
+   	    android:id="@+id/notification_select_layout"
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    >
+    		
+   	    <View 
+   	        android:id="@+id/notification_divider"
+   	        android:layout_width="0dp"
+   	        android:layout_height="0dp"
+   	        android:layout_centerInParent="true"
+   	        />
+
+   	    <TextView
+   	        android:id="@+id/notification_cancel"
+   	        android:layout_width="wrap_content"
+   	        android:layout_height="wrap_content"
+   	        android:layout_toLeftOf="@+id/notification_divider"
+   	        android:layout_centerVertical="true"
+   	        android:gravity="center"
+   	        android:text="@string/no"
+   	        android:textColor="#FF898989" />
+    	<TextView
+   	        android:id="@+id/notification_enter"
+   	        android:layout_width="wrap_content"
+   	        android:layout_height="wrap_content"
+   	        android:layout_toRightOf="@+id/notification_divider"
+   	        android:layout_centerVertical="true"
+   	        android:gravity="center"
+   	        android:text="@string/yes"
+    	    android:textColor="#FF898989" />
+
+    	</RelativeLayout>
+    	
+</LinearLayout>

@@ -9,9 +9,11 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 
 	private TestFragment testFragment;
 	private LocationManager locationManager;
+	private GPSToastHandler tHandler;
 	public GPSInitTask(TestFragment a,LocationManager lm){
 		testFragment = a;
 		locationManager = lm;
+		tHandler = new GPSToastHandler(testFragment.getActivity());
 	}
 	
 	@Override
@@ -21,11 +23,12 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 		if (check.booleanValue()){
 			boolean gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 			boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-			if (!gps_enabled && !network_enabled){
+			if (!network_enabled || !gps_enabled){
 				newIntent = true;
 				testFragment.setKeepMsgBox(true);
 				Intent gpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				testFragment.startActivityForResult(gpsIntent, TestFragment._GPS);
+				tHandler.sendEmptyMessage(0);
 			}
 		}
 		return newIntent;
@@ -33,6 +36,7 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 
 	@Override
 	 protected void onPostExecute(Boolean result) {
+		locationManager = null;
 		if (!result.booleanValue()){
 			testFragment.runGPS();
 		}

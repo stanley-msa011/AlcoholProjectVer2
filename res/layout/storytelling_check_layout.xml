@@ -12,7 +12,6 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:text="@string/storytelling_message"
-        android:textAlignment="center"
         android:textColor="#FF8a8b8b" />
     
     <TextView

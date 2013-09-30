@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 
+import ubicomp.drunk_detection.check.DefaultCheck;
+
 import debug.clicklog.ClickLogId;
 
 import android.annotation.SuppressLint;
@@ -20,6 +22,10 @@ public class ClickLoggerService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
+		
+		if(DefaultCheck.check(getBaseContext()))
+			return Service.START_REDELIVER_INTENT;
+		
 		long message = intent.getLongExtra(ClickLogId.LOG_MSG_ID, -1);
 		long timestamp = System.currentTimeMillis();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");

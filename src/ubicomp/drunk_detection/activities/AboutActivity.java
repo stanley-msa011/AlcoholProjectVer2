@@ -1,11 +1,18 @@
 package ubicomp.drunk_detection.activities;
 
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLogger;
+import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Point;
@@ -13,25 +20,30 @@ import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.TypedValue;
-import android.view.Display;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.RelativeLayout.LayoutParams;
 
 public class AboutActivity extends Activity {
 
-	private TextView titleText,aboutText, copyrightText, about;
+	private TextView titleText,aboutText, copyrightText, about, phone, phone_number, email;
 	private RelativeLayout logoLayout;
 	private ImageView logo,logo0,logo1,logo2;
 	private RelativeLayout titleLayout;
 	private Point screen;
 	private Typeface wordTypeface,wordTypefaceBold,digitTypeface,digitTypefaceBold;
 	
+	private static final String EMAIL = "ubicomplab.ntu@gmail.com";
 	private static final String COPYRIGHT  = "\u00a9 2013 National Taiwan University,\nAcademia Sinica, and Taipei City Hospital";
 	
 	private int hidden_state;
@@ -53,6 +65,9 @@ public class AboutActivity extends Activity {
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(this);
 		titleLayout = (RelativeLayout) this.findViewById(R.id.about_title_layout );
 		titleText = (TextView) this.findViewById(R.id.about_title);
+		phone = (TextView)this.findViewById(R.id.about_phone);
+		phone_number = (TextView)this.findViewById(R.id.about_phone_number);
+		email = (TextView)this.findViewById(R.id.about_email);
 		about = (TextView) this.findViewById(R.id.about_about);
 		aboutText = (TextView) this.findViewById(R.id.about_content);
 		logoLayout = (RelativeLayout) this.findViewById(R.id.about_logos);
@@ -62,18 +77,8 @@ public class AboutActivity extends Activity {
 		logo2 = (ImageView) this.findViewById(R.id.about_logo2);
 		copyrightText = (TextView) this.findViewById(R.id.about_copyright);
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		if (Build.VERSION.SDK_INT<13){
-			@SuppressWarnings("deprecation")
-			int w = display.getWidth();
-			@SuppressWarnings("deprecation")
-			int h = display.getHeight();
-			screen = new Point(w,h);
-		}
-		else{
-			screen = new Point();
-			display.getSize(screen);
-		}
+		screen = ScreenSize.getScreenSize(this);
+		
 		int titleSize = screen.x * 24/480;
 		textSize =  screen.x * 21/480;
 		
@@ -103,8 +108,29 @@ public class AboutActivity extends Activity {
 		aboutText.setTypeface(wordTypefaceBold);
 		aboutText.setLineSpacing(0, 1.2F);
 		
+		RelativeLayout.LayoutParams pParam = (RelativeLayout.LayoutParams) phone.getLayoutParams();
+		pParam.leftMargin = screen.x * 27/480;
+		pParam.topMargin = screen.x * 4/480;
+		phone.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		phone.setTypeface(wordTypeface);
+		phone.setLineSpacing(0, 1.2F);
+		
+		RelativeLayout.LayoutParams pnParam = (RelativeLayout.LayoutParams) phone_number.getLayoutParams();
+		pnParam.leftMargin = screen.x * 10/480;
+		pnParam.topMargin = screen.x * 0/480;
+		phone_number.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		phone_number.setTypeface(digitTypefaceBold);
+		phone_number.setLineSpacing(0, 1.2F);
+		
+		RelativeLayout.LayoutParams emailParam = (RelativeLayout.LayoutParams) email.getLayoutParams();
+		emailParam.leftMargin = screen.x * 10/480;
+		emailParam.topMargin = screen.x * 0/480;
+		email.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		email.setTypeface(digitTypefaceBold);
+		email.setLineSpacing(0, 1.2F);
+		
 		RelativeLayout.LayoutParams lParam = (RelativeLayout.LayoutParams) logoLayout.getLayoutParams();
-		lParam.topMargin = screen.x * 60/480; 
+		lParam.topMargin = screen.x * 15/480; 
 		
 		RelativeLayout.LayoutParams l0Param = (RelativeLayout.LayoutParams) logo0.getLayoutParams();
 		l0Param.height = l0Param.width =icon_size;
@@ -212,7 +238,7 @@ public class AboutActivity extends Activity {
     			message[4]+
     			happ_design+"\n"+
     			message[5]+rickie_wu+"\n"+
-    			message[6]+yuga_huang
+    			message[6]+yuga_huang+"\n"
     			);
 		int start= 0;
 		int end =message[0].length()+1;
@@ -242,11 +268,143 @@ public class AboutActivity extends Activity {
 		end = start + message[6].length();
 		helpSpannable.setSpan(new CustomTypefaceSpan("custom1",wordTypeface,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		start = end;
-		end = start + yuga_huang.length();
+		end = start + yuga_huang.length()+1;
 		helpSpannable.setSpan(new CustomTypefaceSpan("custom3",digitTypefaceBold,0xFF727171), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		
 		aboutText.setText(helpSpannable);
 		
+		inflater = LayoutInflater.from(this);
+		shadowBg = new View(this);
+		shadowBg.setKeepScreenOn(true);
+		shadowBg.setBackgroundColor(0x99000000);
+		callLayout = (RelativeLayout) inflater.inflate(R.layout.call_check_layout, null);
+		setCallCheckBox();
+		
+		phone_number.setOnClickListener(new CallCheckOnClickListener());
+		email.setOnClickListener(new EmailOnClickListener());
 	}
 
+	private LayoutInflater inflater;
+	private RelativeLayout callLayout;
+	private FrameLayout bgLayout;
+	private TextView callOK,callCancel,callHelp;
+	private View shadowBg;
+	//Call
+	
+	private void setCallCheckBox(){
+		
+		callOK = (TextView) callLayout.findViewById(R.id.call_ok_button);
+		callCancel = (TextView) callLayout.findViewById(R.id.call_cancel_button);
+		callHelp = (TextView) callLayout.findViewById(R.id.call_help);
+		
+		
+		callHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callHelp.setTypeface(wordTypefaceBold);
+		RelativeLayout.LayoutParams hParam = (LayoutParams) callHelp.getLayoutParams();
+		hParam.width = screen.x * 349/480;
+		hParam.height = screen.x * 114/480;
+		
+		callOK.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callOK.setTypeface(wordTypefaceBold);
+		callCancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callCancel.setTypeface(wordTypefaceBold);
+		
+		RelativeLayout.LayoutParams rParam = (LayoutParams) callOK.getLayoutParams();
+		rParam.width = screen.x * 154/480;
+		rParam.height = screen.x * 60/480;
+		rParam.topMargin = screen.x * 5/480;
+		rParam.rightMargin = screen.x * 15/480; 
+		RelativeLayout.LayoutParams pParam = (LayoutParams) callCancel.getLayoutParams();
+		pParam.width = screen.x * 154/480;
+		pParam.height = screen.x * 60/480;
+		pParam.topMargin = screen.x * 5/480;
+		pParam.leftMargin = screen.x * 35/1480; 
+	}
+	
+	private class CallCheckOnClickListener  implements View.OnClickListener{
+		
+		@SuppressWarnings("deprecation")
+		@Override
+		public void onClick(View v) {
+			bgLayout = (FrameLayout) getWindow().getDecorView().findViewById(android.R.id.content);
+
+			bgLayout.addView(shadowBg);
+			bgLayout.addView(callLayout);
+			FrameLayout.LayoutParams shadowParam = (FrameLayout.LayoutParams) shadowBg.getLayoutParams();
+			if (Build.VERSION.SDK_INT>=8)
+				shadowParam.width = shadowParam.height = LayoutParams.MATCH_PARENT;
+			else
+				shadowParam.width = shadowParam.height = LayoutParams.FILL_PARENT;
+			
+			FrameLayout.LayoutParams boxParam = (FrameLayout.LayoutParams) callLayout.getLayoutParams();
+			boxParam.width = screen.x * 349/480;
+			boxParam.height = screen.x * 189/480;
+			boxParam.gravity=Gravity.CENTER;
+			
+			callHelp.setText(R.string.phone_check);
+			callOK.setOnClickListener(new CallOnClickListener());
+			callCancel.setOnClickListener(new CallCancelOnClickListener());
+			phone_number.setOnClickListener(null);
+			email.setOnClickListener(null);
+		}
+	}
+	
+	private class CallCancelOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			bgLayout.removeView(shadowBg);
+			bgLayout.removeView(callLayout);
+			phone_number.setOnClickListener(new CallCheckOnClickListener());
+			email.setOnClickListener(new EmailOnClickListener());
+		}
+		
+	}
+	
+	private class CallOnClickListener implements View.OnClickListener{
+		@Override
+		public void onClick(View v) {
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CALL);
+			Intent intentDial = new Intent("android.intent.action.CALL",Uri.parse("tel:0233664926"));
+			activity.startActivity(intentDial);
+			activity.finish();
+		}
+	}
+	
+	
+private class EmailOnClickListener  implements View.OnClickListener{
+		
+		@Override
+		public void onClick(View v) {
+			Intent i = new Intent(Intent.ACTION_SEND);
+			i.setType("message/rfc822");
+			i.putExtra(Intent.EXTRA_EMAIL  , new String[]{EMAIL});
+			
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+			String uid = sp.getString("uid",  "sober_default_test");
+			if (uid.equals( "sober_default_test")){
+				CustomToastSmall.generateToast(getBaseContext(), R.string.email_reject);
+				return;
+			}
+			i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject)+" "+uid);
+			try {
+			    startActivity(Intent.createChooser(i, getString(R.string.email_message)));
+			} catch (android.content.ActivityNotFoundException ex) {
+				CustomToastSmall.generateToast(getBaseContext(), R.string.email_fail);
+			}
+		}
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event){
+		if (keyCode == KeyEvent.KEYCODE_BACK ){
+			if (callLayout.getParent()!=null && callLayout.getParent().equals(bgLayout)){
+				bgLayout.removeView(shadowBg);
+				bgLayout.removeView(callLayout);
+				phone_number.setOnClickListener(new CallCheckOnClickListener());
+				email.setOnClickListener(new EmailOnClickListener());
+				return true;
+			}
+		}
+		return super.onKeyUp(keyCode, event);
+	}
 }

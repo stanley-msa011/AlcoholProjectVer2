@@ -47,7 +47,6 @@ public class QuestionDB {
 		int[] used = new int[12];
 		long _ts = 0L;
 		if (cursor.moveToFirst()){
-			//_ts = cursor.getLong(1);
 			for (int i=0;i<12;++i){
 				acc[i] = cursor.getInt(i+5);
 				used[i] = cursor.getInt(i+17);
@@ -687,16 +686,19 @@ public class QuestionDB {
 		if (usage < 0)//for used condition
 			usage = 0;
 		
-		if (year==_year && month == _month && day == _day)
-			++usage;
-		else
-			usage = 1;
+		
 		
 		if (StartDateCheck.check(context)){
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 			long share_time = sp.getLong("share_storytelling_time", 0);
 			long cur_time = System.currentTimeMillis();
 			if (cur_time - share_time > FIVE_MINS){
+				
+				if (year==_year && month == _month && day == _day)
+					++usage;
+				else
+					usage = 1;
+
 				if (usage <= DATE_USAGE_LIMIT ){
 					Log.d("STORYTELLING","ADD ACC");
 					addAcc = true;

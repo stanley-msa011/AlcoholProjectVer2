@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="72"
-    android:versionName="3.17" >
+    android:versionCode="94"
+    android:versionName="3.45" >
 
     <uses-sdk
         android:maxSdkVersion="18"
-        android:minSdkVersion="14"
+        android:minSdkVersion="7"
         android:targetSdkVersion="18" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -24,7 +24,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
     <supports-screens
         android:xlargeScreens="false"
         android:largeScreens="false"
@@ -82,6 +81,8 @@
         </service>
         <service android:name="ubicomp.drunk_detection.activities.ClickLoggerService" >
         </service>
+        <service android:name="ubicomp.drunk_detection.activities.GPSService" >
+        </service>
         
         <activity
             android:name="ubicomp.drunk_detection.activities.PreSettingActivity"
@@ -103,7 +104,6 @@
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.AboutActivity"
-            android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity

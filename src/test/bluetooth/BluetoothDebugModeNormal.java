@@ -11,6 +11,9 @@ import ubicomp.drunk_detection.fragments.TestFragment;
 public class BluetoothDebugModeNormal extends Bluetooth {
 
 	protected BracValueDebugHandler bracDebugHandler;
+	protected static float PRESSURE_DIFF_MIN_RANGE  = 50f;
+	protected static float PRESSURE_DIFF_MIN =100.f;
+	
 	
 	private String temp_pressure;
 	
@@ -22,9 +25,6 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 		this.bracDebugHandler = bracDebugHandler;
 	}
 
-	private static int READ_A0 = 10;
-	private static int READ_A1 = 11;
-	
 	@Override
 	public void start(){
 		testFragment.showDebug("bluetooth start the test");
@@ -70,12 +70,7 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 						end = sendMsgToApp(msg);
 						sendDebugMsg(msg);
 						msg="a";
-						read_type = READ_A0;
-					}else if ((char)temp[i]=='c'){
-						end = sendMsgToApp(msg);
-						sendDebugMsg(msg);
-						msg="c";
-						read_type = READ_A1;
+						read_type = READ_ALCOHOL;
 					}else if ((char)temp[i]=='m'){
 						end = sendMsgToApp(msg);
 						sendDebugMsg(msg);

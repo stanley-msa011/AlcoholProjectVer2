@@ -16,7 +16,6 @@
    		    android:layout_height="wrap_content"
    		    android:gravity="center"
    		    android:text="@string/analysis_counter"
-   		    android:textAlignment="center"
    		    android:textColor="#FFFFFFFF" />
 
    </RelativeLayout>

@@ -17,7 +17,6 @@ public class HourlyAlarmService extends Service {
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -25,7 +24,7 @@ public class HourlyAlarmService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
 		super.onStartCommand(intent, flags, startId);
-		Log.e("ALARM","Start AlarmService(Hourly)");   
+		Log.e("ALARM","Start AlarmService(Hourly)");
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		boolean start = sp.getBoolean("hourly_alarm", false);
@@ -40,26 +39,34 @@ public class HourlyAlarmService extends Service {
 		String title = getResources().getString(R.string.app_name);
 		String msgText = getResources().getString(R.string.notification_msg_2);
 		
-		if (Build.VERSION.SDK_INT>=16){
+		if (Build.VERSION.SDK_INT >= 11){
+			
 			Notification.Builder notificationBuilder = new Notification.Builder(getBaseContext());
 			notificationBuilder.setContentTitle(title);
 			notificationBuilder.setContentText(msgText);
 			notificationBuilder.setSmallIcon(R.drawable.icon);
 			notificationBuilder.setContentIntent(pIntent);
-
-			notification = notificationBuilder.build();
-		}
-		else{
+		
+			if (Build.VERSION.SDK_INT <16)
+				notification = notificationBuilder.getNotification();
+			else
+				notification = notificationBuilder.build();
+			
+			notification.defaults = Notification.DEFAULT_ALL;
+			notification.flags |= Notification.FLAG_AUTO_CANCEL;
+			
+			NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.notify(0,notification);
+		}else{
 			notification = new Notification();
-			notification.contentIntent = pIntent;
-			notification.icon = R.drawable.icon;
-			notification.setLatestEventInfo(this,title,msgText, pIntent);
+			notification.defaults = Notification.DEFAULT_ALL;
+			notification.flags |= Notification.FLAG_AUTO_CANCEL;
+			notification.setLatestEventInfo(getBaseContext(), title, msgText,pIntent);
+			NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.notify(0,notification);
 		}
-		notification.defaults = Notification.DEFAULT_ALL;
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-		NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(0,notification);
+		
+		stopSelf();
 		
 		return Service.START_REDELIVER_INTENT;
 	}

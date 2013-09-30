@@ -58,7 +58,6 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 	public void restartPreview(){
 		if (cameraRecorder.camera!=null){
 			try{
-				cameraRecorder.camera.setFaceDetectionListener(null);
 				cameraRecorder.camera.stopPreview();
 				cameraRecorder.camera.startPreview();
 			}catch(Exception e){

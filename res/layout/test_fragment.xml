@@ -71,7 +71,6 @@
     	    android:layout_centerInParent="true"
     	    android:gravity="center"
     	    android:text="@string/start"
-    	    android:textAlignment="center"
     	    android:textColor="#FF454545" />
     	
     	<TextView
@@ -80,7 +79,6 @@
     	    android:layout_height="wrap_content"
     	    android:layout_centerInParent="true"
     	    android:gravity="center"
-    	    android:textAlignment="center"
     	    android:textColor="#FF2e2e2e" />
 
     </RelativeLayout>
@@ -100,7 +98,6 @@
     	    android:layout_height="wrap_content"
     	    android:layout_centerHorizontal="true"
     	    android:gravity="center"
-    	    android:textAlignment="center"
     	    android:textColor="#FFc98123" 
     	    android:layout_below="@+id/test_start_layout"
     	    />
@@ -113,7 +110,6 @@
 	   	    android:layout_centerHorizontal="true"
 	   	    android:gravity="center"
 	   	    android:text="@string/brac"
-	   	    android:textAlignment="center"
 	   	    android:textColor="#FFc98123" />
 	
 		<ImageView

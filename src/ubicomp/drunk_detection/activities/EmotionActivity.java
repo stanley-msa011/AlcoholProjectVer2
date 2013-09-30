@@ -4,15 +4,17 @@ import statistic.ui.questionnaire.content.ConnectSocialInfo;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,7 +23,6 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -94,18 +95,7 @@ public class EmotionActivity extends Activity {
 	    requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_emotion);
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		if (Build.VERSION.SDK_INT<13){
-			@SuppressWarnings("deprecation")
-			int w = display.getWidth();
-			@SuppressWarnings("deprecation")
-			int h = display.getHeight();
-			screen = new Point(w,h);
-		}
-		else{
-			screen = new Point();
-			display.getSize(screen);
-		}
+		screen = ScreenSize.getScreenSize(this);
 		texts = getResources().getStringArray(R.array.emotionDIY_solution);
 		
 		this.activity = this;
@@ -121,6 +111,12 @@ public class EmotionActivity extends Activity {
 		setCallCheckBox();
 		setPlayGuideBox();
 		db = new QuestionDB(activity);
+		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		SharedPreferences.Editor edit = sp.edit();
+		edit.putLong("LatestEmotionDIYTime", System.currentTimeMillis());
+		edit.commit();
+		
 	}
 
 	@Override
@@ -365,11 +361,20 @@ private void setPlayGuideBox(){
 		
 		String[] recreation = new String[5];
 		
-		recreation[0] = sp.getString("recreation0", "");
-		recreation[1] = sp.getString("recreation1", "");
-		recreation[2] = sp.getString("recreation2", "");
+		recreation[0] = sp.getString("recreation0",getString(R.string.default_recreation_1));
+		recreation[1] = sp.getString("recreation1", getString(R.string.default_recreation_2));
+		recreation[2] = sp.getString("recreation2", getString(R.string.default_recreation_3));
 		recreation[3] = sp.getString("recreation3", "");
 		recreation[4] = sp.getString("recreation4", "");
+		
+		if (recreation[0].length() == 0)
+			recreation[0] = getString(R.string.default_recreation_1);
+		
+		if (recreation[1].length() == 0)
+			recreation[1] = getString(R.string.default_recreation_2);
+		
+		if (recreation[2].length() == 0)
+			recreation[2] = getString(R.string.default_recreation_3);
 		
 		boolean[] has_value = {
 				recreation[0].length()>0,
@@ -530,12 +535,12 @@ private View createTextView(String textStr){
 		@Override
 		public void onClick(View v) {
 			
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			boolean addAcc = db.insertEmotion(in,selected);
 			if (addAcc)
-				CustomToast.generateToast(activity, R.string.emotionDIY_end_toast, 1, screen);
+				CustomToast.generateToast(activity, R.string.emotionDIY_end_toast, 1);
 			else
-				CustomToast.generateToast(activity, R.string.emotionDIY_end_toast, 0, screen);
+				CustomToast.generateToast(activity, R.string.emotionDIY_end_toast, 0);
 			activity.finish();
 		}
 	}
@@ -554,9 +559,11 @@ private View createTextView(String textStr){
 			this.call = call;
 		}
 		
+		@SuppressLint("InlinedApi")
+		@SuppressWarnings("deprecation")
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_OPEN_CALL_BOX);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_OPEN_CALL_BOX);
 			int item_count = mainLayout.getChildCount();
 			for (int i=0;i<item_count;++i)
 				mainLayout.getChildAt(i).setEnabled(false);
@@ -565,7 +572,10 @@ private View createTextView(String textStr){
 			bgLayout.addView(shadowBg);
 			bgLayout.addView(callLayout);
 			shadowParam = (LayoutParams) shadowBg.getLayoutParams();
-			shadowParam.width = shadowParam.height = LayoutParams.MATCH_PARENT;
+			if (Build.VERSION.SDK_INT >=8)
+				shadowParam.width = shadowParam.height = LayoutParams.MATCH_PARENT;
+			else
+				shadowParam.width = shadowParam.height = LayoutParams.FILL_PARENT;
 			
 			boxParam = (LayoutParams) callLayout.getLayoutParams();
 			boxParam.width = screen.x * 349/480;
@@ -581,6 +591,7 @@ private View createTextView(String textStr){
 		
 	}
 	
+	@SuppressLint("InlinedApi")
 	private class PlayGuideOnClickListener  implements View.OnClickListener{
 
 		private int type;
@@ -589,9 +600,10 @@ private View createTextView(String textStr){
 			this.type =type;
 		}
 		
+		@SuppressWarnings("deprecation")
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_OPEN_PLAY_BOX);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_OPEN_PLAY_BOX);
 			int item_count = mainLayout.getChildCount();
 			for (int i=0;i<item_count;++i)
 				mainLayout.getChildAt(i).setEnabled(false);
@@ -600,7 +612,10 @@ private View createTextView(String textStr){
 			bgLayout.addView(shadowBg);
 			bgLayout.addView(playLayout);
 			shadowParam = (LayoutParams) shadowBg.getLayoutParams();
-			shadowParam.width = shadowParam.height = LayoutParams.MATCH_PARENT;
+			if (Build.VERSION.SDK_INT >= 8)
+				shadowParam.width = shadowParam.height = LayoutParams.MATCH_PARENT;
+			else
+				shadowParam.width = shadowParam.height = LayoutParams.FILL_PARENT;
 			
 			boxParam = (LayoutParams) playLayout.getLayoutParams();
 			boxParam.width = screen.x * 349/480;
@@ -639,7 +654,7 @@ private View createTextView(String textStr){
 		
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			setRecreationEnd(recreation);
 		}
 		
@@ -661,13 +676,13 @@ private View createTextView(String textStr){
 			if (mediaPlayer == null)
 				return;
 			if (mediaPlayer.isPlaying()){
-				ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_PAUSE_AUDIO);
+				ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_PAUSE_AUDIO);
 				mediaPlayer.pause();
 				playPause.setImageDrawable(playPlayDrawable);
 				playHelp.setText(R.string.emotion_box_pause);
 			}
 			else{
-				ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_PLAY_AUDIO);
+				ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_PLAY_AUDIO);
 				mediaPlayer.start();
 				playPause.setImageDrawable(playPauseDrawable);
 				playHelp.setText(R.string.emotion_box_playing);
@@ -678,7 +693,7 @@ private View createTextView(String textStr){
 	private class PlayCancelOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CANCEL_AUDIO);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CANCEL_AUDIO);
 			if (mediaPlayer != null){
 				mediaPlayer.release();
 				mediaPlayer = null;
@@ -697,7 +712,7 @@ private View createTextView(String textStr){
 	private class CallCancelOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CANCEL_CALL);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CANCEL_CALL);
 			bgLayout.removeView(shadowBg);
 			bgLayout.removeView(callLayout);
 			int item_count = mainLayout.getChildCount();
@@ -721,7 +736,7 @@ private View createTextView(String textStr){
 		
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CALL);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CALL);
 			db.insertEmotion(in,name);
 			Intent intentDial = new Intent("android.intent.action.CALL",Uri.parse("tel:"+call));
 			activity.startActivity(intentDial);
@@ -737,7 +752,7 @@ private View createTextView(String textStr){
 		
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			setQuestionEnd(in);
 		}
 	}
@@ -745,7 +760,7 @@ private View createTextView(String textStr){
 	private class RecreationOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			setQuestionRecreation();
 		}
 	}
@@ -758,7 +773,7 @@ private View createTextView(String textStr){
 		
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_SELECTION);
 			setQuestionCall(type);
 		}
 	}
@@ -795,7 +810,7 @@ private View createTextView(String textStr){
 		if (keyCode == KeyEvent.KEYCODE_BACK){
 			if (!enableBack)
 				return false;
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONDIY_RETURN_BUTTON);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_RETURN_BUTTON);
 			if (state == 0){
 				CustomToastSmall.generateToast(this, R.string.emotionDIY_toast);
 				--state;

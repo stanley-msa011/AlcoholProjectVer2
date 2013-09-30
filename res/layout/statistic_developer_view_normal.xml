@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+>
+    <TextView
+        android:id="@+id/developer_brac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BRAC:"
+        android:textSize="30sp"
+        android:textColor="#FF000000"
+        />
+
+    <TextView
+        android:id="@+id/developer_brac_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:layout_toRightOf="@+id/developer_brac"
+        android:textColor="#FF000000"
+        />
+    <TextView
+        android:id="@+id/developer_voltage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Voltage:"
+        android:textSize="30sp"
+        android:layout_below="@+id/developer_brac"
+        android:textColor="#FF000000"
+        />
+     <TextView
+        android:id="@+id/developer_voltage_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:layout_toRightOf="@+id/developer_voltage"
+        android:layout_below="@+id/developer_brac"
+        android:textColor="#FF000000"
+        />
+    
+    <TextView
+        android:id="@+id/developer_ts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TS:"
+        android:textSize="30sp"
+        android:layout_below="@+id/developer_voltage"
+        android:textColor="#FF000000"
+        />
+     <TextView
+        android:id="@+id/developer_ts_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:layout_toRightOf="@+id/developer_ts"
+        android:layout_below="@+id/developer_voltage"
+        android:textColor="#FF000000"
+        />
+     
+</RelativeLayout>

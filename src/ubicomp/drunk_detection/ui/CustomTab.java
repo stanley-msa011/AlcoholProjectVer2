@@ -1,6 +1,5 @@
 package ubicomp.drunk_detection.ui;
 
-import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -31,7 +30,7 @@ public class CustomTab {
 	
 	
 	private void setting(){
-		int width = FragmentTabs.getScreenWidth();
+		int width = ScreenSize.getScreenX(context);
 		view = inflater.inflate(R.layout.tab_icon_layout, null);
 		bg = (ImageView) view.findViewById(R.id.tab_icon_bg);
 		icon = (ImageView) view.findViewById(R.id.tab_icon_icon);

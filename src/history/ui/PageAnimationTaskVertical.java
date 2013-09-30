@@ -2,6 +2,7 @@ package history.ui;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -32,7 +33,6 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	private Point screen;
 	private int y_axis;
 	
-	
 	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx){
 		this.pageWidget = pageWidget;
 		this.from = from;
@@ -40,7 +40,7 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 		this.startImageIdx = startImageIdx;
 		this.endImageIdx = endImageIdx;
 		this.historyFragment = historyFragment;
-		screen = FragmentTabs.getSize();
+		screen = ScreenSize.getScreenSize(historyFragment.getActivity());
 		width_gap_1 = (to.x - from.x)/(float)gaps;
 		height_gap_1 = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;
@@ -54,15 +54,11 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 		this.startImageIdx = startImageIdx;
 		this.endImageIdx = endImageIdx;
 		this.historyFragment = historyFragment;
-		screen = FragmentTabs.getSize();
 		width_gap_1 = (to.x - from.x)/(float)gaps;
 		height_gap_1 = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;	
 		end_type = type;
-		if (FragmentTabs.isWideScreen())
-			y_axis = screen.x*1137/1080;
-		else
-			y_axis = screen.x * 993/1080;
+		y_axis = screen.y - screen.x * 574/1080;
 	}
 	
 	@Override

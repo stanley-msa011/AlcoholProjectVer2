@@ -7,12 +7,7 @@ import android.content.Context;
 public class LoadingDialogControl {
 	
 	static ProgressDialog dialog = null;
-	
-	public static void cancel(){
-		if (dialog !=null)
-			dialog.cancel();
-	}
-	
+
 	public static void show(Context context){
 		
 		if (dialog == null){

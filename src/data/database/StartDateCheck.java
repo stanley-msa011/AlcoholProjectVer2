@@ -15,12 +15,13 @@ public class StartDateCheck {
 		Calendar start_date = Calendar.getInstance();
 		int year = sp.getInt("sYear", start_date.get(Calendar.YEAR));
 		int month = sp.getInt("sMonth", start_date.get(Calendar.MONTH));
-		int date = sp.getInt("sDay", Calendar.DAY_OF_MONTH);
+		int date = sp.getInt("sDate", Calendar.DAY_OF_MONTH);
 		start_date.set(year, month, date, 0, 0,0);
 		start_date.set(Calendar.MILLISECOND, 0);
 		
-		if (now.after(start_date))
+		if (now.after(start_date)){
 			return true;
+		}
 		return false;
 	}
 }

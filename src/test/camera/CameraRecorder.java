@@ -6,10 +6,11 @@ import java.util.List;
 import ubicomp.drunk_detection.activities.R;
 
 import test.data.ImageFileHandler;
-import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.fragments.TestFragment;
+import ubicomp.drunk_detection.ui.ScreenSize;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -22,13 +23,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+@SuppressLint("InlinedApi")
 public class CameraRecorder {
     
     private TestFragment testFragment;
-    private Activity activity;
-    Camera camera;
-    private PictureCallback pictureCallback;
-    private ImageFileHandler imgFileHandler;
+    private Context context;
+    protected Camera camera;
+    protected Camera.PictureCallback pictureCallback;
+    protected ImageFileHandler imgFileHandler;
     
     private PreviewWindow preview;
     private FrameLayout previewFrame = null;
@@ -40,7 +42,7 @@ public class CameraRecorder {
     
     public CameraRecorder(TestFragment testFragment, ImageFileHandler imgFileHandler){
     	this.testFragment = testFragment;
-    	this.activity = testFragment.getActivity();
+    	this.context = testFragment.getActivity();
     	this.imgFileHandler =  imgFileHandler;
     	imgFileHandler.setRecorder(this);
     	pictureCallback = new PictureCallback();
@@ -62,7 +64,7 @@ public class CameraRecorder {
 		camera.setParameters(params);
     }
     
-    private Point getBestSize(List<Size> list){
+    protected Point getBestSize(List<Size> list){
 		int bestWidth = Integer.MAX_VALUE;
 		int bestHeight = Integer.MAX_VALUE;
 		if (list.size()>1){
@@ -85,12 +87,12 @@ public class CameraRecorder {
     
     public void setSurfaceCallback(){
     	previewFrame = null;
-    	circle = new ImageView(activity);
+    	circle = new ImageView(context);
     	circle.setBackgroundColor(0xAAAACCFF);
-    	previewFrame =(FrameLayout) activity.findViewById(R.id.test_camera_preview_layout);
-    	previewCircleLayout = new RelativeLayout(activity);
+    	previewFrame =(FrameLayout) testFragment.getView().findViewById(R.id.test_camera_preview_layout);
+    	previewCircleLayout = new RelativeLayout(context);
     	if (previewFrame!=null){
-    		preview = new PreviewWindow(activity,this);
+    		preview = new PreviewWindow(context,this);
     		previewHolder = preview.getHolder();
     		previewHolder.addCallback(preview);
     		previewFrame.addView(preview);
@@ -101,7 +103,7 @@ public class CameraRecorder {
     	previewCircleLayout.addView(circle);
     	circle.setVisibility(View.INVISIBLE);
     	RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) circle.getLayoutParams();
-    	Point screen = FragmentTabs.getSize();
+    	Point screen = ScreenSize.getScreenSize(context);
     	cParam.width = (int)(screen.x * 320.0/720.0);
     	cParam.height = (int)(screen.x * 320.0/720.0);
     }

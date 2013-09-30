@@ -1,11 +1,13 @@
 package test.ui;
 
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.check.AlwaysFinishActivitiesCheck;
 import ubicomp.drunk_detection.fragments.TestFragment;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,11 +16,15 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.LocationManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,7 +33,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Switch;
 import android.widget.TextView;
 
-public class TestQuestionMsgBox {
+public class TestQuestionMsgBox implements TestQuestionMsgBoxInterface{
 
 	private TestFragment testFragment;
 	private Context context;
@@ -59,7 +65,6 @@ public class TestQuestionMsgBox {
 	
 	private Resources r;
 	private Point screen;
-	private boolean isWideScreen;
 	
 	private EndOnClickListener endListener;
 	private CancelOnClickListener cancelListener;
@@ -92,15 +97,14 @@ public class TestQuestionMsgBox {
 		this.mainLayout = mainLayout;
 		emotionStr = context.getResources().getStringArray(R.array.emotion_state);
 		desireStr = context.getResources().getStringArray(R.array.craving_state);
-		screen = FragmentTabs.getSize();
-		isWideScreen = FragmentTabs.isWideScreen();
+		screen = ScreenSize.getScreenSize(context);
 		digitTypeface = Typefaces.getDigitTypeface(context);
 		wordTypeface = Typefaces.getWordTypeface(context);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
 		setting();
 	}
 	
-	private void setting(){
+	protected void setting(){
 		
 		endListener = new EndOnClickListener();
 		cancelListener = new CancelOnClickListener();
@@ -117,10 +121,7 @@ public class TestQuestionMsgBox {
 		title.setTypeface(wordTypefaceBold);
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)title.getLayoutParams();
 		tParam.topMargin = screen.x*53/480;
-		if(isWideScreen)
-			tParam.bottomMargin = screen.x*60/480;
-		else
-			tParam.bottomMargin = screen.x*30/480;
+		tParam.bottomMargin = screen.y * 60/762;
 		
 		help = (TextView) boxLayout.findViewById(R.id.msg_help);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
@@ -153,7 +154,8 @@ public class TestQuestionMsgBox {
 		
 		gpsSwitch = (Switch) boxLayout.findViewById(R.id.msg_gps_switch);
 		gpsSwitch.setHeight(screen.x * 80/480);
-		gpsSwitch.setSwitchMinWidth(screen.x*52/480);
+		if (Build.VERSION.SDK_INT >=16)
+			gpsSwitch.setSwitchMinWidth(screen.x*52/480);
 		gpsSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 40/480 );
 		
 		emotionShow = (ImageView) boxLayout.findViewById(R.id.msg_emotion_show);
@@ -173,19 +175,23 @@ public class TestQuestionMsgBox {
 		desireShowText.setTypeface(wordTypeface);
 		
 		emotionSeekBarLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_seek_bar_layout);
+		
+		int bar_width = screen.x * 260/480;
 		RelativeLayout.LayoutParams eSBParam = (LayoutParams) emotionSeekBarLayout.getLayoutParams();
-		eSBParam.width = screen.x * 260/480;
+		eSBParam.width = bar_width;
+		eSBParam.topMargin = screen.x * -20/480;
 		RelativeLayout.LayoutParams eSBgParam = (LayoutParams) emotionSeekBg.getLayoutParams();
-		eSBgParam.width = screen.x * 260/480;
+		eSBgParam.width = bar_width;
 		desireSeekBarLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_desire_seek_bar_layout);
 		RelativeLayout.LayoutParams dSBParam = (LayoutParams) desireSeekBarLayout.getLayoutParams();
-		dSBParam.width = screen.x * 260/480;
+		dSBParam.width = bar_width;
+		dSBParam.topMargin = screen.x * -20/480;
 		RelativeLayout.LayoutParams dSBgParam = (LayoutParams) desireSeekBg.getLayoutParams();
-		dSBgParam.width = screen.x * 260/480;
+		dSBgParam.width = bar_width;
 		
 		int num_size = screen.x * 26/480;
 		int num_size2 = screen.x * 90/480;
-		int num_size3 = screen.x * 260/480 - (num_size + num_size2)*2;
+		int num_size3 = bar_width - (num_size + num_size2)*2;
 		
 		eNum = new TextView[5];
 		eNum[0] = (TextView) boxLayout.findViewById(R.id.msg_emotion_num0);
@@ -237,19 +243,15 @@ public class TestQuestionMsgBox {
 		
 		emotionLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_emotion_layout);
 		LinearLayout.LayoutParams eParam =  (LinearLayout.LayoutParams)emotionLayout.getLayoutParams();
-		if (isWideScreen)
-			eParam.bottomMargin = screen.x * 50/480;
-		else
-			eParam.bottomMargin = screen.x * 25/480;
+		
+		eParam.bottomMargin = screen.y * 40/762;
+		
 		desireLayout = (RelativeLayout) boxLayout.findViewById(R.id.msg_desire_layout);
 		LinearLayout.LayoutParams dParam =  (LinearLayout.LayoutParams)desireLayout.getLayoutParams();
-		if (isWideScreen)
-			dParam.bottomMargin = screen.x * 50/480;
-		else
-			dParam.bottomMargin = screen.x * 25/480;
+		dParam.bottomMargin = screen.y * 40/762;
 		
 		LinearLayout.LayoutParams sParam =  (LinearLayout.LayoutParams)gpsSwitch.getLayoutParams();
-		sParam.bottomMargin = screen.x * 16/480;
+		sParam.bottomMargin = screen.x * 15/480;
 		
 		divider = boxLayout.findViewById(R.id.msg_divider);
 		
@@ -274,14 +276,11 @@ public class TestQuestionMsgBox {
 		boxParam.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
 		boxParam.topMargin = screen.x * 80/480;
 		boxParam.width = screen.x * 435/480;
-		if (isWideScreen)
-			boxParam.height = screen.x * 637/480;
-		else
-			boxParam.height = screen.x * 578/480;
+		boxParam.height = screen.y * 637/762;
 		
 		RelativeLayout.LayoutParams qParam = (RelativeLayout.LayoutParams) questionLayout.getLayoutParams();
 		qParam.leftMargin = qParam.rightMargin = screen.x * 44/480;
-		qParam.width = screen.x * 392/480;
+		qParam.width = screen.x * 400/480;
 		
 		emotionDrawables = new Drawable[5];
 		emotionDrawables[0]  = r.getDrawable(R.drawable.msg_emotion_1);
@@ -303,7 +302,7 @@ public class TestQuestionMsgBox {
 		desireDrawables[9]  = r.getDrawable(R.drawable.msg_desire_10);
 		
 		
-		int padding_ver = screen.x * 5/480;
+		int padding_ver = screen.x * 15/480;
 		int padding_hor = screen.x * 24/480;
 		
 		emotionSeekBar.setPadding(padding_hor , padding_ver,padding_hor , padding_ver);
@@ -344,10 +343,25 @@ public class TestQuestionMsgBox {
 	public  void settingPostTask(){
 		emotionSeekBar.setProgress(0);
 		desireSeekBar.setProgress(0);
-		gpsSwitch.setOnClickListener(
-				new View.OnClickListener(){
+		gpsSwitch.setOnCheckedChangeListener(
+				new OnCheckedChangeListener(){
 					@Override
-					public void onClick(View v) {enableSend(true);}});
+					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+						enableSend(true);
+						if (isChecked){
+							if (AlwaysFinishActivitiesCheck.check(context)){
+								LocationManager lm =(LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+								boolean gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+								boolean network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+								if (!(gps_enabled && network_enabled)){
+									AlwaysFinishActivitiesCheck.openDialog(context);
+									gpsSwitch.setChecked(false);
+									gpsSwitch.invalidate();
+								}
+							}
+						}
+					}
+				});
 	}
 	
 	public void clear(){
@@ -404,17 +418,17 @@ public class TestQuestionMsgBox {
 				return;
 			}
 			if (doneByDoubleClick)
-				ClickLoggerLog.Log(context, ClickLogId.TEST_QUESTION_SEND);
+				ClickLogger.Log(context, ClickLogId.TEST_QUESTION_SEND);
 			else
-				ClickLoggerLog.Log(context, ClickLogId.TEST_QUESTION_SEND_DATA);
+				ClickLogger.Log(context, ClickLogId.TEST_QUESTION_SEND_DATA);
 			
 			boxLayout.setVisibility(View.INVISIBLE);
 			boolean enableGPS = gpsSwitch.isChecked();
 			int desire = desireSeekBar.getProgress()+1;
 			int emotion =  emotionSeekBar.getProgress()+1;
 				
-				testFragment.writeQuestionFile(emotion, desire);
-				testFragment.startGPS(enableGPS);
+			testFragment.writeQuestionFile(emotion, desire);
+			testFragment.startGPS(enableGPS);
 		}
 	}
 	
@@ -432,7 +446,7 @@ public class TestQuestionMsgBox {
 			int desire = -1;
 			int emotion =  -1;
 			
-			ClickLoggerLog.Log(context, ClickLogId.TEST_QUESTION_CANCEL);
+			ClickLogger.Log(context, ClickLogId.TEST_QUESTION_CANCEL);
 			
 			testFragment.writeQuestionFile(emotion, desire);
 			testFragment.startGPS(enableGPS);
@@ -447,10 +461,10 @@ public class TestQuestionMsgBox {
 		boxLayout.setVisibility(View.VISIBLE);
 	}
 	
-	public void closeInitializingBox(){
+	public void closeBox(){
+		if (boxLayout!=null)
 			boxLayout.setVisibility(View.INVISIBLE);
-			FragmentTabs.enableTabAndClick(true);
-			return;
+		return;
 	}
 	
 	private class EmotionOnTouchListener implements View.OnTouchListener{
@@ -498,6 +512,7 @@ public class TestQuestionMsgBox {
 			for (int i=0;i<dNum.length;++i)
 				dNum[i].setVisibility(View.INVISIBLE);
 			dNum[progress].setVisibility(View.VISIBLE);
+			enableSend(true);
 		}
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -517,9 +532,8 @@ public class TestQuestionMsgBox {
 			TextView tv =(TextView)v;
 			switch(e){
 				case MotionEvent.ACTION_MOVE:
-					if(!rect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())){
+					if(!rect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY()))
 						tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeLarge);
-			        }
 					break;
 				case MotionEvent.ACTION_UP:
 					tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSizeLarge);

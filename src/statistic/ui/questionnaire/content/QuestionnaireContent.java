@@ -3,7 +3,7 @@ package statistic.ui.questionnaire.content;
 import java.util.ArrayList;
 
 import statistic.ui.QuestionMsgBox;
-import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.ui.ScreenSize;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -38,7 +38,7 @@ abstract public class QuestionnaireContent {
 		this.choiceDrawable = msgBox.getChoiceDrawable();
 		this.msgBox = msgBox;
 		this.context = msgBox.getContext();
-		int x = FragmentTabs.getScreenWidth();	
+		int x = ScreenSize.getScreenX(context);
 		textSize = x * 21/480;
 		contentSideMargin = x * 40/480;
 		contentMargin = x * 10/480;

@@ -22,7 +22,6 @@ public class BracDataHandlerDebugMode extends BracDataHandler {
 	public BracDataHandlerDebugMode(String timestamp_string,
 			TestFragment fragment) {
 		super(timestamp_string, fragment);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

@@ -1,9 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".AboutActivity" >
+    tools:context=".AboutActivity" 
+    >
 	<RelativeLayout 
 	    android:id="@+id/about_title_layout"
     	android:layout_width="match_parent"
@@ -42,7 +44,7 @@
 	        android:layout_centerVertical="true"
 	        android:text="@string/about_help"
 	        android:textColor="#FF777777" />
-
+	    
 	</RelativeLayout>
 	    
     <RelativeLayout
@@ -59,12 +61,43 @@
         	android:gravity="left|center_vertical"
 			android:textColor="#FF727171"
 			/>
+    	
+    	<TextView
+	        android:id="@+id/about_phone"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/phone"
+	        android:layout_below="@+id/about_content"
+	        android:gravity="left|center_vertical"
+	        android:textColor="#FF727171" />
+	    
+	    <TextView 
+	        android:id="@+id/about_phone_number"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/phone_number"
+	        android:layout_below="@+id/about_content"
+	        android:layout_toRightOf="@+id/about_phone"
+	        android:gravity="left|center_vertical"
+	        android:textColor="#FF727171" 
+	        />
+    	
+	    <TextView
+	        android:id="@+id/about_email"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/about_phone_number"
+	        android:layout_toRightOf="@+id/about_phone"
+	        android:gravity="left|center_vertical"
+	        android:text="@string/email"
+	        android:textColor="#FF727171" />
+
     	<RelativeLayout 
 	        android:id="@+id/about_logos"
         	android:layout_width="match_parent"
         	android:layout_height="wrap_content"
         	android:layout_centerHorizontal="true"
-        	android:layout_below="@+id/about_content"
+        	android:layout_below="@+id/about_email"
         	>
 
     	    

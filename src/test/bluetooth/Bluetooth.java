@@ -46,8 +46,8 @@ public class Bluetooth {
 	protected float absolute_min;
 	protected float now_pressure;
 	protected boolean isPeak = false;
-	protected final static float PRESSURE_DIFF_MIN_RANGE =150.f;
-	protected final static float PRESSURE_DIFF_MIN =150.f;
+	protected final static float PRESSURE_DIFF_MIN_RANGE  = 200f;
+	protected final static float PRESSURE_DIFF_MIN =600.f;
 	protected final static float MAX_PRESSURE = Float.MAX_VALUE;
 	protected final static long IMAGE_MILLIS_0 = 500;
 	protected final static long IMAGE_MILLIS_1 = 2500;

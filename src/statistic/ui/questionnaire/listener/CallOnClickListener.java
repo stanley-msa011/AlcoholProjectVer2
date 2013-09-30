@@ -1,7 +1,7 @@
 package statistic.ui.questionnaire.listener;
 
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import statistic.ui.QuestionMsgBox;
 import android.content.Intent;
 import android.net.Uri;
@@ -20,7 +20,7 @@ public class CallOnClickListener extends QuestionnaireOnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		ClickLoggerLog.Log(msgBox.getContext(), ClickLogId.STATISTIC_QUESTION_NEXT);
+		ClickLogger.Log(msgBox.getContext(), ClickLogId.STATISTIC_QUESTION_NEXT);
 		if (!isEmotion)
 			seq.add(",-1");
 		msgBox.insertSeq();

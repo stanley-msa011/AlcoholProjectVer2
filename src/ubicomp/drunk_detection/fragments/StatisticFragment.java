@@ -5,6 +5,7 @@ import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.statistic_page_view.AnalysisCounterView;
 import statistic.ui.statistic_page_view.AnalysisProgressView;
@@ -17,6 +18,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,7 +38,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 
 public class StatisticFragment extends Fragment {
 	private View view;
@@ -77,7 +79,7 @@ public class StatisticFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	view = inflater.inflate(R.layout.statistic_fragment, container,false);
-    	screen = FragmentTabs.getSize();
+    	screen = ScreenSize.getScreenSize(getActivity());
     	if (screen == null){
     		if (activity!=null)
     			activity.finish();
@@ -205,7 +207,7 @@ public class StatisticFragment extends Fragment {
 				page = ClickLogId.STATISTIC_MONTHLY_VIEW;
 				break;
 			}
-			ClickLoggerLog.Log(getActivity(), page);
+			ClickLogger.Log(getActivity(), page);
 			for (int i=0;i<3;++i)
 				dots[i].setImageDrawable(dot_off);
 			dots[arg0].setImageDrawable(dot_on);
@@ -225,7 +227,7 @@ public class StatisticFragment extends Fragment {
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
 					if (event.getAction()== MotionEvent.ACTION_DOWN)
-						ClickLoggerLog.Log(getActivity(), ClickLogId.STATISTIC_ANALYSIS_TOUCH);
+						ClickLogger.Log(getActivity(), ClickLogId.STATISTIC_ANALYSIS_TOUCH);
 					return false;
 				}
 			});
@@ -276,9 +278,9 @@ public class StatisticFragment extends Fragment {
 					default_counter = -1;
 				}
 				if (isAdd)
-					CustomToast.generateToast(activity, show_text, add_self_help_counter, screen);
+					CustomToast.generateToast(activity, show_text, add_self_help_counter);
 				else
-					CustomToast.generateToast(activity, show_text, default_counter, screen);
+					CustomToast.generateToast(activity, show_text, default_counter);
 				
 				SharedPreferences.Editor editor = sp.edit();
 		    	editor.putBoolean("tested", false);
@@ -338,7 +340,7 @@ public class StatisticFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getActivity(), ClickLogId.STATISTIC_QUESTION_BUTTON);
+			ClickLogger.Log(getActivity(), ClickLogId.STATISTIC_QUESTION_BUTTON);
 			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			int result = sp.getInt("latest_result", -1);
@@ -362,9 +364,11 @@ public class StatisticFragment extends Fragment {
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 		int result = sp.getInt("latest_result", -1);
 		if (result  == -1){
-			questionAnimation.cancel();
+			if (Build.VERSION.SDK_INT >= 8)
+				questionAnimation.cancel();
 			questionButton.setAnimation(null);
-			questionButton.setAlpha(1.0F);
+			if (Build.VERSION.SDK_INT >= 11)
+				questionButton.setAlpha(1.0F);
 		}
 		else{
 			questionButton.setAnimation(questionAnimation);
@@ -381,9 +385,9 @@ public class StatisticFragment extends Fragment {
 	
 	public void showEndOfQuestionnaire(boolean addAcc){
 		if (addAcc)
-			CustomToast.generateToast(activity, R.string.after_questionnaire, 1, screen);
+			CustomToast.generateToast(activity, R.string.after_questionnaire, 1);
 		else
-			CustomToast.generateToast(activity, R.string.after_questionnaire, 0, screen);
+			CustomToast.generateToast(activity, R.string.after_questionnaire, 0);
 	}
 	
 	public void updateSelfHelpCounter(){

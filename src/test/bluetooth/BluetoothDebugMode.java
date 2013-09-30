@@ -12,6 +12,9 @@ public class BluetoothDebugMode extends Bluetooth {
 
 	protected BracValueDebugHandler bracDebugHandler;
 	
+	protected static float PRESSURE_DIFF_MIN_RANGE  = 50f;
+	protected static float PRESSURE_DIFF_MIN =100.f;
+	
 	public BluetoothDebugMode(TestFragment testFragment,
 			CameraRunHandler cameraRunHandler,
 			BracValueFileHandler bracFileHandler,

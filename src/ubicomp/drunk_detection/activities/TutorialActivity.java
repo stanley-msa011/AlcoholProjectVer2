@@ -1,9 +1,10 @@
 package ubicomp.drunk_detection.activities;
 
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,7 +17,6 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -38,7 +38,7 @@ public class TutorialActivity extends Activity {
 	private TextView notify; 
 	
 	private LoadingHandler loadingHandler;
-	private static Point size;
+	private static Point screen;
 	
 	private RelativeLayout layout;
 	private Typeface digitTypeface;
@@ -49,7 +49,7 @@ public class TutorialActivity extends Activity {
 	
 	private AlphaAnimation animation;
 	
-	private boolean isWideScreen;
+	//private boolean isWideScreen;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +58,7 @@ public class TutorialActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_tutorial);
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		if (Build.VERSION.SDK_INT<13){
-			@SuppressWarnings("deprecation")
-			int w = display.getWidth();
-			@SuppressWarnings("deprecation")
-			int h = display.getHeight();
-			size = new Point(w,h);
-		}
-		else{
-			size = new Point();
-			display.getSize(size);
-		}
-		isWideScreen = (float)size.y/(float)size.x > 1.67;
+		screen = ScreenSize.getScreenSize(this);
 		
 		digitTypeface = Typefaces.getDigitTypeface(this);
 		wordTypefaceBold  = Typefaces.getWordTypefaceBold(this);
@@ -80,33 +68,35 @@ public class TutorialActivity extends Activity {
 		arrow = (ImageView) this.findViewById(R.id.tutorial_arrow);
 		
 		RelativeLayout.LayoutParams rParam = (RelativeLayout.LayoutParams) replay.getLayoutParams();
-		rParam.bottomMargin = size.x * 32/480;
+		rParam.bottomMargin = screen.x * 32/480;
 		
 		step = (TextView) this.findViewById(R.id.tutorial_step);
-		step.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 85/480);
+		step.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 85/480);
 		step.setTypeface(digitTypeface);
 		
 		RelativeLayout.LayoutParams sParam = (RelativeLayout.LayoutParams) step.getLayoutParams();
-		sParam.topMargin = size.x * 79/480;
-		sParam.height = size.x * 85/480;
+		sParam.topMargin = screen.x * 79/480;
+		sParam.height = screen.x * 85/480;
 		
 		notify= (TextView) this.findViewById(R.id.tutorial_notify);
-		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 25/480);
+		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 25/480);
 		notify.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams nParam = (RelativeLayout.LayoutParams) notify.getLayoutParams();
-		nParam.topMargin = size.x * 25/480;
-		nParam.height = size.x * 25/480;
+		nParam.topMargin = screen.x * 25/480;
+		nParam.height = screen.x * 25/480;
 		
 		help = (TextView) this.findViewById(R.id.tutorial_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, size.x * 25/480);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 25/480);
 		help.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
-		if (isWideScreen)
-			hParam.topMargin = size.x * 486/480;
-		else
-			hParam.topMargin = size.x * 446/480;
-		hParam.height = size.x * 25/480;
+		//if (isWideScreen)
+		//	hParam.topMargin = screen.x * 486/480;
+		//else
+		//	hParam.topMargin = screen.x * 446/480;
+		hParam.topMargin = screen.y * 486/762;
+		
+		hParam.height = screen.x * 25/480;
 		
 		tab = (ImageView) this.findViewById(R.id.tutorial_tab);
 		layout = (RelativeLayout) this.findViewById(R.id.tutorial_layout);
@@ -136,8 +126,10 @@ public class TutorialActivity extends Activity {
 	protected void onPause(){
 		super.onPause();
 		loadingHandler.removeMessages(0);
-		if (animation!=null)
-			animation.cancel();
+		if (animation!=null){
+			if (Build.VERSION.SDK_INT>=8)
+				animation.cancel();
+		}
 		if (arrow != null){
 			arrow.setAnimation(null);
 		}
@@ -180,11 +172,13 @@ public class TutorialActivity extends Activity {
 			tab.setVisibility(View.INVISIBLE);
 			arrow.setImageDrawable(arrowDrawables[0]);
 			aParam.addRule(RelativeLayout.RIGHT_OF, help.getId());
-			if (isWideScreen)
-				aParam.topMargin = size.x * 550/480;
-			else
-				aParam.topMargin = size.x * 510/480;
-			aParam.leftMargin = size.x * 10/480;
+			//if (isWideScreen)
+			//	aParam.topMargin = screen.x * 550/480;
+			//else
+			//	aParam.topMargin = screen.x * 510/480;
+			aParam.topMargin = screen.y * 550/762;
+			
+			aParam.leftMargin = screen.x * 10/480;
 			animation.start();
 		}
 		else if (state == 1){
@@ -195,7 +189,7 @@ public class TutorialActivity extends Activity {
 			arrow.setImageDrawable(arrowDrawables[1]);
 			aParam.addRule(RelativeLayout.ABOVE, tab.getId());
 			aParam.topMargin = 0;
-			aParam.leftMargin = size.x * 40/480;
+			aParam.leftMargin = screen.x * 40/480;
 			animation.start();
 		}
 		else if (state == 2){
@@ -205,11 +199,13 @@ public class TutorialActivity extends Activity {
 			tab.setVisibility(View.INVISIBLE);
 			arrow.setImageDrawable(arrowDrawables[2]);
 			aParam.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-			if (isWideScreen)
-				aParam.topMargin = size.x * 377/480;
-			else
-				aParam.topMargin = size.x * 357/480;
-			aParam.leftMargin = size.x * 170/480;
+			//if (isWideScreen)
+			//	aParam.topMargin = screen.x * 377/480;
+			//else
+			//	aParam.topMargin = screen.x * 357/480;
+			aParam.topMargin = screen.y * 377/762;
+			
+			aParam.leftMargin = screen.x * 170/480;
 			animation.start();
 		}
 	}
@@ -223,9 +219,9 @@ public class TutorialActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			if (step == -1)
-				ClickLoggerLog.Log(getBaseContext(), ClickLogId.TUTORIAL_REPLAY);
+				ClickLogger.Log(getBaseContext(), ClickLogId.TUTORIAL_REPLAY);
 			else
-				ClickLoggerLog.Log(getBaseContext(), ClickLogId.TUTORIAL_CLICK);
+				ClickLogger.Log(getBaseContext(), ClickLogId.TUTORIAL_CLICK);
 			settingState(step+1);
 		}
 		
@@ -234,8 +230,9 @@ public class TutorialActivity extends Activity {
 	private class EndListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.TUTORIAL_END);
+			ClickLogger.Log(getBaseContext(), ClickLogId.TUTORIAL_END);
 			arrow.setAnimation(null);
+			if (Build.VERSION.SDK_INT >= 8)
 			animation.cancel();
 			finish();
 		}

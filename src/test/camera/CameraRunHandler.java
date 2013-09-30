@@ -22,7 +22,4 @@ public class CameraRunHandler extends Handler {
 			cameraRecorder.CloseFail(2);
 	}
 	
-	public void takePicture(){
-		cameraRecorder.takePicture();
-	}
 }

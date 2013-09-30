@@ -1,7 +1,7 @@
 package statistic.ui.questionnaire.listener;
 
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.content.QuestionnaireContent;
 import android.view.View;
@@ -23,7 +23,7 @@ public class SelectedListener implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		msgBox.cleanSelection();
-		ClickLoggerLog.Log(msgBox.getContext(), ClickLogId.STATISTIC_QUESTION_SELECT);
+		ClickLogger.Log(msgBox.getContext(), ClickLogId.STATISTIC_QUESTION_SELECT);
 		ImageView img = (ImageView) v.findViewById(QuestionnaireContent.QUESTION_IMAGE_ID);
 		img.setImageDrawable(msgBox.getChoiceSelectedDrawable());
 		msgBox.setNextButton(str_id, listener);

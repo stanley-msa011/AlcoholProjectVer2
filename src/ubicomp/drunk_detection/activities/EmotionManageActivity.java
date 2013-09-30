@@ -3,13 +3,16 @@ package ubicomp.drunk_detection.activities;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -17,7 +20,6 @@ import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -92,18 +94,7 @@ public class EmotionManageActivity extends Activity {
 		emotion_texts = getResources().getStringArray(R.array.emotion_manage_emotion);
 		related_texts = getResources().getStringArray(R.array.emotion_manage_related);
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		if (Build.VERSION.SDK_INT<13){
-			@SuppressWarnings("deprecation")
-			int w = display.getWidth();
-			@SuppressWarnings("deprecation")
-			int h = display.getHeight();
-			screen = new Point(w,h);
-		}
-		else{
-			screen = new Point();
-			display.getSize(screen);
-		}
+		screen = ScreenSize.getScreenSize(this);
 		
 		this.activity = this;
 		db = new QuestionDB(activity);
@@ -119,6 +110,11 @@ public class EmotionManageActivity extends Activity {
 		
 		upDrawable = getResources().getDrawable(R.drawable.questionnaire_item_up);
 		downDrawable = getResources().getDrawable(R.drawable.questionnaire_item_down);
+		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		SharedPreferences.Editor edit = sp.edit();
+		edit.putLong("LatestEmotionManageTime", System.currentTimeMillis());
+		edit.commit();
 	}
 
 	@Override
@@ -283,7 +279,7 @@ private View createTextView(int textStr){
 					public void beforeTextChanged(CharSequence arg0, int arg1,int arg2, int arg3) {}
 					@Override
 					public void onTextChanged(CharSequence arg0, int arg1,	int arg2, int arg3) {
-						ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_EDIT);					
+						ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_EDIT);					
 					}
 		});
 		edit.setId(0x1999);
@@ -342,7 +338,7 @@ private View createTextView(int textStr){
 		
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			r_texts.setText(str);
 			isShow = false;
 			if (select_item != null){
@@ -407,12 +403,12 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	private class EndOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			boolean addAcc = db.insertEmotionManage(emotion, r_type, reason);
 			if (addAcc)
-				CustomToast.generateToast(activity, R.string.emotion_manage_end_toast, 1, screen);
+				CustomToast.generateToast(activity, R.string.emotion_manage_end_toast, 1);
 			else
-				CustomToast.generateToast(activity, R.string.emotion_manage_end_toast, 0, screen);
+				CustomToast.generateToast(activity, R.string.emotion_manage_end_toast, 0);
 			activity.finish();
 		}
 	}
@@ -425,7 +421,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		}
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			state = 1;
 			emotion = _emotion;
 			setQuestionType();
@@ -442,7 +438,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			state = 2;
 			r_type = type;
 			setQuestionEdit();
@@ -452,7 +448,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	private class EditedOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			state = 3;
 			setQuestionEnd();
 		}
@@ -487,7 +483,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event){
 		if (keyCode == KeyEvent.KEYCODE_BACK){
-			ClickLoggerLog.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_RETURN_BUTTON);
+			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_RETURN_BUTTON);
 			if (state == 0){
 				CustomToastSmall.generateToast(this, R.string.emotion_manage_toast);
 				--state;

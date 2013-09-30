@@ -23,7 +23,6 @@ public class BracDataHandlerDebugModeNormal extends BracDataHandler {
 	public BracDataHandlerDebugModeNormal(String timestamp_string,
 			TestFragment fragment) {
 		super(timestamp_string, fragment);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

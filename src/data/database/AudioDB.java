@@ -237,12 +237,13 @@ public class AudioDB {
     			"year= " +dv.year+
     			" AND month= " +dv.month+
     			" AND day= " + dv.date+
-    			" AND filename=" + "'"+dv.toFileString()+"'";
+    			" AND filename=" + "'"+dv.toFileString()+"' ORDER BY id DESC LIMIT 1";
     	cursor = db.rawQuery(sql, null);
     	
     	for (int i=0;i<3;++i)
     		used[i] = acc[i];
     	
+    	/*
     	if (cursor.getCount() > 0){
     		sql = "UPDATE Record SET upload = 0, ts = "+ts+" , " +
     			" acc1 = " +acc[0]+", "+
@@ -261,6 +262,7 @@ public class AudioDB {
     		db.close();
     		return;
     	}
+    	*/
     	cursor.close();
     	
     	sql = "INSERT INTO Record (year,month,day,filename,ts,acc1,acc2,acc3,used1,used2,used3) VALUES (" +

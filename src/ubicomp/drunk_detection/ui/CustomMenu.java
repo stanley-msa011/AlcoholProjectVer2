@@ -1,17 +1,17 @@
 package ubicomp.drunk_detection.ui;
 
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 import ubicomp.drunk_detection.activities.AboutActivity;
 import ubicomp.drunk_detection.activities.EmotionActivity;
 import ubicomp.drunk_detection.activities.EmotionManageActivity;
-import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +19,7 @@ import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-@SuppressLint("ViewConstructor")
+@SuppressLint({ "ViewConstructor", "InlinedApi" })
 public class CustomMenu extends PopupWindow {
 
 	private View menu0,menu1,menu2;
@@ -28,13 +28,20 @@ public class CustomMenu extends PopupWindow {
 	
 	private Typeface wordTypeface;
 	
+	@SuppressWarnings("deprecation")
 	public CustomMenu(Context context,LayoutInflater inflater) {
+		if (inflater == null)
+			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View menu=inflater.inflate(R.layout.menu, null);
 		this.context = context;
 		this.setContentView(menu);
 		this.setFocusable(false);
 		this.setOutsideTouchable(true);
-		this.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
+		if (Build.VERSION.SDK_INT >= 8)
+			this.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
+		else
+			this.setWidth(WindowManager.LayoutParams.FILL_PARENT);
+		
 		this.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
 		this.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 		menu0 = menu.findViewById(R.id.menu_0);
@@ -46,17 +53,20 @@ public class CustomMenu extends PopupWindow {
 		
 		wordTypeface = Typefaces.getWordTypeface(context);
 		
-		int x = FragmentTabs.getScreenWidth();
+		int x = ScreenSize.getScreenX(context);
 		
 		m0 = (TextView) menu.findViewById(R.id.menu_text_0);
 		m0.setTypeface(wordTypeface);
 		m0.setTextSize(TypedValue.COMPLEX_UNIT_PX, x*24/480);
+		m0.getLayoutParams().height = x*209/1080;
 		m1 = (TextView) menu.findViewById(R.id.menu_text_1);
 		m1.setTypeface(wordTypeface);
 		m1.setTextSize(TypedValue.COMPLEX_UNIT_PX, x*24/480);
+		m1.getLayoutParams().height = x*209/1080;
 		m2 = (TextView) menu.findViewById(R.id.menu_text_2);
 		m2.setTypeface(wordTypeface);
 		m2.setTextSize(TypedValue.COMPLEX_UNIT_PX, x*24/480);
+		m2.getLayoutParams().height = x*209/1080;
 	}
 	
 	
@@ -67,15 +77,15 @@ public class CustomMenu extends PopupWindow {
 			switch (v.getId()){
 				case R.id.menu_0:
 					intent = new Intent(context, EmotionActivity.class);
-					ClickLoggerLog.Log(context, ClickLogId.MENU_EMOTIONDIY);
+					ClickLogger.Log(context, ClickLogId.MENU_EMOTIONDIY);
 					break;
 				case R.id.menu_1:
 					intent = new Intent(context, EmotionManageActivity.class);
-					ClickLoggerLog.Log(context, ClickLogId.MENU_EMOTIONMANAGE);
+					ClickLogger.Log(context, ClickLogId.MENU_EMOTIONMANAGE);
 					break;
 				case R.id.menu_2:
 					intent = new Intent(context,AboutActivity.class);
-					ClickLoggerLog.Log(context, ClickLogId.MENU_ABOUT);
+					ClickLogger.Log(context, ClickLogId.MENU_ABOUT);
 					break;
 				default:
 					intent = null;

@@ -1,17 +1,18 @@
 package history.ui;
 
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 
-import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.activities.StorytellingSharingActivity;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,10 +46,11 @@ public class StorytellingBox {
 		this.mainLayout = mainLayout;
 		background = new FrameLayout(context);
 		background.setBackgroundColor(0x99000000);
-		screen = FragmentTabs.getSize();
+		screen = ScreenSize.getScreenSize(context);
 		setting();
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void setting(){
 		
 		background.setVisibility(View.INVISIBLE);
@@ -62,7 +64,10 @@ public class StorytellingBox {
 		mainLayout.addView(boxLayout);
 		
 		RelativeLayout.LayoutParams bgParam = (LayoutParams) background.getLayoutParams();
-		bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
+		if (Build.VERSION.SDK_INT>= 8)
+			bgParam.width = bgParam.height = LayoutParams.MATCH_PARENT;
+		else
+			bgParam.width = bgParam.height = LayoutParams.FILL_PARENT;
 		
 		RelativeLayout.LayoutParams param = (LayoutParams) boxLayout.getLayoutParams();
 		param.width = screen.x * 349/480;
@@ -110,7 +115,7 @@ public class StorytellingBox {
 	private class EndListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_SHARE_CANCEL);
+			ClickLogger.Log(context, ClickLogId.STORYTELLING_SHARE_CANCEL);
 			background.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
 			historyFragment.enablePage(true);
@@ -121,7 +126,7 @@ public class StorytellingBox {
 		@Override
 		public void onClick(View v) {
 			
-			ClickLoggerLog.Log(context, ClickLogId.STORYTELLING_SHARE_OK);
+			ClickLogger.Log(context, ClickLogId.STORYTELLING_SHARE_OK);
 			background.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
 			historyFragment.enablePage(true);

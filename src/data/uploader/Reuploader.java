@@ -33,6 +33,7 @@ import data.database.HistoryDB;
 import data.info.BracDetectionState;
 
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.check.DefaultCheck;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -48,6 +49,9 @@ public class Reuploader {
 	private static DataReuploader reuploader = null;
 	
 	public static void reuploader(Context context){
+		if(DefaultCheck.check(context))
+			return;
+		
 		if(!NetworkCheck.networkCheck(context))
 			return;
 		if (reuploader!=null){
@@ -81,12 +85,12 @@ public class Reuploader {
 		private static String SERVER_URL;
 		private String devId;
 		
-		
+		private SharedPreferences sp;
 		public DataReuploader(Context context){
 			db = new HistoryDB(context);
 			this.context = context;
 			this.devId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+			 sp = PreferenceManager.getDefaultSharedPreferences(context);
 			SERVER_URL = ServerUrl.SERVER_URL_TEST(sp.getBoolean("developer", false));
 		}
 		
@@ -100,6 +104,9 @@ public class Reuploader {
 		        else
 		        	mainStorageDir = new File(context.getFilesDir(),"drunk_detection");
 			
+			 long gps_ts = Long.valueOf(sp.getString("LatestGPSTimestamp", "0"))*1000L;
+			 Log.d("REUPLOADER","gps ts = "+gps_ts);
+			 
 			
 			BracDetectionState state[] = db.getAllNotUploadedDetection();
 			if (state == null)
@@ -108,6 +115,7 @@ public class Reuploader {
 			Log.d("REUPLOADER","state.length "+state.length);
 			
 			for (int i=0;i<state.length;++i){
+				Log.d("REUPLOADER","state ts = "+state[i].timestamp);
 				String _ts =String.valueOf(state[i].timestamp/1000L);
 				File[]  imageFiles;
 				File textFile, geoFile,stateFile, questionFile;

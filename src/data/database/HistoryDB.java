@@ -3,6 +3,7 @@ package data.database;
 import java.util.Calendar;
 
 import test.data.BracDataHandler;
+import ubicomp.drunk_detection.activities.GPSService;
 
 import data.calculate.TimeBlock;
 import data.calculate.WeekNum;
@@ -20,7 +21,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class HistoryDB {
 
@@ -28,21 +28,16 @@ public class HistoryDB {
 	private SQLiteOpenHelper dbHelper = null;
     private SQLiteDatabase db = null;
 	
-    private Calendar start_date;
     
     private static final int nBlocks = 3;
     private Context context;
+    private SharedPreferences sp;
+    
     
 	public HistoryDB(Context context){
+		sp = PreferenceManager.getDefaultSharedPreferences(context);
 		dbHelper = new DBHelper(context);
 		this.context = context;
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
-		start_date = Calendar.getInstance();
-		int year = sp.getInt("sYear", start_date.get(Calendar.YEAR));
-		int month = sp.getInt("sMonth", start_date.get(Calendar.MONTH));
-		int date = sp.getInt("sDay", Calendar.DAY_OF_MONTH);
-		start_date.set(year, month, date, 0, 0,0);
-		start_date.set(Calendar.MILLISECOND, 0);
 	}
 	
 	public DateBracDetectionState[] getAllHistory(){
@@ -384,7 +379,9 @@ public class HistoryDB {
     	long ts_days = (long)(n_days-1)*DAY;
     	long start_ts = cal.getTimeInMillis() - ts_days;
     	
-    	String sql = "SELECT * FROM Detection WHERE ts >= "+start_ts+" GROUP BY year,month,day,timeblock ORDER BY id ASC";
+    	String sql ="SELECT * FROM Detection JOIN (" +
+    			" SELECT MIN(id) AS mid FROM Detection WHERE ts >= "+start_ts+" GROUP BY year,month,day,timeblock ORDER BY id ASC" +
+    			")";
     	
     	db = dbHelper.getReadableDatabase();
     	Cursor cursor = db.rawQuery(sql, null);
@@ -458,7 +455,16 @@ public class HistoryDB {
     
     public BracDetectionState[] getAllNotUploadedDetection(){
     	db = dbHelper.getReadableDatabase();
-    	String sql = "SELECT id,week, ts, brac, emotion, desire FROM Detection WHERE upload = 0 ORDER BY id ASC";
+    	long cur_ts = System.currentTimeMillis(); 
+    	long gps_ts = sp.getLong("LatestGPSTime", 0) + GPSService.GPS_TOTAL_TIME;
+    	String sql;
+    	if (cur_ts <= gps_ts){
+    		long gps_detection_ts = Long.valueOf(sp.getString("LatestGPSTimestamp", "0"))*1000L;
+    		sql = "SELECT id,week, ts, brac, emotion, desire FROM Detection WHERE upload = 0 AND ts <> "+gps_detection_ts+" ORDER BY id ASC";
+    	}
+    	else{
+    		sql = "SELECT id,week, ts, brac, emotion, desire FROM Detection WHERE upload = 0  ORDER BY id ASC";
+    	}
     	Cursor cursor = db.rawQuery(sql, null);
     	int count = cursor.getCount();
     	if (count == 0){

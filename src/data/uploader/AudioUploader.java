@@ -26,6 +26,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.check.DefaultCheck;
 
 import data.database.AudioDB;
 import data.info.AccAudioData;
@@ -42,6 +43,9 @@ public class AudioUploader extends AsyncTask<Void, Void, Void> {
 	
 	private static AudioUploader uploader;
 	public static void upload(Context context){
+		if(DefaultCheck.check(context))
+			return;
+		
 		if(!NetworkCheck.networkCheck(context))
 			return;
 		if (uploader != null)

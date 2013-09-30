@@ -77,6 +77,17 @@
     <string name="test_guide_show_turn_on">請按酒測裝置右下角按鈕\n以啟用酒測裝置</string>
     <string name="test_guide_start">請點選\'開始\'進行測試</string>
     <string name="test_guide_msg_box">請依對話框指示進行操作</string>
+    <string-array name="test_guide_msg">
+        <item>珍惜自己，對自己負責，\n才能讓自己更好</item>
+        <item>放眼未來，從現在起努力\n，你一定能脫胎換骨</item>
+        <item>成功戒酒的人之所以成功\n，是因為他們能從失敗中\n得到寶貴經驗</item>
+        <item>不要妥協於現狀，要極力\n爭取更美好的未來</item>
+        <item>唯一能阻礙你前進的，只\n有自我設限</item>
+        <item>好事多磨，戒酒需要不斷\n的努力</item>
+        <item>一天過一天，我感覺我的\n狀況越來越好</item>
+        <item>我們最愛的是我們自己，\n好好愛惜自己</item>
+    </string-array>
+    
     <string name="test_guide_end">\n請點選按鈕以結束</string>
     <string name="test_guide_testing">請將臉對於螢幕中央，\n並開始吹氣</string>
     <string name="test_guide_test_fail">酒測器沒電了</string>
@@ -131,7 +142,7 @@
         <item >您開始懂得好好善待自己，並且”自愛”\n是一生最重要的一場戀愛。</item>
         <item >對過去憤怒，或對未來恐懼，只是讓您的\n生活變得更無力，更容易錯過現在。</item>
         <item >我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。</item>
-        <item >我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。</item>
+        <item >你正勇於面對戒酒在生活的挑戰，接受自\n己的不足，但也珍惜自己的任何改變。</item>
         <item >您發現當您越認真努力戒酒，生活變得更\n順，運氣也會跟著變好。</item>
         <item >您相信自己一步一步在走您自己所創造的\n不一樣中。</item>
         <item >就像一次一次的身體訓練，每一次都讓我\n們變得更強壯或更堅定。</item>
@@ -139,8 +150,26 @@
     </string-array>
     <string name="call_to">要聯絡誰？</string>
     <string name="next">下一步</string>
-    <string name="question_type0_help">為了家人和不一樣的\n自己，請繼續加油，\n堅持下去</string>
-    <string name="question_type0_next">我相信我做得到的</string>
+    <string-array name="question_type0_help">
+        <item>為了家人和不一樣的\n自己，請繼續加油，\n堅持下去</item>
+        <item>我們將成為我們所想\n要成為的人</item>
+        <item>打破所有的阻抗和障\n礙，持續且堅定的努\n力來達成目標</item>
+        <item>一天過一天，我感覺\n我的狀況越來越好</item>
+        <item>好事多磨，戒酒需要\n不斷的努力</item>
+        <item>戒酒成功與失敗只有\n一線之隔，要時時提\n醒自己不要喝酒</item>
+        <item>不要只從少喝幾杯酒\n來衡量每天的成效，\n而也要看戒酒後長期\n帶來的好處</item>
+        <item>做一件事需要具備能\n力，但要真正戒酒需\n要正面的動機及態度</item>
+    </string-array>
+    <string-array name="question_type0_next">
+        <item>我相信我做得到的</item>
+        <item>我相信我做得到的</item>
+        <item>我相信我做得到的</item>
+        <item>感覺變好</item>
+        <item>繼續加油</item>
+        <item>了解</item>
+        <item>了解</item>
+        <item>了解</item>
+    </string-array>
     <string name="question_type1_help">重新整理浮動的心，\n堅持持續戒酒的決心，\n建議您可以：</string>
     <string name="question_type2_help">您似乎開始喝酒了，\n現在啟用一小時停酒提醒，\n同時建議您可以：</string>
     <string name="question_type3_help">您似乎喝了不少酒，\n建議您可以：</string>
@@ -207,10 +236,13 @@
 		<item>合作開發。</item>
 		<item>開發目為協助酗酒患者戒酒並自我控制使用。</item>
 		<item>此應用程式需搭配專用酒測器方可使用。</item>
-		<item>應用界面視覺設計：</item>
+		<item>應用介面視覺設計：</item>
 		<item>插畫：</item>
 		<item>著色：</item>
 	</string-array>
+	<string name="phone">聯絡開發團隊：</string>
+	<string name="phone_number"><u>(02)3366-4926</u></string>
+	<string name="phone_check">確定要聯絡開發團隊？</string>
 	<string name="dot">、</string>
 	<string name="ntu">國立台灣大學</string>
 	<string name= "sinica">中央研究院</string>
@@ -243,4 +275,16 @@
 	<string name= "storytelling_check_toast1">分享對象未填寫</string>
 	<string name= "storytelling_check_toast2">分享時間未填寫</string>
 	<string name= "storytelling_check_toast3">請填寫分享對象及時間</string>
+	<string name= "default_recreation_1">聽音樂</string>
+	<string name= "default_recreation_2">慢跑</string>
+	<string name= "default_recreation_3">打球</string>
+	<string name="default_goal_good"> 機車</string>
+	<string name="default_forbidden">您不是本實驗參加者，因此無法使用吹氣功能</string>
+	<string name="open_gps">請將位置資訊服務相關功能開啟</string>
+	<string name="check_do_not_keep_activities">您已開啟“不要保留活動”且未啟用“位置資訊服務”。\n建議您至“設定->開發人員選項”下取消勾選“不要保留活動”。\n本次測試將不會回報您的位置</string>
+	<string name= "email"><u>ubicomplab.ntu@gmail.com</u></string>
+	<string name= "email_subject">[戒酒小幫手]問題回報</string>
+	<string name= "email_message">請問要如何寄送信件</string>
+	<string name= "email_reject">非本實驗受試者煩請不要寄送信件</string>
+	<string name= "email_fail">手機端未安裝信件寄送程式</string>
 </resources>

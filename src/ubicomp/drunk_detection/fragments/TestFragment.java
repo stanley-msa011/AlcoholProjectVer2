@@ -3,13 +3,18 @@ package ubicomp.drunk_detection.fragments;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.Random;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
+import ubicomp.drunk_detection.activities.GPSService;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.activities.TutorialActivity;
+import ubicomp.drunk_detection.check.AlwaysFinishActivitiesCheck;
+import ubicomp.drunk_detection.check.DefaultCheck;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 
 import test.bluetooth.BTInitHandler;
@@ -17,8 +22,10 @@ import test.bluetooth.BTRunTask;
 import test.bluetooth.Bluetooth;
 import test.bluetooth.BluetoothDebugMode;
 import test.bluetooth.BluetoothDebugModeNormal;
+import test.bluetooth.BluetoothOld;
 import test.camera.CameraInitHandler;
 import test.camera.CameraRecorder;
+import test.camera.CameraRecorderOld;
 import test.camera.CameraRunHandler;
 import test.data.BracDataHandler;
 import test.data.BracDataHandlerDebugMode;
@@ -28,8 +35,10 @@ import test.data.BracValueFileHandler;
 import test.data.ImageFileHandler;
 import test.data.QuestionFile;
 import test.gps.GPSInitTask;
-import test.gps.GPSRunTask;
+import test.ui.NotificationBox;
 import test.ui.TestQuestionMsgBox;
+import test.ui.TestQuestionMsgBoxInterface;
+import test.ui.TestQuestionMsgBoxOld;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -39,6 +48,7 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -58,8 +68,9 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import data.uploader.Reuploader;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 
 public class TestFragment extends Fragment {
 
@@ -85,7 +96,7 @@ public class TestFragment extends Fragment {
 	//GPS
 	private LocationManager locationManager;
 	private GPSInitTask gpsInitTask;
-	private GPSRunTask gpsRunTask;
+	//private GPSRunTask gpsRunTask;
 	private boolean gps_state = false;
 	
 	//Bluetooth
@@ -108,7 +119,7 @@ public class TestFragment extends Fragment {
 	private BracDataHandler BDH;
 	
 	private RelativeLayout main_layout;
-	private TestQuestionMsgBox msgBox;
+	private TestQuestionMsgBoxInterface msgBox;
 
 	private LoadingHandler loadingHandler;
 	private FailBgHandler failBgHandler;
@@ -156,8 +167,13 @@ public class TestFragment extends Fragment {
 	private String test_guide_test_timeout;
 	private String test_guide_connect_fail;
 	
+	private String[] test_guide_msg;
+	
 	private Thread start_thread = null;
 	
+	private SharedPreferences sp;
+	
+	private NotificationBox notificationBox;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -176,6 +192,8 @@ public class TestFragment extends Fragment {
 		test_guide_test_fail = getString(R.string.test_guide_test_fail);
 		test_guide_test_timeout = getString(R.string.test_guide_test_timeout);
 		test_guide_connect_fail = getString(R.string.test_guide_connect_fail);
+		test_guide_msg = getResources().getStringArray(R.array.test_guide_msg);
+		sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
 	
 	public void onPause(){
@@ -186,13 +204,16 @@ public class TestFragment extends Fragment {
 		if (!isKeepMsgBox()){
 			stop();
 			clear();
+			AlwaysFinishActivitiesCheck.dismiss();
 		}
+		if (notificationBox!=null)
+			notificationBox.dismiss();
+		
 		super.onPause();
 	}
 	
 	public void onResume(){
 		super.onResume();
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		checkDebug2(sp.getBoolean("debug", false),sp.getBoolean("debug_type", false));
 		if (!isKeepMsgBox()){
 			activity = this.getActivity();
@@ -206,8 +227,15 @@ public class TestFragment extends Fragment {
 		}
 	}
 	private void settingOnResume(){
-		if (msgBox==null)
-			msgBox = new TestQuestionMsgBox(testFragment,main_layout);
+		if (msgBox==null){
+			if (Build.VERSION.SDK_INT >=14)
+				msgBox = new TestQuestionMsgBox(testFragment,main_layout);
+			else
+				msgBox = new TestQuestionMsgBoxOld(testFragment,main_layout);
+		}
+		if (notificationBox == null)
+			notificationBox = new NotificationBox(testFragment.getActivity(),main_layout);
+		
 		loadingHandler = new LoadingHandler();
 		msgLoadingHandler = new MsgLoadingHandler();
 		failBgHandler = new FailBgHandler();
@@ -222,19 +250,27 @@ public class TestFragment extends Fragment {
 		timestamp = setTimeStamp();
 		setStorage();
 		locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-		cameraRecorder = new CameraRecorder(testFragment,imgFileHandler);
+		if (Build.VERSION.SDK_INT>=9)
+			cameraRecorder = new CameraRecorder(testFragment,imgFileHandler);
+		else
+			cameraRecorder = new CameraRecorderOld(testFragment,imgFileHandler);
+		
 		cameraRunHandler = new CameraRunHandler(cameraRecorder);
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		Boolean debug = sp.getBoolean("debug", false);
 		Boolean debug_type = sp.getBoolean("debug_type", false);
-		if (debug){
-			if (debug_type)
-				bt = new BluetoothDebugModeNormal(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		
+		if (Build.VERSION.SDK_INT >= 14){
+			if (debug){
+				if (debug_type)
+					bt = new BluetoothDebugModeNormal(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+				else
+					bt = new BluetoothDebugMode(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+			}
 			else
-				bt = new BluetoothDebugMode(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
-		}
-		else
-			bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+				bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		}else
+			 bt = new BluetoothOld(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+		
 		for (int i=0;i<3;++i)
 			INIT_PROGRESS[i]=DONE_PROGRESS[i]=false;
 	}
@@ -242,7 +278,7 @@ public class TestFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	view = inflater.inflate(R.layout.test_fragment, container,false);
-    	screen = FragmentTabs.getSize();
+    	screen = ScreenSize.getScreenSize(getActivity());
     	if (screen == null){
     		if (activity!=null)
     			activity.finish();
@@ -345,12 +381,25 @@ public class TestFragment extends Fragment {
 	public void runGPS(){
 		if (gps_state){
 			gpsInitTask.cancel(true);
-			gpsRunTask = new GPSRunTask(this,locationManager,mainDirectory);
-			Object[] a = {gps_state};
-			gpsRunTask.execute(a);
-		}
-		else
+			Log.d("GPS","start the service");
+			Intent gpsIntent = new Intent(activity,GPSService.class);
+			Bundle data = new Bundle();
+			data.putString("directory",timestamp);
+			gpsIntent.putExtras(data);
+			activity.startService(gpsIntent);
+			SharedPreferences.Editor edit = sp.edit();
+			edit.putLong("LatestGPSTime", System.currentTimeMillis());
+			edit.putString("LatestGPSTimestamp", timestamp);
+			edit.commit();
 			updateDoneState(_GPS);
+		}
+		else{
+			SharedPreferences.Editor edit = sp.edit();
+			edit.putLong("LatestGPSTime", 0);
+			edit.putString("LatestGPSTimestamp", "0");
+			edit.commit();
+			updateDoneState(_GPS);
+		}
 	}
 	
 	public void startBT(){
@@ -389,8 +438,15 @@ public class TestFragment extends Fragment {
 			if (!FragmentTabs.getClickable())
 				return;
 			
-			ClickLoggerLog.Log(getActivity(), ClickLogId.TEST_START_BUTTON);
-			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
+			if(DefaultCheck.check(activity)){
+				CustomToastSmall.generateToast(activity, R.string.default_forbidden);
+				return;
+			}
+			
+			if (notificationBox!=null)
+				notificationBox.dismiss();
+			
+			ClickLogger.Log(activity, ClickLogId.TEST_START_BUTTON);
 			boolean firstTime = sp.getBoolean("first", true);
 			helpButton.setOnClickListener(null);
 			if (firstTime){
@@ -424,7 +480,7 @@ public class TestFragment extends Fragment {
 	private class EndTestOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
-			ClickLoggerLog.Log(getActivity(), ClickLogId.TEST_RESTART_BUTTON);
+			ClickLogger.Log(getActivity(), ClickLogId.TEST_RESTART_BUTTON);
 			stopDueToInit();
 			if (loadingHandler!=null)
 				loadingHandler.sendEmptyMessage(0);
@@ -475,7 +531,6 @@ public class TestFragment extends Fragment {
 				btRunTask.execute();
 				messageView.setText(R.string.test_guide_turn_on);
 				showDebug("Device launched");
-				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 				Boolean debug = sp.getBoolean("debug", false);
 				
 				if (debug)
@@ -503,7 +558,6 @@ public class TestFragment extends Fragment {
 				}
 			}
 			if (DONE_PROGRESS[_GPS]&&DONE_PROGRESS[_BT]&&DONE_PROGRESS[_CAMERA]){
-				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 				Boolean debug = sp.getBoolean("debug", false);
 				Boolean debug_type = sp.getBoolean("debug_type", false);
 				if (debug){
@@ -514,9 +568,12 @@ public class TestFragment extends Fragment {
 				}
 				else
 					BDH = new BracDataHandler(timestamp, testFragment);
-				int bdh_result = BDH.start();
-				if (bdh_result != BracDataHandler.ERROR)
-					changeTabsHandler.sendEmptyMessage(0);
+				BDH.start();
+				
+				if (!gps_state)
+					Reuploader.reuploader(getActivity());
+					
+				changeTabsHandler.sendEmptyMessage(0);
 		}
 	}
 	
@@ -525,7 +582,6 @@ public class TestFragment extends Fragment {
 			cameraRecorder.close();
 		
 		if (bt!=null)
-			//bt.close();
 			bt = null;
 		if (gpsInitTask!=null)
 			gpsInitTask.cancel(true);
@@ -535,9 +591,7 @@ public class TestFragment extends Fragment {
 			cameraInitHandler.removeMessages(0);
 		if (btRunTask!=null)
 			btRunTask.cancel(true);
-		if (gpsRunTask!=null){
-			gpsRunTask.cancel(true);
-		}
+		
 		if (timeUpHandler!=null){
 			timeUpHandler.removeMessages(0);
 			timeUpHandler.removeMessages(1);
@@ -560,8 +614,6 @@ public class TestFragment extends Fragment {
 			cameraInitHandler.removeMessages(0);
 		if (btRunTask!=null)
 			btRunTask.cancel(true);
-		if (gpsRunTask!=null)
-			gpsRunTask.cancel(true);
 		if (loadingHandler!=null){
 			loadingHandler.removeMessages(0);
 			loadingHandler = null;
@@ -590,6 +642,9 @@ public class TestFragment extends Fragment {
 			timeUpHandler.removeMessages(0);
 			timeUpHandler.removeMessages(1);
 		}
+		if (changeTabsHandler!=null){
+			changeTabsHandler.removeMessages(0);
+		}
 	}
 	
 	private void clear(){
@@ -612,9 +667,26 @@ public class TestFragment extends Fragment {
 			startText.setVisibility(View.VISIBLE);
 			helpButton.setOnClickListener(new TutorialOnClickListener());
 			face.setVisibility(View.INVISIBLE);
+
+			if (notificationBox == null)
+				notificationBox = new NotificationBox(testFragment.getActivity(),main_layout);
+			notificationBox.show(NotificationBox.getType(getActivity()));
 			
-			//bg.setOnTouchListener(new BackgroundDoubleOnTouchListener());
 			LoadingDialogControl.dismiss();
+			
+			/*
+			if (msgBox==null){
+				if (Build.VERSION.SDK_INT >= 14)
+					msgBox = new TestQuestionMsgBox(testFragment,main_layout);
+				else
+					msgBox = new TestQuestionMsgBoxOld(testFragment,main_layout);
+			}
+			msgBox.settingPreTask();
+			msgBox.settingInBackground();
+			msgBox.settingPostTask();
+			msgBox.generateGPSCheckBox();
+			messageView.setText(R.string.test_guide_msg_box);
+			*/
 		}
 	}
     
@@ -623,8 +695,12 @@ public class TestFragment extends Fragment {
 		public void handleMessage(Message msg){
 			startButton.setOnClickListener(null);
 			startButton.setEnabled(false);
-			if (msgBox==null)
-				msgBox = new TestQuestionMsgBox(testFragment,main_layout);
+			if (msgBox==null){
+				if (Build.VERSION.SDK_INT >= 14)
+					msgBox = new TestQuestionMsgBox(testFragment,main_layout);
+				else
+					msgBox = new TestQuestionMsgBoxOld(testFragment,main_layout);
+			}
 			msgBox.settingPreTask();
 			msgBox.settingInBackground();
 			msgBox.settingPostTask();
@@ -675,6 +751,7 @@ public class TestFragment extends Fragment {
 			face.setVisibility(View.VISIBLE);
 			
 			messageView.setText(R.string.test_guide_testing);
+			
 			if (bt!=null && cameraRecorder!=null){
 				bt.start();
 				cameraRecorder.start();
@@ -682,12 +759,24 @@ public class TestFragment extends Fragment {
 			}
 		}
 	}
+	
+	private int prev_drawable_time = -1;
+	
 	public void changeTestMessage(float value,int time){
 		bracText.setText(format.format(value));
 		if (time >= blowDrawables.length)
 			time = blowDrawables.length-1;
+		if (prev_drawable_time == time)
+			return;
+		prev_drawable_time = time;
 		if (blowDrawables!=null)
 			testCircle.setImageDrawable(blowDrawables[time]);
+		
+		if (time == 2){
+			Random rand = new Random();
+			int idx = rand.nextInt(test_guide_msg.length);
+			messageView.setText(test_guide_msg[idx]);
+		}
 	}
 	
 	public void stopByFail(int fail){
@@ -783,7 +872,8 @@ public class TestFragment extends Fragment {
 	private class ChangeTabsHandler extends Handler{
 		public void handleMessage(Message msg){
 			if (msgBox!=null)
-				msgBox.closeInitializingBox();
+				msgBox.closeBox();
+			FragmentTabs.enableTabAndClick(true);
 			FragmentTabs.changeTab(1);
 		}
 	}
@@ -792,7 +882,7 @@ public class TestFragment extends Fragment {
 		public void onClick(View v) {
 			if (!FragmentTabs.getClickable())
 				return;
-			ClickLoggerLog.Log(getActivity(), ClickLogId.TEST_TUTORIAL_BUTTON);
+			ClickLogger.Log(getActivity(), ClickLogId.TEST_TUTORIAL_BUTTON);
 			showTutorial();
 		}
 	}
@@ -811,7 +901,6 @@ public class TestFragment extends Fragment {
 	
 	//Debug --------------------------------------------------------------------------------------------------------
 	private void checkDebug(){
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this.getActivity());
 		Boolean debug = sp.getBoolean("debug", false);
 		ScrollView sv = (ScrollView) view.findViewById(R.id.debugView);
 
@@ -871,7 +960,6 @@ public class TestFragment extends Fragment {
 		
 		@Override
 		public void onClick(View v) {
-			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 			SharedPreferences.Editor editor = sp.edit();
 	    	editor.putInt("latest_result", cond);
 	    	editor.putBoolean("tested", true);
@@ -885,7 +973,6 @@ public class TestFragment extends Fragment {
 	public void showDebug(String message){
 		if (this == null)
 			return;
-		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(activity);
 		Boolean debug = sp.getBoolean("debug", false);
 		if (msgHandler!=null && debug){
 			Message msg = new Message();

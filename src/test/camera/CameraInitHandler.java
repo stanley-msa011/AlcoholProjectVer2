@@ -16,7 +16,7 @@ public class CameraInitHandler extends Handler {
 	
 	public void handleMessage(Message msg){
 		cameraRecorder.init();
-		 cameraRecorder.setSurfaceCallback();
-		 testFragment.updateInitState(TestFragment._CAMERA);
+		cameraRecorder.setSurfaceCallback();
+		testFragment.updateInitState(TestFragment._CAMERA);
 	}
 }

@@ -1,5 +1,7 @@
 package ubicomp.drunk_detection.activities;
 
+import java.util.Calendar;
+
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
@@ -7,6 +9,7 @@ import ubicomp.drunk_detection.fragments.TestFragment;
 import ubicomp.drunk_detection.ui.CustomTab;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.CustomMenu;
+import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,7 +24,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -39,11 +41,10 @@ import android.widget.TabWidget;
 import data.uploader.ClickLogUploader;
 import data.uploader.Reuploader;
 import debug.clicklog.ClickLogId;
-import debug.clicklog.ClickLoggerLog;
+import debug.clicklog.ClickLogger;
 
 public class FragmentTabs extends FragmentActivity {
 	
-	private static boolean isWideScreen;
 	static private TabHost tabHost;
 
 	private static Context context;
@@ -62,7 +63,7 @@ public class FragmentTabs extends FragmentActivity {
 	private android.support.v4.app.FragmentManager fm;
 	TabChangeListener tabChangeListener;
 	
-	private FragmentTabs fragmentTabs; 
+	private  FragmentTabs fragmentTabs; 
 	
 	private LoadingPageHandler loadingPageHandler;
 	
@@ -70,36 +71,22 @@ public class FragmentTabs extends FragmentActivity {
 	
 	private CustomMenu menu;
 	
-	@SuppressWarnings("deprecation")
+	private static int notify_action = 0;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.tab_layout);
+		
 		context = this;
 		fragmentTabs = this;
 		Typefaces.initAll(this);
 		
 		loading_page = (ImageView) this.findViewById(R.id.loading_page);
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		if (Build.VERSION.SDK_INT<13){
-			int w = display.getWidth();
-			int h = display.getHeight();
-			screen_px = new Point(w,h);
-		}
-		else{
-			screen_px = new Point();
-			display.getSize(screen_px);
-		}
-		if (screen_px.x > screen_px.y){
-			int tmp = screen_px.x;
-			screen_px.x = screen_px.y;
-			screen_px.y = tmp;
-		}
-
-		isWideScreen = ((float)screen_px.y/(float)screen_px.x)>1.67F;
+		screen_px = ScreenSize.getScreenSize(getContext());
 		
 		tab_px = new Point(screen_px.x,screen_px.x*209/1080);
 		
@@ -157,16 +144,11 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	protected void onResume(){
 		super.onResume();
-		//enableTab(true);
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
-		//boolean first_setting = sp.getBoolean("first_setting", false);
 		if (uid.length() == 0){
-			loading_page.setVisibility(View.INVISIBLE);
-			Intent newIntent = new Intent(this, DeveloperActivity.class);
-			this.startActivity(newIntent);
-			return;
+			defaultSetting();
 		}
 	}
 	
@@ -191,32 +173,8 @@ public class FragmentTabs extends FragmentActivity {
 		}
 	}
 	
-	public static int getScreenWidth(){
-		return screen_px.x;
-	}
-	
-	public static Point getSize(){
-		if (screen_px == null)
-			return null;
-		Point size = new Point();
-		size.x = screen_px.x;
-		size.y = screen_px.y;
-		if (tab_px!=null&&tab_px.y>0)
-			size.y -= tab_px.y;
-		return size;
-	}
-	
-	public static Point getTabSize(){
-		if (tab_px != null)
-			return tab_px;
-		return null;
-	}
-	
-	public static boolean isWideScreen(){
-		return isWideScreen;
-	}
-	
 	public static void changeTab(int pos){
+		notify_action = 0;
 		TabWidget tabWidget = tabHost.getTabWidget();
 		int count  = tabWidget.getChildCount();
 		if (pos>=0 && pos < count){
@@ -224,37 +182,13 @@ public class FragmentTabs extends FragmentActivity {
 		}
 	}
 	
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-    	MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.main_menu, menu);
-    	return true;
-    }
-	
-    public boolean onOptionsItemSelected(MenuItem item){
-		int id = item.getItemId();
-		Intent newIntent;
-		switch(id){
-			case R.id.menu_emotion_diy:
-				newIntent = new Intent(this, EmotionActivity.class);
-				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_EMOTIONDIY);
-				this.startActivity(newIntent);
-				return true;
-			case R.id.menu_emotion_management:
-				newIntent = new Intent(this, EmotionManageActivity.class);
-				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_EMOTIONMANAGE);
-				this.startActivity(newIntent);
-				return true;
-			case R.id.menu_about:
-				newIntent = new Intent(this, AboutActivity.class);
-				ClickLoggerLog.Log(getBaseContext(), ClickLogId.MENU_ABOUT);
-				this.startActivity(newIntent);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+	public static void changeTab(int pos, int action){
+		if (pos == 2){
+			notify_action = action;
+			tabHost.setCurrentTab(pos);
 		}
-    }
-    
+	}
+	
     public class TabChangeListener implements TabHost .OnTabChangeListener{
 
     	private String lastTabId;
@@ -278,7 +212,7 @@ public class FragmentTabs extends FragmentActivity {
 				tab = ClickLogId.TAB_STATISTIC;
 			else if (tabId.equals(tabName[2]))
 				tab = ClickLogId.TAB_STORYTELLING;
-			ClickLoggerLog.Log(getBaseContext(), tab);
+			ClickLogger.Log(getBaseContext(), tab);
 			
 			ft = fm.beginTransaction();
 			
@@ -302,6 +236,12 @@ public class FragmentTabs extends FragmentActivity {
 							if (fragments[i] != null)
 								ft.remove(fragments[i]);
 							fragments[i] = new HistoryFragment();
+							if (notify_action != 0){
+								Bundle data = new Bundle();
+								data.putInt("action", notify_action);
+								fragments[i].setArguments(data);
+								notify_action = 0;
+							}
 						}
 						ft.add(R.id.real_tabcontent,fragments[i],tabName[i] );
 					}else{
@@ -422,17 +362,58 @@ public class FragmentTabs extends FragmentActivity {
 	
 	@Override
 	public void openOptionsMenu(){
+		if (Build.VERSION.SDK_INT<14){
+			super.openOptionsMenu();
+			return;
+		}
 		if (menu == null)
-			menu = new CustomMenu(this,this.getLayoutInflater());
+			menu = new CustomMenu(this,getLayoutInflater());
 		if (!menu.isShowing() && clickable)
 			menu.showAtLocation(this.getWindow().getDecorView(), Gravity.BOTTOM,0, 0);
 	}
 	
 	@Override
 	public void closeOptionsMenu(){
+		if (Build.VERSION.SDK_INT<14){
+			super.closeOptionsMenu();
+			return;
+		}
 		if (menu!=null && menu.isShowing())
 			menu.dismiss();
 	}
+	
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main_menu, menu);
+		return true;
+    }
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		int id = item.getItemId();
+		Intent newIntent;
+		switch(id){
+			case R.id.menu_emotion_diy:
+				newIntent = new Intent(this, EmotionActivity.class);
+				ClickLogger.Log(getBaseContext(), ClickLogId.MENU_EMOTIONDIY);
+				this.startActivity(newIntent);
+				return true;
+			case R.id.menu_emotion_management:
+				newIntent = new Intent(this, EmotionManageActivity.class);
+				ClickLogger.Log(getBaseContext(), ClickLogId.MENU_EMOTIONMANAGE);
+				this.startActivity(newIntent);
+				return true;
+			case R.id.menu_about:
+				newIntent = new Intent(this, AboutActivity.class);
+				ClickLogger.Log(getBaseContext(), ClickLogId.MENU_ABOUT);
+				this.startActivity(newIntent);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+			}
+	   }
 	
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event){
@@ -447,13 +428,48 @@ public class FragmentTabs extends FragmentActivity {
 				closeOptionsMenu();
 				return true;
 			}else{
-				if (clickable)
+				if (clickable){
+					Context context = FragmentTabs.getContext();
+					if (context != null)
+						ClickLogger.Log(context, ClickLogId.MAIN_ACTIVITY_EXIT);
 					return super.onKeyUp(keyCode, event);
-				else
+				}else
 					return true;
 			}
 		}
 		return super.onKeyUp(keyCode, event);
 	}
+	
+	private void defaultSetting(){
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences.Editor editor = sp.edit();
+		editor.putString("uid", "sober_default_test");
+		editor.putBoolean("developer", false);
+		editor.putString("goal_good", getString(R.string.default_goal_good));
+		editor.putInt("goal_money", 50000);
+		editor.putInt("drink_cost", 200);
+		Calendar cal = Calendar.getInstance();
+		editor.putInt("sYear",cal.get(Calendar.YEAR));
+		editor.putInt("sMonth",cal.get(Calendar.MONTH));
+		editor.putInt("sDate", cal.get(Calendar.DAY_OF_MONTH));
+		editor.putString("connect_n0", "");
+		editor.putString("connect_n1", "");
+		editor.putString("connect_n2", "");
+		editor.putString("connect_p0", "");
+		editor.putString("connect_p1", "");
+		editor.putString("connect_p2", "");
+		editor.putString("recreation0", getString(R.string.default_recreation_1));
+		editor.putString("recreation1", getString(R.string.default_recreation_2));
+		editor.putString("recreation2", getString(R.string.default_recreation_3));
+		editor.putString("recreation3", "");
+		editor.putString("recreation4", "");
+		editor.putInt("connect_s0", 1);
+		editor.putInt("connect_s1", 2);
+		editor.putInt("connect_s2", 3);
+		editor.putBoolean("upload_audio", false);
+		editor.putBoolean("show_saving", true);
+		editor.commit();
+	}
+	
 	
 }

@@ -34,6 +34,12 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 			edit.putLong("latest_regular_check", 0L);
 			edit.putLong("LatestTestTime", 0L);
 			edit.putLong("share_storytelling_time", 0);
+			edit.putLong("LatestGPSTime", 0);
+			edit.putString("LatestGPSTimestamp", "0");
+			edit.putLong("LatestEmotionDIYTime", 0L);
+			edit.putLong("LatestEmotionManageTime", 0L);
+			edit.putLong("LatestStorytellingSharingTime", 0L);
+			edit.putLong("LatestStorytellingRecordingTime", 0L);
 			edit.commit();
 		}
 		
@@ -72,8 +78,6 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarm.cancel(pending);
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis()+10,2*AlarmManager.INTERVAL_HOUR,pending);
-		
-		
 		
 		Intent check_intent = new Intent();
 		check_intent.setClass(context, AlarmReceiver.class);

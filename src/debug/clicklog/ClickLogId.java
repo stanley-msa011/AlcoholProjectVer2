@@ -92,4 +92,6 @@ public class ClickLogId {
 	public final static long STORYTELLING_SHARE_EDIT_TIME						=	8100005;
 	public final static long STORYTELLING_SHARE_RETURN_BUTTON		=	8200004;
 	public final static long STORYTELLING_SHARE_END									=	8300000;
+	
+	public final static long MAIN_ACTIVITY_EXIT													=	9000004;
 }
