@@ -12,7 +12,12 @@ import android.util.Log;
 public class BracValueFileHandler extends Handler {
 	private File file;
 	private BufferedWriter writer;
+	private File directory;
+	private String timestamp;
+	
 	public BracValueFileHandler(File directory, String timestamp){
+		this.directory = directory;
+		this.timestamp = timestamp;
 		file = new File(directory,timestamp+".txt");
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
@@ -20,6 +25,14 @@ public class BracValueFileHandler extends Handler {
 			Log.d("BRAC WRITER","FAIL TO OPEN");
 			writer = null;
 		}
+	}
+	
+	public String getTimestamp(){
+		return timestamp;
+	}
+	
+	public File getDirectory(){
+		return directory;
 	}
 	
 	public void handleMessage(Message msg){

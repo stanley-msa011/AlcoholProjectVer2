@@ -118,11 +118,12 @@ public class Reuploader {
 				Log.d("REUPLOADER","state ts = "+state[i].timestamp);
 				String _ts =String.valueOf(state[i].timestamp/1000L);
 				File[]  imageFiles;
-				File textFile, geoFile,stateFile, questionFile;
+				File textFile, geoFile,stateFile, questionFile, pressureFile;
 				imageFiles = new File[3];
 				
 				textFile = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + _ts + ".txt");
 		        geoFile = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + "geo.txt");
+		        pressureFile = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + _ts + "_pressure.txt");
 		        
 		        imageFiles[0] = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + "IMG_" + _ts + "_1.jpg");
 		        imageFiles[1] = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + "IMG_" + _ts + "_2.jpg");
@@ -131,7 +132,7 @@ public class Reuploader {
 		    	stateFile = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + "state.txt");
 		    	questionFile = new File(mainStorageDir.getPath() + File.separator + _ts + File.separator + "question.txt");
 		    	
-		       	int result = connectingToServer(textFile,geoFile,stateFile,imageFiles,questionFile,_ts);
+		       	int result = connectingToServer(textFile,geoFile,stateFile,imageFiles,questionFile,pressureFile,_ts);
 		        if (result == ERROR)
 		        	break;
 			}
@@ -153,7 +154,7 @@ public class Reuploader {
 			Log.d("REUPLOADER","CANCEL");
 		}
 		
-		private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles, File questionFile, String ts){
+		private int connectingToServer(File textFile, File geoFile, File stateFile, File[] imageFiles, File questionFile, File pressureFile, String ts){
 			try {
 				DefaultHttpClient httpClient = new DefaultHttpClient();
 				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -209,6 +210,11 @@ public class Reuploader {
 				if (questionFile.exists()){
 					ContentBody cbQuestionFile = new FileBody(questionFile, "application/octet-stream");
 					mpEntity.addPart("userfile[]", cbQuestionFile);
+				}
+				
+				if (pressureFile.exists()){
+					ContentBody cbPressureFile = new FileBody(pressureFile, "application/octet-stream");
+					mpEntity.addPart("userfile[]", cbPressureFile);
 				}
 				
 				if (imageFiles[0].exists())

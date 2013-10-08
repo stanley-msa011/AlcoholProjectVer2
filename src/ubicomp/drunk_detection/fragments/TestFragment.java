@@ -89,7 +89,7 @@ public class TestFragment extends Fragment {
 	
 	private static final long TEST_GAP_DURATION = 120*1000L;
 	private static final int COUNT_DOWN_SECOND = 10;
-	private static final int COUNT_DOWN_SECOND_DEVELOP= 4;
+	private static final int COUNT_DOWN_SECOND_DEVELOP= 3;
 	
 	private boolean keepMsgBox;
 	
@@ -267,7 +267,7 @@ public class TestFragment extends Fragment {
 					bt = new BluetoothDebugMode(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
 			}
 			else
-				bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
+				bt = new Bluetooth(testFragment,cameraRunHandler,bracFileHandler,true);
 		}else
 			 bt = new BluetoothOld(testFragment,cameraRunHandler,bracFileHandler,bracDebugHandler);
 		
@@ -671,6 +671,8 @@ public class TestFragment extends Fragment {
 			if (notificationBox == null)
 				notificationBox = new NotificationBox(testFragment.getActivity(),main_layout);
 			notificationBox.show(NotificationBox.getType(getActivity()));
+			
+			//notificationBox.show(2);
 			
 			LoadingDialogControl.dismiss();
 			

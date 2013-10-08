@@ -19,7 +19,7 @@ public class BluetoothDebugMode extends Bluetooth {
 			CameraRunHandler cameraRunHandler,
 			BracValueFileHandler bracFileHandler,
 			BracValueDebugHandler bracDebugHandler) {
-		super(testFragment, cameraRunHandler, bracFileHandler, bracDebugHandler);
+		super(testFragment, cameraRunHandler, bracFileHandler,false);
 		this.bracDebugHandler = bracDebugHandler;
 	}
 	

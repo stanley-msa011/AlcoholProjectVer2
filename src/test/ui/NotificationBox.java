@@ -90,11 +90,11 @@ public class NotificationBox {
 		divParam.height = screen.x * 48/480;
 		
 		RelativeLayout.LayoutParams yesParam = (LayoutParams) yes.getLayoutParams();
-		yesParam.width = screen.x * 205/480;
+		yesParam.width = screen.x * 110/480;
 		yesParam.height = screen.x * 48/480;
 		
 		RelativeLayout.LayoutParams noParam = (LayoutParams) no.getLayoutParams();
-		noParam.width = screen.x * 205/480;
+		noParam.width = screen.x * 110/480;
 		noParam.height = screen.x * 48/480;
 		
 		no.setOnClickListener(new CancelOnClickListener());
@@ -115,7 +115,7 @@ public class NotificationBox {
 				param.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 				param.bottomMargin = screen.x * 260/1080;
 				param.addRule(RelativeLayout.CENTER_HORIZONTAL);
-				param.width = screen.x * 9/10;
+				param.width = screen.x * 320/480;
 			}
 		}
 		
@@ -207,7 +207,7 @@ public class NotificationBox {
 		}
 	}
 	
-	private static final long THREE_DAYS = AlarmManager.INTERVAL_DAY * 3;
+	private static final long TWO_DAYS = AlarmManager.INTERVAL_DAY * 2;
 	
 	public static int getType(Context context){
 		if (context == null)
@@ -223,11 +223,13 @@ public class NotificationBox {
 		long cur_time = System.currentTimeMillis();
 		
 		boolean[] b = new boolean[4];
-		b[0] = (cur_time - t0 > THREE_DAYS)?true:false;
-		b[1] = (cur_time - t1 > THREE_DAYS)?true:false;
-		b[2] = (cur_time - t2 > THREE_DAYS)?true:false;
-		b[3] = (cur_time - t3 > THREE_DAYS)?true:false;
+		b[0] = (cur_time - t0 > TWO_DAYS)?true:false;
+		b[1] = (cur_time - t1 > TWO_DAYS)?true:false;
+		b[2] = (cur_time - t2 > TWO_DAYS)?true:false;
+		b[3] = (cur_time - t3 > TWO_DAYS)?true:false;
 
+		Log.d("Notify",">"+(cur_time - t0)+"/"+(cur_time - t1)+"/"+(cur_time - t2)+"/"+(cur_time - t3)+"/"+TWO_DAYS);
+		Log.d("Notify",">"+(b[0])+"/"+(b[1])+"/"+(b[2])+"/"+(b[3]));
 		int mod = 0;
 		for (int i=0;i<b.length;++i){
 			if (b[i])++mod;

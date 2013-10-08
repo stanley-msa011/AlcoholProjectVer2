@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:splitMotionEvents="false"
+    android:background="#FF3f3d3d"
     >
     <RelativeLayout
         	android:id = "@+id/history_top_layout"

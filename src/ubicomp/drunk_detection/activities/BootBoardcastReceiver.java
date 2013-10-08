@@ -36,10 +36,10 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 			edit.putLong("share_storytelling_time", 0);
 			edit.putLong("LatestGPSTime", 0);
 			edit.putString("LatestGPSTimestamp", "0");
-			edit.putLong("LatestEmotionDIYTime", 0L);
+			/*edit.putLong("LatestEmotionDIYTime", 0L);
 			edit.putLong("LatestEmotionManageTime", 0L);
 			edit.putLong("LatestStorytellingSharingTime", 0L);
-			edit.putLong("LatestStorytellingRecordingTime", 0L);
+			edit.putLong("LatestStorytellingRecordingTime", 0L);*/
 			edit.commit();
 		}
 		

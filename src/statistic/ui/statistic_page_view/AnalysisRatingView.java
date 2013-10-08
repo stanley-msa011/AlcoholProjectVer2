@@ -10,7 +10,9 @@ import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,6 +33,8 @@ public class AnalysisRatingView extends StatisticPageView {
 	
 	private ImageView bar, bar2;
 	private ImageView pointer, pointer2;
+	private ImageView arrow, arrow2;
+	
 	
 	private NetworkTask netTask;
 	
@@ -39,15 +43,19 @@ public class AnalysisRatingView extends StatisticPageView {
 	
 	private int minLeftPointer, maxLeftPointer;
 	
-	private Typeface wordTypeface;
+	private Typeface wordTypeface, wordTypefaceBold;
 	
 	private String[] helpStr;
+
+	private RelativeLayout titleLayout;
+	
 	
 	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
 		db = new HistoryDB(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_ranking_help);
 		wordTypeface = Typefaces.getWordTypeface(context);
+		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
 	}
 
 	@Override
@@ -57,7 +65,8 @@ public class AnalysisRatingView extends StatisticPageView {
 		}
 	}
 
-	private void setPointer(){
+	@SuppressWarnings("deprecation")
+	private void setPointer(int p1, int p2){
 		
 		if (!StartDateCheck.check(context)){
 			pointer.setVisibility(View.INVISIBLE);
@@ -71,7 +80,116 @@ public class AnalysisRatingView extends StatisticPageView {
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		String uid = sp.getString("uid", "");
+
 		
+		int margin = minLeftPointer;
+		
+		Rank _rank = getRank(uid);
+		nPeople = _rank.nPeople;
+		rank = _rank.rank;
+		
+		Rank _rank_today = getRankToday(uid);
+		nPeopleToday = _rank_today.nPeople;
+		rankToday = _rank_today.rank;
+		
+		if (nPeople == 0)
+			margin = minLeftPointer + maxLeftPointer/2;
+		else
+			margin = (int)((maxLeftPointer - minLeftPointer)*(double)(nPeople - rank)/(double)nPeople ) + minLeftPointer;
+		
+		
+		int margin2 = minLeftPointer;
+		if (nPeopleToday == 0)
+			margin2 = minLeftPointer + maxLeftPointer/2;
+		else
+			margin2 = (int)((maxLeftPointer - minLeftPointer)*(double)(nPeopleToday- rankToday)/(double)nPeopleToday ) + minLeftPointer;
+		
+		
+		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
+		pointerParam.leftMargin = margin;
+		RelativeLayout.LayoutParams pointerParam2 = (RelativeLayout.LayoutParams)pointer2.getLayoutParams();
+		pointerParam2.leftMargin = margin2;
+		
+		
+		
+		contentLayout.updateViewLayout(pointer,pointerParam);
+		contentLayout2.updateViewLayout(pointer2,pointerParam2);
+		
+		if (p1==0 && p2==0){
+			arrow.setVisibility(View.INVISIBLE);
+			arrow2.setVisibility(View.INVISIBLE);
+			contentLayout.invalidate();
+			contentLayout2.invalidate();
+			return;
+		}
+		
+		Point screen = StatisticFragment.getStatisticPx();
+		
+		RelativeLayout.LayoutParams aParam = (RelativeLayout.LayoutParams)arrow.getLayoutParams();
+		if (p1 > 0){
+			aParam.addRule(RelativeLayout.RIGHT_OF, R.id.analysis_rating_pointer);
+			aParam.leftMargin = -screen.x*100/1080;
+			arrow.setVisibility(View.VISIBLE);
+			if (rank == 0){
+				high.setTextColor(0xFFF39700);
+				high.setTypeface(wordTypefaceBold);
+				high.invalidate();
+			}
+		}else if (p1 <0){
+			aParam.addRule(RelativeLayout.RIGHT_OF, R.id.analysis_rating_pointer);
+			aParam.leftMargin = 0;
+			arrow.setVisibility(View.VISIBLE);
+			arrow.setRotationX(0.5f);
+			arrow.setRotationY(0.5f);
+			arrow.setRotation(180);
+		}
+		
+		RelativeLayout.LayoutParams aParam2 = (RelativeLayout.LayoutParams)arrow2.getLayoutParams();
+		if (p2 > 0){
+			aParam2.addRule(RelativeLayout.RIGHT_OF, R.id.analysis_rating_pointer2);
+			aParam2.leftMargin = -screen.x*100/1080;
+			arrow2.setVisibility(View.VISIBLE);
+			if (rankToday == 0){
+				high2.setTextColor(0xFFF39700);
+				high2.setTypeface(wordTypefaceBold);
+				high2.invalidate();
+			}
+		}else if (p2 <0){
+			aParam2.addRule(RelativeLayout.RIGHT_OF, R.id.analysis_rating_pointer2);
+			aParam2.leftMargin = 0;
+			arrow2.setVisibility(View.VISIBLE);
+			arrow2.setRotationX(0.5f);
+			arrow2.setRotationY(0.5f);
+			arrow2.setRotation(180);
+		}
+		
+		if (Build.VERSION.SDK_INT < 16)
+			titleLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.analysis_title_bar_highlight));
+		else
+			titleLayout.setBackground(context.getResources().getDrawable(R.drawable.analysis_title_bar_highlight));
+		
+		titleLayout.invalidate();
+		contentLayout.invalidate();
+		contentLayout2.invalidate();
+		contentLayout.updateViewLayout(arrow,aParam);
+		contentLayout2.updateViewLayout(arrow2,aParam2);
+	}
+	
+	private class Rank{
+		public int nPeople, rank;
+		public Rank(int nPeople, int rank){
+			this.nPeople = nPeople;
+			this.rank = rank;
+		}
+		public double getScore(){
+			if (nPeople == 0)
+				return Double.MAX_VALUE;
+			return (double)rank/(double)nPeople;
+		}
+	}
+	
+	private Rank getRank(String uid){
+		int nPeople, rank;
 		RankHistory[] historys = db.getAllUsersHistory();
 		if (historys == null){
 			nPeople =0;
@@ -95,50 +213,36 @@ public class AnalysisRatingView extends StatisticPageView {
 				prev_score = historys[i].score;
 			}
 		}
-		int margin = minLeftPointer;
-		
-		if (nPeople == 0)
-			margin = minLeftPointer + maxLeftPointer/2;
-		else
-			margin = (int)((maxLeftPointer - minLeftPointer)*(double)(nPeople - rank)/(double)nPeople ) + minLeftPointer;
-		
-		
-		RankHistory[] historys_today = db.getAllUsersHistoryToday();
-		if (historys_today == null){
-			nPeopleToday =0;
-			rankToday = 0;
+		return new Rank(nPeople,rank);
+	}
+	
+	private Rank getRankToday(String uid){
+		int nPeople, rank;
+		RankHistory[] historys = db.getAllUsersHistoryToday();
+		if (historys == null){
+			nPeople =0;
+			rank = 0;
 		}
 		else{
-			rankToday = historys_today.length-1;
-			nPeopleToday = historys_today.length-1;
+			rank = historys.length-1;
+			nPeople = historys.length-1;
 			int tmp_rank = 0, count = 0;
-			int prev_score = historys_today[0].score;
+			int prev_score = historys[0].score;
 			
-			for (int i=0;i<historys_today.length;++i){
-				if (historys_today[i].score < prev_score){
+			for (int i=0;i<historys.length;++i){
+				if (historys[i].score < prev_score){
 					tmp_rank = count;
 				}
-				if (historys_today[i].uid.equals(uid)){
-					rankToday = tmp_rank;
+				if (historys[i].uid.equals(uid)){
+					rank = tmp_rank;
 					break;
 				}
 				++count;
-				prev_score = historys_today[i].score;
+				prev_score = historys[i].score;
 			}
 		}
-		
-		int margin2 = minLeftPointer;
-		if (nPeopleToday == 0)
-			margin2 = minLeftPointer + maxLeftPointer/2;
-		else
-			margin2 = (int)((maxLeftPointer - minLeftPointer)*(double)(nPeopleToday- rankToday)/(double)nPeopleToday ) + minLeftPointer;
-		
-		RelativeLayout.LayoutParams pointerParam = (RelativeLayout.LayoutParams)pointer.getLayoutParams();
-		pointerParam.leftMargin = margin;
-		RelativeLayout.LayoutParams pointerParam2 = (RelativeLayout.LayoutParams)pointer2.getLayoutParams();
-		pointerParam2.leftMargin = margin2;
+		return new Rank(nPeople,rank);
 	}
-	
 	
 	@Override
 	public void onPreTask() {
@@ -181,6 +285,12 @@ public class AnalysisRatingView extends StatisticPageView {
 		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_rating_content_layout);
 		contentLayout2 = (RelativeLayout) view.findViewById(R.id.analysis_rating_content_layout2);
 		
+		arrow = (ImageView) view.findViewById(R.id.analysis_rating_arrow);
+		arrow.setVisibility(View.INVISIBLE);
+		arrow2 = (ImageView) view.findViewById(R.id.analysis_rating_arrow2);
+		arrow2.setVisibility(View.INVISIBLE);
+		
+		titleLayout = (RelativeLayout) view.findViewById(R.id.analysis_rating_title_layout);
 	}
 
 	@Override
@@ -215,7 +325,7 @@ public class AnalysisRatingView extends StatisticPageView {
 	public void onPostTask() {
 		help.setText(helpStr[0] );
 		help2.setText(helpStr[1]);
-		setPointer();
+		setPointer(0,0);
 		netTask = new NetworkTask();
 		netTask.execute();
 	}
@@ -243,12 +353,39 @@ public class AnalysisRatingView extends StatisticPageView {
 		protected void onPostExecute(Void result){
 			if (historys == null || historys_average == null)
 				return;
+			
+			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+			String uid = sp.getString("uid", "");
+			double prev_score = getRank(uid).getScore();
+			double prev_score_today = getRankToday(uid).getScore();
+			
 			db.cleanInteractionHistory();
 			for (int i=0;i<historys.length;++i)
 				db.insertInteractionHistory(historys[i]);
 			for (int i=0;i<historys_average.length;++i)
 				db.insertInteractionHistoryToday(historys_average[i]);
-			setPointer();
+			
+			double score = getRank(uid).getScore();
+			double score_today = getRankToday(uid).getScore();
+			
+			Log.d("Score",score+" "+prev_score);
+			Log.d("Score",score_today+" "+prev_score_today);
+			int p1,p2;
+			if (score == prev_score)
+				p1= 0;
+			else if (score > prev_score)
+				p1 = -1;
+			else
+				p1 = 1;
+			
+			if (score_today == prev_score_today)
+				p2= 0;
+			else if (score_today > prev_score_today)
+				p2 = -1;
+			else
+				p2 = 1;
+			
+			setPointer(p1,p2);
 		}
 		
 	}

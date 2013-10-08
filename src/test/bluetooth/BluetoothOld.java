@@ -12,7 +12,7 @@ public class BluetoothOld extends Bluetooth {
 			CameraRunHandler cameraRunHandler,
 			BracValueFileHandler bracFileHandler,
 			BracValueDebugHandler bracDebugHandler) {
-		super(testFragment, cameraRunHandler, bracFileHandler, bracDebugHandler);
+		super(testFragment, cameraRunHandler, bracFileHandler,false);
 	}
 
 	@Override

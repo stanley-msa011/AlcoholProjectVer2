@@ -448,6 +448,10 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 	private class EditedOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			if (r_texts.getText().toString().length() == 0){
+				CustomToastSmall.generateToast(getBaseContext(), R.string.emotion_manage_check_toast);
+				return;
+			}
 			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONMANAGE_SELECTION);
 			state = 3;
 			setQuestionEnd();

@@ -78,14 +78,11 @@
     <string name="test_guide_start">請點選\'開始\'進行測試</string>
     <string name="test_guide_msg_box">請依對話框指示進行操作</string>
     <string-array name="test_guide_msg">
-        <item>珍惜自己，對自己負責，\n才能讓自己更好</item>
-        <item>放眼未來，從現在起努力\n，你一定能脫胎換骨</item>
-        <item>成功戒酒的人之所以成功\n，是因為他們能從失敗中\n得到寶貴經驗</item>
-        <item>不要妥協於現狀，要極力\n爭取更美好的未來</item>
-        <item>唯一能阻礙你前進的，只\n有自我設限</item>
-        <item>好事多磨，戒酒需要不斷\n的努力</item>
-        <item>一天過一天，我感覺我的\n狀況越來越好</item>
-        <item>我們最愛的是我們自己，\n好好愛惜自己</item>
+        <item>飲酒過量，有礙健康</item>
+        <item>飲酒過量，害人害己</item>
+        <item>半杯茶，贏過一壺酒</item>
+        <item>應酬不喝酒，健康才長久</item>
+        <item>健康人生，減速前進\n酒色財氣，禁止通行</item>
     </string-array>
     
     <string name="test_guide_end">\n請點選按鈕以結束</string>
@@ -157,7 +154,7 @@
         <item>一天過一天，我感覺\n我的狀況越來越好</item>
         <item>好事多磨，戒酒需要\n不斷的努力</item>
         <item>戒酒成功與失敗只有\n一線之隔，要時時提\n醒自己不要喝酒</item>
-        <item>不要只從少喝幾杯酒\n來衡量每天的成效，\n而也要看戒酒後長期\n帶來的好處</item>
+        <item>不要只從少喝幾杯酒\n來衡量每天的成效</item>
         <item>做一件事需要具備能\n力，但要真正戒酒需\n要正面的動機及態度</item>
     </string-array>
     <string-array name="question_type0_next">
@@ -167,7 +164,7 @@
         <item>感覺變好</item>
         <item>繼續加油</item>
         <item>了解</item>
-        <item>了解</item>
+        <item>要看戒酒長期的好處</item>
         <item>了解</item>
     </string-array>
     <string name="question_type1_help">重新整理浮動的心，\n堅持持續戒酒的決心，\n建議您可以：</string>
@@ -256,6 +253,7 @@
 	<string name= "get_self_help_counter">+1點</string>
 	<string name= "emotionDIY_end_toast">做好心情DIY</string>
 	<string name= "emotion_manage_end_toast">做好情緒管理</string>
+	<string name = "emotion_manage_check_toast">尚未填寫原因</string>
 	<string name= "emotionDIY_help_case1">嘗試閉眼專注觀察呼吸？\n您可以聽從指示引導或直接去做</string>
 	<string name= "emotionDIY_help_case2">專心健走 10 ~ 30 分鐘？\n您可以聽從指示引導或直接去做</string>
 	<string name= "emotionDIY_help_case3">從事休閒活動？\n您可以選擇以下內容</string>
@@ -289,9 +287,9 @@
 	<string name= "email_fail">手機端未安裝信件寄送程式</string>
 	
 	<string-array name= "notification_box_message">
-	    <item>點擊選單內的心情DIY可以協助紓解酒癮，請問是否要現在使用？\n(完成後可獲得點數)</item>
-	    <item>點擊選單內的情緒管理可以協助調理情緒，請問是否要現在使用？\n(完成後可獲得點數)</item>
-	    <item>您最近是否有分享您的戒酒歷程？請問是否要現在分享？\n(完成後可獲得點數)</item>
-	    <item>使用戒酒歷程幫忙記錄您的心情，請問是否要記錄今天的心情？\n(完成後可獲得點數)</item>
+	    <item>點擊選單內的心情DIY\n可以協助紓解酒癮，\n請問是否要現在使用？\n(完成後可獲得點數)</item>
+	    <item>點擊選單內的情緒管理\n可以協助調理情緒，\n請問是否要現在使用？\n(完成後可獲得點數)</item>
+	    <item>您可以分享戒酒歷程，\n請問是否要現在分享？\n(完成後可獲得點數)</item>
+	    <item>用戒酒歷程記錄心情，\n請問是否要現在記錄？\n(完成後可獲得點數)</item>
 	</string-array>
 </resources>

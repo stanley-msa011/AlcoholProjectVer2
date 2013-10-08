@@ -1,17 +1,15 @@
 package test.bluetooth;
 
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
-
 import test.camera.CameraRunHandler;
-import test.data.BracValueDebugHandler;
+import test.data.BracPressureHandler;
 import test.data.BracValueFileHandler;
 import ubicomp.drunk_detection.fragments.TestFragment;
 
@@ -98,7 +96,13 @@ public class Bluetooth {
 	
 	protected boolean start_recorder = false;
 	
-	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler, BracValueDebugHandler bracDebugHandler){
+	private int start_times = 0;
+	private int break_times = 0;
+	private BracPressureHandler bracPressureHandler = null;
+	private ArrayList<Float> pressure_list;
+	private float temp_pressure;
+	
+	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler,boolean recordPressure){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
 		this.cameraRunHandler = cameraRunHandler;
@@ -111,6 +115,10 @@ public class Bluetooth {
 		start = false;
 		sp= PreferenceManager.getDefaultSharedPreferences(context);
 		sp_editor = sp.edit();
+		if (recordPressure){
+			bracPressureHandler = new BracPressureHandler(bracFileHandler.getDirectory(),bracFileHandler.getTimestamp());
+			pressure_list = new ArrayList<Float>();
+		}
 	}
 	
 	public void enableAdapter(){
@@ -285,6 +293,9 @@ public class Bluetooth {
 		show_value = 0.f;
 		zero_start_time = zero_end_time = zero_duration = 0;
 		start_recorder = false;
+		start_times = 0;
+		break_times = 0;
+		pressure_list.clear();
 		try {
 			in = socket.getInputStream();
 			if (in.available() > 0)
@@ -359,6 +370,7 @@ public class Bluetooth {
 					String output = timeStamp+"\t"+alcohol+"\n";
 					if (start_recorder){
 						show_value = alcohol;
+						pressure_list.add(temp_pressure);
 						write_to_file(output);
 					}
 				}
@@ -366,6 +378,7 @@ public class Bluetooth {
 			else if (msg.charAt(0)=='m'){
 				
 				now_pressure = Float.valueOf(msg.substring(1));
+				temp_pressure = now_pressure;
 				
 				long time = System.currentTimeMillis();
 				if(!start&&now_pressure < absolute_min){
@@ -382,6 +395,7 @@ public class Bluetooth {
 				if(now_pressure > absolute_min +diff_limit && !isPeak){
 					isPeak = true;
 					start_time = time;
+					++start_times;
 					temp_duration = 0;
 					Log.d("BT","Peak Start");
 				}else if (now_pressure > absolute_min +diff_limit && isPeak){
@@ -422,6 +436,7 @@ public class Bluetooth {
 					}else if (isPeak){
 						isPeak = false;
 						start_time = end_time = 0;
+						++break_times;
 						Log.d("BT","Peak End");
 					}
 			}else if (msg.charAt(0) == 'v'){	}
@@ -452,6 +467,24 @@ public class Bluetooth {
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();
+		if (bracPressureHandler != null && pressure_list!=null){
+			double pressure_sum = 0.0;
+			int count = pressure_list.size();
+			if (count > 0){
+				Iterator<Float> iter= pressure_list.iterator();
+				while(iter.hasNext())
+					pressure_sum+=iter.next();
+				pressure_sum/=count;
+			}
+			
+			Message msg = new Message();
+			Bundle data = new Bundle();
+			data.putString("pressure", start_times+"\t"+break_times+"\t"+pressure_sum+"\t"+absolute_min);
+			msg.setData(data);
+			msg.what = 0;
+			bracPressureHandler.sendMessage(msg);
+		}
+		
 	}
 	
 	public void closeWithCamera(){
