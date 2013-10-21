@@ -90,6 +90,7 @@
     <string name="test_guide_test_fail">酒測器沒電了</string>
      <string name="test_guide_test_timeout">測試超時</string>
     <string name="test_guide_connect_fail">酒測器連接錯誤</string>
+    <string name="test_guide_multi_blow">吹氣不穩以致測試失敗</string>
     <string name="tutorial_next">點擊進入下一步</string>
     <string-array name="tutorial_step">
         <item >按下開關，使指示燈亮起</item>
@@ -140,11 +141,26 @@
         <item >對過去憤怒，或對未來恐懼，只是讓您的\n生活變得更無力，更容易錯過現在。</item>
         <item >我們的價值是由我們是怎樣的人來決定，\n而不是有了什麼來決定。</item>
         <item >你正勇於面對戒酒在生活的挑戰，接受自\n己的不足，但也珍惜自己的任何改變。</item>
-        <item >您發現當您越認真努力戒酒，生活變得更\n順，運氣也會跟著變好。</item>
+        <item >您發現當您越認真努力戒酒，生活變得更\n順利，運氣也會跟著變好。</item>
         <item >您相信自己一步一步在走您自己所創造的\n不一樣中。</item>
         <item >就像一次一次的身體訓練，每一次都讓我\n們變得更強壯或更堅定。</item>
         <item >您發現別人的鼓勵讓我們更堅持下去，但\n若可以鼓勵他人，更能讓生活更有意義。</item>
     </string-array>
+    <string-array name="quote_learning">
+        <item >面對問題及相信自我！</item>
+        <item >確定決心及抱持希望！</item>
+        <item >下定決心並主動出擊！</item>
+        <item >自我接納及了解！</item>
+        <item >自愛並善待自身！</item>
+        <item >保持平靜並活在當下！</item>
+        <item >對自己負責且致力改變！</item>
+        <item >勇於面對、接納自我並改變！</item>
+        <item >感受自身的進步！</item>
+        <item >持續努力並了解自身！</item>
+        <item >努力不懈並堅定決心！</item>
+        <item >感謝他人並回饋大眾！</item>
+    </string-array>
+    <string name="quote_next_message">您將從中學習‧‧‧</string>
     <string name="call_to">要聯絡誰？</string>
     <string name="next">下一步</string>
     <string-array name="question_type0_help">
@@ -248,7 +264,9 @@
 	<string name= "rickie_wu">Rickie Wu</string>
 	<string name="yuda_huang">Yuga Huang</string>
 	<string name= "current_version">目前版本：</string>
-	<string name="testTimeCheckToast">吹氣測試的間隔請大於兩分鐘</string>
+	<string name="testTimeCheckToastLong">酒測器回復中，請稍等兩分鐘</string>
+	<string name="testTimeCheckToastShort">酒測器回復中，請稍等一分鐘</string>
+	<string name="testTimeCheckToastHalf">酒測器回復中，請稍等半分鐘</string>
 	<string name= "self_help_counter_unit">點</string>
 	<string name= "get_self_help_counter">+1點</string>
 	<string name= "emotionDIY_end_toast">做好心情DIY</string>
@@ -292,4 +310,7 @@
 	    <item>您可以分享戒酒歷程，\n請問是否要現在分享？\n(完成後可獲得點數)</item>
 	    <item>用戒酒歷程記錄心情，\n請問是否要現在記錄？\n(完成後可獲得點數)</item>
 	</string-array>
+	
+	<string name="know">了解</string>
+	<string name="bonus">特殊獎勵</string>
 </resources>

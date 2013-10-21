@@ -399,6 +399,7 @@ public class TestQuestionMsgBox implements TestQuestionMsgBoxInterface{
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor edit = sp.edit();
 		edit.putLong("LatestTestTime", System.currentTimeMillis());
+		edit.putBoolean("testFail", false);
 		edit.commit();
 		help.setText("");
 		questionLayout.setVisibility(View.VISIBLE);

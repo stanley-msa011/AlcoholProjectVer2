@@ -14,6 +14,7 @@ import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 
 import data.calculate.WeekNum;
+import data.database.AdditionalDB;
 import data.database.AudioDB;
 import data.database.HistoryDB;
 import data.info.AccumulatedHistoryState;
@@ -27,6 +28,7 @@ import history.ui.AudioRecordBox;
 import history.ui.PageAnimationTaskVertical;
 import history.ui.PageAnimationTaskVertical2;
 import history.ui.PageWidgetVertical;
+import history.ui.QuoteMsgBox;
 import history.ui.StorytellingBox;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -65,8 +67,10 @@ import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class HistoryFragment extends Fragment {
@@ -81,6 +85,7 @@ public class HistoryFragment extends Fragment {
 	private RelativeLayout stageLayout;
 	private HistoryDB hdb;
 	private AudioDB adb;
+	private AdditionalDB addDb;
 	private PageWidgetVertical pageWidget;
 	private PageAnimationTaskVertical pageAnimationTask;
 	private PageAnimationTaskVertical2 pageAnimationTask2;
@@ -168,12 +173,29 @@ public class HistoryFragment extends Fragment {
 	
 	private AlphaAnimation shareAnimation;
 	
+	private long READING_PAGE_TIME = 5400;
+	
+	private int LONG_FLING_LIMIT = 1;
+	
+	private ScrollView quoteScrollView;
+	private RelativeLayout quoteHiddenLayout;
+	private TextView quoteHiddenText;
+	private ImageView quoteNextButton;
+	private QuoteScrollListener quoteScrollListener;
+	
+	private QuoteScrollHandler quoteScrollHandler;
+	private ScrollHandler scrollHandler;
+	private Thread infiniteThread;
+	
+	private QuoteMsgBox quoteMsgBox;
+	
 	 @Override
 	    public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
 	        this.activity = this.getActivity();
 	        hdb = new HistoryDB(activity);
 	    	adb = new AudioDB(activity);
+	    	addDb = new AdditionalDB(activity);
 	    	from_cal = Calendar.getInstance();
 	    	
 	    	wordTypefaceBold = Typefaces.getDigitTypefaceBold(activity);
@@ -196,6 +218,8 @@ public class HistoryFragment extends Fragment {
 			format.setMaximumFractionDigits(0);
 			
 			scrollToHandler = new ScrollToHandler();
+			quoteScrollHandler= new QuoteScrollHandler();
+			scrollHandler = new ScrollHandler();
 	    }
 	
     @Override
@@ -232,6 +256,10 @@ public class HistoryFragment extends Fragment {
     	chartLayout = (RelativeLayout) view.findViewById(R.id.history_content_layout);
     	scrollView = (HorizontalScrollView) view.findViewById(R.id.history_scroll_view);
     	chartAreaLayout = (RelativeLayout) view.findViewById(R.id.history_chart_area_layout);
+    	quoteHiddenLayout = (RelativeLayout) view.findViewById(R.id.history_quote_hidden_layout);
+    	quoteHiddenText = (TextView) view.findViewById(R.id.history_quote_hidden_text);
+    	quoteNextButton = (ImageView) view.findViewById(R.id.history_quote_hidden_button);
+    	quoteScrollView = (ScrollView) view.findViewById(R.id.history_quote_scroll_view);
     	
     	int textSize = bg_x*21/480;
     	stageLayout = (RelativeLayout) view.findViewById(R.id.history_stage_message_layout);
@@ -249,6 +277,9 @@ public class HistoryFragment extends Fragment {
     	quoteText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
     	quoteText.setTypeface(wordTypefaceBold);
     	
+    	quoteHiddenText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+    	quoteHiddenText.setTypeface(wordTypefaceBold);
+    	
     	storytellingButton = (ImageView) view.findViewById(R.id.history_storytelling_button);
     	storytellingOnClickListener = new StorytellingOnClickListener();
     	storytellingButton.setOnClickListener(storytellingOnClickListener);
@@ -265,8 +296,22 @@ public class HistoryFragment extends Fragment {
     	rParam.topMargin = quoteTopMargin;
     	rParam.width = bg_x*70/480;
     	
-    	LayoutParams qParam = (LayoutParams) quoteText.getLayoutParams();
+    	
+    	LayoutParams qParam = (LayoutParams) quoteScrollView.getLayoutParams();
     	qParam.topMargin = quoteTopMargin;
+    	qParam.height = bg_x*52/480;
+    	quoteScrollListener = new QuoteScrollListener();
+    	quoteScrollView.setOnTouchListener(quoteScrollListener);
+    	
+    	LinearLayout.LayoutParams qTextParam = (LinearLayout.LayoutParams) quoteText.getLayoutParams();
+    	qTextParam.height = bg_x*52/480;
+    	
+    	LinearLayout.LayoutParams qHiddenParam = (LinearLayout.LayoutParams) quoteHiddenLayout.getLayoutParams();
+    	qHiddenParam.height = bg_x*52/480;
+    	
+    	LayoutParams qNextButtonParam = (LayoutParams) quoteNextButton.getLayoutParams();
+    	qNextButtonParam.leftMargin = bg_x*20/480;
+    	
     	
     	return view;
     }
@@ -300,6 +345,24 @@ public class HistoryFragment extends Fragment {
 				shareAnimation.cancel();
     		storytellingButton.setAnimation(null);
     	}
+    	if (quoteScrollHandler!=null)
+    		quoteScrollHandler.removeMessages(0);
+    	if (infiniteThread!=null && !infiniteThread.isInterrupted()){
+    		infiniteThread.interrupt();
+    		try {
+				infiniteThread.join();
+			} catch (InterruptedException e) {}
+    		finally{
+    			infiniteThread = null;
+    		}
+    	}
+    	if (scrollHandler!=null){
+    		scrollHandler.removeMessages(0);
+    		scrollHandler.removeMessages(1);
+    	}
+    	if (quoteMsgBox!=null)
+    		quoteMsgBox.closeBox();
+    	quoteScrollView.scrollTo(0, 0);
     	clear();
     	super.onPause();
     }
@@ -493,6 +556,21 @@ public class HistoryFragment extends Fragment {
     	FragmentTabs.enableTabAndClick(true);
     	isAnimation = false;
     	chart.invalidate();
+    	if (infiniteThread!=null && !infiniteThread.isInterrupted()){
+    		infiniteThread.interrupt();
+    		try {
+				infiniteThread.join();
+			} catch (InterruptedException e) {}
+    		finally{
+    			infiniteThread = null;
+    		}
+    	}
+    	if (scrollHandler!=null){
+    		scrollHandler.removeMessages(0);
+    		scrollHandler.removeMessages(1);
+    	}
+    	quoteScrollView.scrollTo(0, 0);
+    	
     	if (received_msg == NotificationBox.TYPE_STORYTELLING_RECORDING){
     		received_msg = 0;
     		Calendar cal = Calendar.getInstance();
@@ -600,6 +678,8 @@ public class HistoryFragment extends Fragment {
 				received_msg = 0;
 			}
 			
+			RelativeLayout r = (RelativeLayout) view;
+			quoteMsgBox = new QuoteMsgBox(historyFragment,r);
 			
 		}
 	}
@@ -647,6 +727,17 @@ public class HistoryFragment extends Fragment {
 		}
 	}
 	
+	private void quoteScroll(int next_page){
+		hideSpecialQuote();
+		Message msg = new Message();
+		msg.what = 0;
+		Bundle data = new Bundle();
+		data.putInt("time", next_page);
+		msg.setData(data);
+		quoteScrollHandler.sendMessageDelayed(msg, READING_PAGE_TIME);
+	}
+	
+	
 	private class GestureListener extends GestureDetector.SimpleOnGestureListener{
 
 		@Override
@@ -676,6 +767,7 @@ public class HistoryFragment extends Fragment {
 					FragmentTabs.enableTabAndClick(true);
 					return true;
 				}
+				quoteScroll(page_week+1);
 				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_UP);
 				setStageVisible(false);
 				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx,1);
@@ -693,6 +785,7 @@ public class HistoryFragment extends Fragment {
 					FragmentTabs.enableTabAndClick(true);
 					return true;
 				}
+				quoteScroll(page_week-1);
 				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_DOWN);
 				setStageVisible(false);
 				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,endIdx,0);
@@ -1401,4 +1494,149 @@ public class HistoryFragment extends Fragment {
 		}
 	}
 	
+	private class QuoteScrollListener implements View.OnTouchListener{
+		private boolean enable=false;
+		
+		/*
+		public void setEnable(final boolean enable){
+			this.enable = enable;
+		}
+		*/
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			return !enable;
+		}
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class QuoteScrollHandler extends Handler{
+		public void handleMessage(Message msg){
+			int time = msg.getData().getInt("time");
+			if (time==page_week){
+				addLongFlingTime(getActivity());
+				int limit = LONG_FLING_LIMIT;
+				//if (addDb.getLatestStorytellingFling().ts == 0)
+				//	limit /=2;
+				int cur_time = getLongFlingTime(getActivity());
+				Log.d("Quote","OK "+time+" "+cur_time+"/"+limit);
+				if (cur_time>=limit){
+					//quoteScrollView.smoothScrollTo(0, quoteScrollView.getBottom());
+					infiniteThread = new InfiniteScroll();
+					infiniteThread.start();
+					resetLongFlingTime(getActivity());
+					
+					View.OnClickListener listener = new QuoteOnClickListener(page_week);
+					quoteHiddenText.setOnClickListener(listener);
+					quoteNextButton.setOnClickListener(listener);
+				}
+			}
+		}
+	}
+	
+	private class InfiniteScroll extends Thread{
+		@Override
+		public void run() {
+			while(true){
+				scrollHandler.removeMessages(0);
+				scrollHandler.removeMessages(1);
+				scrollHandler.sendEmptyMessage(1);
+				if (isInterrupted())
+					break;
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					break;
+				}
+				if (isInterrupted())
+					break;
+				scrollHandler.removeMessages(0);
+				scrollHandler.removeMessages(1);
+				scrollHandler.sendEmptyMessage(0);
+				if (isInterrupted())
+					break;
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					break;
+				}
+				if (isInterrupted())
+					break;
+			}
+		}
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class ScrollHandler extends Handler{
+		public void handleMessage(Message msg){
+			if (msg.what==0){//up
+				Log.d("Quote","up");
+				quoteScrollView.smoothScrollTo(0, 0);
+			}else if (msg.what == 1){//down
+				Log.d("Quote","down");
+				quoteScrollView.smoothScrollTo(0, quoteScrollView.getBottom());
+			}
+		}
+	}
+	
+	
+	private void addLongFlingTime(Context context){
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		int time = sp.getInt("LongFlingTime", 0);
+		if (time < LONG_FLING_LIMIT){
+			SharedPreferences.Editor edit = sp.edit();
+			edit.putInt("LongFlingTime", (time+1));
+			edit.commit();
+		}
+	}
+	
+	
+	private int getLongFlingTime(Context context){
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		int time = sp.getInt("LongFlingTime", 0);
+		return time;
+	}
+	
+	private void resetLongFlingTime(Context context){
+
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor edit = sp.edit();
+		edit.putInt("LongFlingTime", 0);
+		edit.commit();
+	}
+	
+	private class QuoteOnClickListener implements View.OnClickListener{
+
+		private int page;
+		public QuoteOnClickListener(int page){
+			this.page = page;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			hideSpecialQuote();
+			quoteMsgBox.openBox(page);
+			ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_QUOTE_CLICK);
+		}
+		
+	}
+	
+	private void hideSpecialQuote(){
+		quoteScrollHandler.removeMessages(0);
+		if (infiniteThread!=null && !infiniteThread.isInterrupted()){
+    		infiniteThread.interrupt();
+    		try {
+				infiniteThread.join();
+			} catch (InterruptedException e) {}
+    		finally{
+    			infiniteThread = null;
+    		}
+    	}
+    	if (scrollHandler!=null){
+    		scrollHandler.removeMessages(0);
+    		scrollHandler.removeMessages(1);
+    	}
+    	quoteScrollView.scrollTo(0, 0);
+		quoteHiddenText.setOnClickListener(null);
+		quoteNextButton.setOnClickListener(null);
+	}
 }

@@ -102,4 +102,14 @@ public class ServerUrl {
 		else
 			return SERVER_URL_USAGE ;
 	}
+	
+	private static final String SERVER_URL_FLING = "https://140.112.30.165/drunk_detection_ubicomp/storytelling_fling_upload.php";
+	private static final String DEVELOPER_SERVER_URL_FLING = "https://140.112.30.165/develop/drunk_detection/storytelling_fling_upload.php";
+	
+	public static String SERVER_URL_FLING(boolean develop){
+		if (develop)
+			return DEVELOPER_SERVER_URL_FLING;
+		else
+			return SERVER_URL_FLING ;
+	}
 }

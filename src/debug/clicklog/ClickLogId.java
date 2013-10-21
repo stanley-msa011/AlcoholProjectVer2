@@ -38,6 +38,9 @@ public class ClickLogId {
 	public final static long TEST_QUESTION_SEND												=	2400000;
 	public final static long TEST_QUESTION_SEND_DATA									=	2400010;
 	
+	public final static long TEST_NOTIFICATION_OK											=	2500000;
+	public final static long TEST_NOTIFICATION_CANCEL								=	2600000;
+	
 	public final static long STATISTIC_TODAY_VIEW											=	3000001;
 	public final static long STATISTIC_WEEKLY_VIEW											=	3100001;
 	public final static long STATISTIC_MONTHLY_VIEW									=	3200001;
@@ -94,4 +97,7 @@ public class ClickLogId {
 	public final static long STORYTELLING_SHARE_END									=	8300000;
 	
 	public final static long MAIN_ACTIVITY_EXIT													=	9000004;
+	
+	public final static long STORYTELLING_QUOTE_CLICK								= 9100000;
+	public final static long STORYTELLING_QUOTE_END									= 9200000;
 }

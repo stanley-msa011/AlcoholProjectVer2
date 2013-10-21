@@ -2,6 +2,9 @@ package test.ui;
 
 import java.util.Random;
 
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLogger;
+
 import ubicomp.drunk_detection.activities.EmotionActivity;
 import ubicomp.drunk_detection.activities.EmotionManageActivity;
 import ubicomp.drunk_detection.activities.FragmentTabs;
@@ -166,6 +169,7 @@ public class NotificationBox {
 	private class TypeEmotionDIYOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLogger.Log(context, ClickLogId.TEST_NOTIFICATION_OK+10);
 			Intent intent = new Intent(context,EmotionActivity.class);
 			context.startActivity(intent);
 		}
@@ -174,6 +178,7 @@ public class NotificationBox {
 	private class TypeEmotionManageOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLogger.Log(context, ClickLogId.TEST_NOTIFICATION_OK+20);
 			Intent intent = new Intent(context,EmotionManageActivity.class);
 			context.startActivity(intent);
 		}
@@ -182,6 +187,7 @@ public class NotificationBox {
 	private class TypeStorytellingSharingOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLogger.Log(context, ClickLogId.TEST_NOTIFICATION_OK+30);
 			FragmentTabs.changeTab(2,2);			
 		}
 	}
@@ -189,6 +195,7 @@ public class NotificationBox {
 	private class TypeStorytellingRecordingOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLogger.Log(context, ClickLogId.TEST_NOTIFICATION_OK+40);
 			FragmentTabs.changeTab(2,3);			
 		}
 	}
@@ -196,6 +203,7 @@ public class NotificationBox {
 	private class CancelOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View v) {
+			ClickLogger.Log(context, ClickLogId.TEST_NOTIFICATION_CANCEL);
 			dismiss();
 		}
 	}

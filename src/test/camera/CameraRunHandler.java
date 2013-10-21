@@ -20,6 +20,8 @@ public class CameraRunHandler extends Handler {
 			cameraRecorder.CloseFail(1);
 		else if (msg.what == 3)//timeout
 			cameraRecorder.CloseFail(2);
+		else if (msg.what == 4)//blow_twice
+			cameraRecorder.CloseFail(3);
 	}
 	
 }

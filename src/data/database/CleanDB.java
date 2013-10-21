@@ -33,6 +33,10 @@ public class CleanDB {
 		db.execSQL(sql);
 		sql = "DELETE FROM SelfHelpCounterUpdate";
 		db.execSQL(sql);
+		sql = "DELETE FROM StorytellingUsage";
+		db.execSQL(sql);
+		sql = "DELETE FROM StorytellingFling";
+		db.execSQL(sql);
 		db.close();
 	}
 	

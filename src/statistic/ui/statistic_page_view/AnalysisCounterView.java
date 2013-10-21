@@ -1,5 +1,6 @@
 package statistic.ui.statistic_page_view;
 
+import data.database.AdditionalDB;
 import data.database.AudioDB;
 import data.database.HistoryDB;
 import data.database.QuestionDB;
@@ -31,6 +32,7 @@ public class AnalysisCounterView extends StatisticPageView {
 	private HistoryDB hdb;
 	private QuestionDB qdb;
 	private AudioDB adb;
+	private AdditionalDB addDb;
 	private RelativeLayout titleLayout;
 	
 	private Typeface wordTypeface,digitTypefaceBold;
@@ -43,6 +45,7 @@ public class AnalysisCounterView extends StatisticPageView {
 		hdb = new HistoryDB(context);
     	qdb = new QuestionDB(context);
     	adb = new AudioDB(context);
+    	addDb = new AdditionalDB(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_counter_help);
 		wordTypeface = Typefaces.getWordTypeface(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
@@ -101,7 +104,8 @@ public class AnalysisCounterView extends StatisticPageView {
     			+ qdb.getLatestEmotionManage().getSelfHelpCounter() 
     			+ qdb.getLatestQuestionnaire().getSelfHelpCounter()
 				+ adb.getLatestAudioData().getSelfHelpCounter()
-				+ qdb.getLatestStorytellingUsage().getSelfHelpCounter();
+				+ qdb.getLatestStorytellingUsage().getSelfHelpCounter()
+				+ addDb.getLatestStorytellingFling().getSelfHelpCounter();
     	int coupon = total_counter/COUPON_COUNTER;
     	int counter = total_counter;
     	

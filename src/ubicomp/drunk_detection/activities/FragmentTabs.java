@@ -7,6 +7,7 @@ import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.fragments.TestFragment;
 import ubicomp.drunk_detection.ui.CustomTab;
+import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.CustomMenu;
 import ubicomp.drunk_detection.ui.ScreenSize;
@@ -83,6 +84,8 @@ public class FragmentTabs extends FragmentActivity {
 		context = this;
 		fragmentTabs = this;
 		Typefaces.initAll(this);
+		
+		CustomToast.settingSoundPool(getBaseContext());
 		
 		loading_page = (ImageView) this.findViewById(R.id.loading_page);
 		

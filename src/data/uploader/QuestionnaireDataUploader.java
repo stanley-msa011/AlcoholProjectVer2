@@ -34,11 +34,13 @@ import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.check.DefaultCheck;
 
 import data.calculate.WeekNum;
+import data.database.AdditionalDB;
 import data.database.HistoryDB;
 import data.database.QuestionDB;
 import data.info.EmotionData;
 import data.info.EmotionManageData;
 import data.info.QuestionnaireData;
+import data.info.StorytellingFling;
 import data.info.StorytellingUsage;
 import data.info.UsedDetection;
 
@@ -77,16 +79,19 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 	
 		private QuestionDB db;
 		private HistoryDB hdb;
+		private AdditionalDB adb;
 		private Context context;
 		private static String SERVER_URL_EMOTION ;
 		private static String SERVER_URL_EMOTION_MANAGE;
 		private static String SERVER_URL_QUESTIONNAIRE;
 		private static String SERVER_URL_USED ;
-		private static String SERVER_URL_USAGE = "";
+		private static String SERVER_URL_USAGE ;
+		private static String SERVER_URL_FLING;
 		
 		public QuestionnaireDataUploader (Context context){
 			db = new QuestionDB(context);
 			hdb = new HistoryDB(context);
+			adb = new AdditionalDB(context);
 			this.context = context;
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 			boolean developer = sp.getBoolean("developer", false);
@@ -95,6 +100,7 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 			SERVER_URL_QUESTIONNAIRE = ServerUrl.SERVER_URL_QUESTIONNAIRE(developer);
 			SERVER_URL_USED = ServerUrl.SERVER_URL_USED(developer);
 			SERVER_URL_USAGE = ServerUrl.SERVER_URL_USAGE(developer);
+			SERVER_URL_FLING = ServerUrl.SERVER_URL_FLING(developer);
 		}
 		
 		@Override
@@ -154,6 +160,18 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 			       	int result = connectingToServer(usage[i]);
 			        if (result == -1){
 			        	Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - STORYTELLING USAGE");
+			        	return null;
+			        }
+				}
+			}
+			
+			StorytellingFling[] fling = adb.getNotUploadedStorytellingFling();
+			if (fling!=null){
+				Log.d("QUESTIONNAIRE UPLOADER"," STORYTELLING FLING START NOT NULL");
+				for (int i=0;i<fling.length;++i){
+			       	int result = connectingToServer(fling[i]);
+			        if (result == -1){
+			        	Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - STORYTELLING FLING");
 			        	return null;
 			        }
 				}
@@ -400,6 +418,50 @@ public class QuestionnaireDataUploader extends AsyncTask<Void, Void, Void> {
 				}
 				else
 					Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - STORYTELLING USAGE");
+				
+			} catch (Exception e) {
+				return -1;
+			} 
+			return 0;
+		}
+		
+		private int connectingToServer(StorytellingFling sf){
+			try {
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+				InputStream instream = context.getResources().openRawResource(R.raw.alcohol_certificate);
+				try{
+					trustStore.load(instream, null);
+				} finally{
+					instream.close();
+				}
+				SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
+				Scheme sch = new Scheme("https",socketFactory,443);
+				
+				httpClient.getConnectionManager().getSchemeRegistry().register(sch);
+				
+				HttpPost httpPost = new HttpPost(SERVER_URL_FLING);
+				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+				
+				List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+				
+				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
+				String uid = sp.getString("uid", "");
+				nvps.add(new BasicNameValuePair("flingData[]",uid));
+				nvps.add(new BasicNameValuePair("flingData[]",String.valueOf(sf.ts)));
+				nvps.add(new BasicNameValuePair("flingData[]",String.valueOf(sf.acc)));
+				nvps.add(new BasicNameValuePair("flingData[]",String.valueOf(sf.used)));
+				nvps.add(new BasicNameValuePair("flingData[]",String.valueOf(sf.isClear)));
+				nvps.add(new BasicNameValuePair("flingData[]",String.valueOf(sf.page)));
+				
+				httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+				
+				
+				if (uploader(httpClient, httpPost,context)){
+					adb.setStorytellingFlingUploaded(sf.ts);
+				}
+				else
+					Log.d("QUESTIONNAIRE UPLOADER","FAIL TO UPLOAD - STORYTELLING FLING");
 				
 			} catch (Exception e) {
 				return -1;

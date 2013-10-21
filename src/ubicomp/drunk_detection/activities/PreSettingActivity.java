@@ -2,6 +2,7 @@ package ubicomp.drunk_detection.activities;
 
 import java.util.Calendar;
 
+import data.database.AdditionalDB;
 import data.database.AudioDB;
 import data.database.HistoryDB;
 import data.database.QuestionDB;
@@ -383,10 +384,12 @@ public class PreSettingActivity extends Activity {
 			HistoryDB hdb = new HistoryDB(activity);
 			QuestionDB qdb = new QuestionDB(activity);
 			AudioDB adb = new AudioDB(activity);
+			AdditionalDB addDB = new AdditionalDB(activity);
 			long ts = System.currentTimeMillis();
 			hdb.cleanAcc(ts);
 			qdb.cleanAcc(ts);
 			adb.cleanAcc(ts);
+			addDB.cleanAcc(ts);
 			Reuploader.reuploader(activity);
 		}
 	}

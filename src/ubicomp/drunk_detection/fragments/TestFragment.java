@@ -1,6 +1,5 @@
 package ubicomp.drunk_detection.fragments;
 
-
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Random;
@@ -87,16 +86,16 @@ public class TestFragment extends Fragment {
 	public static final int _BT = 1;
 	public static final int _CAMERA = 2;
 	
-	private static final long TEST_GAP_DURATION = 120*1000L;
+	private static final long TEST_GAP_DURATION_LONG= 120*1000L;
+	private static final long TEST_GAP_DURATION_SHORT= 60*1000L;
 	private static final int COUNT_DOWN_SECOND = 10;
-	private static final int COUNT_DOWN_SECOND_DEVELOP= 3;
+	private static final int COUNT_DOWN_SECOND_DEVELOP= 0;
 	
 	private boolean keepMsgBox;
 	
 	//GPS
 	private LocationManager locationManager;
 	private GPSInitTask gpsInitTask;
-	//private GPSRunTask gpsRunTask;
 	private boolean gps_state = false;
 	
 	//Bluetooth
@@ -166,6 +165,7 @@ public class TestFragment extends Fragment {
 	private String test_guide_test_fail;
 	private String test_guide_test_timeout;
 	private String test_guide_connect_fail;
+	private String test_guide_multi_blow;
 	
 	private String[] test_guide_msg;
 	
@@ -193,6 +193,7 @@ public class TestFragment extends Fragment {
 		test_guide_test_timeout = getString(R.string.test_guide_test_timeout);
 		test_guide_connect_fail = getString(R.string.test_guide_connect_fail);
 		test_guide_msg = getResources().getStringArray(R.array.test_guide_msg);
+		test_guide_multi_blow = getString(R.string.test_guide_multi_blow);
 		sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
 	
@@ -403,7 +404,7 @@ public class TestFragment extends Fragment {
 	}
 	
 	public void startBT(){
-		messageView.setText(R.string.wait);
+		//messageView.setText(R.string.wait);
 		//initialize bt task
 		btInitHandler = new BTInitHandler(testFragment,bt);
 		btInitHandler.sendEmptyMessage(0);
@@ -460,7 +461,10 @@ public class TestFragment extends Fragment {
 				long lastTime = sp.getLong("LatestTestTime", 0);
 				long curTime = System.currentTimeMillis();
 				Boolean debug = sp.getBoolean("debug", false);
-				if (curTime - lastTime > TEST_GAP_DURATION || debug){
+				boolean testFail = sp.getBoolean("testFail", false);
+				long TEST_GAP_DURATION = testFail?TEST_GAP_DURATION_SHORT:TEST_GAP_DURATION_LONG;
+				long time = curTime - lastTime;
+				if (time > TEST_GAP_DURATION || debug){
 					bg.setOnTouchListener(null);
 					startButton.setOnClickListener(null);
 					startButton.setEnabled(false);
@@ -468,10 +472,23 @@ public class TestFragment extends Fragment {
 					bracText.setText("0.00");
 					reset();
 					messageView.setText(R.string.test_guide_show_turn_on);
-					start_thread = new Thread(new TimeUpRunnable(0,3000));
+					start_thread = new Thread(new TimeUpRunnable(0,100));
 					start_thread.start();
 				}else{
-					CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToast);
+					if (testFail){
+						if (time > 30000)
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastHalf);
+						else
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastShort);
+						
+					}else{
+						if (time > 90000)
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastHalf);
+						else if (time > 60000)
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastShort);
+						else
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastLong);
+					}
 				}
 			}
 		}
@@ -672,8 +689,6 @@ public class TestFragment extends Fragment {
 				notificationBox = new NotificationBox(testFragment.getActivity(),main_layout);
 			notificationBox.show(NotificationBox.getType(getActivity()));
 			
-			//notificationBox.show(2);
-			
 			LoadingDialogControl.dismiss();
 			
 			/*
@@ -784,12 +799,23 @@ public class TestFragment extends Fragment {
 	public void stopByFail(int fail){
 		Message msg = new Message();
 		Bundle data = new Bundle();
-		if (fail==0)
+		switch (fail){
+		case 0:
 			data.putString("msg", test_guide_connect_fail);
-		else if(fail==1)
+			break;
+		case 1:
 			data.putString("msg",test_guide_test_fail);
-		else
+			break;
+		case 2:
 			data.putString("msg",test_guide_test_timeout);
+			break;
+		case 3:
+			data.putString("msg", test_guide_multi_blow);
+			break;
+		default:
+			data.putString("msg",test_guide_test_timeout);
+			break;
+		}
 		msg.setData(data);
 		msg.what = 0;
 		if (failBgHandler!=null)
@@ -842,6 +868,8 @@ public class TestFragment extends Fragment {
 	
 	private class CountDownRunnable implements Runnable{
 
+		private static final int SECOND_FIX = 1300;
+		
 		int msg;
 		int sec;
 		public CountDownRunnable (int msg, int sec){
@@ -853,11 +881,12 @@ public class TestFragment extends Fragment {
 		@Override
 		public void run() {
 			try {
+				Thread.sleep(SECOND_FIX );
 				for (int i=0;i<sec;++i){
-					Thread.sleep(1000);
+					Thread.sleep(SECOND_FIX );
 					countDownHandler.sendEmptyMessage(0);
 				}
-				timeUpHandler.sendEmptyMessage(msg);
+				timeUpHandler.sendEmptyMessageDelayed(msg, SECOND_FIX );
 			} catch (InterruptedException e) {}
 		}
 	}
@@ -950,7 +979,6 @@ public class TestFragment extends Fragment {
 				conditionButtons[i].setOnClickListener(null);
 			}
 		}
-			
 	}
 	
 	private class ConditionOnClickListener implements View.OnClickListener{
@@ -971,7 +999,6 @@ public class TestFragment extends Fragment {
 		}
 	}
 	
-	
 	public void showDebug(String message){
 		if (this == null)
 			return;
@@ -984,7 +1011,6 @@ public class TestFragment extends Fragment {
 			msg.what = 0;
 			msgHandler.sendMessage(msg);
 		}
-		
 	}
 	
 	@SuppressLint("HandlerLeak")
@@ -994,7 +1020,5 @@ public class TestFragment extends Fragment {
 			debugMsg.setSelection(debugMsg.getText().length());
 		}
 	}
-	
-
 
 }

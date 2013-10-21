@@ -61,14 +61,58 @@
     	    android:layout_height="wrap_content"
     	    android:gravity="left" />
     	
-    	<TextView
-    	    android:id="@+id/history_quote"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:gravity="left"
-    	    android:layout_toRightOf="@+id/history_stage_rate"
-    	    android:textAlignment="textStart"
-    	    android:textColor="#FF717071" />
+    	
+    	<ScrollView
+				android:id="@+id/history_quote_scroll_view"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" 
+				android:scrollbars="none"
+				android:layout_toRightOf="@+id/history_stage_rate"
+				>
+    	
+    		<LinearLayout 
+    	    	android:id="@+id/history_quote_layout"
+    	    	android:layout_width="wrap_content"
+    	    	android:layout_height="wrap_content"
+    	    	android:orientation="vertical"
+    	    	>
+    	
+    			<TextView
+		    	    android:id="@+id/history_quote"
+    	    		android:layout_width="wrap_content"
+    	    		android:layout_height="wrap_content"
+    	    		android:gravity="left"
+    	    		android:textAlignment="textStart"
+    	    		android:layout_weight="1"
+    	    		android:textColor="#FF717071" />
+	    		
+    			<RelativeLayout 
+    		    	android:id="@+id/history_quote_hidden_layout"
+    		    	android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					>
+	
+    		    	<TextView
+	    		        android:id="@+id/history_quote_hidden_text"
+    		        	android:layout_width="wrap_content"
+    		        	android:layout_height="wrap_content"
+    		        	android:gravity="left"
+    		        	android:layout_centerVertical="true"
+    	    			android:textColor="#FF717071" 
+    		        	android:text="@string/quote_next_message" />
+
+					<ImageView
+					    android:id="@+id/history_quote_hidden_button"
+					    android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+					    android:layout_centerVertical="true"
+					    android:layout_toRightOf="@+id/history_quote_hidden_text"
+					    android:src="@drawable/history_next" />
+
+	    		</RelativeLayout>
+    		</LinearLayout>
+    	</ScrollView>
     	
     </RelativeLayout>
     <RelativeLayout 

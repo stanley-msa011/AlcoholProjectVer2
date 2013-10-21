@@ -44,8 +44,8 @@ public class Bluetooth {
 	protected float absolute_min;
 	protected float now_pressure;
 	protected boolean isPeak = false;
-	protected final static float PRESSURE_DIFF_MIN_RANGE  = 200f;
-	protected final static float PRESSURE_DIFF_MIN =600.f;
+	protected final static float PRESSURE_DIFF_MIN_RANGE  = 100f;
+	protected final static float PRESSURE_DIFF_MIN =900.f;
 	protected final static float MAX_PRESSURE = Float.MAX_VALUE;
 	protected final static long IMAGE_MILLIS_0 = 500;
 	protected final static long IMAGE_MILLIS_1 = 2500;
@@ -56,10 +56,10 @@ public class Bluetooth {
 	protected final static long MILLIS_2 = 1650;
 	protected final static long MILLIS_3 = 2800;
 	protected final static long MILLIS_4 = 3850;
-	protected final static long MILLIS_5 = 5000;
+	protected final static long MILLIS_5 = 4980;
 	
 	protected final static long START_MILLIS = 2000;
-	protected final static long MAX_TEST_TIME = 22000;
+	protected final static long MAX_TEST_TIME = 25000;
 	
 	protected long start_time;
 	protected long end_time;
@@ -101,6 +101,7 @@ public class Bluetooth {
 	private BracPressureHandler bracPressureHandler = null;
 	private ArrayList<Float> pressure_list;
 	private float temp_pressure;
+	private float init_voltage = 9999.f;
 	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler,boolean recordPressure){
 		this.testFragment = testFragment;
@@ -354,12 +355,14 @@ public class Bluetooth {
 			close();
 			if (e.getMessage()!=null && e.getMessage().equals("TIMEOUT"))
 				cameraRunHandler.sendEmptyMessage(3);
-			else
+			else if (e.getMessage()!=null && e.getMessage().equals("BLOW_TWICE")){
+				cameraRunHandler.sendEmptyMessage(4);
+			}else
 				cameraRunHandler.sendEmptyMessage(2);
 		}
 	}
 	
-	protected boolean sendMsgToApp(String msg){
+	protected boolean sendMsgToApp(String msg) throws Exception{
 		synchronized(lock){
 			if (msg=="");
 				//Do nothing
@@ -396,6 +399,16 @@ public class Bluetooth {
 					isPeak = true;
 					start_time = time;
 					++start_times;
+					if (start_times == 1){
+						SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+						SharedPreferences.Editor edit = sp.edit();
+						edit.putLong("LatestTestTime", System.currentTimeMillis());
+						edit.putBoolean("testFail", true);
+						edit.commit();
+					}
+					if (start_times >2){
+						throw new Exception("BLOW_TWICE");
+					}
 					temp_duration = 0;
 					Log.d("BT","Peak Start");
 				}else if (now_pressure > absolute_min +diff_limit && isPeak){
@@ -439,7 +452,10 @@ public class Bluetooth {
 						++break_times;
 						Log.d("BT","Peak End");
 					}
-			}else if (msg.charAt(0) == 'v'){	}
+			}else if (msg.charAt(0) == 'v'){
+				if(!start)
+					init_voltage=Float.valueOf(msg.substring(1));
+			}
 		}
 		return false;
 	}
@@ -467,24 +483,25 @@ public class Bluetooth {
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();
-		if (bracPressureHandler != null && pressure_list!=null){
-			double pressure_sum = 0.0;
-			int count = pressure_list.size();
-			if (count > 0){
-				Iterator<Float> iter= pressure_list.iterator();
-				while(iter.hasNext())
-					pressure_sum+=iter.next();
-				pressure_sum/=count;
+		try{
+			if (bracPressureHandler != null && pressure_list!=null){
+				double pressure_sum = 0.0;
+				int count = pressure_list.size();
+				if (count > 0){
+					Iterator<Float> iter= pressure_list.iterator();
+					while(iter.hasNext())
+						pressure_sum+=iter.next();
+					pressure_sum/=count;
+				}
+					
+				Message msg = new Message();
+				Bundle data = new Bundle();
+				data.putString("pressure", start_times+"\t"+break_times+"\t"+pressure_sum+"\t"+absolute_min+"\t"+init_voltage);
+				msg.setData(data);
+				msg.what = 0;
+				bracPressureHandler.sendMessage(msg);
 			}
-			
-			Message msg = new Message();
-			Bundle data = new Bundle();
-			data.putString("pressure", start_times+"\t"+break_times+"\t"+pressure_sum+"\t"+absolute_min);
-			msg.setData(data);
-			msg.what = 0;
-			bracPressureHandler.sendMessage(msg);
-		}
-		
+		}catch(Exception e){};
 	}
 	
 	public void closeWithCamera(){

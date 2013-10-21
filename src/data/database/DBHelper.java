@@ -8,7 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 12; 
+	private static final int DB_VERSION = 13; 
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -185,6 +185,18 @@ public class DBHelper extends SQLiteOpenHelper {
         		" minutes INTEGER NOT NULL DEFAULT -1"+
         		")"
         		);
+        
+        db.execSQL(
+        		"CREATE TABLE StorytellingFling (" +
+        		" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        		" ts INTEGER NOT NULL," +
+        		" acc INTEGER NOT NULL," +
+        		" used INTEGER NOT NULL," +
+        		" isClear INTEGER NOT NULL DEFAULT 0,"+
+        		" page INTEGER NOT NULL,"+
+        		" upload INTEGER NOT NULL DEFAULT 0" +
+        		")"
+        		);
 	}
 
 	@Override
@@ -241,6 +253,20 @@ public class DBHelper extends SQLiteOpenHelper {
 		if (old_ver <12){
 			db.execSQL("ALTER TABLE StorytellingUsage ADD name CHAR[255] NOT NULL DEFAULT 'NONE'");
 			db.execSQL("ALTER TABLE StorytellingUsage ADD minutes INTEGER NOT NULL DEFAULT -1");
+		}
+		
+		if (old_ver <13){
+			db.execSQL(
+	        		"CREATE TABLE StorytellingFling (" +
+	        		" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+	        		" ts INTEGER NOT NULL," +
+	        		" acc INTEGER NOT NULL," +
+	        		" used INTEGER NOT NULL," +
+	        		" isClear INTEGER NOT NULL DEFAULT 0,"+
+	        		" page INTEGER NOT NULL,"+
+	        		" upload INTEGER NOT NULL DEFAULT 0" +
+	        		")"
+	        		);
 		}
 	}
 	

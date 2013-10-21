@@ -17,6 +17,7 @@ import java.util.zip.ZipInputStream;
 import ubicomp.drunk_detection.activities.PreSettingActivity;
 
 import data.calculate.WeekNum;
+import data.database.AdditionalDB;
 import data.database.AudioDB;
 import data.database.CleanDB;
 import data.database.HistoryDB;
@@ -27,6 +28,7 @@ import data.info.DateValue;
 import data.info.EmotionData;
 import data.info.EmotionManageData;
 import data.info.QuestionnaireData;
+import data.info.StorytellingFling;
 import data.info.StorytellingUsage;
 import data.info.UsedDetection;
 
@@ -53,6 +55,7 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 	private QuestionDB qdb;
 	private AudioDB adb;
 	private CleanDB cdb;
+	private AdditionalDB addDb;
 	
 	public RestoreData(String uid,Context context){
 		this.uid = uid;
@@ -70,6 +73,7 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 		qdb = new QuestionDB(context);
 		adb = new AudioDB(context);
 		cdb = new CleanDB(context);
+		addDb = new AdditionalDB(context);
 	}
 	
 	private ProgressDialog dialog = null;
@@ -93,6 +97,7 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 			 restoreQuestionnaires();
 			 restoreAudios();
 			 restoreStorytellingUsage();
+			 restoreStorytellingFling();
 		}
 		return null;
 	}
@@ -414,6 +419,36 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 			}
 		}
 		qdb.restoreData(su);
+		return 0;
+	}
+	
+	private int  restoreStorytellingFling(){
+		File f;
+		StorytellingFling sf = null;
+		f = new File(dir+"/"+uid+"/storyfling.restore");
+		if (f.exists()){
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(f))));
+				String str = reader.readLine();
+				if (str==null)
+					Log.d("RESTORE","No Storytelling Fling Info");
+				else{
+					while((str = reader.readLine()) !=null){
+						String[] data = str.split(",");
+						long ts = Integer.valueOf(data[0])*1000L;
+						int acc = Integer.valueOf(data[1]);
+						int used= Integer.valueOf(data[2]);
+						sf = new StorytellingFling(ts,acc,used,0,-1);
+					}
+				}
+				reader.close();
+			} catch (FileNotFoundException e) {
+				Log.d("RESTORE","NO Storytelling Fling FILE");
+			} catch (IOException e) {
+				Log.d("RESTORE","Storytelling Fling FILE READ FAIL");
+			}
+		}
+		addDb.restoreData(sf);
 		return 0;
 	}
 	
