@@ -11,6 +11,7 @@ import java.util.UUID;
 import test.camera.CameraRunHandler;
 import test.data.BracPressureHandler;
 import test.data.BracValueFileHandler;
+import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.TestFragment;
 
 import android.bluetooth.BluetoothAdapter;
@@ -21,6 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
@@ -57,6 +60,7 @@ public class Bluetooth {
 	protected final static long MILLIS_3 = 2800;
 	protected final static long MILLIS_4 = 3850;
 	protected final static long MILLIS_5 = 4980;
+	protected final static long BIP_MILLIS = 332;
 	
 	protected final static long START_MILLIS = 2000;
 	protected final static long MAX_TEST_TIME = 25000;
@@ -103,6 +107,9 @@ public class Bluetooth {
 	private float temp_pressure;
 	private float init_voltage = 9999.f;
 	
+	private static SoundPool soundpool;
+	private static int soundId;
+	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler,boolean recordPressure){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
@@ -120,6 +127,10 @@ public class Bluetooth {
 			bracPressureHandler = new BracPressureHandler(bracFileHandler.getDirectory(),bracFileHandler.getTimestamp());
 			pressure_list = new ArrayList<Float>();
 		}
+		if (soundpool == null){
+			soundpool = new SoundPool(1,AudioManager.STREAM_MUSIC,1);
+			soundId = soundpool.load(context, R.raw.din_ding, 1);
+		}
 	}
 	
 	public void enableAdapter(){
@@ -127,23 +138,21 @@ public class Bluetooth {
 			btAdapter.enable();
 			int state = btAdapter.getState();
 			while (state!=BluetoothAdapter.STATE_ON){
-				try { Thread.sleep(100);} catch (InterruptedException e) {}
+				try { Thread.sleep(10);} catch (InterruptedException e) {}
 				state =  btAdapter.getState();
 			}
 		}
 	}
 	
-	public void pair(){
+	public boolean pair(){
 		sensor = null;
 		Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
 		Iterator<BluetoothDevice> iter = devices.iterator();
 		while (iter.hasNext()){
 			BluetoothDevice device = iter.next();
-			if (	device.getName().equals(DEVICE_NAME)
-					||device.getName().equals(DEVICE_NAME2)
-					||device.getName().startsWith(DEVICE_NAME_FORMAL)){
+			if (device.getName().equals(DEVICE_NAME) ||device.getName().equals(DEVICE_NAME2) ||device.getName().startsWith(DEVICE_NAME_FORMAL)){
 				sensor = device;
-				break;
+				return true;
 			}
 		}
 		if (sensor == null){
@@ -152,6 +161,7 @@ public class Bluetooth {
 			context.registerReceiver(receiver, filter);
 			btAdapter.startDiscovery();
 		}
+		return false;
 	}
 	
 	protected class btReceiver extends BroadcastReceiver{
@@ -162,36 +172,51 @@ public class Bluetooth {
 				if (device == null)
 					return;
 				String name = device.getName();
-				if (	name.equals(DEVICE_NAME)
-						||name.equals(DEVICE_NAME2)
-						||name.startsWith(DEVICE_NAME_FORMAL)){
-					btAdapter.cancelDiscovery();
+				if (name.equals(DEVICE_NAME) ||name.equals(DEVICE_NAME2) ||name.startsWith(DEVICE_NAME_FORMAL)){
+					if (btAdapter.isDiscovering())
+						btAdapter.cancelDiscovery();
 					sensor = device;
+					connect();
+					close();
 				}
 			}
 		}
 	}
 	
-	public int connect(){
-		if (sensor == null)
-			return -1;
+	public boolean connect(){
+		if (btAdapter !=null && btAdapter.isDiscovering())
+			btAdapter.cancelDiscovery();
+		
+		if (sensor == null){
+			close();
+			return false;
+		}
 		try {
 			if (Build.VERSION.SDK_INT<11)
 				socket = sensor.createRfcommSocketToServiceRecord(uuid);
 			else
 				socket = sensor.createRfcommSocketToServiceRecord(uuid);
-			btAdapter.cancelDiscovery();
+			try{
+				socket.close();
+				if (Build.VERSION.SDK_INT<11)
+					socket = sensor.createRfcommSocketToServiceRecord(uuid);
+				else
+					socket = sensor.createRfcommSocketToServiceRecord(uuid);
+			}catch(Exception e){
+				Log.d("BT","FAIL TO CLOSE BEFORE CONNECTION");
+			}
 			socket.connect();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CONNECT TO THE SENSOR: "+e.toString());
-			close();
-			return -1;
+			closeWithCamera();
+			return false;
 		}
-		return 1;
+		return true;
 	}
 	
 	public void start(){
 		start = true;
+		soundpool.play(soundId, 1.f, 1.f, 0, 0, 1.f);
 	}
 	
 	
@@ -296,7 +321,8 @@ public class Bluetooth {
 		start_recorder = false;
 		start_times = 0;
 		break_times = 0;
-		pressure_list.clear();
+		if(pressure_list!=null)
+			pressure_list.clear();
 		try {
 			in = socket.getInputStream();
 			if (in.available() > 0)
@@ -417,16 +443,21 @@ public class Bluetooth {
 					temp_duration += (end_time-start_time);
 					start_time = end_time;
 				
-					if (duration > MILLIS_5)
+					if (duration > MILLIS_5){
 						show_in_UI(show_value,5);
-					else if (duration > MILLIS_4)
+					}
+					else if (duration > MILLIS_4){
 						show_in_UI(show_value,4);
-					else if (duration > MILLIS_3)
+					}
+					else if (duration > MILLIS_3){
 						show_in_UI(show_value,3);
-					else if (duration > MILLIS_2)
+					}
+					else if (duration > MILLIS_2){
 						show_in_UI(show_value,2);
-					else if (duration > MILLIS_1)
+					}
+					else if (duration > MILLIS_1){
 						show_in_UI(show_value,1);
+					}
 						
 					if (duration >= START_MILLIS)
 						start_recorder = true;
@@ -461,14 +492,7 @@ public class Bluetooth {
 	}
 	
 	public void close(){
-		try {
-			if (socket != null && socket.isConnected()){
-				sendEnd();
-				socket.close();
-			}
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR");
-		}
+		sendEnd();
 		try {
 			if (in != null)
 				in.close();
@@ -481,6 +505,15 @@ public class Bluetooth {
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CLOSE THE SENSOR OUTPUTSTREAM");
 		}
+		try {
+			if (socket != null){
+				socket.close();
+			}
+		} catch (Exception e) {
+			Log.e("BT","FAIL TO CLOSE THE SENSOR");
+		}
+		
+		
 		if (bracFileHandler!= null)
 			bracFileHandler.close();
 		try{

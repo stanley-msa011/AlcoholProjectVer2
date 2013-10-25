@@ -10,6 +10,7 @@ import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.activities.TutorialActivity;
 import ubicomp.drunk_detection.check.AlwaysFinishActivitiesCheck;
 import ubicomp.drunk_detection.check.DefaultCheck;
+import ubicomp.drunk_detection.config.Config;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
@@ -47,6 +48,8 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -86,10 +89,10 @@ public class TestFragment extends Fragment {
 	public static final int _BT = 1;
 	public static final int _CAMERA = 2;
 	
-	private static final long TEST_GAP_DURATION_LONG= 120*1000L;
-	private static final long TEST_GAP_DURATION_SHORT= 60*1000L;
-	private static final int COUNT_DOWN_SECOND = 10;
-	private static final int COUNT_DOWN_SECOND_DEVELOP= 0;
+	private static final long TEST_GAP_DURATION_LONG= Config.TEST_GAP_DURATION_LONG;
+	private static final long TEST_GAP_DURATION_SHORT= Config.TEST_GAP_DURATION_SHORT;
+	private static final int COUNT_DOWN_SECOND = Config.COUNT_DOWN_SECOND;
+	private static final int COUNT_DOWN_SECOND_DEVELOP= Config.COUNT_DOWN_SECOND_DEVELOP;
 	
 	private boolean keepMsgBox;
 	
@@ -175,6 +178,9 @@ public class TestFragment extends Fragment {
 	
 	private NotificationBox notificationBox;
 	
+	private static SoundPool soundpool;
+	private static int soundId;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -195,6 +201,10 @@ public class TestFragment extends Fragment {
 		test_guide_msg = getResources().getStringArray(R.array.test_guide_msg);
 		test_guide_multi_blow = getString(R.string.test_guide_multi_blow);
 		sp= PreferenceManager.getDefaultSharedPreferences(getActivity());
+		if (soundpool == null){
+			soundpool = new SoundPool(1,AudioManager.STREAM_MUSIC,1);
+			soundId = soundpool.load(this.getActivity(), R.raw.short_beep, 1);
+		}
 	}
 	
 	public void onPause(){
@@ -895,6 +905,7 @@ public class TestFragment extends Fragment {
 	private class CountDownHandler extends Handler{
 		public void handleMessage(Message msg){
 			--count_down_sec;
+			soundpool.play(soundId, 0.6f, 0.6f, 0, 0, 1.f);
 			countDownText.setText(String.valueOf(count_down_sec));
 		}
 	}
@@ -927,6 +938,10 @@ public class TestFragment extends Fragment {
 	
 	public void writeQuestionFile(int emotion,int desire){
 		questionFile.write(emotion, desire);
+	}
+	
+	public void setPairMessage(){
+		messageView.setText(R.string.test_guide_pair);
 	}
 	
 	

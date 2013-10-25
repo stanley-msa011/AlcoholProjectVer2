@@ -8,6 +8,7 @@ import java.util.Calendar;
 import test.ui.NotificationBox;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.config.Config;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScreenSize;
@@ -26,7 +27,7 @@ import debug.clicklog.ClickLogger;
 import history.ui.HistoryStorytelling;
 import history.ui.AudioRecordBox;
 import history.ui.PageAnimationTaskVertical;
-import history.ui.PageAnimationTaskVertical2;
+import history.ui.PageAnimationTaskVerticalFling;
 import history.ui.PageWidgetVertical;
 import history.ui.QuoteMsgBox;
 import history.ui.StorytellingBox;
@@ -88,7 +89,7 @@ public class HistoryFragment extends Fragment {
 	private AdditionalDB addDb;
 	private PageWidgetVertical pageWidget;
 	private PageAnimationTaskVertical pageAnimationTask;
-	private PageAnimationTaskVertical2 pageAnimationTask2;
+	private PageAnimationTaskVerticalFling pageAnimationTask2;
 	
 	private HorizontalScrollView scrollView;
 	
@@ -173,9 +174,9 @@ public class HistoryFragment extends Fragment {
 	
 	private AlphaAnimation shareAnimation;
 	
-	private long READING_PAGE_TIME = 5400;
+	private static final long READING_PAGE_TIME = Config.READING_PAGE_TIME;
 	
-	private int LONG_FLING_LIMIT = 1;
+	private static final int LONG_FLING_LIMIT = Config.LONG_FLING_LIMIT;
 	
 	private ScrollView quoteScrollView;
 	private RelativeLayout quoteHiddenLayout;
@@ -690,17 +691,13 @@ public class HistoryFragment extends Fragment {
 			resetPage(0);
 			return;
 		}
-			isAnimation = true;
-			FragmentTabs.enableTabAndClick(false);
-			
-			int[] aBgs = HistoryStorytelling.getAnimationBgs(page_states);
-			int pageIdx = page_week;
-			int startIdx = pageIdx-1;
-			if (startIdx <0)
-				startIdx =0;
-			setStageVisible(false);
-			pageAnimationTask = new PageAnimationTaskVertical(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx);
-			pageAnimationTask.execute();
+		isAnimation = true;
+		FragmentTabs.enableTabAndClick(false);
+		int[] aBgs = HistoryStorytelling.getAnimationBgs(page_states);
+		int startIdx = page_week-1;
+		setStageVisible(false);
+		pageAnimationTask = new PageAnimationTaskVertical(pageWidget,from,to,aBgs,historyFragment,startIdx);
+		pageAnimationTask.execute();
 	}
 	
 	public void setStageVisible(boolean t){
@@ -770,7 +767,7 @@ public class HistoryFragment extends Fragment {
 				quoteScroll(page_week+1);
 				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_UP);
 				setStageVisible(false);
-				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx,1);
+				pageAnimationTask2 = new PageAnimationTaskVerticalFling(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx,1);
 				pageAnimationTask2.execute();
 			}else if (y2 - y1 >  0){//DOWN
 				pageWidget.setOnTouchListener(null);
@@ -788,7 +785,7 @@ public class HistoryFragment extends Fragment {
 				quoteScroll(page_week-1);
 				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_DOWN);
 				setStageVisible(false);
-				pageAnimationTask2 = new PageAnimationTaskVertical2(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,endIdx,0);
+				pageAnimationTask2 = new PageAnimationTaskVerticalFling(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,endIdx,0);
 				pageAnimationTask2.execute();
 			}
 			return true;
@@ -1515,8 +1512,8 @@ public class HistoryFragment extends Fragment {
 			if (time==page_week){
 				addLongFlingTime(getActivity());
 				int limit = LONG_FLING_LIMIT;
-				//if (addDb.getLatestStorytellingFling().ts == 0)
-				//	limit /=2;
+				if (addDb.getLatestStorytellingFling().ts == 0)
+					limit /=2;
 				int cur_time = getLongFlingTime(getActivity());
 				Log.d("Quote","OK "+time+" "+cur_time+"/"+limit);
 				if (cur_time>=limit){

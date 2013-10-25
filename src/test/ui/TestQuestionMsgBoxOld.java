@@ -141,10 +141,12 @@ public class TestQuestionMsgBoxOld implements TestQuestionMsgBoxInterface{
 		gpsNo = (TextView) boxLayout.findViewById(R.id.msg_gps_no);
 		gpsNo.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		gpsNo.setTypeface(wordTypefaceBold);
+		gpsNo.setVisibility(View.INVISIBLE);
 		
 		gpsYes = (TextView) boxLayout.findViewById(R.id.msg_gps_yes);
 		gpsYes.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
 		gpsYes.setTypeface(wordTypefaceBold);
+		gpsYes.setVisibility(View.INVISIBLE);
 		
 		emotionSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_emotion_seek_bar);
 		desireSeekBar = (SeekBar) boxLayout.findViewById(R.id.msg_desire_seek_bar);

@@ -12,19 +12,12 @@ public class BluetoothOld extends Bluetooth {
 			CameraRunHandler cameraRunHandler,
 			BracValueFileHandler bracFileHandler,
 			BracValueDebugHandler bracDebugHandler) {
-		super(testFragment, cameraRunHandler, bracFileHandler,false);
+		super(testFragment, cameraRunHandler, bracFileHandler,true);
 	}
 
 	@Override
 	public void close(){
-		try {
-			if (socket != null){
-				sendEnd();
-				socket.close();
-			}
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR");
-		}
+		sendEnd();
 		try {
 			if (in != null)
 				in.close();
@@ -36,6 +29,13 @@ public class BluetoothOld extends Bluetooth {
 				out.close();
 		} catch (Exception e) {
 			Log.e("BT","FAIL TO CLOSE THE SENSOR OUTPUTSTREAM");
+		}
+		try {
+			if (socket != null){
+				socket.close();
+			}
+		} catch (Exception e) {
+			Log.e("BT","FAIL TO CLOSE THE SENSOR");
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();

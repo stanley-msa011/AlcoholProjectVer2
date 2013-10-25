@@ -15,6 +15,7 @@ import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.SurfaceHolder;
@@ -50,7 +51,9 @@ public class CameraRecorder {
     
     public void init(){
     	picture_count = 0;
-    	int camera_count = Camera.getNumberOfCameras();
+    	int camera_count = 1;
+    	if (Build.VERSION.SDK_INT>=9)
+    		camera_count = Camera.getNumberOfCameras();
 		if (camera_count > 1)
 			camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
 		else
@@ -61,13 +64,17 @@ public class CameraRecorder {
 		List<Size> list = params.getSupportedPictureSizes();
 		Point bestSize = getBestSize(list);
 		params.setPictureSize(bestSize.x, bestSize.y);
-		camera.setParameters(params);
+		try{
+			camera.setParameters(params);
+		}catch(Exception e){}
+		
+		setSurfaceCallback();
     }
     
     protected Point getBestSize(List<Size> list){
 		int bestWidth = Integer.MAX_VALUE;
 		int bestHeight = Integer.MAX_VALUE;
-		if (list.size()>1){
+		if (list.size()>0){
 			Iterator<Camera.Size> iter = list.iterator();
 			while(iter.hasNext()){
 				Camera.Size cur = iter.next();
@@ -85,7 +92,7 @@ public class CameraRecorder {
     		preview.setVisibility(View.VISIBLE);
     }
     
-    public void setSurfaceCallback(){
+    private void setSurfaceCallback(){
     	previewFrame = null;
     	circle = new ImageView(context);
     	circle.setBackgroundColor(0xAAAACCFF);
@@ -154,7 +161,8 @@ public class CameraRecorder {
     
     public void CloseFail(int type){
     	close();
-    	circle.setVisibility(View.INVISIBLE);
+    	if (circle!=null)
+    		circle.setVisibility(View.INVISIBLE);
     	testFragment.stopByFail(type);
     }
     
