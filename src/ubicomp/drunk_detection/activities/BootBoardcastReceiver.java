@@ -43,6 +43,17 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 			edit.commit();
 		}
 		
+		testNotificationSetting(context,intent);
+		regularCheckSetting(context, intent);
+	}
+	
+	public static void testNotificationSetting(Context context, Intent intent){
+		
+		Log.d("Alarm","notification_setting");
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		int notification_minutes = sp.getInt("notification_gap", 120);
+		long notification_gap = notification_minutes * 60 * 1000;
+		
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		
 		Intent service_intent = new Intent();
@@ -57,27 +68,50 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		int cur_hour = c.get(Calendar.HOUR_OF_DAY);
 		int cur_min = c.get(Calendar.MINUTE);
 		
-		if (cur_min < 29){
-			if (cur_hour%2 == 0){
+		if (notification_minutes == 120){
+			if (cur_min < 30){
+				if (cur_hour%2 == 0){
+					c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+				}else{
+					c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+					c.add(Calendar.HOUR_OF_DAY, 1);
+				}
+			}else{
+				if (cur_hour%2 == 0){
+					c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+					c.add(Calendar.HOUR_OF_DAY, 2);
+				}else{
+					c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+					c.add(Calendar.HOUR_OF_DAY, 1);
+				}
+			}
+		}else if (notification_minutes == 60){
+			if (cur_min < 30){
 				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
 			}else{
 				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+				c.add(Calendar.HOUR_OF_DAY, 1);
+			}
+		}else if (notification_minutes == 30){
+			if (cur_min < 30){
+				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
+			}else{
+				c.set(cur_year, cur_month, cur_date, cur_hour, 0, 0);
 				c.add(Calendar.HOUR_OF_DAY, 1);
 			}
 		}else{
-			if (cur_hour%2 == 0){
-				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
-				c.add(Calendar.HOUR_OF_DAY, 2);
-			}else{
-				c.set(cur_year, cur_month, cur_date, cur_hour, 30, 0);
-				c.add(Calendar.HOUR_OF_DAY, 1);
-			}
+			//do not change c
 		}
-		
 		
 		PendingIntent pending = PendingIntent.getBroadcast(context, requestCode, service_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarm.cancel(pending);
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis()+10,2*AlarmManager.INTERVAL_HOUR,pending);
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis()+10,notification_gap,pending);
+	}
+
+	
+	public static void regularCheckSetting(Context context, Intent intent){
+		Log.d("Alarm","regular_check_setting");
+		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		
 		Intent check_intent = new Intent();
 		check_intent.setClass(context, AlarmReceiver.class);
@@ -92,7 +126,5 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		ClickLogUploader.upload(context);
 		Intent regularCheckIntent = new Intent(context,RegularCheckService.class);
 		context.startService(regularCheckIntent);
-		
 	}
-
 }

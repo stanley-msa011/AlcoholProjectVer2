@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-
 import test.ui.NotificationBox;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
@@ -48,6 +47,7 @@ import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.graphics.Paint.Align;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -309,6 +309,7 @@ public class HistoryFragment extends Fragment {
     	
     	LinearLayout.LayoutParams qHiddenParam = (LinearLayout.LayoutParams) quoteHiddenLayout.getLayoutParams();
     	qHiddenParam.height = bg_x*52/480;
+    	quoteHiddenLayout.setPadding(0, 0, bg_x*30/480, 0);
     	
     	LayoutParams qNextButtonParam = (LayoutParams) quoteNextButton.getLayoutParams();
     	qNextButtonParam.leftMargin = bg_x*20/480;
@@ -519,7 +520,7 @@ public class HistoryFragment extends Fragment {
     private void setStorytellingTexts(){
     	
     	AccumulatedHistoryState curAH = page_states[page_week];
-    	float progress = (float)curAH.getScore()*100F/(float)curAH.MAX_SCORE;
+    	float progress = curAH.getProgress();
     	
     	String stageText = String.valueOf(page_week+1);
     	
@@ -697,7 +698,10 @@ public class HistoryFragment extends Fragment {
 		int startIdx = page_week-1;
 		setStageVisible(false);
 		pageAnimationTask = new PageAnimationTaskVertical(pageWidget,from,to,aBgs,historyFragment,startIdx);
-		pageAnimationTask.execute();
+		if (Build.VERSION.SDK_INT>= 11)
+			pageAnimationTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
+		else
+			pageAnimationTask.execute();
 	}
 	
 	public void setStageVisible(boolean t){
@@ -768,7 +772,11 @@ public class HistoryFragment extends Fragment {
 				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_UP);
 				setStageVisible(false);
 				pageAnimationTask2 = new PageAnimationTaskVerticalFling(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,pageIdx,1);
-				pageAnimationTask2.execute();
+				if (Build.VERSION.SDK_INT>= 11)
+					pageAnimationTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
+				else
+					pageAnimationTask2.execute();
+				//pageAnimationTask2.execute();
 			}else if (y2 - y1 >  0){//DOWN
 				pageWidget.setOnTouchListener(null);
 				FragmentTabs.enableTabAndClick(false);
@@ -786,7 +794,11 @@ public class HistoryFragment extends Fragment {
 				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_DOWN);
 				setStageVisible(false);
 				pageAnimationTask2 = new PageAnimationTaskVerticalFling(pageWidget,from,to,aBgs,historyFragment,curPageTouch,startIdx,endIdx,0);
-				pageAnimationTask2.execute();
+				if (Build.VERSION.SDK_INT>= 11)
+					pageAnimationTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
+				else
+					pageAnimationTask2.execute();
+				//pageAnimationTask2.execute();
 			}
 			return true;
 		}
@@ -1523,8 +1535,7 @@ public class HistoryFragment extends Fragment {
 					resetLongFlingTime(getActivity());
 					
 					View.OnClickListener listener = new QuoteOnClickListener(page_week);
-					quoteHiddenText.setOnClickListener(listener);
-					quoteNextButton.setOnClickListener(listener);
+					quoteHiddenLayout.setOnClickListener(listener);
 				}
 			}
 		}
@@ -1633,7 +1644,6 @@ public class HistoryFragment extends Fragment {
     		scrollHandler.removeMessages(1);
     	}
     	quoteScrollView.scrollTo(0, 0);
-		quoteHiddenText.setOnClickListener(null);
-		quoteNextButton.setOnClickListener(null);
+    	quoteHiddenLayout.setOnClickListener(null);
 	}
 }

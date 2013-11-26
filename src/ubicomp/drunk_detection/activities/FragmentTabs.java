@@ -331,37 +331,27 @@ public class FragmentTabs extends FragmentActivity {
 	private static boolean clickable = false;
 	
 	private boolean doubleClickState = false;
+	private long latestClickTime = 0;
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (!clickable)
 			return super.onTouchEvent(event);
 		if (event.getAction() ==MotionEvent.ACTION_DOWN){
-			if (!doubleClickState){
-				doubleClickState = true;
-				new Thread(new BackgroundDoubleOnTouchRunnable()).start();
-			}
-			else{
-				openOptionsMenu();
+			long cur_time = System.currentTimeMillis();
+			if ((cur_time - latestClickTime)<400 && doubleClickState == true){
 				doubleClickState = false;
+				openOptionsMenu();
+				latestClickTime = 0;
+				return false;
+			}else if((cur_time - latestClickTime) >= 400 || doubleClickState == false){
+				doubleClickState = true;
+				latestClickTime = cur_time;
+				return false;
 			}
-			return false;
 		}
 		return super.onTouchEvent(event);
 	}
-	
-	private class BackgroundDoubleOnTouchRunnable implements Runnable{
-		@Override
-		public void run() {
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-			}finally{
-				doubleClickState = false;
-			}
-		}
-	}
-	
 	
 	@Override
 	public void openOptionsMenu(){

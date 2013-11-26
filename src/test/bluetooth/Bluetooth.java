@@ -47,8 +47,8 @@ public class Bluetooth {
 	protected float absolute_min;
 	protected float now_pressure;
 	protected boolean isPeak = false;
-	protected final static float PRESSURE_DIFF_MIN_RANGE  = 100f;
-	protected final static float PRESSURE_DIFF_MIN =900.f;
+	protected final static float PRESSURE_DIFF_MIN_RANGE  = 50f;
+	protected final static float PRESSURE_DIFF_MIN =950.f;
 	protected final static float MAX_PRESSURE = Float.MAX_VALUE;
 	protected final static long IMAGE_MILLIS_0 = 500;
 	protected final static long IMAGE_MILLIS_1 = 2500;
@@ -108,7 +108,8 @@ public class Bluetooth {
 	private float init_voltage = 9999.f;
 	
 	private static SoundPool soundpool;
-	private static int soundId;
+	private static int soundId, soundIdBlow;
+	private long sound_time = 0;
 	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler,boolean recordPressure){
 		this.testFragment = testFragment;
@@ -130,6 +131,7 @@ public class Bluetooth {
 		if (soundpool == null){
 			soundpool = new SoundPool(1,AudioManager.STREAM_MUSIC,1);
 			soundId = soundpool.load(context, R.raw.din_ding, 1);
+			soundIdBlow = soundpool.load(context, R.raw.bo, 1);
 		}
 	}
 	
@@ -138,7 +140,7 @@ public class Bluetooth {
 			btAdapter.enable();
 			int state = btAdapter.getState();
 			while (state!=BluetoothAdapter.STATE_ON){
-				try { Thread.sleep(10);} catch (InterruptedException e) {}
+				try { Thread.sleep(100);} catch (InterruptedException e) {}
 				state =  btAdapter.getState();
 			}
 		}
@@ -150,9 +152,14 @@ public class Bluetooth {
 		Iterator<BluetoothDevice> iter = devices.iterator();
 		while (iter.hasNext()){
 			BluetoothDevice device = iter.next();
-			if (device.getName().equals(DEVICE_NAME) ||device.getName().equals(DEVICE_NAME2) ||device.getName().startsWith(DEVICE_NAME_FORMAL)){
-				sensor = device;
-				return true;
+			if (device.getName()!=null){
+				if (device.getName().equals(DEVICE_NAME) ||device.getName().equals(DEVICE_NAME2) ||device.getName().startsWith(DEVICE_NAME_FORMAL)){
+					sensor = device;
+					SharedPreferences.Editor edit = sp.edit();
+					edit.putString("currentSensor", device.getName());
+					edit.commit();
+					return true;
+				}
 			}
 		}
 		if (sensor == null){
@@ -172,6 +179,8 @@ public class Bluetooth {
 				if (device == null)
 					return;
 				String name = device.getName();
+				if (name == null)
+					return;
 				if (name.equals(DEVICE_NAME) ||name.equals(DEVICE_NAME2) ||name.startsWith(DEVICE_NAME_FORMAL)){
 					if (btAdapter.isDiscovering())
 						btAdapter.cancelDiscovery();
@@ -321,6 +330,7 @@ public class Bluetooth {
 		start_recorder = false;
 		start_times = 0;
 		break_times = 0;
+		sound_time = 0;
 		if(pressure_list!=null)
 			pressure_list.clear();
 		try {
@@ -457,6 +467,11 @@ public class Bluetooth {
 					}
 					else if (duration > MILLIS_1){
 						show_in_UI(show_value,1);
+					}
+					
+					if (duration > sound_time){
+						soundpool.play(soundIdBlow, 1.f, 1.f, 0, 0, 1.f);
+						sound_time+=100;
 					}
 						
 					if (duration >= START_MILLIS)

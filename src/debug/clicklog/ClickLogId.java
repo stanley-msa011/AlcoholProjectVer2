@@ -10,7 +10,10 @@ public class ClickLogId {
 	 *		3	STATISTIC PAGE
 	 *		4	STORYTELLING	PAGE
 	 *		5	EMOTION DIY PAGE
-	 *		6 	MENU
+	 *		6 EMOTION MANAGE PAGE
+	 *		7 	MENU
+	 *		8 STORYTELLING SHARING
+	 *		9 ADDITIONAL
 	 * action
 	 * 	0	click
 	 * 	1	scroll
@@ -18,6 +21,7 @@ public class ClickLogId {
 	 * 	3	fling
 	 *		4	back_button
 	 *		5	edit action
+	 *		6 spinner selection
 	*/
 	
 	public final static String LOG_MSG_ID = "CLICK_MSG";
@@ -100,4 +104,5 @@ public class ClickLogId {
 	
 	public final static long STORYTELLING_QUOTE_CLICK								= 9100000;
 	public final static long STORYTELLING_QUOTE_END									= 9200000;
+	public final static long ABOUT_TIME_SPINNER_SELECTION						= 9300006;
 }

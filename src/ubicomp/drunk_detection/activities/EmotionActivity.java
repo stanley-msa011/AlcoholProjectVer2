@@ -13,6 +13,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -22,6 +24,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -59,6 +62,10 @@ public class EmotionActivity extends Activity {
 	private MediaPlayer mediaPlayer;
 	
 	private ItemOnTouchListener onTouchListener;
+	
+	private Thread media_thread;
+	private String playString;
+	private MediaUpdateHandler media_handler;
 	
 	private static final int[] DRAWABLE_ID = {
 		R.drawable.questionnaire_item_sol_1,
@@ -111,6 +118,8 @@ public class EmotionActivity extends Activity {
 		setCallCheckBox();
 		setPlayGuideBox();
 		db = new QuestionDB(activity);
+		playString = getString(R.string.emotion_box_playing);
+		media_handler = new MediaUpdateHandler();
 		
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		SharedPreferences.Editor edit = sp.edit();
@@ -135,6 +144,10 @@ public class EmotionActivity extends Activity {
 			bgLayout.removeView(callLayout);
 		if (playLayout!=null)
 			bgLayout.removeView(playLayout);
+		if (media_thread != null && !media_thread.isInterrupted())
+			media_thread.interrupt();
+		if (media_handler != null)
+			media_handler.removeMessages(0);
 		if (mediaPlayer != null)
 			mediaPlayer.release();
 		int item_count = mainLayout.getChildCount();
@@ -623,6 +636,10 @@ private View createTextView(String textStr){
 			boxParam.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 			
 			playHelp.setText(R.string.emotion_box_playing);
+			if (media_thread != null && !media_thread.isInterrupted())
+				media_thread.interrupt();
+			if (media_handler != null)
+				media_handler.removeMessages(0);
 			if (mediaPlayer!=null)
 				mediaPlayer.release();
 			switch (type){
@@ -635,6 +652,8 @@ private View createTextView(String textStr){
 			default:
 				mediaPlayer = MediaPlayer.create(activity, R.raw.emotion1);
 			}
+			media_thread = new Thread(new MediaRunnable());
+			media_thread.start();
 			mediaPlayer.start();
 			mediaPlayer.setOnCompletionListener(new PlayOnCompletionListener());
 			playPause.setOnClickListener(new PlayOnClickListener());
@@ -664,6 +683,10 @@ private View createTextView(String textStr){
 
 		@Override
 		public void onCompletion(MediaPlayer mp) {
+			if (media_thread != null && !media_thread.isInterrupted())
+				media_thread.interrupt();
+			if (media_handler != null)
+				media_handler.removeMessages(0);
 			playPause.setImageDrawable(playPlayDrawable);
 			playHelp.setText(R.string.emotion_box_replay);
 		}
@@ -673,6 +696,10 @@ private View createTextView(String textStr){
 	private class PlayOnClickListener implements View.OnClickListener{
 		@Override
 		public void onClick(View arg0) {
+			if (media_thread != null && !media_thread.isInterrupted())
+				media_thread.interrupt();
+			if (media_handler != null)
+				media_handler.removeMessages(0);
 			if (mediaPlayer == null)
 				return;
 			if (mediaPlayer.isPlaying()){
@@ -683,6 +710,8 @@ private View createTextView(String textStr){
 			}
 			else{
 				ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_PLAY_AUDIO);
+				media_thread = new Thread(new MediaRunnable());
+				media_thread.start();
 				mediaPlayer.start();
 				playPause.setImageDrawable(playPauseDrawable);
 				playHelp.setText(R.string.emotion_box_playing);
@@ -694,6 +723,10 @@ private View createTextView(String textStr){
 		@Override
 		public void onClick(View v) {
 			ClickLogger.Log(getBaseContext(), ClickLogId.EMOTIONDIY_CANCEL_AUDIO);
+			if (media_thread != null && !media_thread.isInterrupted())
+				media_thread.interrupt();
+			if (media_handler != null)
+				media_handler.removeMessages(0);
 			if (mediaPlayer != null){
 				mediaPlayer.release();
 				mediaPlayer = null;
@@ -825,5 +858,39 @@ private View createTextView(String textStr){
 			}
 		}
 		return false;
+	}
+	
+	private class MediaRunnable implements Runnable{
+		@Override
+		public void run() {
+			
+			try {
+				while(true){
+					Thread.sleep(1000);
+					media_handler.sendEmptyMessage(0);
+					Log.d("PLAYING","IN THREAD");
+				}
+			} catch (InterruptedException e) {}
+		}
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class MediaUpdateHandler extends Handler{
+		public void handleMessage(Message msg){
+			Log.d("PLAYING","IN HANDLER");
+			try{
+				playHelp.setText(playString+"("+getFormattedTime(mediaPlayer.getCurrentPosition())+"/"+getFormattedTime(mediaPlayer.getDuration())+")");
+			}catch(Exception e){}
+		}
+	}
+	
+	private static String getFormattedTime(long time){
+		time = time/1000L;
+		long min = time/60L;
+		long sec = time%60L;
+		if (sec<10)
+			return min+":0"+sec;
+		else
+			return min+":"+sec;
 	}
 }

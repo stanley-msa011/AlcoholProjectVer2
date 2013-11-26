@@ -679,6 +679,8 @@ public class TestFragment extends Fragment {
     		msgBox.clear();
     		msgBox = null;
     	}
+		if (countDownText!=null)
+			countDownText.setText("");
 	}
 	
 	@SuppressLint("HandlerLeak")

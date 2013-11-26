@@ -1,144 +1,188 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".AboutActivity" 
-    >
-	<RelativeLayout 
-	    android:id="@+id/about_title_layout"
-    	android:layout_width="match_parent"
- 		android:layout_height="wrap_content"
- 		android:background="#FFf39800"
- 		>
-    	<ImageView
-	        android:id="@+id/about_logo"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:src="@drawable/titlebar_icon" 
-        	android:scaleType="fitXY"
-        	android:layout_centerVertical="true"
-        	/>
+    tools:context=".AboutActivity" >
 
-    	<TextView
-    	    android:id="@+id/about_title"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerVertical="true"
-    	    android:layout_toRightOf="@+id/about_logo"
-    	    android:text="@string/app_name"
-    	    android:textColor="#FFFFFFFF" />
-
-	</RelativeLayout>
-    
-	<RelativeLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:background="@drawable/questionnaire_bar_question" >
-
-	    <TextView
-	        android:id="@+id/about_about"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_centerVertical="true"
-	        android:text="@string/about_help"
-	        android:textColor="#FF777777" />
-	    
-	</RelativeLayout>
-	    
     <RelativeLayout
+        android:id="@+id/about_title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFf39800" >
+
+        <ImageView
+            android:id="@+id/about_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/titlebar_icon" />
+
+        <TextView
+            android:id="@+id/about_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/about_logo"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFFFF" />
+    </RelativeLayout>
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/about_bg" >
 
-	    
-    	<TextView
-	        android:id="@+id/about_content"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_centerHorizontal="true"
-        	android:gravity="left|center_vertical"
-			android:textColor="#FF727171"
-			/>
-    	
-    	<TextView
-	        android:id="@+id/about_phone"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/phone"
-	        android:layout_below="@+id/about_content"
-	        android:gravity="left|center_vertical"
-	        android:textColor="#FF727171" />
-	    
-	    <TextView 
-	        android:id="@+id/about_phone_number"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/phone_number"
-	        android:layout_below="@+id/about_content"
-	        android:layout_toRightOf="@+id/about_phone"
-	        android:gravity="left|center_vertical"
-	        android:textColor="#FF727171" 
-	        />
-    	
-	    <TextView
-	        android:id="@+id/about_email"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@+id/about_phone_number"
-	        android:layout_toRightOf="@+id/about_phone"
-	        android:gravity="left|center_vertical"
-	        android:text="@string/email"
-	        android:textColor="#FF727171" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-    	<RelativeLayout 
-	        android:id="@+id/about_logos"
-        	android:layout_width="match_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_centerHorizontal="true"
-        	android:layout_below="@+id/about_email"
-        	>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/questionnaire_bar_question" >
 
-    	    
-    	    
-    	    
-        	<ImageView
-        	    android:id="@+id/about_logo0"
-        	    android:layout_width="wrap_content"
-        	    android:layout_height="wrap_content"
-        	    android:layout_gravity="center"
-        	    android:adjustViewBounds="true"
-        	    android:scaleType="centerInside"
-        	    android:src="@drawable/logo0" />
+                <TextView
+                    android:id="@+id/about_about"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/about_help"
+                    android:textColor="#FF777777" />
+            </RelativeLayout>
 
-        	<ImageView
-        	    android:id="@+id/about_logo1"
-        	    android:layout_width="wrap_content"
-        	    android:layout_height="wrap_content"
-        	    android:layout_gravity="center"
-        	    android:layout_toRightOf="@+id/about_logo0"
-        	    android:adjustViewBounds="true"
-        	    android:scaleType="centerInside"
-        	    android:src="@drawable/logo1" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
 
-        	<ImageView
-        	    android:id="@+id/about_logo2"
-        	    android:layout_width="wrap_content"
-        	    android:layout_height="wrap_content"
-        	    android:layout_gravity="center"
-        	    android:layout_toRightOf="@+id/about_logo1"
-        	    android:adjustViewBounds="true"
-        	    android:scaleType="centerInside"
-        	    android:src="@drawable/logo2" />
+                <TextView
+                    android:id="@+id/about_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="left|center_vertical"
+                    android:textColor="#FF727171" />
 
-    	</RelativeLayout>
-    
-    	<TextView
-	        android:id="@+id/about_copyright"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_alignParentBottom="true"
-        	android:textColor="#FF727171" />
-		</RelativeLayout>
+                <TextView
+                    android:id="@+id/about_phone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/about_content"
+                    android:gravity="left|center_vertical"
+                    android:text="@string/phone"
+                    android:textColor="#FF727171" />
+
+                <TextView
+                    android:id="@+id/about_phone_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/about_content"
+                    android:layout_toRightOf="@+id/about_phone"
+                    android:gravity="left|center_vertical"
+                    android:text="@string/phone_number"
+                    android:textColor="#FF727171" />
+
+                <TextView
+                    android:id="@+id/about_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/about_phone_number"
+                    android:layout_toRightOf="@+id/about_phone"
+                    android:gravity="left|center_vertical"
+                    android:text="@string/email"
+                    android:textColor="#FF727171" />
+
+                <RelativeLayout
+                    android:id="@+id/about_logos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/about_email"
+                    android:layout_centerHorizontal="true" >
+
+                    <ImageView
+                        android:id="@+id/about_logo0"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/logo0" />
+
+                    <ImageView
+                        android:id="@+id/about_logo1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_toRightOf="@+id/about_logo0"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/logo1" />
+
+                    <ImageView
+                        android:id="@+id/about_logo2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_toRightOf="@+id/about_logo1"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/logo2" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/about_copyright"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/about_logos"
+                    android:textColor="#FF727171" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/questionnaire_bar_question" >
+                <TextView
+                    android:id="@+id/about_setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/about_setting"
+                    android:textColor="#FF777777" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/questionnaire_bar_normal" >
+
+                <TextView
+                    android:id="@+id/about_time_gap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/about_time_gap"
+                    android:textColor="#FF777777" />
+
+                <Spinner
+                    android:id="@+id/about_time_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" 
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/about_time_gap"
+                    />
+                
+                <TextView
+                    android:id="@+id/about_time_minute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                     android:layout_toRightOf="@+id/about_time_spinner"
+                    android:text="@string/minute"
+                    android:textColor="#FF777777" />
+                
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
 </LinearLayout>

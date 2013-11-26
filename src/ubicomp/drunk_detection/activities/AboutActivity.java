@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,16 +28,23 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.RelativeLayout.LayoutParams;
 
 public class AboutActivity extends Activity {
 
-	private TextView titleText,aboutText, copyrightText, about, phone, phone_number, email;
+	private TextView titleText,aboutText, copyrightText, about, phone, phone_number, email, setting,timeText,timeMinute;
+	private Spinner timeSpinner;
+	private String[] time_array;
+	
 	private RelativeLayout logoLayout;
 	private ImageView logo,logo0,logo1,logo2;
 	private RelativeLayout titleLayout;
@@ -50,6 +58,9 @@ public class AboutActivity extends Activity {
 	private Activity activity;
 	
 	private int textSize;
+	private SharedPreferences sp;
+	
+	private int time_gap;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +69,8 @@ public class AboutActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_about);
 		activity = this;
+		
+		sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		
 		wordTypeface = Typefaces.getWordTypeface(this);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(this);
@@ -70,12 +83,52 @@ public class AboutActivity extends Activity {
 		email = (TextView)this.findViewById(R.id.about_email);
 		about = (TextView) this.findViewById(R.id.about_about);
 		aboutText = (TextView) this.findViewById(R.id.about_content);
+		setting = (TextView) this.findViewById(R.id.about_setting);
+		timeText = (TextView) this.findViewById(R.id.about_time_gap);
+		timeMinute = (TextView) this.findViewById(R.id.about_time_minute);
 		logoLayout = (RelativeLayout) this.findViewById(R.id.about_logos);
 		logo = (ImageView) this.findViewById(R.id.about_logo);
 		logo0 = (ImageView) this.findViewById(R.id.about_logo0);
 		logo1 = (ImageView) this.findViewById(R.id.about_logo1);
 		logo2 = (ImageView) this.findViewById(R.id.about_logo2);
 		copyrightText = (TextView) this.findViewById(R.id.about_copyright);
+		timeSpinner = (Spinner) this.findViewById(R.id.about_time_spinner);
+		
+		time_array = getResources().getStringArray(R.array.about_time_selection);
+		
+		ArrayAdapter<CharSequence> timeAdapter =
+				new ArrayAdapter<CharSequence>(
+						getBaseContext(),
+						R.layout.time_spinner,R.id.custom_spinner_text,
+						time_array); 
+		timeSpinner.setAdapter(timeAdapter);
+		time_gap = sp.getInt("notification_gap", 120);
+		int default_spinner_idx = 0;
+		for (int i=0;i<time_array.length;++i){
+			if (Integer.valueOf(time_array[i])==time_gap)
+				default_spinner_idx = i;
+		}
+		
+		timeSpinner.setSelection(default_spinner_idx);
+		
+		timeSpinner.setOnItemSelectedListener(
+				new OnItemSelectedListener(){
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
+						
+						int new_setting = Integer.valueOf(time_array[position]);
+						if (time_gap != new_setting){
+							SharedPreferences.Editor edit = sp.edit();
+							edit.putInt("notification_gap",new_setting);
+							edit.commit();
+							time_gap = new_setting;
+							ClickLogger.Log(getBaseContext(), ClickLogId.ABOUT_TIME_SPINNER_SELECTION);
+							BootBoardcastReceiver.testNotificationSetting(getBaseContext(), getIntent());
+						}
+					}
+					@Override
+					public void onNothingSelected(AdapterView<?> parent) {}}
+		);
 		
 		screen = ScreenSize.getScreenSize(this);
 		
@@ -100,6 +153,21 @@ public class AboutActivity extends Activity {
 		aaParam.leftMargin = screen.x * 26/480;
 		about.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		about.setTypeface(wordTypefaceBold);
+		
+		RelativeLayout.LayoutParams asParam = (RelativeLayout.LayoutParams) setting.getLayoutParams();
+		asParam.leftMargin = screen.x * 26/480;
+		setting.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		setting.setTypeface(wordTypefaceBold);
+		
+		RelativeLayout.LayoutParams timeTextParam = (RelativeLayout.LayoutParams) timeText.getLayoutParams();
+		timeTextParam.leftMargin = screen.x * 26/480;
+		timeText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		timeText.setTypeface(wordTypefaceBold);
+		
+		RelativeLayout.LayoutParams timeMinuteParam = (RelativeLayout.LayoutParams) timeMinute.getLayoutParams();
+		timeMinuteParam.leftMargin = screen.x * 5/480;
+		timeMinute.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		timeMinute.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams aParam = (RelativeLayout.LayoutParams) aboutText.getLayoutParams();
 		aParam.leftMargin = aParam.rightMargin = screen.x * 27/480;
@@ -145,6 +213,7 @@ public class AboutActivity extends Activity {
 		
 		RelativeLayout.LayoutParams cParam = (RelativeLayout.LayoutParams) copyrightText.getLayoutParams();
 		cParam.leftMargin = screen.x * 27/480;
+		cParam.topMargin = screen.x *42/480;
 		cParam.bottomMargin = screen.x *27/480;
 		copyrightText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 16/480);
 		copyrightText.setTypeface(digitTypeface);
@@ -323,6 +392,7 @@ public class AboutActivity extends Activity {
 	
 	private class CallCheckOnClickListener  implements View.OnClickListener{
 		
+		@TargetApi(Build.VERSION_CODES.FROYO)
 		@SuppressWarnings("deprecation")
 		@Override
 		public void onClick(View v) {

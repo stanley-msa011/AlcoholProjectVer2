@@ -80,6 +80,10 @@ public class AnalysisProgressView extends StatisticPageView {
 			currentWeek = (int)(diff_millis / (1000 * 60 * 60 * 24 * 7));
 		}
 		restWeek = totalWeek - currentWeek;
+		if (restWeek < 0 )
+			restWeek = 0;
+		if (restWeek > totalWeek)
+			restWeek = totalWeek;
 		
 		Point screen = StatisticFragment.getStatisticPx();
 		RelativeLayout.LayoutParams titleParam = (RelativeLayout.LayoutParams)title.getLayoutParams();

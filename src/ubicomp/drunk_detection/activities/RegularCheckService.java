@@ -115,6 +115,7 @@ public class RegularCheckService extends Service {
 		    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
 		    mpEntity.addPart("user[]", new StringBody(joinDate));
 			
+		    mpEntity.addPart("sensor", new StringBody(sp.getString("currentSensor", "unknown")));
 		    
 			httpPost.setEntity(mpEntity);
 			if (uploader(httpClient, httpPost,this)){

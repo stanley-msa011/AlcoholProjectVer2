@@ -4,6 +4,7 @@ import statistic.ui.QuestionMsgBox;
 import statistic.ui.questionnaire.listener.EmotionCallOnClickListener;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
 import statistic.ui.questionnaire.listener.SelectedListener;
+import statistic.ui.questionnaire.listener.SelfOnClickListenerType1;
 import statistic.ui.questionnaire.listener.SocialCallOnClickListener;
 import ubicomp.drunk_detection.activities.R;
 
@@ -23,6 +24,7 @@ public class Type1Content extends QuestionnaireContent {
 		setSelectItem(R.string.connect_to_family, new SelectedListener (msgBox,new FamilyOnClickListener(msgBox),R.string.next));
 		setSelectItem(R.string.connect_to_emotion_hot_line, new SelectedListener(msgBox,new EmotionCallOnClickListener(msgBox),R.string.next));
 		setSelectItem(R.string.connect_for_social_help, new SelectedListener(msgBox,new SocialCallOnClickListener(msgBox),R.string.next));
+		setSelectItem(R.string.self_help,new SelectedListener(msgBox,new SelfOnClickListenerType1(msgBox),R.string.next));
 		msgBox.showQuestionnaireLayout(true);
 	}
 

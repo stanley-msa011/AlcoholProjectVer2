@@ -30,7 +30,7 @@ public class ImageFileHandler extends Handler {
 	public void handleMessage(Message msg){
 		
 		int count = msg.what;
-		String file_name = "IMG_"+timestamp+"_"+count+".jpg";
+		String file_name = "IMG_"+timestamp+"_"+count+".sob";
 		
 		file = new File(directory,file_name);
 		byte[] img = msg.getData().getByteArray("Img");

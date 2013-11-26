@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 public class AlarmService extends Service {
 
@@ -32,6 +33,8 @@ public class AlarmService extends Service {
 		
 		if(DefaultCheck.check(getBaseContext()))
 			return Service.START_REDELIVER_INTENT;
+		
+		Log.d("ALARM","Regular Service");
 		
 		db = new HistoryDB(this);
 		

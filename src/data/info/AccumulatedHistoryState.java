@@ -10,7 +10,7 @@ public class AccumulatedHistoryState extends HistoryState  implements SelfHelpCo
 	public int[] acc_test_total = {0,0,0};
 	public int[] acc_pass_total = {0,0,0};
 	
-	public int MAX_SCORE = 15;
+	private final static int MAX_SCORE = 15;
 	
 	public AccumulatedHistoryState(int week,int[] acc_test_week,int[] acc_pass_week, int[] acc_test_total, int[] acc_pass_total) {
 		super(week);
@@ -68,5 +68,12 @@ public class AccumulatedHistoryState extends HistoryState  implements SelfHelpCo
 			sb.append("\t");
 		}
 		return sb.toString();
+	}
+	
+	public float getProgress(){
+		float progress =  (float)getScore()*100F/MAX_SCORE;
+		if (progress > 100.f)
+			return 100.f;
+		return progress;
 	}
 }

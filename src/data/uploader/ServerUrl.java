@@ -2,8 +2,8 @@ package data.uploader;
 
 public class ServerUrl {
 
-	private static final String SERVER_URL_TEST = "https://140.112.30.165/drunk_detection_ubicomp/drunk_detect_upload_2.php";
-	private static final String DEVELOP_SERVER_URL_TEST = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload_2.php";
+	private static final String SERVER_URL_TEST = "https://140.112.30.165/drunk_detection_ubicomp/drunk_detect_upload_3.php";
+	private static final String DEVELOP_SERVER_URL_TEST = "https://140.112.30.165/develop/drunk_detection/drunk_detect_upload_3.php";
 	
 	public static String SERVER_URL_TEST(boolean develop){
 		if (develop)
@@ -83,8 +83,8 @@ public class ServerUrl {
 			return SERVER_URL_USED ;
 	}
 
-	private static final String SERVER_URL_REGULAR_CHECK = "https://140.112.30.165/drunk_detection_ubicomp/regular_check_2.php";
-	private static final String DEVELOPER_SERVER_URL_REGULAR_CHECK = "https://140.112.30.165/develop/drunk_detection/regular_check_2.php";
+	private static final String SERVER_URL_REGULAR_CHECK = "https://140.112.30.165/drunk_detection_ubicomp/regular_check_3.php";
+	private static final String DEVELOPER_SERVER_URL_REGULAR_CHECK = "https://140.112.30.165/develop/drunk_detection/regular_check_3.php";
 	
 	public static String SERVER_URL_REGULAR_CHECK (boolean develop){
 		if (develop)

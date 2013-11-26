@@ -301,6 +301,7 @@ public class StatisticDayView extends StatisticPageView {
 		BracDetectionState[] historys = db.getTodayBracState();
 		Point statistic_size = StatisticFragment.getStatisticPx();
 		int blockMargin = statistic_size.x * 6/480;
+		int circle_size = statistic_size.x * 63/480;
 		
 		int cur_hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 		
@@ -309,6 +310,8 @@ public class StatisticDayView extends StatisticPageView {
 			
 			RelativeLayout sLayout = new RelativeLayout(context);
 			sLayout.addView(circleImages[i]);
+			RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) circleImages[i].getLayoutParams();
+			param.width = param.height = circle_size;
 			sLayout.addView(circleValues[i]);
 			sLayout.setId(0x999);
 			RelativeLayout.LayoutParams circleParam =(RelativeLayout.LayoutParams ) circleImages[i].getLayoutParams();

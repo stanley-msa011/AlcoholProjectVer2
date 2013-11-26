@@ -92,6 +92,10 @@ public class AudioRecordBox {
 	
 	private Spannable helpSpannable;
 	
+	private Thread media_thread;
+	private String playString;
+	private MediaUpdateHandler media_handler;
+	
 	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
 		this.historyFragment = historyFragment;
 		this.context = historyFragment.getActivity();
@@ -107,6 +111,8 @@ public class AudioRecordBox {
 		changeStateHandler = new ChangeStateHandler();
 		record_str = context.getString(R.string.audio_box_recording);
 		second_str = context.getString(R.string.second);
+		playString = context.getString(R.string.emotion_box_playing);
+		media_handler = new MediaUpdateHandler();
 		setting();
 	}
 	
@@ -339,12 +345,18 @@ public class AudioRecordBox {
 					mediaPlayer.setScreenOnWhilePlaying(true);
 					mediaPlayer.setVolume(5F, 5F);
 					mediaPlayer.prepare();
+					media_thread = new Thread(new MediaRunnable());
+					media_thread.start();
 					mediaPlayer.start();
 					mediaPlayer.setOnCompletionListener(
 							new OnCompletionListener(){
 								@Override
 								public void onCompletion(MediaPlayer arg0) {
 									try {
+										if (media_thread != null && !media_thread.isInterrupted())
+											media_thread.interrupt();
+										if (media_handler != null)
+											media_handler.removeMessages(0);
 										mediaPlayer.stop();
 										mediaPlayer.release();
 										mediaPlayer = null;
@@ -440,6 +452,10 @@ public class AudioRecordBox {
 			t.start();
 			if (mediaPlayer != null){
 				try {
+					if (media_thread != null && !media_thread.isInterrupted())
+						media_thread.interrupt();
+					if (media_handler != null)
+						media_handler.removeMessages(0);
 					mediaPlayer.stop();
 					mediaPlayer.release();
 					mediaPlayer = null;
@@ -462,6 +478,10 @@ public class AudioRecordBox {
 		}
 		if (mediaPlayer !=null){
 			try {
+				if (media_thread != null && !media_thread.isInterrupted())
+					media_thread.interrupt();
+				if (media_handler != null)
+					media_handler.removeMessages(0);
 				mediaPlayer.stop();
 				mediaPlayer.release();
 				mediaPlayer = null;
@@ -517,5 +537,39 @@ public class AudioRecordBox {
 		public void onTick(long millisUntilFinished) {
 			help.setText(record_str+" "+millisUntilFinished/1000+" "+second_str);
 		}
+	}
+	
+	private class MediaRunnable implements Runnable{
+		@Override
+		public void run() {
+			
+			try {
+				while(true){
+					Thread.sleep(1000);
+					media_handler.sendEmptyMessage(0);
+					Log.d("PLAYING","IN THREAD");
+				}
+			} catch (InterruptedException e) {}
+		}
+	}
+	
+	@SuppressLint("HandlerLeak")
+	private class MediaUpdateHandler extends Handler{
+		public void handleMessage(Message msg){
+			Log.d("PLAYING","IN HANDLER");
+			try{
+				help.setText(playString+"("+getFormattedTime(mediaPlayer.getCurrentPosition())+"/"+getFormattedTime(mediaPlayer.getDuration())+")");
+			}catch(Exception e){}
+		}
+	}
+	
+	private static String getFormattedTime(long time){
+		time = time/1000L;
+		long min = time/60L;
+		long sec = time%60L;
+		if (sec<10)
+			return min+":0"+sec;
+		else
+			return min+":"+sec;
 	}
 }

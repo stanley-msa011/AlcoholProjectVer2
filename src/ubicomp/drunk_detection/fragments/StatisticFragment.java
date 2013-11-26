@@ -132,8 +132,8 @@ public class StatisticFragment extends Fragment {
     	enablePage(true);
     	statisticFragment = this;
     	analysisViews = new StatisticPageView[4];
-    	analysisViews[0] = new AnalysisProgressView(activity, statisticFragment);
-    	analysisViews[1] = new AnalysisCounterView(activity, statisticFragment);
+    	analysisViews[0] = new AnalysisCounterView(activity, statisticFragment);
+    	analysisViews[1] = new AnalysisProgressView(activity, statisticFragment);
     	SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
     	if (sp.getBoolean("show_saving", true))
     		analysisViews[2] = new AnalysisSavingView(activity, statisticFragment);
