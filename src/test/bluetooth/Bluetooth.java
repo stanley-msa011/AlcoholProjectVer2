@@ -32,6 +32,8 @@ import android.util.Log;
 
 public class Bluetooth {
 
+	protected static final String TAG = "BT";
+	
 	protected BluetoothAdapter btAdapter;
 	
 	protected static final UUID uuid=  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -93,7 +95,7 @@ public class Bluetooth {
 	protected long zero_start_time;
 	protected long zero_end_time;
 	protected long zero_duration;
-	protected static final int MAX_ZERO_DURATION = 3000;
+	protected static final int MAX_ZERO_DURATION = 6000;
 	
 	protected SharedPreferences sp;
 	protected SharedPreferences.Editor sp_editor;
@@ -111,6 +113,9 @@ public class Bluetooth {
 	private static int soundId, soundIdBlow;
 	private long sound_time = 0;
 	
+	protected boolean btEnabledBeforeStart = true;
+	
+	
 	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler,boolean recordPressure){
 		this.testFragment = testFragment;
 		this.context = testFragment.getActivity();
@@ -118,7 +123,7 @@ public class Bluetooth {
 		this.bracFileHandler = bracFileHandler;
 		btAdapter =  BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null)
-			Log.e("BT","THE DEVICE DOES NOT SUPPORT BLUETOOTH");
+			Log.e(TAG,"THE DEVICE DOES NOT SUPPORT BLUETOOTH");
 		now_pressure = 0.f;
 		btUIHandler=new BTUIHandler(testFragment);
 		start = false;
@@ -136,7 +141,11 @@ public class Bluetooth {
 	}
 	
 	public void enableAdapter(){
+		Log.d(TAG,"Enable Adapter Start");
+		btEnabledBeforeStart = true;
 		if (!btAdapter.isEnabled()){
+			Log.d(TAG,"Enable Adapter Not Start");
+			btEnabledBeforeStart = false;
 			btAdapter.enable();
 			int state = btAdapter.getState();
 			while (state!=BluetoothAdapter.STATE_ON){
@@ -212,11 +221,11 @@ public class Bluetooth {
 				else
 					socket = sensor.createRfcommSocketToServiceRecord(uuid);
 			}catch(Exception e){
-				Log.d("BT","FAIL TO CLOSE BEFORE CONNECTION");
+				Log.d(TAG,"FAIL TO CLOSE BEFORE CONNECTION");
 			}
 			socket.connect();
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO CONNECT TO THE SENSOR: "+e.toString());
+			Log.e(TAG,"FAIL TO CONNECT TO THE SENSOR: "+e.toString());
 			closeWithCamera();
 			return false;
 		}
@@ -268,7 +277,7 @@ public class Bluetooth {
 			}
 			return true;
 		} catch (IOException e) {
-			Log.d("BT","SEND START FAIL "+ e.toString());
+			Log.d(TAG,"SEND START FAIL "+ e.toString());
 			close();
 			cameraRunHandler.sendEmptyMessage(1);
 			return false;
@@ -306,7 +315,7 @@ public class Bluetooth {
 				out.write(sendEndMessage);
 			return;
 		} catch (Exception e) {
-			Log.e("BT","SEND END FAIL "+ e.toString());
+			Log.e(TAG,"SEND END FAIL "+ e.toString());
 			return;
 		}
 	}
@@ -314,7 +323,7 @@ public class Bluetooth {
 	public void read(){
 		
 		boolean end=false;
-		byte[] temp = new byte[256];
+		byte[] temp = new byte[1024];
 		int bytes = 0;
 		String msg = "";
 		isPeak=false;
@@ -360,7 +369,7 @@ public class Bluetooth {
 						read_type = READ_PRESSURE;
 					}
 					else if ( (char)temp[i]=='b'){
-							throw new Exception("NO BETTARY");
+							throw new Exception("NO BATTERY");
 					}else if ((char)temp[i]=='v'){
 						end = sendMsgToApp(msg);
 						msg = "v";
@@ -372,6 +381,7 @@ public class Bluetooth {
 					break;
 				if (in.available() > 0){
 					bytes =in.read(temp);
+					Thread.sleep(20);
 					zero_start_time = System.currentTimeMillis();
 				}else{
 					bytes = 0;
@@ -381,18 +391,21 @@ public class Bluetooth {
 					zero_duration += ( zero_end_time - zero_start_time);
 					zero_start_time = zero_end_time;
 					if (zero_duration > MAX_ZERO_DURATION)
-						throw new Exception("NO BETTARY");
+						throw new Exception("ZERO_DURATION");
 					Thread.sleep(50);
 				}
 			}
 			close();
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR: " +e.toString());
+			Log.e(TAG,"FAIL TO READ DATA FROM THE SENSOR: " +e.toString());
 			close();
-			if (e.getMessage()!=null && e.getMessage().equals("TIMEOUT"))
+			if (e.getMessage()!=null && e.getMessage().equals("TIMEOUT")){
+				Log.d(TAG,"End zero duration : "+zero_duration);
 				cameraRunHandler.sendEmptyMessage(3);
-			else if (e.getMessage()!=null && e.getMessage().equals("BLOW_TWICE")){
+			}else if (e.getMessage()!=null && e.getMessage().equals("BLOW_TWICE")){
 				cameraRunHandler.sendEmptyMessage(4);
+			}else if (e.getMessage()!=null && e.getMessage().equals("ZERO_DURATION")){
+				cameraRunHandler.sendEmptyMessage(5);
 			}else
 				cameraRunHandler.sendEmptyMessage(2);
 		}
@@ -422,15 +435,15 @@ public class Bluetooth {
 				long time = System.currentTimeMillis();
 				if(!start&&now_pressure < absolute_min){
 					absolute_min = now_pressure;
-					Log.d("BT","absolute min setting: "+absolute_min);
+					Log.d(TAG,"absolute min setting: "+absolute_min);
 				}
 				
-				Log.i("BT",absolute_min+"/"+now_pressure+"/"+(now_pressure-absolute_min));
+				Log.i(TAG,absolute_min+"/"+now_pressure+"/"+(now_pressure-absolute_min));
 				if (!start)
 					return false;
 				
 				float diff_limit = PRESSURE_DIFF_MIN_RANGE * (5000.f - temp_duration)/5000.f + PRESSURE_DIFF_MIN;
-				Log.i("BT","limit  "+diff_limit +"/" + temp_duration);
+				Log.i(TAG,"limit  "+diff_limit +"/" + temp_duration);
 				if(now_pressure > absolute_min +diff_limit && !isPeak){
 					isPeak = true;
 					start_time = time;
@@ -446,7 +459,7 @@ public class Bluetooth {
 						throw new Exception("BLOW_TWICE");
 					}
 					temp_duration = 0;
-					Log.d("BT","Peak Start");
+					Log.d(TAG,"Peak Start");
 				}else if (now_pressure > absolute_min +diff_limit && isPeak){
 					end_time = time;
 					duration += (end_time-start_time);
@@ -496,7 +509,7 @@ public class Bluetooth {
 						isPeak = false;
 						start_time = end_time = 0;
 						++break_times;
-						Log.d("BT","Peak End");
+						Log.d(TAG,"Peak End");
 					}
 			}else if (msg.charAt(0) == 'v'){
 				if(!start)
@@ -507,30 +520,8 @@ public class Bluetooth {
 	}
 	
 	public void close(){
-		sendEnd();
-		try {
-			if (in != null)
-				in.close();
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
-		}
-		try {
-			if (out != null)
-				out.close();
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR OUTPUTSTREAM");
-		}
-		try {
-			if (socket != null){
-				socket.close();
-			}
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR");
-		}
+		normalClose();
 		
-		
-		if (bracFileHandler!= null)
-			bracFileHandler.close();
 		try{
 			if (bracPressureHandler != null && pressure_list!=null){
 				double pressure_sum = 0.0;
@@ -551,6 +542,45 @@ public class Bluetooth {
 			}
 		}catch(Exception e){};
 	}
+	
+	protected void normalClose(){
+		Log.d(TAG,"NORMAL CLOSE");
+		
+		sendEnd();
+		
+		Log.d(TAG,"SEND END DONE");
+		try {
+			if (in != null)
+				in.close();
+		} catch (Exception e) {
+			Log.e(TAG,"FAIL TO CLOSE THE SENSOR INPUTSTREAM");
+		}
+		try {
+			if (out != null)
+				out.close();
+		} catch (Exception e) {
+			Log.e(TAG,"FAIL TO CLOSE THE SENSOR OUTPUTSTREAM");
+		}
+		try {
+			if (socket != null){
+				socket.close();
+			}
+		} catch (Exception e) {
+			Log.e(TAG,"FAIL TO CLOSE THE SENSOR");
+		}
+		if (bracFileHandler!= null)
+			bracFileHandler.close();
+		
+		try{
+			Log.d(TAG,"check bt cond. before start "+btEnabledBeforeStart );
+			if (!btEnabledBeforeStart){
+				Log.d(TAG,"auto close");
+				btAdapter.disable();
+				Log.d(TAG,"auto close done");
+			}
+		}catch(Exception e){};
+	}
+	
 	
 	public void closeWithCamera(){
 		close();

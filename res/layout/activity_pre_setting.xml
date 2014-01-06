@@ -43,6 +43,12 @@
     	    android:textOff="no"
     	    android:text="Is Developer?" />
 
+    	<CheckBox
+    	    android:id="@+id/auto_delete"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:text="Auto clean old data?" />
+
     	<TextView
 	        android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
@@ -228,6 +234,12 @@
      	    android:text="Upload Audio File" />
      	
      	<CheckBox
+     	    android:id="@+id/upload_facebook_check_box"
+     	    android:layout_width="wrap_content"
+     	    android:layout_height="wrap_content"
+     	    android:text="Upload Facebook Message?" />
+     	
+     	<CheckBox
      	    android:id="@+id/show_saving_box"
      	    android:layout_width="wrap_content"
      	    android:layout_height="wrap_content"
@@ -268,6 +280,26 @@
     	    android:layout_height="wrap_content"
     	    android:text="Dummy Data Switch" />
 	
+    	<CheckBox
+    	    android:id="@+id/system_lock"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:text="Lock the system?" />
+    	<TextView
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="Lock date:" />
+    	<TextView
+	        android:id="@+id/lock_date"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	/>
+    	<Button
+    	    android:id="@+id/lock_button"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:text="system lock date" />
+    	
     </LinearLayout>
     </ScrollView>
 </RelativeLayout>

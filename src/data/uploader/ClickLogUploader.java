@@ -48,6 +48,8 @@ public class ClickLogUploader {
 	
 	private static ClickLogUploaderThread clickUploader = null;
 	
+	private static final String TAG = "Click Log Uploader";
+	
 	public static void upload(Context context){
 		if(DefaultCheck.check(context))
 			return;
@@ -87,18 +89,18 @@ public class ClickLogUploader {
 		@Override
 		protected Void doInBackground(Void... arg0) {
 
-			Log.d("Click Log Uploader", "START");
+			Log.d(TAG, "START");
 			
 			String not_uploaded_files[] = getNotUploadedFiles();
 			if (not_uploaded_files == null){
-				Log.d("Click Log Uploader", "no logFile needed to upload");
+				Log.d(TAG, "no logFile needed to upload");
 				return null;
 			}
 			
 			for (int i=0; i<not_uploaded_files.length; ++i){
 				File logFile = new File(logDir.getPath(), not_uploaded_files[i]);
 				if(logFile.exists()){
-					Log.d("Click Log Uploader", "file = "+logFile.getPath());
+					Log.d(TAG, "file = "+logFile.getPath());
 					int result = connectingToServer(logFile);
 					if(result == ERROR)
 						break;
@@ -111,18 +113,18 @@ public class ClickLogUploader {
 		protected void onPostExecute(Void result){
 			clickUploader = null;
 			SynchronizedLock.sharedLock.unlock();
-			Log.d("Click Log Uploader", "END");
+			Log.d(TAG, "END");
 		}
 		
 		@Override
 		protected void onCancelled(){
 			clickUploader = null;
 			SynchronizedLock.sharedLock.unlock();
-			Log.d("Click Log Uploader", "CANCEL");
+			Log.d(TAG, "CANCEL");
 		}
 		
 		private String[] getNotUploadedFiles() {
-			Log.d("Click Log Uploader","get not uploaded files");
+			Log.d(TAG,"get not uploaded files");
 			logDir = new File(Environment.getExternalStorageDirectory(), "drunk_detection/sequence_log_binary");
 			if(!logDir.exists()){
 				return null;
@@ -140,7 +142,7 @@ public class ClickLogUploader {
 			}
 			
 			String[] all_logs = logDir.list(new logFilter(latestUpload));
-			Log.d("Click Log Uploader","get all logs");
+			Log.d(TAG,"get all logs");
 			
 			return all_logs;
 		}
@@ -177,7 +179,7 @@ public class ClickLogUploader {
 
 		private int connectingToServer(File logFile){
 			try {
-				Log.d("Click Log Uploader", "upload logFile connecting to server");
+				Log.d(TAG, "upload logFile connecting to server");
 				DefaultHttpClient httpClient = new DefaultHttpClient();
 				KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 				InputStream instream = context.getResources().openRawResource(R.raw.alcohol_certificate);
@@ -207,7 +209,7 @@ public class ClickLogUploader {
 				
 				httpPost.setEntity(mpEntity);
 				if (uploader(httpClient, httpPost,context)){
-					Log.d("Click Log Uploader", "success upload logFile: " + logFile.getName());
+					Log.d(TAG, "success upload logFile: " + logFile.getName());
 					set_uploaded_logfile(logFile.getName());
 				}
 				
@@ -232,7 +234,7 @@ public class ClickLogUploader {
 		}
 
 		private boolean uploader(HttpClient httpClient, HttpPost httpPost,Context context){
-			Log.d("Click Log Uploader","start upload");
+			Log.d(TAG,"start upload");
 			HttpResponse httpResponse;
 			ResponseHandler <String> res=new BasicResponseHandler();  
 			boolean  result = false;

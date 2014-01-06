@@ -19,11 +19,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
 import data.info.RankHistory;
+import data.info.RankHistoryDetail;
 import data.uploader.ServerUrl;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class UserLevelCollector {
 
@@ -42,9 +44,9 @@ public class UserLevelCollector {
 		responseHandler=new BasicResponseHandler();
 	}
 	
-	public RankHistory[] update(){
+	public RankHistoryDetail[] update(){
 		try{
-			
+			Log.d("radar",">start update");
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 		
 			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -62,22 +64,27 @@ public class UserLevelCollector {
 			HttpPost httpPost = new HttpPost(SERVER_URL);
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 			
+			Log.d("radar",">before http" );
 			HttpResponse httpResponse;
 			httpResponse = httpClient.execute(httpPost);
 			String responseString = responseHandler.handleResponse(httpResponse);
 			int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
 			
+			Log.d("radar",">response "+responseString);
+			
 			if (responseString != null && httpStatusCode == HttpStatus.SC_OK){
-				RankHistory[] historys= parse(responseString);
+				RankHistoryDetail[] historys= parse(responseString);
 				return historys;
 			}
 			
-		}catch(Exception e){}
+		}catch(Exception e){
+			Log.d("radar",">exception "+e.toString());
+		}
 		
 		return null;
 	}
 	
-	public RankHistory[] updateAverage(){
+	public RankHistory[] updateToday(){
 		try{
 			
 			DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -103,7 +110,7 @@ public class UserLevelCollector {
 			int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
 			
 			if (responseString != null && httpStatusCode == HttpStatus.SC_OK){
-				RankHistory[] historys= parse(responseString);
+				RankHistory[] historys= parseToday(responseString);
 				return historys;
 			}
 			
@@ -112,7 +119,38 @@ public class UserLevelCollector {
 		return null;
 	}
 	
-	RankHistory[] parse(String response){
+	RankHistoryDetail[] parse(String response){
+		Log.d("radar",">start parse");
+		if (response == null)
+			return null;
+		response = response.substring(2, response.length()-2);
+		String[] tmp = response.split("]," );
+		if (tmp.length==0)
+			return null;
+		RankHistoryDetail[] historys;
+		historys = new RankHistoryDetail[tmp.length];
+		for (int i=0;i<tmp.length;++i){
+			if (tmp[i].charAt(0)=='[')
+				tmp[i]=tmp[i].substring(1,tmp[i].length());
+			String[] items = tmp[i].split(",");
+			String uid = items[0].substring(1, items[0].length()-1);
+			int level;
+			if (items[1].equals("null"))
+				level = 0;
+			else
+				level= Integer.valueOf(items[1]);
+			int test = Integer.valueOf(items[2]);
+			int ques = Integer.valueOf(items[3]);
+			int story = Integer.valueOf(items[4]);
+			Log.d("radar",">"+test+" "+ques+" "+story);
+			historys[i] = new RankHistoryDetail(level,uid,test,ques,story);
+		}
+		
+		return historys;
+	}
+	
+	
+	RankHistory[] parseToday(String response){
 		if (response == null)
 			return null;
 		response = response.substring(2, response.length()-2);

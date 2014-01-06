@@ -2,7 +2,6 @@ package test.bluetooth;
 
 import ubicomp.drunk_detection.fragments.TestFragment;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class BTRunTask extends AsyncTask<Void, Void, Void> {
 
@@ -16,7 +15,6 @@ public class BTRunTask extends AsyncTask<Void, Void, Void> {
 	
 	@Override
 	protected Void doInBackground(Void... params) {
-		Log.d("BT","Run in background");
 		if(bt.sendStart())
 			bt.read();
 		else

@@ -25,6 +25,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class BracDataHandler {
+	
+	private static final String TAG = "BrAC_DATA_HANDLER";
+	
 	protected String ts;
 	protected Context context;
 	protected double avg_result = 0;
@@ -118,7 +121,7 @@ public class BracDataHandler {
        		state_writer.flush();
        		state_writer.close();
 		} catch (Exception e) {	
-			Log.d("BrAC DATA HANDLER","FAIL TO WRITE");
+			Log.d(TAG,"FAIL TO WRITE");
 		}
        	
        	db.insertNewState(detection,a_history);
@@ -151,7 +154,7 @@ public class BracDataHandler {
 			median = values[(values.length-1)/2];
 			
 		} catch (FileNotFoundException e1) {
-			Log.d("BrAC DATA HANDLER","FILE NOT FOUND");
+			Log.d(TAG,"FILE NOT FOUND");
 			return ERROR;
 		}
         return median;

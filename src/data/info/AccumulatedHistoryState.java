@@ -10,7 +10,7 @@ public class AccumulatedHistoryState extends HistoryState  implements SelfHelpCo
 	public int[] acc_test_total = {0,0,0};
 	public int[] acc_pass_total = {0,0,0};
 	
-	private final static int MAX_SCORE = 15;
+	private final static int MAX_SCORE = 14;
 	
 	public AccumulatedHistoryState(int week,int[] acc_test_week,int[] acc_pass_week, int[] acc_test_total, int[] acc_pass_total) {
 		super(week);

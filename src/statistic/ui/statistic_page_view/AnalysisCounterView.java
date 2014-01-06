@@ -8,6 +8,7 @@ import data.database.QuestionDB;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -64,13 +65,12 @@ public class AnalysisCounterView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		
-		Point screen = StatisticFragment.getStatisticPx();
 		title = (TextView) view.findViewById(R.id.analysis_counter_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 21/480);
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,TextSize.normalTextSize(context));
 		title.setTypeface(wordTypeface);
 		titleLayout = (RelativeLayout) view.findViewById(R.id.analysis_counter_title_layout);
 		help = (TextView) view.findViewById(R.id.analysis_counter_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,TextSize.normalTextSize(context));
 		help.setTypeface(wordTypeface);
 		help.setText(" ");
 	}

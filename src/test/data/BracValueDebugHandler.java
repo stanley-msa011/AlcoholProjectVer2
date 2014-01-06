@@ -12,12 +12,14 @@ import android.util.Log;
 public class BracValueDebugHandler extends Handler {
 	private File file;
 	private BufferedWriter writer;
+	
+	private static final String TAG = "BrAC_DEBUG_HANDLER";
 	public BracValueDebugHandler(File directory, String timestamp){
 		file = new File(directory,timestamp+"_debug.txt");
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
 		} catch (IOException e) {
-			Log.d("BRAC DEBUG WRITER","FAIL TO OPEN");
+			Log.d(TAG,"FAIL TO OPEN");
 			writer = null;
 		}
 	}
@@ -28,10 +30,10 @@ public class BracValueDebugHandler extends Handler {
 			try {
 				writer.write(str);
 			} catch (IOException e) {
-				Log.d("BRAC DEBUG WRITER","FAIL TO WRITE");
+				Log.d(TAG,"FAIL TO WRITE");
 			}
 		}else{
-			Log.d("BRAC DEBUG WRITER","NULL TO WRITE");
+			Log.d(TAG,"NULL TO WRITE");
 		}
 	}
 	

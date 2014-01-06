@@ -22,20 +22,20 @@ public class BluetoothOld extends Bluetooth {
 			if (in != null)
 				in.close();
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
+			Log.e(TAG,"FAIL TO CLOSE THE SENSOR INPUTSTREAM");
 		}
 		try {
 			if (out != null)
 				out.close();
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR OUTPUTSTREAM");
+			Log.e(TAG,"FAIL TO CLOSE THE SENSOR OUTPUTSTREAM");
 		}
 		try {
 			if (socket != null){
 				socket.close();
 			}
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR");
+			Log.e(TAG,"FAIL TO CLOSE THE SENSOR");
 		}
 		if (bracFileHandler!= null)
 			bracFileHandler.close();

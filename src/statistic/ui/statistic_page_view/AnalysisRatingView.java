@@ -1,8 +1,13 @@
 package statistic.ui.statistic_page_view;
 
+import java.util.ArrayList;
+
 import data.database.HistoryDB;
 import data.database.StartDateCheck;
 import data.info.RankHistory;
+import data.info.RankHistoryDetail;
+import debug.clicklog.ClickLogId;
+import debug.clicklog.ClickLogger;
 import statistic.data.UserLevelCollector;
 import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
@@ -12,15 +17,16 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 
 public class AnalysisRatingView extends StatisticPageView {
@@ -48,7 +54,6 @@ public class AnalysisRatingView extends StatisticPageView {
 	private String[] helpStr;
 
 	private RelativeLayout titleLayout;
-	
 	
 	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
 		super(context, R.layout.analysis_rating_view,statisticFragment);
@@ -190,7 +195,7 @@ public class AnalysisRatingView extends StatisticPageView {
 	
 	private Rank getRank(String uid){
 		int nPeople, rank;
-		RankHistory[] historys = db.getAllUsersHistory();
+		RankHistoryDetail[] historys = db.getAllUsersHistory();
 		if (historys == null){
 			nPeople =0;
 			rank = 0;
@@ -247,9 +252,7 @@ public class AnalysisRatingView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		
-		Point screen = StatisticFragment.getStatisticPx();
-		
-		int textSize = screen.x * 21/480;
+		int textSize = TextSize.normalTextSize(context);
 		
 		title = (TextView) view.findViewById(R.id.analysis_rating_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
@@ -283,6 +286,14 @@ public class AnalysisRatingView extends StatisticPageView {
 		bar2 = (ImageView) view.findViewById(R.id.analysis_rating_bar2);
 		
 		contentLayout = (RelativeLayout) view.findViewById(R.id.analysis_rating_content_layout);
+		contentLayout.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View arg0) {
+				ClickLogger.Log(context, ClickLogId.STATISTIC_RANK_SHOW_CLICK);
+				statisticFragment.showRadarChart(calculateRank());
+			}
+		});
+		
 		contentLayout2 = (RelativeLayout) view.findViewById(R.id.analysis_rating_content_layout2);
 		
 		arrow = (ImageView) view.findViewById(R.id.analysis_rating_arrow);
@@ -335,8 +346,8 @@ public class AnalysisRatingView extends StatisticPageView {
 		clear();
 	}
 	
-	private RankHistory[] historys;
-	private RankHistory[] historys_average;
+	private RankHistoryDetail[] historys;
+	private RankHistory[] historys_today;
 	private UserLevelCollector levelCollector;
 	
 	private class NetworkTask extends AsyncTask<Void, Void, Void>{
@@ -345,13 +356,13 @@ public class AnalysisRatingView extends StatisticPageView {
 		protected Void doInBackground(Void... arg0) {
 			levelCollector = new UserLevelCollector(view.getContext());
 			historys = levelCollector.update();
-			historys_average = levelCollector.updateAverage();
+			historys_today = levelCollector.updateToday();
 			return null;
 		}
 		
 		@Override
 		protected void onPostExecute(Void result){
-			if (historys == null || historys_average == null)
+			if (historys == null || historys_today == null)
 				return;
 			
 			SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
@@ -362,14 +373,12 @@ public class AnalysisRatingView extends StatisticPageView {
 			db.cleanInteractionHistory();
 			for (int i=0;i<historys.length;++i)
 				db.insertInteractionHistory(historys[i]);
-			for (int i=0;i<historys_average.length;++i)
-				db.insertInteractionHistoryToday(historys_average[i]);
+			for (int i=0;i<historys_today.length;++i)
+				db.insertInteractionHistoryToday(historys_today[i]);
 			
 			double score = getRank(uid).getScore();
 			double score_today = getRankToday(uid).getScore();
 			
-			Log.d("Score",score+" "+prev_score);
-			Log.d("Score",score_today+" "+prev_score_today);
 			int p1,p2;
 			if (score == prev_score)
 				p1= 0;
@@ -390,5 +399,37 @@ public class AnalysisRatingView extends StatisticPageView {
 		
 	}
 	
+	private ArrayList<Double> calculateRank(){
+		ArrayList<Double> result = new ArrayList<Double>();
+		RankHistoryDetail[] historys = db.getAllUsersHistory();
+		if (historys == null){
+			result.add(0.0);
+			result.add(0.0);
+			result.add(0.0);
+			return result; 
+		}
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+		String uid = sp.getString("uid", "sober_default_test");
+		int test = 0,ques = 0,story = 0;
+		for (int i=0;i<historys.length;++i){
+			if (historys[i].uid.equals(uid)){
+				test = historys[i].test;
+				ques = historys[i].ques;
+				story = historys[i].story;
+				break;
+			}
+		}
+
+		double test_r,ques_r,story_r;
+		test_r = (double)((double)test)/6.0;
+		ques_r =(double)((double)ques)/9.0;
+		story_r = (double)((double)story)/9.0;
+		
+		result.add(test_r);
+		result.add(ques_r);
+		result.add(story_r);
+		
+		return result;
+	}
 
 }

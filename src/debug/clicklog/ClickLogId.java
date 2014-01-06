@@ -54,6 +54,8 @@ public class ClickLogId {
 	public final static long STATISTIC_QUESTION_CANCEL								=	3500000;
 	public final static long STATISTIC_QUESTION_SELECT								=	3600000;
 	public final static long STATISTIC_QUESTION_NEXT									=	3700000;
+	public final static long STATISTIC_RANK_SHOW_CLICK								=	3800000;
+	public final static long STATISTIC_RANK_CLOSE_CLICK								=	3900000;
 	
 	public final static long STORYTELLING_FLING_UP										=	4000003;
 	public final static long STORYTELLING_FLING_DOWN								=	4000013;
@@ -105,4 +107,9 @@ public class ClickLogId {
 	public final static long STORYTELLING_QUOTE_CLICK								= 9100000;
 	public final static long STORYTELLING_QUOTE_END									= 9200000;
 	public final static long ABOUT_TIME_SPINNER_SELECTION						= 9300006;
+	public final static long GCM_RECEIVE_CLICK													= 9400000;
+	public final static long STORYTELLING_FB_SHARE_BUTTON_CLICK		= 9500000;
+	public final static long FB_SHARE_BUTTON														= 9600000;
+	public final static long FB_SHARE_CHECK_BUTTON										= 9600010;
+	public final static long FB_SHARE_CANCEL_BUTTON									= 9600020;
 }

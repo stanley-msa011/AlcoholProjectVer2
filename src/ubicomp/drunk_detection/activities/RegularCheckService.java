@@ -38,6 +38,8 @@ import android.util.Log;
 
 public class RegularCheckService extends Service {
 
+	private static final String TAG="REGULAR_CHECK_SERVICE";
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
@@ -119,18 +121,18 @@ public class RegularCheckService extends Service {
 		    
 			httpPost.setEntity(mpEntity);
 			if (uploader(httpClient, httpPost,this)){
-				Log.d("REGULAR CHECK", "SUCCESS");
+				Log.d(TAG, "SUCCESS");
 				SharedPreferences.Editor edit = sp.edit();
 				edit.putLong("latest_regular_check", System.currentTimeMillis());
 				edit.commit();
 			}
 			else{
-				Log.d("REGULAR CHECK", "FAIL TO CONNECT");
+				Log.d(TAG, "FAIL TO CONNECT");
 				return -1;
 			}
 			
 		} catch (Exception e) {
-			Log.d("REGULAR CHECK", "EXCEPTION:"+e.toString());
+			Log.d(TAG, "EXCEPTION:"+e.toString());
 			return -1;
 		} 
 		

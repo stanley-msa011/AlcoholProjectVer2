@@ -8,7 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 13; 
+	private static final int DB_VERSION = 16; 
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -68,7 +68,10 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(
         		"CREATE TABLE Ranking ("+
         				" user_id CHAR[255] PRIMERY KEY," +
-        				" score INTEGER NOT NULL" +
+        				" score INTEGER NOT NULL," +
+        				" test_score INTEGER NOT NULL  DEFAULT 0,"+
+        				" ques_score INTEGER NOT NULL  DEFAULT 0,"+
+        				" story_score INTEGER NOT NULL  DEFAULT 0"+
         				")"
         );
         
@@ -197,6 +200,27 @@ public class DBHelper extends SQLiteOpenHelper {
         		" upload INTEGER NOT NULL DEFAULT 0" +
         		")"
         		);
+        
+        db.execSQL(
+        		"CREATE TABLE GCMRead (" +
+        		" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        		" ts INTEGER NOT NULL," +
+        		" message CHAR[255] NOT NULL," +
+        		" upload INTEGER NOT NULL DEFAULT 0" +
+        		")"
+        		);
+        
+        db.execSQL(
+        		"CREATE TABLE Facebook (" +
+        		" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        		" ts INTEGER NOT NULL," +
+        		" pageWeek INTEGER NOT NULL,"+
+        		" pageLevel INTEGER NOT NULL," +
+        		" text CHAR[500] NOT NULL," +
+        		" uploadSuccess INTEGER NOT NULL,"+
+        		" upload INTEGER NOT NULL DEFAULT 0" +
+        		")"
+        		);
 	}
 
 	@Override
@@ -264,6 +288,34 @@ public class DBHelper extends SQLiteOpenHelper {
 	        		" used INTEGER NOT NULL," +
 	        		" isClear INTEGER NOT NULL DEFAULT 0,"+
 	        		" page INTEGER NOT NULL,"+
+	        		" upload INTEGER NOT NULL DEFAULT 0" +
+	        		")"
+	        		);
+		}
+		if (old_ver < 14){
+			db.execSQL(
+	        		"CREATE TABLE GCMRead (" +
+	        		" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+	        		" ts INTEGER NOT NULL," +
+	        		" message CHAR[255] NOT NULL," +
+	        		" upload INTEGER NOT NULL DEFAULT 0" +
+	        		")"
+	        		);
+		}
+		if (old_ver < 15){
+			db.execSQL("ALTER TABLE Ranking ADD test_score INTEGER NOT NULL DEFAULT 0");
+			db.execSQL("ALTER TABLE Ranking ADD ques_score INTEGER NOT NULL DEFAULT 0");
+			db.execSQL("ALTER TABLE Ranking ADD story_score INTEGER NOT NULL DEFAULT 0");
+		}
+		if (old_ver < 16){
+			db.execSQL(
+	        		"CREATE TABLE Facebook (" +
+	        		" id INTEGER PRIMARY KEY AUTOINCREMENT," +
+	        		" ts INTEGER NOT NULL," +
+	        		" pageWeek INTEGER NOT NULL,"+
+	        		" pageLevel INTEGER NOT NULL," +
+	        		" text CHAR[500] NOT NULL," +
+	        		" uploadSuccess INTEGER NOT NULL,"+
 	        		" upload INTEGER NOT NULL DEFAULT 0" +
 	        		")"
 	        		);

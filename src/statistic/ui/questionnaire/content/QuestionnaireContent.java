@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import statistic.ui.QuestionMsgBox;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -39,7 +40,7 @@ abstract public class QuestionnaireContent {
 		this.msgBox = msgBox;
 		this.context = msgBox.getContext();
 		int x = ScreenSize.getScreenX(context);
-		textSize = x * 21/480;
+		textSize = TextSize.normalTextSize(context);
 		contentSideMargin = x * 40/480;
 		contentMargin = x * 10/480;
 		itemHeight = x * 60/480;

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import data.uploader.Reuploader;
+import data.uploader.DataUploader;
 
 import android.app.Service;
 import android.content.Context;
@@ -33,18 +33,19 @@ public class GPSService extends Service{
 	public final static long GPS_TOTAL_TIME = 33000L;
 	private final static long GPS_SEARCH_TIME = 30000L;
 	
+	private static final String TAG = "GPS_SERVICE";
 	
 	private Timer timer = null;
 	
 	public int onStartCommand(Intent intent, int flags,int startId){
-		Log.d("GPS","start the service");
+		Log.d(TAG,"start the service");
 		
 		super.onStartCommand(intent, flags, startId);
 		 bestLoc = null;
 		Bundle data = intent.getExtras();
 		String directory = data.getString("directory");
 		
-		Log.d("GPS","dir: "+directory);
+		Log.d(TAG,"dir: "+directory);
 		
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		
@@ -54,7 +55,7 @@ public class GPSService extends Service{
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
 		} catch (IOException e) {
-			Log.d("GEO WRITER","FAIL TO OPEN");
+			Log.d(TAG,"FILE: FAIL TO OPEN");
 			writer = null;
 		}
 		
@@ -92,7 +93,7 @@ public class GPSService extends Service{
 			dir = new File(this.getFilesDir(),"drunk_detection");
 		if (!dir.exists())
 			if (!dir.mkdirs())
-				Log.d("TEST STORAGE","FAIL TO CREATE DIR");
+				Log.d(TAG,"FILE: FAIL TO CREATE DIR");
 		
 		File mainDirectory = new File(dir,timestamp);
 		if (!mainDirectory.exists())
@@ -107,12 +108,9 @@ public class GPSService extends Service{
 		@Override
 		public void onLocationChanged(Location location) {
 			
-			if (location !=null)
-				Log.d("GPS","update loc: "+location.getProvider());
-			else
-				Log.d("GPS","update loc: "+(location!=null));
 			
 			if (location!=null){
+				Log.d(TAG,"update loc: "+location.getProvider());
 				if (bestLoc == null)
 					bestLoc = location;
 				else
@@ -179,7 +177,7 @@ public class GPSService extends Service{
 			gpsLocationListener = null;
 			networkLocationListener = null;
 			
-			Reuploader.reuploader(getBaseContext());
+			DataUploader.upload(getBaseContext());
 			
 			stopSelf();
 		}

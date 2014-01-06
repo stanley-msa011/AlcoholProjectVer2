@@ -14,7 +14,9 @@ import statistic.ui.questionnaire.content.Type3Content;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -95,6 +97,7 @@ public class QuestionMsgBox {
 		closeButton.setPadding(padding, 0, 0, padding);
 	}
 	
+	@SuppressLint("InlinedApi")
 	@SuppressWarnings("deprecation")
 	public void settingPreTask(){
 		
@@ -113,7 +116,7 @@ public class QuestionMsgBox {
 		qParam.topMargin = screen.x * 12/480;
 		
 		
-		int textSize = screen.x * 21/480;
+		int textSize = TextSize.normalTextSize(context);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		help.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (LayoutParams) help.getLayoutParams();

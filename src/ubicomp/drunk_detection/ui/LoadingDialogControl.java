@@ -8,20 +8,27 @@ public class LoadingDialogControl {
 	
 	static ProgressDialog dialog = null;
 
-	public static void show(Context context){
+	public static void show(Context context, int type){
 		
 		if (dialog == null){
 			dialog = new ProgressDialog(context);
 		}
 		else if (dialog.getContext() == null ||  !dialog.getContext().equals(context)){
-			dialog.cancel();
+			try{
+				dialog.cancel();
+			}catch (Exception e){}
 			dialog = new ProgressDialog(context);
 			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		}
 		dialog.setCancelable(true);
 		if (!dialog.isShowing()){
-			dialog.show();
-			dialog.setContentView(R.layout.loading_box_theme);
+			try{
+				dialog.show();
+				if (type == 0)
+					dialog.setContentView(R.layout.loading_box_theme);
+				else if (type == 1)
+					dialog.setContentView(R.layout.uploading_box_theme);
+			}catch(Exception e){}
 		}
 	}
 	
@@ -31,5 +38,9 @@ public class LoadingDialogControl {
 		dialog.cancel();
 		if (dialog.isShowing())
 			dialog.dismiss();
+	}
+	
+	public static void show(Context context){
+		show(context,0);
 	}
 }

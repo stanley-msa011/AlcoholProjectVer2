@@ -47,10 +47,11 @@ public class CustomToast {
 			toastText = (TextView) layout.findViewById(R.id.custom_toast_text);
 			toastText.setTypeface(Typefaces.getWordTypefaceBold(context));
 			int screen_x = ScreenSize.getScreenX(context);
-			toastText.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen_x /24);
+			int titleSize = TextSize.smallTitleTextSize(context);
+			toastText.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize);
 			toastCounter = (TextView) layout.findViewById(R.id.custom_toast_counter);
 			toastCounter.setTypeface(Typefaces.getWordTypefaceBold(context));
-			toastCounter.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen_x /24);
+			toastCounter.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize);
 			toastImage = (ImageView) layout.findViewById(R.id.custom_toast_main_picture);
 			RelativeLayout.LayoutParams iParam = (LayoutParams) toastImage.getLayoutParams();
 			iParam.topMargin = screen_x * 280/480;

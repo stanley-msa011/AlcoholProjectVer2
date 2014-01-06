@@ -3,8 +3,10 @@ package ubicomp.drunk_detection.activities;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.check.LockCheck;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.os.Message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -70,6 +73,8 @@ public class TutorialActivity extends Activity {
 		RelativeLayout.LayoutParams rParam = (RelativeLayout.LayoutParams) replay.getLayoutParams();
 		rParam.bottomMargin = screen.x * 32/480;
 		
+		int titleSize = TextSize.smallTitleTextSize(this);
+		
 		step = (TextView) this.findViewById(R.id.tutorial_step);
 		step.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 85/480);
 		step.setTypeface(digitTypeface);
@@ -79,7 +84,7 @@ public class TutorialActivity extends Activity {
 		sParam.height = screen.x * 85/480;
 		
 		notify= (TextView) this.findViewById(R.id.tutorial_notify);
-		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 25/480);
+		notify.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleSize);
 		notify.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams nParam = (RelativeLayout.LayoutParams) notify.getLayoutParams();
@@ -87,7 +92,7 @@ public class TutorialActivity extends Activity {
 		nParam.height = screen.x * 25/480;
 		
 		help = (TextView) this.findViewById(R.id.tutorial_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 25/480);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleSize);
 		help.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
 		//if (isWideScreen)
@@ -120,6 +125,13 @@ public class TutorialActivity extends Activity {
 	@Override
 	protected void onResume(){
 		super.onResume();
+		
+		if (LockCheck.check(getBaseContext())){
+			Intent lock_intent = new Intent(this,LockedActivity.class);
+			this.startActivity(lock_intent);
+			this.finish();
+			return;
+		}
 		loadingHandler.sendEmptyMessage(0);
 	}
 	

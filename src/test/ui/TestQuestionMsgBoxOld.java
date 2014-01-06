@@ -8,6 +8,7 @@ import ubicomp.drunk_detection.check.AlwaysFinishActivitiesCheck;
 import ubicomp.drunk_detection.fragments.TestFragment;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -112,9 +113,9 @@ public class TestQuestionMsgBoxOld implements TestQuestionMsgBoxInterface{
 		
 		questionLayout = (LinearLayout) boxLayout.findViewById(R.id.msg_question_layout);
 		
-		textSize = screen.x * 21/480;
-		textSizeLarge = screen.x * 32/480;
-		textSizeXLarge = screen.x * 48/480;
+		textSize = TextSize.normalTextSize(context);
+		textSizeLarge = TextSize.largeTitleSize(context);
+		textSizeXLarge = TextSize.slargeTitleSize(context);
 		title = (TextView)boxLayout.findViewById(R.id.msg_title);
 		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSizeLarge);
 		title.setTypeface(wordTypefaceBold);

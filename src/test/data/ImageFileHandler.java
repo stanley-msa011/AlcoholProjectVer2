@@ -2,7 +2,6 @@ package test.data;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 import test.camera.CameraRecorder;
 
@@ -17,7 +16,7 @@ public class ImageFileHandler extends Handler {
 	private String timestamp;
 	private CameraRecorder recorder;
 	
-	
+	private static final String TAG = "IMAGE_FILE_HANDLER";
 	public ImageFileHandler(File directory, String timestamp){
 		this.directory = directory;
 		this.timestamp = timestamp;
@@ -38,11 +37,11 @@ public class ImageFileHandler extends Handler {
 			writer = new FileOutputStream(file);
 			writer.write(img);
 			writer.close();
-		} catch (IOException e) {
-			Log.d("IMAGE WRITER","FAIL TO OPEN");
+		} catch (Exception e) {
+			Log.d(TAG,"FAIL TO OPEN");
 			try {
 				writer.close();
-			} catch (IOException e1) {}
+			} catch (Exception e1) {}
 			writer = null;
 		}
 		if (count == 3){

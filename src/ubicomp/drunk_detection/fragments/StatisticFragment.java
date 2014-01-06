@@ -1,5 +1,7 @@
 package ubicomp.drunk_detection.fragments;
 
+import java.util.ArrayList;
+
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
@@ -7,6 +9,7 @@ import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import statistic.ui.QuestionMsgBox;
+import statistic.ui.RadarChart3;
 import statistic.ui.statistic_page_view.AnalysisCounterView;
 import statistic.ui.statistic_page_view.AnalysisProgressView;
 import statistic.ui.statistic_page_view.AnalysisRatingView;
@@ -29,6 +32,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.AlphaAnimation;
@@ -41,11 +45,12 @@ import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 
 public class StatisticFragment extends Fragment {
+	
 	private View view;
 	private Activity activity;
 	private ViewPager statisticView;
 	private StatisticPagerAdapter statisticViewAdapter;
-	private RelativeLayout statisticLayout,dots_layout;
+	private RelativeLayout statisticLayout,dots_layout, allLayout;
 	private ImageView[] dots;
 	private Drawable dot_on,dot_off;
 	private LinearLayout analysisLayout;
@@ -122,8 +127,6 @@ public class StatisticFragment extends Fragment {
 		questionButton.setPadding(padding, padding, padding, padding);
 		questionButton.setOnTouchListener(new ScaleOnTouchListener());
 		
-		RelativeLayout.LayoutParams fsParam = (RelativeLayout.LayoutParams) firstScroll.getLayoutParams();
-		fsParam.topMargin = screen.x;
         return view;
     }
     
@@ -156,7 +159,7 @@ public class StatisticFragment extends Fragment {
     }
     
 	private void clear(){
-    	
+    	removeRadarChart();
     	statisticViewAdapter.clear();
     	for (int i=0;i<analysisViews.length;++i){
     		if (analysisViews[i]!=null)
@@ -397,4 +400,41 @@ public class StatisticFragment extends Fragment {
 		}catch(Exception e){	}
 	}
 	
+	private View rv;
+	
+	public void showRadarChart(ArrayList<Double> scoreList){
+		RelativeLayout.LayoutParams fsParam = (RelativeLayout.LayoutParams) firstScroll.getLayoutParams();
+		fsParam.topMargin = screen.x;
+		allLayout = (RelativeLayout) view.findViewById(R.id.statistic_fragment_layout);
+		ArrayList<String> labelList = new ArrayList<String>();
+		labelList.add(getString(R.string.radar_label1));
+		labelList.add(getString(R.string.radar_label2));
+		labelList.add(getString(R.string.radar_label3));
+		
+		removeRadarChart();
+		
+		rv = new RadarChart3(activity,scoreList,labelList,getString(R.string.radar_title));
+		allLayout.addView(rv);
+		RelativeLayout.LayoutParams rvParam = (RelativeLayout.LayoutParams) rv.getLayoutParams();
+		rvParam.height = rvParam.width = screen.x * 9/10;
+		rvParam.addRule(RelativeLayout.CENTER_IN_PARENT);
+		allLayout.invalidate();
+		rv.invalidate();
+		rv.setOnClickListener(
+				new OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						ClickLogger.Log(getActivity(), ClickLogId.STATISTIC_RANK_CLOSE_CLICK);
+						 removeRadarChart();
+					}
+		});
+		enablePage(false);
+	}
+	
+	public void removeRadarChart(){
+		allLayout = (RelativeLayout) view.findViewById(R.id.statistic_fragment_layout);
+		if (rv != null && rv.getParent()!=null && rv.getParent().equals(allLayout))
+			allLayout.removeView(rv);
+		enablePage(true);
+	}
 }

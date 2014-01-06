@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -60,9 +59,7 @@ public class PreviewWindow extends SurfaceView  implements SurfaceHolder.Callbac
 			try{
 				cameraRecorder.camera.stopPreview();
 				cameraRecorder.camera.startPreview();
-			}catch(Exception e){
-				Log.d("PREVIEW WINDOW",e.getMessage().toString());
-			}
+			}catch(Exception e){	}
 		}
 	}
 }

@@ -1,13 +1,14 @@
 package history.ui;
 
 import data.database.AdditionalDB;
-import data.uploader.Reuploader;
+import data.uploader.DataUploader;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -83,7 +84,7 @@ public class QuoteMsgBox {
 		boxParam.width = screen.x * 348/480;
 		
 		
-		int textSize = screen.x * 21/480;
+		int textSize = TextSize.normalTextSize(context);
 		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		help.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (RelativeLayout.LayoutParams) help.getLayoutParams();
@@ -127,7 +128,7 @@ public class QuoteMsgBox {
 				CustomToast.generateToast(context, R.string.bonus, 3);
 			else
 				CustomToast.generateToast(context, R.string.bonus, 0);
-			Reuploader.reuploader(context);
+			DataUploader.upload(context);
 		}
 		
 	}

@@ -5,6 +5,7 @@ import java.util.Calendar;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -57,14 +58,12 @@ public class AnalysisProgressView extends StatisticPageView {
 	@Override
 	public void onPreTask() {
 		
-		Point screen = StatisticFragment.getStatisticPx();
-		
 		title = (TextView) view.findViewById(R.id.analysis_progress_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 21/480);
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,TextSize.normalTextSize(context));
 		title.setTypeface(wordTypeface);
 		
 		help = (TextView) view.findViewById(R.id.analysis_progress_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX,TextSize.normalTextSize(context));
 		help.setTypeface(wordTypeface);
 		
 	}

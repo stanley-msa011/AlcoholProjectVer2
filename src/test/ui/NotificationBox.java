@@ -10,6 +10,7 @@ import ubicomp.drunk_detection.activities.EmotionManageActivity;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.app.AlarmManager;
 import android.content.Context;
@@ -19,7 +20,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -69,9 +69,9 @@ public class NotificationBox {
 		divider = boxLayout.findViewById(R.id.notification_divider);
 		selectLayout = (RelativeLayout) boxLayout.findViewById(R.id.notification_select_layout);
 		
-		textSize = screen.x * 24/480;
-		textSizeLarge = screen.x * 32/480;
-		textSizeXLarge = screen.x * 48/480;
+		textSize = TextSize.titleSize(context);
+		textSizeLarge = TextSize.largeTitleSize(context);
+		textSizeXLarge = TextSize.slargeTitleSize(context);
 		
 		text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		text.setTypeface(wordTypeface);
@@ -226,8 +226,6 @@ public class NotificationBox {
 		long t2 = sp.getLong("LatestStorytellingSharingTime", 0L);
 		long t3 = sp.getLong("LatestStorytellingRecordingTime", 0L);
 		
-		Log.d("Notify",t0+" "+t1+" "+t2+" "+t3);
-		
 		long cur_time = System.currentTimeMillis();
 		
 		boolean[] b = new boolean[4];
@@ -236,8 +234,6 @@ public class NotificationBox {
 		b[2] = (cur_time - t2 > TWO_DAYS)?true:false;
 		b[3] = (cur_time - t3 > TWO_DAYS)?true:false;
 
-		Log.d("Notify",">"+(cur_time - t0)+"/"+(cur_time - t1)+"/"+(cur_time - t2)+"/"+(cur_time - t3)+"/"+TWO_DAYS);
-		Log.d("Notify",">"+(b[0])+"/"+(b[1])+"/"+(b[2])+"/"+(b[3]));
 		int mod = 0;
 		for (int i=0;i<b.length;++i){
 			if (b[i])++mod;
@@ -265,7 +261,6 @@ public class NotificationBox {
 		edit.putLong("LatestStorytellingRecordingTime", cur_time);
 		edit.commit();
 		
-		Log.d("Notify","Commit");
 		return type;
 	}
 	

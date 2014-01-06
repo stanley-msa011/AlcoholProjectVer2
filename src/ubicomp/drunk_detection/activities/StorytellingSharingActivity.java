@@ -4,6 +4,7 @@ import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
@@ -20,7 +21,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -39,7 +39,7 @@ public class StorytellingSharingActivity extends Activity {
 
 	private LayoutInflater inflater;
 	
-	private int textSize;
+	private int titleSize;
 	private int iconMargin;
 	private Point screen;
 	private Typeface wordTypefaceBold;
@@ -77,7 +77,7 @@ public class StorytellingSharingActivity extends Activity {
 		mainLayout.removeAllViews();
 		onTouchListener = new ItemOnTouchListener();
 		
-		textSize = screen.x * 24/480;
+		titleSize = TextSize.smallTitleTextSize(activity);
 		iconMargin = screen.x * 33/480;
 		
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -129,13 +129,13 @@ public class StorytellingSharingActivity extends Activity {
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF777777);
 		text.setText(textStr);
 		
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
 		
@@ -146,13 +146,13 @@ private View createTextView(int textStr){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF777777);
 		text.setText(textStr);
 		
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
 		
@@ -170,8 +170,9 @@ private View createTextView(int textStr){
 		else
 			edit.setBackgroundDrawable(mainLayout.getContext().getResources().getDrawable(R.drawable.questionnaire_input));
 		edit.setTextColor(0xFF000000);
-		edit.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize*4/3);
+		edit.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize*4/3);
 		edit.setTypeface(wordTypefaceBold);
+		edit.setHint(R.string.emotion_manage_input);
 		final long ClickLog;
 		if (type==0)
 			ClickLog = ClickLogId.STORYTELLING_SHARE_EDIT_NAME;
@@ -209,16 +210,16 @@ private View createTextView(int textStr){
 		
 		RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.titlebar, null);
 		TextView text = (TextView) layout.findViewById(R.id.titlebar_text);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setText(R.string.storytelling_share_title);
 		
 		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.titlebar_icon);
 		RelativeLayout.LayoutParams iParam =(RelativeLayout.LayoutParams) icon.getLayoutParams();
-		iParam.leftMargin = textSize;
+		iParam.leftMargin = titleSize;
 		
 		return layout;
 	}
@@ -234,13 +235,13 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF5c5c5c);
 		text.setText(textStr);
 		
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
 		icon.setImageDrawable(getResources().getDrawable(DrawableId));
@@ -276,7 +277,6 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 				return;
 			}
 			int time = Integer.valueOf(time_str);
-			Log.d("Storytelling",who+":"+time);
 			
 			boolean getSHC = db.insertStorytellingUsage(who,time);
 			

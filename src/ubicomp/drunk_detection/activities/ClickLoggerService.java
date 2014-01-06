@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 
 import ubicomp.drunk_detection.check.DefaultCheck;
+import ubicomp.drunk_detection.check.LockCheck;
 
 import debug.clicklog.ClickLogId;
 
@@ -20,10 +21,14 @@ import android.util.Log;
 @SuppressLint("SimpleDateFormat")
 public class ClickLoggerService extends Service {
 
+	private static final String TAG = "CLICKLOGGER_SERVICE";
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
 		
 		if(DefaultCheck.check(getBaseContext()))
+			return Service.START_REDELIVER_INTENT;
+		if (LockCheck.check(getBaseContext()))
 			return Service.START_REDELIVER_INTENT;
 		
 		long message = intent.getLongExtra(ClickLogId.LOG_MSG_ID, -1);
@@ -44,7 +49,7 @@ public class ClickLoggerService extends Service {
 			ds.writeLong(message);
 			ds.flush();
 		} catch (Exception e) {
-			Log.d("CLICK LOGGER","FAIL");
+			Log.d(TAG,"WRITE FAIL");
 		} finally{
 			try {
 				ds.close();
@@ -74,7 +79,7 @@ public class ClickLoggerService extends Service {
 			ds.writeLong(message);
 			ds.flush();
 		} catch (Exception e) {
-			Log.d("CLICK LOGGER","FAIL");
+			Log.d(TAG,"WRITE FAIL");
 		} finally{
 			try {
 				ds.close();

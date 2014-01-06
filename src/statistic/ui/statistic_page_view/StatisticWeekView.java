@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 
 public class StatisticWeekView extends StatisticPageView {
@@ -76,23 +77,20 @@ public class StatisticWeekView extends StatisticPageView {
 	
 	@Override
 	public void onPreTask() {
-		Point screen = StatisticFragment.getStatisticPx();
-		
 		dateLayout = (LinearLayout) view.findViewById(R.id.statistic_week_date_label_layout);
 		timeLayout = (LinearLayout) view.findViewById(R.id.statistic_week_timeblock_label_layout);
 		blockLayout = (GridLayout) view.findViewById(R.id.statistic_week_block_layout);
 		
-		int textSize = screen.x * 27/480;
-		int textSize2 = screen.x * 20/480;
-		int textSize3 = screen.x * 20/480;
+		int titleSize = TextSize.titleSize(context);
+		int textSize = TextSize.normalTextSize(context);
 		title= (TextView) view.findViewById(R.id.statistic_week_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize);
 		title.setTypeface(wordTypefaceBold);
 		
 		time_labels = new TextView[nBlocks];
 		for (int i=0;i<nBlocks;++i){
 			time_labels[i] = new TextView(context);
-			time_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+			time_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			time_labels[i].setTextColor(0xFF727171);
 			time_labels[i].setText(blockHint[i]);
 			time_labels[i].setTypeface(wordTypefaceBold);
@@ -104,7 +102,7 @@ public class StatisticWeekView extends StatisticPageView {
 		date_labels = new TextView[nDate];
 		for (int i=0;i<nDate;++i){
 			date_labels[i] = new TextView(context);
-			date_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize3);
+			date_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			date_labels[i].setTextColor(0xFF727171);
 			date_labels[i].setGravity(Gravity.CENTER);
 			date_labels[i].setTypeface(digitTypefaceBold);
@@ -127,7 +125,7 @@ public class StatisticWeekView extends StatisticPageView {
 			labelImgs[i].setScaleType(ScaleType.CENTER);
 			labelLayout.addView(labelImgs[i]);
 			labels[i] = new TextView(context);
-			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			labels[i].setTextColor(0xFF727171);
 			labels[i].setGravity(Gravity.CENTER);
 			labels[i].setTypeface(wordTypefaceBold);

@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import android.util.Log;
-
 public class QuestionFile {
 
 	private File file;
@@ -22,7 +20,6 @@ public class QuestionFile {
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
 		} catch (IOException e) {
-			Log.d("QUESTION WRITER","FAIL TO OPEN");
 			writer = null;
 		}
 		try {

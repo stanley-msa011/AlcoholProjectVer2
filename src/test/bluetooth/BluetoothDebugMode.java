@@ -10,6 +10,8 @@ import ubicomp.drunk_detection.fragments.TestFragment;
 
 public class BluetoothDebugMode extends Bluetooth {
 
+	
+	
 	protected BracValueDebugHandler bracDebugHandler;
 	
 	protected static float PRESSURE_DIFF_MIN_RANGE  = 50f;
@@ -83,7 +85,7 @@ public class BluetoothDebugMode extends Bluetooth {
 						msg="m";
 						read_type = READ_PRESSURE;
 					}else if ( (char)temp[i]=='b'){
-							throw new Exception("NO BETTARY");
+							throw new Exception("NO BATTERY");
 					}else if ((char)temp[i]=='v'){
 						end = sendMsgToApp(msg);
 						sendDebugMsg(msg);
@@ -107,14 +109,14 @@ public class BluetoothDebugMode extends Bluetooth {
 					zero_duration += ( zero_end_time - zero_start_time);
 					zero_start_time = zero_end_time;
 					if (zero_duration > MAX_ZERO_DURATION)
-						throw new Exception("NO BETTARY");
+						throw new Exception("NO BATTERY");
 					Thread.sleep(50);
 				}
 				
 			}
 			close();
 		} catch (Exception e) {
-			Log.e("BT","FAIL TO READ DATA FROM THE SENSOR: " +e.toString());
+			Log.e(TAG,"FAIL TO READ DATA FROM THE SENSOR: " +e.toString());
 			close();
 			if (e.getMessage()!=null && e.getMessage().equals("TIMEOUT")){
 				testFragment.showDebug("Close by timeout" );
@@ -128,28 +130,7 @@ public class BluetoothDebugMode extends Bluetooth {
 	
 	@Override
 	public void close(){
-		try {
-			if (socket != null && socket.isConnected()){
-				sendEnd();
-				socket.close();
-			}
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR");
-		}
-		try {
-			if (in != null)
-				in.close();
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR INPUTSTREAM");
-		}
-		try {
-			if (out != null)
-				out.close();
-		} catch (Exception e) {
-			Log.e("BT","FAIL TO CLOSE THE SENSOR OUTPUTSTREAM");
-		}
-		if (bracFileHandler!= null)
-			bracFileHandler.close();
+		normalClose();
 		if (bracDebugHandler !=null)
 			bracDebugHandler.close();
 	}

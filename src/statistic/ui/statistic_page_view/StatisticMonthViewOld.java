@@ -23,6 +23,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 
 public class StatisticMonthViewOld extends StatisticPageView {
@@ -74,22 +75,19 @@ public class StatisticMonthViewOld extends StatisticPageView {
 	
 	@Override
 	public void onPreTask() {
-		Point screen = StatisticFragment.getStatisticPx();
-		
 		timeLayout = (LinearLayout) view.findViewById(R.id.statistic_month_timeblock_label_layout);
 		blockLayout = (TableLayout) view.findViewById(R.id.statistic_month_block_layout);
 		
-		int textSize = screen.x * 27/480;
-		int textSize2 = screen.x * 20/480;
-		int textSize3 = screen.x * 20/480;
+		int titleSize = TextSize.titleSize(context);
+		int textSize = TextSize.normalTextSize(context);
 		title= (TextView) view.findViewById(R.id.statistic_month_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize);
 		title.setTypeface(wordTypefaceBold);
 		
 		time_labels = new TextView[nBlocks];
 		for (int i=0;i<nBlocks;++i){
 			time_labels[i] = new TextView(context);
-			time_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+			time_labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			time_labels[i].setTextColor(0xFF727171);
 			time_labels[i].setText(blockHint[i]);
 			time_labels[i].setTypeface(wordTypefaceBold);
@@ -98,16 +96,16 @@ public class StatisticMonthViewOld extends StatisticPageView {
 		}
 
 		month0 = (TextView) view.findViewById(R.id.statistic_month_0);;
-		month0.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize3);
+		month0.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		month0.setTypeface(digitTypefaceBold);
 		month1 = (TextView) view.findViewById(R.id.statistic_month_1);;
-		month1.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize3);
+		month1.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		month1.setTypeface(digitTypefaceBold);
 		month2 = (TextView) view.findViewById(R.id.statistic_month_2);;
-		month2.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize3);
+		month2.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		month2.setTypeface(digitTypefaceBold);
 		month3 = (TextView) view.findViewById(R.id.statistic_month_3);;
-		month3.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize3);
+		month3.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		month3.setTypeface(digitTypefaceBold);
 		
 		circles = new ImageView[nBlocks*nDate];
@@ -133,7 +131,7 @@ public class StatisticMonthViewOld extends StatisticPageView {
 			labelImgs[i].setScaleType(ScaleType.CENTER);
 			labelLayout.addView(labelImgs[i]);
 			labels[i] = new TextView(context);
-			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+			labels[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			labels[i].setTextColor(0xFF727171);
 			labels[i].setGravity(Gravity.CENTER);
 			labels[i].setText(labelHint[i]);

@@ -3,6 +3,7 @@ package statistic.ui.statistic_page_view;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -61,14 +62,12 @@ public class AnalysisSavingView extends StatisticPageView {
 	@SuppressLint("CutPasteId")
 	@Override
 	public void onPreTask() {
-		Point screen = StatisticFragment.getStatisticPx();
-		
 		title = (TextView) view.findViewById(R.id.analysis_saving_title);
-		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,screen.x * 21/480);
+		title.setTextSize(TypedValue.COMPLEX_UNIT_PX,TextSize.normalTextSize(context));
 		title.setTypeface(wordTypeface);
 		
 		help = (TextView) view.findViewById(R.id.analysis_saving_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize.normalTextSize(context));
 		help.setTypeface(wordTypeface);
 		
 		goalBar = (ImageView) view.findViewById(R.id.analysis_saving_bar);

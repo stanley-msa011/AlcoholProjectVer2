@@ -3,7 +3,7 @@ package ubicomp.drunk_detection.activities;
 import java.util.Calendar;
 
 import data.uploader.ClickLogUploader;
-import data.uploader.Reuploader;
+import data.uploader.DataUploader;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -21,12 +21,14 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 	private static final int requestCode = 0x2013;
 	private static final int requestCode2 = 0x2014;
 	
+	private static final String TAG = "BOOT_BC_RECEIVER";
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		
 		String action = intent.getAction();
 		
-		Log.d("ALARM","BootBroadcastReceiver - "+action);
+		Log.d(TAG,"BootBroadcastReceiver - "+action);
 		
 		if (action.equals(Intent.ACTION_TIME_CHANGED) || action.equals(Intent.ACTION_TIMEZONE_CHANGED)){
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -49,7 +51,7 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 	
 	public static void testNotificationSetting(Context context, Intent intent){
 		
-		Log.d("Alarm","notification_setting");
+		Log.d(TAG,"notification_setting");
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 		int notification_minutes = sp.getInt("notification_gap", 120);
 		long notification_gap = notification_minutes * 60 * 1000;
@@ -110,7 +112,7 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 
 	
 	public static void regularCheckSetting(Context context, Intent intent){
-		Log.d("Alarm","regular_check_setting");
+		Log.d(TAG,"regular_check_setting");
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		
 		Intent check_intent = new Intent();
@@ -122,7 +124,7 @@ public class BootBoardcastReceiver extends BroadcastReceiver{
 		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+10000, AlarmManager.INTERVAL_HALF_HOUR, pending2);
 		
 		
-		Reuploader.reuploader(context);
+		DataUploader.upload(context);
 		ClickLogUploader.upload(context);
 		Intent regularCheckIntent = new Intent(context,RegularCheckService.class);
 		context.startService(regularCheckIntent);

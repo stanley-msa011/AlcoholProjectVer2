@@ -7,7 +7,9 @@ import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.activities.StorytellingSharingActivity;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
@@ -50,15 +52,18 @@ public class StorytellingBox {
 		setting();
 	}
 	
+	@SuppressLint("InlinedApi")
 	@SuppressWarnings("deprecation")
 	private void setting(){
+		
+		int textSize = TextSize.normalTextSize(context);
 		
 		background.setVisibility(View.INVISIBLE);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);
 		boxLayout = (RelativeLayout) inflater.inflate(R.layout.storytelling_check_layout,null);
 		boxLayout.setVisibility(View.INVISIBLE);
 		help = (TextView) boxLayout.findViewById(R.id.storytelling_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		help.setTypeface(wordTypefaceBold);
 		mainLayout.addView(background);
 		mainLayout.addView(boxLayout);
@@ -75,10 +80,10 @@ public class StorytellingBox {
 		param.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 		
 		cancel = (TextView) boxLayout.findViewById(R.id.storytelling_cancel_button);
-		cancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		cancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		cancel.setTypeface(wordTypefaceBold);
 		ok = (TextView) boxLayout.findViewById(R.id.storytelling_ok_button);
-		ok.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		ok.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		ok.setTypeface(wordTypefaceBold);
 		
 		ok.setOnClickListener(okListener);

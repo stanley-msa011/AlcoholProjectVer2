@@ -2,9 +2,11 @@ package ubicomp.drunk_detection.activities;
 
 import statistic.ui.questionnaire.content.ConnectSocialInfo;
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.check.LockCheck;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import data.database.QuestionDB;
 import debug.clicklog.ClickLogId;
@@ -24,7 +26,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -43,7 +44,7 @@ public class EmotionActivity extends Activity {
 
 	private LayoutInflater inflater;
 	
-	private int textSize;
+	private int titleSize;
 	private int iconMargin;
 	private Typeface wordTypefaceBold;
 	
@@ -131,6 +132,12 @@ public class EmotionActivity extends Activity {
 	@Override
 	protected void onResume(){
 		super.onResume();
+		if (LockCheck.check(getBaseContext())){
+			Intent lock_intent = new Intent(this,LockedActivity.class);
+			this.startActivity(lock_intent);
+			this.finish();
+			return;
+		}
 		enableBack = true;
 		setQuestionStart();
 	}
@@ -165,16 +172,17 @@ public class EmotionActivity extends Activity {
 		callCancel = (TextView) callLayout.findViewById(R.id.call_cancel_button);
 		callHelp = (TextView) callLayout.findViewById(R.id.call_help);
 		
+		int textSize =TextSize.normalTextSize(activity);
 		
-		callHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		callHelp.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (LayoutParams) callHelp.getLayoutParams();
 		hParam.width = screen.x * 349/480;
 		hParam.height = screen.x * 114/480;
 		
-		callOK.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callOK.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		callOK.setTypeface(wordTypefaceBold);
-		callCancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callCancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		callCancel.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams rParam = (LayoutParams) callOK.getLayoutParams();
@@ -191,6 +199,8 @@ public class EmotionActivity extends Activity {
 	
 private void setPlayGuideBox(){
 		
+	int textSize =TextSize.normalTextSize(activity);
+	
 		playPause = (ImageView) playLayout.findViewById(R.id.play_pause_button);
 		playCancel = (ImageView) playLayout.findViewById(R.id.play_cancel_button);
 		playHelp = (TextView) playLayout.findViewById(R.id.play_help);
@@ -198,7 +208,7 @@ private void setPlayGuideBox(){
 		playPauseDrawable = getResources().getDrawable(R.drawable.record_stop);
 		playPlayDrawable = getResources().getDrawable(R.drawable.record_play);
 		
-		playHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		playHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 		playHelp.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (LayoutParams) playHelp.getLayoutParams();
 		hParam.width = screen.x * 349/480;
@@ -222,7 +232,7 @@ private void setPlayGuideBox(){
 		mainLayout.removeAllViews();
 		onTouchListener = new ItemOnTouchListener();
 		
-		textSize = screen.x * 24/480;
+		titleSize = TextSize.smallTitleTextSize(activity);
 		iconMargin = screen.x * 33/480;
 		View title = createTitleView();
 		mainLayout.addView(title);
@@ -428,13 +438,13 @@ private void setPlayGuideBox(){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF777777);
 		text.setText(textStr);
 		
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
 		
@@ -445,13 +455,13 @@ private View createTextView(String textStr){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF777777);
 		text.setText(textStr);
 		
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		layout.setBackgroundResource(R.drawable.questionnaire_bar_question);
 		
@@ -462,13 +472,13 @@ private View createTextView(String textStr){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF5c5c5c);
 		text.setText(textStr);
 		
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
 		if (DrawableId>0)
@@ -487,13 +497,13 @@ private View createTextView(String textStr){
 		
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.question_select_item, null);
 		TextView text = (TextView) layout.findViewById(R.id.question_description);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setTextColor(0xFF5c5c5c);
 		text.setText(textStr);
 		
 		LinearLayout.LayoutParams tParam = (LinearLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.question_icon);
 		if (DrawableId>0)
@@ -512,16 +522,16 @@ private View createTextView(String textStr){
 		
 		RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.titlebar, null);
 		TextView text = (TextView) layout.findViewById(R.id.titlebar_text);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize );
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX,titleSize );
 		text.setTypeface(wordTypefaceBold);
 		text.setText(R.string.emotionDIY_title);
 		
 		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams)text.getLayoutParams();
-		tParam.leftMargin = textSize;
+		tParam.leftMargin = titleSize;
 		
 		ImageView icon = (ImageView) layout.findViewById(R.id.titlebar_icon);
 		RelativeLayout.LayoutParams iParam =(RelativeLayout.LayoutParams) icon.getLayoutParams();
-		iParam.leftMargin = textSize;
+		iParam.leftMargin = titleSize;
 		
 		return layout;
 	}
@@ -868,7 +878,6 @@ private View createTextView(String textStr){
 				while(true){
 					Thread.sleep(1000);
 					media_handler.sendEmptyMessage(0);
-					Log.d("PLAYING","IN THREAD");
 				}
 			} catch (InterruptedException e) {}
 		}
@@ -877,7 +886,6 @@ private View createTextView(String textStr){
 	@SuppressLint("HandlerLeak")
 	private class MediaUpdateHandler extends Handler{
 		public void handleMessage(Message msg){
-			Log.d("PLAYING","IN HANDLER");
 			try{
 				playHelp.setText(playString+"("+getFormattedTime(mediaPlayer.getCurrentPosition())+"/"+getFormattedTime(mediaPlayer.getDuration())+")");
 			}catch(Exception e){}

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="121"
-    android:versionName="3.72" >
+    android:versionCode="135"
+    android:versionName="3.86" >
 
     <uses-sdk
         android:maxSdkVersion="18"
@@ -23,13 +23,20 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="ubicomp.drunk_detection.activities.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="ubicomp.drunk_detection.activities.permission.C2D_MESSAGE" />
+
     <supports-screens
-        android:xlargeScreens="false"
         android:largeScreens="false"
         android:normalScreens="true"
-        android:smallScreens="false" 
-        />
+        android:smallScreens="false"
+        android:xlargeScreens="false" />
 
     <application
         android:allowBackup="true"
@@ -42,52 +49,67 @@
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <receiver android:name="ubicomp.drunk_detection.activities.BootBoardcastReceiver">
+
+        <receiver android:name="ubicomp.drunk_detection.activities.BootBoardcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
-        
-        <receiver 
+        <receiver
             android:name="ubicomp.drunk_detection.activities.NetworkChangeReceiver"
-            android:singleUser="true"
-            >
+            android:singleUser="true" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="android.net.wifi.STATE_CHANGE"/>
+                <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
         </receiver>
-        
-        <receiver 
-            android:name="ubicomp.drunk_detection.activities.AlarmReceiver" 
-            android:exported="false"
-            >
+        <receiver
+            android:name="ubicomp.drunk_detection.activities.AlarmReceiver"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.android.alarmclock.ALARM_ALERT" />
             </intent-filter>
         </receiver>
-        
+        <receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="ubicomp.drunk_detection.activities" />
+            </intent-filter>
+        </receiver>
+
         <service android:name="ubicomp.drunk_detection.activities.AlarmService" >
         </service>
         <service android:name="ubicomp.drunk_detection.activities.HourlyAlarmService" >
         </service>
-		<service android:name="ubicomp.drunk_detection.activities.RegularCheckService" >
+        <service android:name="ubicomp.drunk_detection.activities.RegularCheckService" >
         </service>
         <service android:name="ubicomp.drunk_detection.activities.ClickLoggerService" >
         </service>
         <service android:name="ubicomp.drunk_detection.activities.GPSService" >
         </service>
-        
+        <service android:name="ubicomp.drunk_detection.activities.GCMIntentService" >
+        </service>
+
         <activity
             android:name="ubicomp.drunk_detection.activities.PreSettingActivity"
             android:noHistory="true"
             android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ubicomp.drunk_detection.activities.GCMAlertActivity"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.EmotionActivity"
@@ -109,15 +131,27 @@
         <activity
             android:name="ubicomp.drunk_detection.activities.DeveloperActivity"
             android:noHistory="true"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="ubicomp.drunk_detection.activities.StorytellingSharingActivity"
             android:noHistory="true"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="ubicomp.drunk_detection.activities.LockedActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ubicomp.drunk_detection.activities.FacebookActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <meta-data android:value="@string/facebook_app_id" android:name="com.facebook.sdk.ApplicationId"/>
+        <activity android:name="com.facebook.LoginActivity"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:label="@string/app_name" />
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
     </application>
 
 </manifest>

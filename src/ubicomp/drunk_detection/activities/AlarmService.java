@@ -19,7 +19,7 @@ import android.util.Log;
 public class AlarmService extends Service {
 
 	private HistoryDB db;
-	
+	private static final String TAG = "ALARM_SERVICE";
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -34,7 +34,7 @@ public class AlarmService extends Service {
 		if(DefaultCheck.check(getBaseContext()))
 			return Service.START_REDELIVER_INTENT;
 		
-		Log.d("ALARM","Regular Service");
+		Log.d(TAG,"Regular Service");
 		
 		db = new HistoryDB(this);
 		

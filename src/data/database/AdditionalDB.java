@@ -2,6 +2,8 @@ package data.database;
 
 import java.util.Calendar;
 
+import data.info.FacebookInfo;
+import data.info.GCMInfo;
 import data.info.StorytellingFling;
 
 import android.app.AlarmManager;
@@ -109,7 +111,8 @@ public class AdditionalDB {
 			page=cursor.getInt(5);
 			flings[i] = new StorytellingFling(ts,acc,used,isClear,page);
 		}
-		
+		cursor.close();
+		db.close();
 		return flings;
 	}
 	
@@ -149,4 +152,91 @@ public class AdditionalDB {
 		db.execSQL(sql);
 		db.close();
 	}
+	
+	public void insertGCM(String message){
+		String sql;
+		db = dbHelper.getWritableDatabase();
+		long ts = System.currentTimeMillis();
+		sql="INSERT INTO GCMRead (ts,message) VALUES ("+ts+",'"+message+"')";
+		db.execSQL(sql);
+		db.close();
+	}
+	
+	public GCMInfo[]  getNotUploadedGCM(){
+		String sql;
+		Cursor cursor;
+		db = dbHelper.getReadableDatabase();
+		sql = "SELECT * FROM GCMRead WHERE upload=0";
+		cursor  = db.rawQuery(sql, null);
+		int len = cursor.getCount();
+		if (len ==0){
+			cursor.close();
+			db.close();
+			return null;
+		}
+		
+		GCMInfo[] ginfo = new GCMInfo[len];
+		for(int i=0;i<len;++i){
+			cursor.moveToPosition(i);
+			long ts=cursor.getLong(1);
+			String msg=cursor.getString(2);
+			ginfo[i] = new GCMInfo(ts,msg);
+		}
+		cursor.close();
+		db.close();
+		return ginfo;
+	}
+	
+	public void setGCMUploaded(long ts){
+		db = dbHelper.getWritableDatabase();
+		String sql = "UPDATE GCMRead SET upload = 1 WHERE ts = "+ts;
+		db.execSQL(sql);
+		db.close();
+	}
+	
+	public void insertFacebook(FacebookInfo info){
+		String sql;
+		db = dbHelper.getWritableDatabase();
+		long ts = info.ts;
+		int pageWeek = info.pageWeek;
+		int pageLevel = info.pageLevel;
+		int uploadSuccessInt = info.uploadSuccess?1:0; 
+		sql="INSERT INTO Facebook (ts,pageWeek,pageLevel,text,uploadSuccess) VALUES ("+ts+","+pageWeek+","+pageLevel+",'"+info.text+"',"+uploadSuccessInt+")";
+		db.execSQL(sql);
+		db.close();
+	}
+	public FacebookInfo[]  getNotUploadedFacebook(){
+		String sql;
+		Cursor cursor;
+		db = dbHelper.getReadableDatabase();
+		sql = "SELECT * FROM Facebook WHERE upload=0";
+		cursor  = db.rawQuery(sql, null);
+		int len = cursor.getCount();
+		if (len ==0){
+			cursor.close();
+			db.close();
+			return null;
+		}
+		
+		FacebookInfo[]finfo = new FacebookInfo[len];
+		for(int i=0;i<len;++i){
+			cursor.moveToPosition(i);
+			long ts=cursor.getLong(1);
+			int week = cursor.getInt(2);
+			int level = cursor.getInt(3);
+			String text = cursor.getString(4);
+			int uploadSuccess = cursor.getInt(5);
+			finfo[i] = new FacebookInfo(ts,week,level,text,uploadSuccess==1);
+		}
+		cursor.close();
+		db.close();
+		return finfo;
+	}
+	public void setFacebookUploaded(long ts){
+		db = dbHelper.getWritableDatabase();
+		String sql = "UPDATE Facebook SET upload = 1 WHERE ts = "+ts;
+		db.execSQL(sql);
+		db.close();
+	}
+	
 }

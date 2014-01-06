@@ -12,4 +12,10 @@ public class Config {
 	//HistoryFragment
 	public static final long READING_PAGE_TIME = 5400;
 	public static final int LONG_FLING_LIMIT = 10;
+	
+	//PWD
+	public static final String PASSWORD = "UBICOMP_MLL336_2013"; 
+	
+	//GCM
+    public static final String SENDER_ID = "1075576910063";
 }

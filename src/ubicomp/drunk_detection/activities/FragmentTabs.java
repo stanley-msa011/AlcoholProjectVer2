@@ -3,9 +3,11 @@ package ubicomp.drunk_detection.activities;
 import java.util.Calendar;
 
 import ubicomp.drunk_detection.activities.R;
+import ubicomp.drunk_detection.check.LockCheck;
 import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.fragments.TestFragment;
+import ubicomp.drunk_detection.gcm.GCMUtilities;
 import ubicomp.drunk_detection.ui.CustomTab;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
@@ -40,7 +42,7 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 import data.uploader.ClickLogUploader;
-import data.uploader.Reuploader;
+import data.uploader.DataUploader;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 
@@ -139,7 +141,7 @@ public class FragmentTabs extends FragmentActivity {
 	
 	@Override
 	protected void onStart(){
-		Reuploader.reuploader(this);
+		DataUploader.upload(this);
 		ClickLogUploader.upload(this);
 		Intent a_intent = new Intent(this,RegularCheckService.class);
 		this.startService(a_intent);
@@ -147,12 +149,20 @@ public class FragmentTabs extends FragmentActivity {
 	}
 	protected void onResume(){
 		super.onResume();
+		if (LockCheck.check(getBaseContext())){
+			Intent lock_intent = new Intent(this,LockedActivity.class);
+			this.startActivity(lock_intent);
+			this.finish();
+			return;
+		}
 		
+		clickable = true;
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		String uid = sp.getString("uid", "");
 		if (uid.length() == 0){
 			defaultSetting();
 		}
+		GCMUtilities.register(getBaseContext());
 	}
 	
 	protected void onStop(){
@@ -163,7 +173,8 @@ public class FragmentTabs extends FragmentActivity {
 	
 	protected void onPause(){
 		closeOptionsMenu();
-		Reuploader.cancel();
+		DataUploader.cancel();
+		GCMUtilities.unregister(getBaseContext());
 		super.onPause();
 	}
 	
@@ -339,12 +350,12 @@ public class FragmentTabs extends FragmentActivity {
 			return super.onTouchEvent(event);
 		if (event.getAction() ==MotionEvent.ACTION_DOWN){
 			long cur_time = System.currentTimeMillis();
-			if ((cur_time - latestClickTime)<400 && doubleClickState == true){
+			if ((cur_time - latestClickTime)<600 && doubleClickState){
 				doubleClickState = false;
 				openOptionsMenu();
 				latestClickTime = 0;
 				return false;
-			}else if((cur_time - latestClickTime) >= 400 || doubleClickState == false){
+			}else if((cur_time - latestClickTime) >= 600 || !doubleClickState){
 				doubleClickState = true;
 				latestClickTime = cur_time;
 				return false;

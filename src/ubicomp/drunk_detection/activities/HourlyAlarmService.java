@@ -15,6 +15,9 @@ import android.util.Log;
 
 public class HourlyAlarmService extends Service {
 
+	
+	private static final String TAG = "ALARM(HOURLY)";
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
@@ -24,7 +27,7 @@ public class HourlyAlarmService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags,int startId){
 		super.onStartCommand(intent, flags, startId);
-		Log.e("ALARM","Start AlarmService(Hourly)");
+		Log.d(TAG,"Start AlarmService(Hourly)");
 		
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
 		boolean start = sp.getBoolean("hourly_alarm", false);

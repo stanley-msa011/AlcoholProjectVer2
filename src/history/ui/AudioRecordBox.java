@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import data.database.AudioDB;
 import data.info.DateValue;
-import data.uploader.AudioUploader;
+import data.uploader.AdditionalDataUploader;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 
@@ -18,6 +18,7 @@ import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -147,7 +148,7 @@ public class AudioRecordBox {
 		contentLayout = (RelativeLayout) boxLayout.findViewById(R.id.rec_box_layout);
 		
 		help = (TextView) boxLayout.findViewById(R.id.rec_help);
-		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		help.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize.normalTextSize(context));
 		help.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (LayoutParams) help.getLayoutParams();
 		hParam.width = screen.x * 349/480;
@@ -300,7 +301,7 @@ public class AudioRecordBox {
 					} catch (IllegalStateException e) {}
 				}
 				ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
-				AudioUploader.upload(context);
+				AdditionalDataUploader.upload(context);
 				setButtonState(STATE_INIT);
 			}
 		}
@@ -326,7 +327,7 @@ public class AudioRecordBox {
 				} catch (IllegalStateException e) {}
 			}
 			ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
-			AudioUploader.upload(context);
+			AdditionalDataUploader.upload(context);
 		}
 	}
 	

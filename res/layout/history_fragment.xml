@@ -21,6 +21,15 @@
             android:src="@drawable/storytelling_button_selector"
             android:visibility="invisible" />
         
+        <ImageView 
+            android:id="@+id/history_fb_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/history_storytelling_button"
+            android:src="@drawable/fb_logo"
+            android:visibility="invisible" 
+            />
+        
     	<RelativeLayout 
         	android:id="@+id/history_book_layout"
         	android:layout_width="match_parent"

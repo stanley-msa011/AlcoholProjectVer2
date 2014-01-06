@@ -48,8 +48,8 @@ public class ServerUrl {
 			return SERVER_URL_AUDIO ;
 	} 
 	
-	private static final String SERVER_URL_RANK = "https://140.112.30.165/drunk_detection_ubicomp/userStates2.php";
-	private static final String DEVELOPER_SERVER_URL_RANK = "https://140.112.30.165/develop/drunk_detection/userStates2.php";
+	private static final String SERVER_URL_RANK = "https://140.112.30.165/drunk_detection_ubicomp/userStates3.php";
+	private static final String DEVELOPER_SERVER_URL_RANK = "https://140.112.30.165/develop/drunk_detection/userStates3.php";
 	public static String SERVER_URL_RANK (boolean develop){
 		if (develop)
 			return DEVELOPER_SERVER_URL_RANK;
@@ -111,5 +111,35 @@ public class ServerUrl {
 			return DEVELOPER_SERVER_URL_FLING;
 		else
 			return SERVER_URL_FLING ;
+	}
+	
+	private static final String SERVER_URL_GCM = "https://140.112.30.165/drunk_detection_ubicomp/GCM/register.php";
+	private static final String DEVELOPER_SERVER_URL_GCM = "https://140.112.30.165/develop/drunk_detection/GCM/register.php";
+	
+	public static String SERVER_URL_GCM(boolean develop){
+		if (develop)
+			return DEVELOPER_SERVER_URL_GCM;
+		else
+			return SERVER_URL_GCM;
+	}
+	
+	private static final String SERVER_URL_GCM_READ = "https://140.112.30.165/drunk_detection_ubicomp/GCM/read.php";
+	private static final String DEVELOPER_SERVER_URL_GCM_READ = "https://140.112.30.165/develop/drunk_detection/GCM/read.php";
+	
+	public static String SERVER_URL_GCM_READ(boolean develop){
+		if (develop)
+			return DEVELOPER_SERVER_URL_GCM_READ;
+		else
+			return SERVER_URL_GCM_READ;
+	}
+	
+	private static final String SERVER_URL_FACEBOOK = "https://140.112.30.165/drunk_detection_ubicomp/facebook.php";
+	private static final String DEVELOPER_SERVER_URL_FACEBOOK  = "https://140.112.30.165/develop/drunk_detection/facebook.php";
+	
+	public static String SERVER_URL_FACEBOOK(boolean develop){
+		if (develop)
+			return DEVELOPER_SERVER_URL_FACEBOOK;
+		else
+			return SERVER_URL_FACEBOOK;
 	}
 }

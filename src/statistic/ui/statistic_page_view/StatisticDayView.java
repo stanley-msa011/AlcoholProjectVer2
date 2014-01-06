@@ -11,6 +11,7 @@ import test.data.BracDataHandler;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.fragments.StatisticFragment;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.content.Context;
 import android.graphics.Point;
@@ -108,11 +109,11 @@ public class StatisticDayView extends StatisticPageView {
 		Point statistic_size = StatisticFragment.getStatisticPx();
 		
 		bracTitle = (TextView) view.findViewById(R.id.statistic_day_title);
-		bracTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,  statistic_size.x * 32/480);
+		bracTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,  TextSize.largeTitleSize(context));
 		bracTitle.setTypeface(wordTypefaceBold);
 		
 		bracValue = (TextView) view.findViewById(R.id.statistic_day_brac_value);
-		bracValue.setTextSize(TypedValue.COMPLEX_UNIT_PX,  statistic_size.x * 64/480);
+		bracValue.setTextSize(TypedValue.COMPLEX_UNIT_PX,  TextSize.xlargeTextSize(context));
 		bracValue.setTypeface(digitTypefaceBold);
 		
 		BracDetectionState history = db.getLatestBracDetection();
@@ -128,8 +129,7 @@ public class StatisticDayView extends StatisticPageView {
 		
 		circleImages = new ImageView[nBlocks];
 		
-		int textSize = statistic_size.x * 21/480;
-		int textSize2 = statistic_size.x * 20/480;
+		int textSize = TextSize.normalTextSize(context);
 		circleTexts =new TextView[nBlocks];
 		circleValues = new TextView[nBlocks];
 		for (int i=0;i<nBlocks;++i){
@@ -137,7 +137,7 @@ public class StatisticDayView extends StatisticPageView {
 			circleTexts[i] = new TextView(context);
 			circleValues[i] = new TextView(context); 
 			
-			circleTexts[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+			circleTexts[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			Spannable s = new SpannableString(blockHintStr[i]+"\n"+blockHintTime[i]);
 			int start = 0;
 			int end = blockHintStr[i].length()+1;
@@ -149,7 +149,7 @@ public class StatisticDayView extends StatisticPageView {
 			circleTexts[i].setGravity(Gravity.CENTER);
 			circleTexts[i].setTypeface(wordTypefaceBold);
 			
-			circleValues[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize2);
+			circleValues[i].setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 			circleValues[i].setTextColor(0xFFFFFFFF);
 			circleValues[i].setTypeface(digitTypeface);
 		}

@@ -15,6 +15,8 @@ public class BracValueFileHandler extends Handler {
 	private File directory;
 	private String timestamp;
 	
+	private static final String TAG = "BrAC_VALUE_HANDLER";
+	
 	public BracValueFileHandler(File directory, String timestamp){
 		this.directory = directory;
 		this.timestamp = timestamp;
@@ -22,7 +24,7 @@ public class BracValueFileHandler extends Handler {
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
 		} catch (IOException e) {
-			Log.d("BRAC WRITER","FAIL TO OPEN");
+			Log.d(TAG,"FAIL TO OPEN");
 			writer = null;
 		}
 	}
@@ -41,10 +43,10 @@ public class BracValueFileHandler extends Handler {
 			try {
 				writer.write(str);
 			} catch (IOException e) {
-				Log.d("BRAC WRITER","FAIL TO WRITE");
+				Log.d(TAG,"FAIL TO WRITE");
 			}
 		}else{
-			Log.d("BRAC WRITER","NULL TO WRITE");
+			Log.d(TAG,"NULL TO WRITE");
 		}
 	}
 	
@@ -53,7 +55,7 @@ public class BracValueFileHandler extends Handler {
 			try {
 				writer.close();
 			} catch (IOException e) {
-				Log.d("BRAC WRITER","FAIL TO CLOSE");
+				Log.d(TAG,"FAIL TO CLOSE");
 			}
 		}
 	}

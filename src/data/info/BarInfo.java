@@ -7,9 +7,10 @@ public class BarInfo{
 	public float emotion = 0.F,desire=0.F,brac=0.F;
 	public int week;
 	public boolean hasData;
+	public boolean drink;
 	public DateValue dv;
 	
-	public BarInfo (float emotion, float desire, float brac, int week,boolean hasData,DateValue dv){
+	public BarInfo (float emotion, float desire, float brac, int week,boolean hasData,DateValue dv, boolean drink){
 		if (emotion > 0.F)
 			this.emotion = emotion;
 		if (desire > 0)
@@ -22,5 +23,6 @@ public class BarInfo{
 		this.week = week;
 		this.hasData = hasData;
 		this.dv = dv;
+		this.drink = drink;
 	}
 }

@@ -54,18 +54,19 @@ public class CustomMenu extends PopupWindow {
 		wordTypeface = Typefaces.getWordTypeface(context);
 		
 		int x = ScreenSize.getScreenX(context);
+		int titleSize= TextSize.smallTitleTextSize(context);
 		
 		m0 = (TextView) menu.findViewById(R.id.menu_text_0);
 		m0.setTypeface(wordTypeface);
-		m0.setTextSize(TypedValue.COMPLEX_UNIT_PX, x*24/480);
+		m0.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleSize);
 		m0.getLayoutParams().height = x*209/1080;
 		m1 = (TextView) menu.findViewById(R.id.menu_text_1);
 		m1.setTypeface(wordTypeface);
-		m1.setTextSize(TypedValue.COMPLEX_UNIT_PX, x*24/480);
+		m1.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleSize);
 		m1.getLayoutParams().height = x*209/1080;
 		m2 = (TextView) menu.findViewById(R.id.menu_text_2);
 		m2.setTypeface(wordTypeface);
-		m2.setTextSize(TypedValue.COMPLEX_UNIT_PX, x*24/480);
+		m2.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleSize);
 		m2.getLayoutParams().height = x*209/1080;
 	}
 	

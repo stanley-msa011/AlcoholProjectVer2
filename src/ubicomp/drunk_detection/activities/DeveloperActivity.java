@@ -1,5 +1,6 @@
 package ubicomp.drunk_detection.activities;
 
+import ubicomp.drunk_detection.config.Config;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,7 +13,7 @@ public class DeveloperActivity extends Activity {
 	private EditText password;
 	private Button enter;
 	
-	private static final String PASSWORD = "UBICOMP_MLL336_2013"; 
+	private static final String PASSWORD = Config.PASSWORD;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

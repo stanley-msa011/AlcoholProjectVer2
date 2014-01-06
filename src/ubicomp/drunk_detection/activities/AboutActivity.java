@@ -5,6 +5,7 @@ import debug.clicklog.ClickLogger;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
 import ubicomp.drunk_detection.ui.ScreenSize;
+import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
 import android.net.Uri;
 import android.os.Build;
@@ -132,8 +133,8 @@ public class AboutActivity extends Activity {
 		
 		screen = ScreenSize.getScreenSize(this);
 		
-		int titleSize = screen.x * 24/480;
-		textSize =  screen.x * 21/480;
+		int titleSize =TextSize.smallTitleTextSize(this);
+		textSize =  TextSize.normalTextSize(this);
 		
 		int icon_size = screen.x * 106/480;
 		
@@ -215,7 +216,7 @@ public class AboutActivity extends Activity {
 		cParam.leftMargin = screen.x * 27/480;
 		cParam.topMargin = screen.x *42/480;
 		cParam.bottomMargin = screen.x *27/480;
-		copyrightText.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 16/480);
+		copyrightText.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize.smallTextSize(activity));
 		copyrightText.setTypeface(digitTypeface);
 		copyrightText.setText(COPYRIGHT);
 		
@@ -366,16 +367,17 @@ public class AboutActivity extends Activity {
 		callCancel = (TextView) callLayout.findViewById(R.id.call_cancel_button);
 		callHelp = (TextView) callLayout.findViewById(R.id.call_help);
 		
+		int textSize = TextSize.normalTextSize(activity);
 		
-		callHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callHelp.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		callHelp.setTypeface(wordTypefaceBold);
 		RelativeLayout.LayoutParams hParam = (LayoutParams) callHelp.getLayoutParams();
 		hParam.width = screen.x * 349/480;
 		hParam.height = screen.x * 114/480;
 		
-		callOK.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callOK.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		callOK.setTypeface(wordTypefaceBold);
-		callCancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, screen.x * 21/480);
+		callCancel.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 		callCancel.setTypeface(wordTypefaceBold);
 		
 		RelativeLayout.LayoutParams rParam = (LayoutParams) callOK.getLayoutParams();
@@ -477,4 +479,5 @@ private class EmailOnClickListener  implements View.OnClickListener{
 		}
 		return super.onKeyUp(keyCode, event);
 	}
+	
 }

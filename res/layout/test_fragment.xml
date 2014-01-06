@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" 
     android:id="@+id/test_fragment_main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#FF000000"
-    android:splitMotionEvents="false"
-    >
-    
+    android:splitMotionEvents="false" >
+
     <FrameLayout
-	    android:id="@+id/test_camera_preview_layout"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_centerHorizontal="true"
-	 />
-    
+        android:id="@+id/test_camera_preview_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true" />
+
     <ImageView
         android:id="@+id/test_background"
         android:layout_width="match_parent"
@@ -21,166 +19,208 @@
         android:layout_centerHorizontal="true"
         android:scaleType="centerCrop"
         android:src="@drawable/test_background" />
-    
+
     <RelativeLayout
         android:id="@+id/test_start_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-    >
+        android:layout_centerHorizontal="true" >
 
-    	<ImageView
-    	    android:id="@+id/test_start_button"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerInParent="true"
-    	    android:scaleType="fitXY"
-    	    android:src="@drawable/start_button_selector"
-    	    android:visibility="invisible" />
-    
-    	<ImageView
-    	    android:id="@+id/test_start_stroke"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerInParent="true"
-    	    android:scaleType="fitXY"
-    	    android:visibility="invisible"
-    	    android:src="@drawable/test_button_stroke" />
-    	
-    	<ImageView
-	        android:id = "@+id/test_start_circle"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:scaleType="fitXY"
-        	android:layout_centerInParent="true"
-        />
-    
-    	<ImageView
-    	    android:id="@+id/test_face"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerInParent="true"
-    	    android:scaleType="fitXY"
-    	    android:visibility="invisible"
-    	    android:src="@drawable/test_face" />
-    	
-    	<TextView
-    	    android:id="@+id/test_start_button_text"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerInParent="true"
-    	    android:gravity="center"
-    	    android:text="@string/start"
-    	    android:textColor="#FF454545" />
-    	
-    	<TextView
-    	    android:id="@+id/test_start_count_down_text"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerInParent="true"
-    	    android:gravity="center"
-    	    android:textColor="#FF2e2e2e" />
+        <ImageView
+            android:id="@+id/test_start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/start_button_selector"
+            android:visibility="invisible" />
 
+        <ImageView
+            android:id="@+id/test_start_stroke"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/test_button_stroke"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/test_start_circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:id="@+id/test_face"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/test_face"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/test_start_button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/start"
+            android:textColor="#FF454545" />
+
+        <TextView
+            android:id="@+id/test_start_count_down_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textColor="#FF2e2e2e" />
     </RelativeLayout>
-    
-	<TextView
-        android:id = "@+id/test_message"
+
+    <TextView
+        android:id="@+id/test_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-	    android:textColor="#FF989898"
-	    android:gravity="center"
-        />
-	
-	   <TextView
-    	    android:id="@+id/test_brac_value_text"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerHorizontal="true"
-    	    android:gravity="center"
-    	    android:textColor="#FFc98123" 
-    	    android:layout_below="@+id/test_start_layout"
-    	    />
-	   
-	   	<TextView
-	   	    android:id="@+id/test_brac_text"
-	   	    android:layout_width="wrap_content"
-	   	    android:layout_height="wrap_content"
-	   	    android:layout_below="@+id/test_brac_value_text"
-	   	    android:layout_centerHorizontal="true"
-	   	    android:gravity="center"
-	   	    android:text="@string/brac"
-	   	    android:textColor="#FFc98123" />
-	
-		<ImageView
-		    android:id="@+id/help_background"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_alignParentRight="true"
-		    android:scaleType="fitXY"
-		    android:src="@drawable/test_tutorial_button" />
-	
-	<!--  Used for Debugging -->
-	<ScrollView
-	    android:id="@+id/debugView"
-	    android:layout_width="match_parent"
-	    android:layout_height="150dp"
-	    android:layout_alignParentBottom="true"
-	    android:visibility="invisible"
-	    android:layout_marginBottom="50dp"
-	  >
+        android:gravity="center"
+        android:textColor="#FF989898" />
 
-	    <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content" >
+    <TextView
+        android:id="@+id/test_brac_value_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/test_start_layout"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:textColor="#FFc98123" />
 
-	        <EditText
-	            android:visibility="invisible"
-	            android:id="@+id/debug_msg"
-	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content"
-	            android:freezesText="true"
-	            android:inputType="textMultiLine"
-	            android:textColor="#FFFFFFFF" />
+    <TextView
+        android:id="@+id/test_brac_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/test_brac_value_text"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="@string/brac"
+        android:textColor="#FFc98123" />
 
-	    </LinearLayout>
-	</ScrollView>
-	
-	<Button 
-	    android:id="@+id/condition_button_1"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="1"
-	    android:layout_alignParentTop="true"
-	    android:layout_alignParentLeft="true"
-	    android:visibility="invisible"
-	    />
-	<Button 
-	    android:id="@+id/condition_button_2"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="2"
-	    android:layout_below="@+id/condition_button_1"
-	    android:layout_alignParentLeft="true"
-	    android:visibility="invisible"
-	    />
-	<Button 
-	    android:id="@+id/condition_button_3"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="3"
-	    android:layout_below="@+id/condition_button_2"
-	    android:layout_alignParentLeft="true"
-	    android:visibility="invisible"
-	    />
-	<Button 
-	    android:id="@+id/condition_button_4"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="4"
-	    android:layout_below="@+id/condition_button_3"
-	    android:layout_alignParentLeft="true"
-	    android:visibility="invisible"
-	    />
-	
+    <ImageView
+        android:id="@+id/help_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/test_tutorial_button" />
+
+    <!-- Used for Debugging -->
+
+    <RelativeLayout
+        android:id="@+id/debugLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true" >
+
+        <TextView
+            android:id="@+id/debug_mode_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFFFF" />
+
+        <LinearLayout
+            android:id="@+id/debugButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/debug_mode_text" >
+
+            <Button
+                android:id="@+id/debug_button_1"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="1" />
+
+            <Button
+                android:id="@+id/debug_button_2"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="2" />
+
+            <Button
+                android:id="@+id/debug_button_3"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="3" />
+
+            <Button
+                android:id="@+id/debug_button_4"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="4" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/debugButtons" >
+
+            <Button
+                android:id="@+id/debug_voltage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Vol" />
+
+            <Button
+                android:id="@+id/debug_mode_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A0-A1 : "
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/debug_voltage_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NULL"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/debug_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="60dp"
+            android:background="#FF000000" >
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <EditText
+                    android:id="@+id/debug_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:focusable="false"
+                    android:freezesText="true"
+                    android:inputType="textMultiLine"
+                    android:textColor="#FFFFFFFF" />
+            </FrameLayout>
+        </ScrollView>
+    </RelativeLayout>
+
 </RelativeLayout>
