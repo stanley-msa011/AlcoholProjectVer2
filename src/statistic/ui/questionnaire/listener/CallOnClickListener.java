@@ -2,7 +2,7 @@ package statistic.ui.questionnaire.listener;
 
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
@@ -12,7 +12,7 @@ public class CallOnClickListener extends QuestionnaireOnClickListener {
 	private String phone;
 	private boolean isEmotion = false;
 	
-	public CallOnClickListener(QuestionMsgBox msgBox,String phone, boolean isEmotion) {
+	public CallOnClickListener(QuestionnaireBox msgBox,String phone, boolean isEmotion) {
 		super(msgBox);
 		this.phone = phone;
 		this.isEmotion = isEmotion;

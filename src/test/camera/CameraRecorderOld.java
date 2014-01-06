@@ -2,18 +2,18 @@ package test.camera;
 
 import java.util.List;
 
+import android.content.Context;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import test.data.ImageFileHandler;
-import ubicomp.drunk_detection.fragments.TestFragment;
 
 public class CameraRecorderOld extends CameraRecorder {
 
-	public CameraRecorderOld(TestFragment testFragment,
+	public CameraRecorderOld(Context context,CameraCaller caller,
 			ImageFileHandler imgFileHandler) {
-		super(testFragment, imgFileHandler);
+		super(context, caller, imgFileHandler);
 	}
 
     public void init(){

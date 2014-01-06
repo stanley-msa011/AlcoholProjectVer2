@@ -12,7 +12,6 @@ import test.camera.CameraRunHandler;
 import test.data.BracPressureHandler;
 import test.data.BracValueFileHandler;
 import ubicomp.drunk_detection.activities.R;
-import ubicomp.drunk_detection.fragments.TestFragment;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -88,7 +87,7 @@ public class Bluetooth {
 	protected CameraRunHandler cameraRunHandler;
 	protected BracValueFileHandler bracFileHandler;
 	
-	protected TestFragment testFragment;
+	//protected TestFragment testFragment;
 	
 	protected float show_value = 0.f;
 	
@@ -114,18 +113,18 @@ public class Bluetooth {
 	private long sound_time = 0;
 	
 	protected boolean btEnabledBeforeStart = true;
+	protected BluetoothDebugger debugger;
 	
-	
-	public Bluetooth(TestFragment testFragment, CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler,boolean recordPressure){
-		this.testFragment = testFragment;
-		this.context = testFragment.getActivity();
+	public Bluetooth(Context context, BluetoothDebugger debugger, BluetoothMessageUpdater updater,CameraRunHandler cameraRunHandler,BracValueFileHandler bracFileHandler,boolean recordPressure){
+		this.debugger = debugger;
+		this.context = context;
 		this.cameraRunHandler = cameraRunHandler;
 		this.bracFileHandler = bracFileHandler;
 		btAdapter =  BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null)
 			Log.e(TAG,"THE DEVICE DOES NOT SUPPORT BLUETOOTH");
 		now_pressure = 0.f;
-		btUIHandler=new BTUIHandler(testFragment);
+		btUIHandler=new BTUIHandler(updater);
 		start = false;
 		sp= PreferenceManager.getDefaultSharedPreferences(context);
 		sp_editor = sp.edit();
@@ -249,7 +248,7 @@ public class Bluetooth {
 		try {
 			int counter = 0;
 			while (true){
-				testFragment.showDebug("start_to_send 'y'");
+				debugger.showDebug("start_to_send 'y'");
 				out = socket.getOutputStream();
 				in = socket.getInputStream();
 				for (int i=0;i<5;++i)
@@ -262,12 +261,12 @@ public class Bluetooth {
 				try {
 					t2.join();
 					if (!connected){
-						testFragment.showDebug("no ack");
+						debugger.showDebug("no ack");
 						t1.join(1);
 						++counter;
 					}
 					else{
-						testFragment.showDebug("ack");
+						debugger.showDebug("ack");
 						t1.join();
 						break;
 					}

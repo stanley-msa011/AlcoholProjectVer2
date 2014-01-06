@@ -57,8 +57,8 @@ public class StatisticMonthView extends StatisticPageView {
 	
 	private static final float ALPHA = 0.4F; 
 	
-	public StatisticMonthView(Context context,StatisticFragment statisticFragment) {
-		super(context, R.layout.statistic_month_view, statisticFragment);
+	public StatisticMonthView(Context context) {
+		super(context, R.layout.statistic_month_view);
 		db = new HistoryDB(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);

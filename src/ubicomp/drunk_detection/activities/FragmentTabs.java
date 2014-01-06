@@ -113,8 +113,7 @@ public class FragmentTabs extends FragmentActivity {
 		fragments = new Fragment[3];
 		tabHost.setOnTabChangedListener(new TabChangeListener());
 		
-		tabHost.setCurrentTab(1);
-		tabHost.setCurrentTab(0);
+		setDefaultTab();
 		
 		loadingPageHandler = new LoadingPageHandler();
 		t = new Thread(new TimerRunnable());
@@ -144,6 +143,7 @@ public class FragmentTabs extends FragmentActivity {
 		DataUploader.upload(this);
 		ClickLogUploader.upload(this);
 		Intent a_intent = new Intent(this,RegularCheckService.class);
+		GCMUtilities.register(getBaseContext());
 		this.startService(a_intent);
 		super.onStart();
 	}
@@ -162,11 +162,11 @@ public class FragmentTabs extends FragmentActivity {
 		if (uid.length() == 0){
 			defaultSetting();
 		}
-		GCMUtilities.register(getBaseContext());
 	}
 	
 	protected void onStop(){
 		context = null;
+		GCMUtilities.unregister(getBaseContext());
 		super.onStop();
 	}
 	
@@ -174,7 +174,6 @@ public class FragmentTabs extends FragmentActivity {
 	protected void onPause(){
 		closeOptionsMenu();
 		DataUploader.cancel();
-		GCMUtilities.unregister(getBaseContext());
 		super.onPause();
 	}
 	
@@ -203,12 +202,32 @@ public class FragmentTabs extends FragmentActivity {
 		}
 	}
 	
+	public void setDefaultTab(){
+		ClickLogger.Log(getBaseContext(), ClickLogId.TAB_TEST);
+		ft = fm.beginTransaction();
+		
+		for (int i = 0; i < fragments.length; ++i) {
+			if (fragments[i] != null)
+				ft.detach(fragments[i]);
+		}
+		if (fragments[0] == null) {
+				if (fragments[0] != null)
+					ft.remove(fragments[0]);
+				fragments[0] = new TestFragment();
+			ft.add(R.id.real_tabcontent, fragments[0], tabName[0]);
+		} else {
+			ft.attach(fragments[0]);
+		}
+		setTabState(tabName[0]);
+		ft.commit();
+	}
+	
     public class TabChangeListener implements TabHost .OnTabChangeListener{
 
     	private String lastTabId;
     	
     	public TabChangeListener(){
-    		 lastTabId = "null";
+    		 lastTabId =tabName[0];
     	}
     	
 		@Override

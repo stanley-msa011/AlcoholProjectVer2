@@ -2,7 +2,7 @@ package statistic.ui.questionnaire.content;
 
 import java.util.Random;
 
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.listener.EndOnClickListener;
 import ubicomp.drunk_detection.activities.R;
 
@@ -10,7 +10,7 @@ public class Type0Content extends QuestionnaireContent {
 
 	private static String[] help,next;
 	
-	public Type0Content(QuestionMsgBox msgBox) {
+	public Type0Content(QuestionnaireBox msgBox) {
 		super(msgBox);
 		if (help==null)
 			help = msgBox.getContext().getResources().getStringArray(R.array.question_type0_help);

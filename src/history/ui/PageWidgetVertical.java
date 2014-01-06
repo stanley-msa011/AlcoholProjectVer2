@@ -184,8 +184,6 @@ public class PageWidgetVertical extends View {
 
 		rotateDegrees = (float) Math.toDegrees(Math.atan2(touch.x - BezierControl1.x, BezierControl1.y - touch.y));
 		canvas.rotate(rotateDegrees, BezierControl1.x, BezierControl1.y);
-		//currentPageShadow.setBounds(leftx,(int) (BezierControl1.y - maxLength), rightx,(int) (BezierControl1.y));
-		//currentPageShadow.draw(canvas);
 		canvas.restore();
 
 		path1.reset();

@@ -78,8 +78,8 @@ public class StatisticDayView extends StatisticPageView {
 	};
 	
 	private int e_idx, d_idx;
-	public StatisticDayView(Context context,StatisticFragment statisticFragment){
-		super(context,R.layout.statistic_day_view,statisticFragment);
+	public StatisticDayView(Context context){
+		super(context,R.layout.statistic_day_view);
 		db = new HistoryDB(context);
 		digitTypeface = Typefaces.getDigitTypeface(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);

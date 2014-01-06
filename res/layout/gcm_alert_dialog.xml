@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/msg_bg" >
+
+    <TextView
+        android:id="@+id/gcm_alert_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name" 
+        android:textColor="#FF000000"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:textSize="24sp"
+        />
+    
+    <ScrollView
+        android:id="@+id/gcm_scroll_view"
+        android:layout_marginTop="20dp"
+        android:layout_width="220dp"
+        android:layout_height="280dp"
+        android:layout_below="@+id/gcm_alert_title" 
+        android:layout_centerHorizontal="true"
+        >
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+            <TextView
+            android:id="@+id/gcm_text"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:textColor="#FF000000"
+            android:textSize="18sp"
+            />
+        </FrameLayout>
+
+    </ScrollView>
+
+    	<TextView
+        	android:id="@+id/gcm_alert_ok"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="@string/ok" 
+        	android:padding="10dp"
+        	android:textColor="#FF000000"
+	        android:layout_marginTop="20dp"
+        	android:layout_below="@+id/gcm_scroll_view"
+        	android:layout_centerHorizontal="true"
+        	android:textSize="24sp"
+        />
+    
+</RelativeLayout>

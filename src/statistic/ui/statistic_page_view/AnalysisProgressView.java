@@ -33,8 +33,8 @@ public class AnalysisProgressView extends StatisticPageView {
 	
 	private String[] helpStr;
 	
-	public AnalysisProgressView(Context context,StatisticFragment statisticFragment){
-		super(context, R.layout.analysis_progress_view,statisticFragment);
+	public AnalysisProgressView(Context context){
+		super(context, R.layout.analysis_progress_view);
 		SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 		wordTypeface = Typefaces.getWordTypeface(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);

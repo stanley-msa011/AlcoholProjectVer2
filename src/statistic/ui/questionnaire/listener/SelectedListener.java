@@ -2,7 +2,7 @@ package statistic.ui.questionnaire.listener;
 
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.content.QuestionnaireContent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -10,11 +10,11 @@ import android.widget.ImageView;
 
 public class SelectedListener implements OnClickListener {
 
-	private QuestionMsgBox msgBox;
+	private QuestionnaireBox msgBox;
 	private View.OnClickListener listener;
 	private int str_id;
 	
-	public SelectedListener(QuestionMsgBox msgBox, View.OnClickListener listener,int str_id){
+	public SelectedListener(QuestionnaireBox msgBox, View.OnClickListener listener,int str_id){
 		this.msgBox = msgBox;
 		this.listener = listener;
 		this.str_id = str_id;

@@ -55,8 +55,8 @@ public class StatisticMonthViewOld extends StatisticPageView {
 	
 	private Calendar startDate;
 	
-	public StatisticMonthViewOld(Context context,StatisticFragment statisticFragment) {
-		super(context, R.layout.statistic_month_view_old, statisticFragment);
+	public StatisticMonthViewOld(Context context) {
+		super(context, R.layout.statistic_month_view_old);
 		db = new HistoryDB(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);

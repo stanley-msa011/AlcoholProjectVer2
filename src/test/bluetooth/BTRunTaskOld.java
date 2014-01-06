@@ -1,15 +1,15 @@
 package test.bluetooth;
 
-import ubicomp.drunk_detection.fragments.TestFragment;
+import test.Tester;
 import android.os.AsyncTask;
 
 public class BTRunTaskOld extends AsyncTask<Void, Void, Void> {
 
-	private TestFragment testFragment;
+	private BluetoothCaller btCaller;
 	private Bluetooth bt;
 	
-	public BTRunTaskOld(TestFragment a,Bluetooth bt){
-		this.testFragment = a;
+	public BTRunTaskOld(BluetoothCaller caller,Bluetooth bt){
+		this.btCaller = caller;
 		this.bt = bt;
 	}
 	
@@ -23,6 +23,6 @@ public class BTRunTaskOld extends AsyncTask<Void, Void, Void> {
 	}
 	
 	protected void onPostExecute(Void result) {
-		testFragment.updateDoneState(TestFragment._BT);
+		btCaller.updateDoneState(Tester._BT);
    }
 }

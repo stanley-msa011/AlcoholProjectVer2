@@ -1,21 +1,21 @@
 package test.camera;
 
-import ubicomp.drunk_detection.fragments.TestFragment;
+import test.Tester;
 import android.os.Handler;
 import android.os.Message;
 
 public class CameraInitHandler extends Handler {
 	
-	private TestFragment testFragment;
+	private Tester tester;
 	private CameraRecorder cameraRecorder;
 	
-	public CameraInitHandler(TestFragment testFragment,CameraRecorder cameraRecorder){
-		this.testFragment = testFragment;
+	public CameraInitHandler(Tester tester,CameraRecorder cameraRecorder){
+		this.tester = tester;
 		this.cameraRecorder = cameraRecorder;
 	}
 	
 	public void handleMessage(Message msg){
 		cameraRecorder.init();
-		testFragment.updateInitState(TestFragment._CAMERA);
+		tester.updateInitState(Tester._CAMERA);
 	}
 }

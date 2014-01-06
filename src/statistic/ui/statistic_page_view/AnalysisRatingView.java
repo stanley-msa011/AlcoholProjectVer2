@@ -9,6 +9,7 @@ import data.info.RankHistoryDetail;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 import statistic.data.UserLevelCollector;
+import statistic.ui.ShowRadarChart;
 import ubicomp.drunk_detection.activities.R;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -55,8 +56,11 @@ public class AnalysisRatingView extends StatisticPageView {
 
 	private RelativeLayout titleLayout;
 	
-	public AnalysisRatingView(Context context,StatisticFragment statisticFragment) {
-		super(context, R.layout.analysis_rating_view,statisticFragment);
+	private ShowRadarChart showRadarChart;
+	
+	public AnalysisRatingView(Context context,ShowRadarChart showRadarChart) {
+		super(context, R.layout.analysis_rating_view);
+		this.showRadarChart = showRadarChart;
 		db = new HistoryDB(context);
 		helpStr = context.getResources().getStringArray(R.array.analysis_ranking_help);
 		wordTypeface = Typefaces.getWordTypeface(context);
@@ -290,7 +294,7 @@ public class AnalysisRatingView extends StatisticPageView {
 			@Override
 			public void onClick(View arg0) {
 				ClickLogger.Log(context, ClickLogId.STATISTIC_RANK_SHOW_CLICK);
-				statisticFragment.showRadarChart(calculateRank());
+				showRadarChart.showRadarChart(calculateRank());
 			}
 		});
 		

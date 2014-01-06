@@ -1,13 +1,13 @@
 package statistic.ui.questionnaire.content;
 
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.listener.SelectedListener;
 import statistic.ui.questionnaire.listener.SituationOnClickListener;
 import ubicomp.drunk_detection.activities.R;
 
 public class SelfHelpContent extends QuestionnaireContent {
 
-	public SelfHelpContent(QuestionMsgBox msgBox) {
+	public SelfHelpContent(QuestionnaireBox msgBox) {
 		super(msgBox);
 	}
 

@@ -3,13 +3,13 @@ package statistic.ui.questionnaire.listener;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 import android.view.View;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 
 public class EndOnClickListener extends QuestionnaireOnClickListener {
 
 	private int aid;
 	
-	public EndOnClickListener(QuestionMsgBox msgBox, int aid) {
+	public EndOnClickListener(QuestionnaireBox msgBox, int aid) {
 		super(msgBox);
 		this.aid = aid;
 	}

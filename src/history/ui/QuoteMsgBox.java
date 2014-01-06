@@ -5,8 +5,8 @@ import data.uploader.DataUploader;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 import ubicomp.drunk_detection.activities.R;
-import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.CustomToast;
+import ubicomp.drunk_detection.ui.EnablePage;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
@@ -29,7 +29,7 @@ import android.widget.TextView;
 public class QuoteMsgBox {
 
 	
-	private HistoryFragment historyFragment;
+	private EnablePage enablePage;
 	private Context context;
 	private LayoutInflater inflater;
 	private LinearLayout boxLayout = null;
@@ -44,9 +44,9 @@ public class QuoteMsgBox {
 	private AdditionalDB aDB;
 	private String[] learningArray;
 	
-	public QuoteMsgBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
-		this.historyFragment = historyFragment;
-		this.context = historyFragment.getActivity();
+	public QuoteMsgBox(Context context,EnablePage enablePage,RelativeLayout mainLayout){
+		this.enablePage = enablePage;
+		this.context = context;
 		this.r = context.getResources();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
@@ -108,7 +108,7 @@ public class QuoteMsgBox {
 	
 	
 	public void openBox(int page){
-		historyFragment.enablePage(false);
+		enablePage.enablePage(false);
 		shadow.setVisibility(View.VISIBLE);
 		shadow.setKeepScreenOn(true);
 		boxLayout.setVisibility(View.VISIBLE);
@@ -134,7 +134,7 @@ public class QuoteMsgBox {
 	}
 	
 	public void closeBox(){
-		historyFragment.enablePage(true);
+		enablePage.enablePage(true);
 		shadow.setVisibility(View.INVISIBLE);
 		shadow.setKeepScreenOn(false);
 		boxLayout.setVisibility(View.INVISIBLE);

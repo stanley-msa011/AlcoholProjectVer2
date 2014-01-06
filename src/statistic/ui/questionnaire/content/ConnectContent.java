@@ -2,7 +2,7 @@ package statistic.ui.questionnaire.content;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.listener.CallCheckOnClickListener;
 import statistic.ui.questionnaire.listener.EndOnClickListenerNoInput;
 import statistic.ui.questionnaire.listener.SelectedListener;
@@ -13,7 +13,7 @@ public class ConnectContent extends QuestionnaireContent {
 	private int type;
 	public static final int TYPE_FAMILY = 2, TYPE_SOCIAL = 3;
 	
-	public ConnectContent(QuestionMsgBox msgBox,int type) {
+	public ConnectContent(QuestionnaireBox msgBox,int type) {
 		super(msgBox);
 		this.type = type;
 	}

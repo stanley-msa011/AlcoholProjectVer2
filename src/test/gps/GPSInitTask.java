@@ -1,19 +1,18 @@
 package test.gps;
 
-import ubicomp.drunk_detection.fragments.TestFragment;
-import android.content.Intent;
+import android.content.Context;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 
 public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 
-	private TestFragment testFragment;
 	private LocationManager locationManager;
 	private GPSToastHandler tHandler;
-	public GPSInitTask(TestFragment a,LocationManager lm){
-		testFragment = a;
+	private GPSInterface gpsInterface;
+	public GPSInitTask(Context context, GPSInterface gps,LocationManager lm){
+		gpsInterface = gps;
 		locationManager = lm;
-		tHandler = new GPSToastHandler(testFragment.getActivity());
+		tHandler = new GPSToastHandler(context);
 	}
 	
 	@Override
@@ -25,9 +24,8 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 			boolean network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 			if (!network_enabled || !gps_enabled){
 				newIntent = true;
-				testFragment.setKeepMsgBox(true);
-				Intent gpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-				testFragment.startActivityForResult(gpsIntent, TestFragment._GPS);
+				gpsInterface.setKeepMsgBox(true);
+				gpsInterface.callGPSActivity();
 				tHandler.sendEmptyMessage(0);
 			}
 		}
@@ -38,7 +36,7 @@ public class GPSInitTask extends AsyncTask<Object, Void, Boolean> {
 	 protected void onPostExecute(Boolean result) {
 		locationManager = null;
 		if (!result.booleanValue()){
-			testFragment.runGPS();
+			gpsInterface.runGPS();
 		}
      }
 	

@@ -41,8 +41,8 @@ public class AnalysisCounterView extends StatisticPageView {
 	private AlphaAnimation animation;
 	private Spannable helpSpannable;
 	
-	public AnalysisCounterView(Context context,StatisticFragment statisticFragment){
-		super(context, R.layout.analysis_counter_view,statisticFragment);
+	public AnalysisCounterView(Context context){
+		super(context, R.layout.analysis_counter_view);
 		hdb = new HistoryDB(context);
     	qdb = new QuestionDB(context);
     	adb = new AudioDB(context);

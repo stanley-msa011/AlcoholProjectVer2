@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
 import statistic.ui.questionnaire.listener.SelectedListener;
 import statistic.ui.questionnaire.listener.SelfOnClickListener;
@@ -15,7 +15,7 @@ import ubicomp.drunk_detection.activities.R;
 
 public class Type2Content extends QuestionnaireContent {
 
-	public Type2Content(QuestionMsgBox msgBox) {
+	public Type2Content(QuestionnaireBox msgBox) {
 		super(msgBox);
 	}
 

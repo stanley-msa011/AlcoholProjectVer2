@@ -11,6 +11,7 @@ import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.config.Config;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
+import ubicomp.drunk_detection.ui.EnablePage;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.TextSize;
@@ -26,13 +27,17 @@ import data.info.DateBracDetectionState;
 import data.info.DateValue;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
+import history.ui.ChartView;
+import history.ui.PageAnimationCaller;
 import history.ui.HistoryStorytelling;
 import history.ui.AudioRecordBox;
 import history.ui.PageAnimationTaskVertical;
 import history.ui.PageAnimationTaskVerticalFling;
 import history.ui.PageWidgetVertical;
 import history.ui.QuoteMsgBox;
+import history.ui.AudioRecordBoxCallee;
 import history.ui.StorytellingBox;
+import history.ui.RecorderCaller;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -44,8 +49,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Paint.Style;
-import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Typeface;
@@ -78,7 +81,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements AudioRecordBoxCallee,EnablePage, PageAnimationCaller, RecorderCaller {
 
 	private View view;
 
@@ -98,27 +101,19 @@ public class HistoryFragment extends Fragment {
 	private HorizontalScrollView scrollView;
 
 	private Point screen;
-
-	private int NUM_OF_BARS;
-
-	private ArrayList<DateValue> selected_dates;
-	private ArrayList<Integer> selected_idx;
 	private ArrayList<DateBracDetectionState> historys;;
 	private ArrayList<BarInfo> bars;
 	private ArrayList<Boolean> hasAudio;
 
+	private int NUM_OF_BARS;
+	private int page_week;
+	
 	private ChartView chart;
 	private ChartTitleView chartTitle;
 	private ChartYAxisView chartYAxis;
 	private ChartLabelView chartLabel;
-
-	private int bar_width;
-	private int bar_gap;
-	private int chart_width;
+	private int chartWidth;
 	private int chartHeight;
-	private int bar_bottom;
-	private int bar_left;
-	private int circle_radius;
 
 	private GestureDetector gDetector;
 	private GestureListener gListener;
@@ -130,12 +125,10 @@ public class HistoryFragment extends Fragment {
 
 	private Bitmap cur_bg_bmp, next_bg_bmp;
 
-	private PointF touchPoint;
 	private PointF from, to;
 	private HistoryFragment historyFragment;
 
-	private int page_week;
-	private PointF curPageTouch;
+	
 	private LoadingHandler loadHandler;
 
 	private Typeface wordTypefaceBold, digitTypeface, digitTypefaceBold;
@@ -147,8 +140,6 @@ public class HistoryFragment extends Fragment {
 	private Calendar from_cal;
 	private Calendar to_cal;
 
-	private Bitmap chartPlayBmp;
-
 	private int max_week;
 	private boolean chartTouchable = true;
 
@@ -156,7 +147,6 @@ public class HistoryFragment extends Fragment {
 	private StorytellingBox storytellingBox;
 
 	private Drawable chartBg1Drawable, chartBg2Drawable, chartBg3Drawable, chartBg4Drawable;
-	private Bitmap chartCircleBmp;
 
 	private AccumulatedHistoryState[] page_states;
 
@@ -168,7 +158,7 @@ public class HistoryFragment extends Fragment {
 
 	private ScrollToHandler scrollToHandler;
 
-	private ImageView storytellingButton,fbButton;
+	private ImageView storytellingButton, fbButton;
 	private StorytellingOnClickListener storytellingOnClickListener;
 
 	private int received_msg = 0;
@@ -255,7 +245,6 @@ public class HistoryFragment extends Fragment {
 		page_height = screen.y - bg_x * 574 / 1080;
 		from = new PointF(page_width, page_height);
 		to = new PointF(page_width / 2, -page_height);
-		touchPoint = new PointF(from.x, from.y);
 
 		pageLayout = (RelativeLayout) view.findViewById(R.id.history_book_layout);
 		chartLayout = (RelativeLayout) view.findViewById(R.id.history_content_layout);
@@ -265,8 +254,8 @@ public class HistoryFragment extends Fragment {
 		quoteHiddenText = (TextView) view.findViewById(R.id.history_quote_hidden_text);
 		quoteNextButton = (ImageView) view.findViewById(R.id.history_quote_hidden_button);
 		quoteScrollView = (ScrollView) view.findViewById(R.id.history_quote_scroll_view);
-		fbButton = (ImageView)view.findViewById(R.id.history_fb_button);
-		
+		fbButton = (ImageView) view.findViewById(R.id.history_fb_button);
+
 		int textSize = TextSize.normalTextSize(activity);
 		stageLayout = (RelativeLayout) view.findViewById(R.id.history_stage_message_layout);
 		stageMessage = (TextView) view.findViewById(R.id.history_stage);
@@ -290,21 +279,20 @@ public class HistoryFragment extends Fragment {
 		storytellingOnClickListener = new StorytellingOnClickListener();
 		storytellingButton.setOnClickListener(storytellingOnClickListener);
 
-		fbButton.setOnClickListener(
-				new OnClickListener(){
-					@Override
-					public void onClick(View arg0) {
-						ClickLogger.Log(activity, ClickLogId.STORYTELLING_FB_SHARE_BUTTON_CLICK);
-						Intent intent = new Intent(getActivity(),FacebookActivity.class);
-						intent.putExtra("image_week", page_week);
-						intent.putExtra("image_score", page_states[page_week].getScore());
-						getActivity().startActivity(intent);
-					}
-				});
-		
+		fbButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				ClickLogger.Log(activity, ClickLogId.STORYTELLING_FB_SHARE_BUTTON_CLICK);
+				Intent intent = new Intent(getActivity(), FacebookActivity.class);
+				intent.putExtra("image_week", page_week);
+				intent.putExtra("image_score", page_states[page_week].getScore());
+				getActivity().startActivity(intent);
+			}
+		});
+
 		LayoutParams fbParam = (LayoutParams) fbButton.getLayoutParams();
-		fbParam.rightMargin = bg_x*10/480;
-		
+		fbParam.rightMargin = bg_x * 10 / 480;
+
 		LayoutParams sParam = (LayoutParams) stageLayout.getLayoutParams();
 		sParam.leftMargin = bg_x * 10 / 480;
 		sParam.topMargin = bg_x * 60 / 480;
@@ -323,12 +311,10 @@ public class HistoryFragment extends Fragment {
 		quoteScrollListener = new QuoteScrollListener();
 		quoteScrollView.setOnTouchListener(quoteScrollListener);
 
-		LinearLayout.LayoutParams qTextParam = (LinearLayout.LayoutParams) quoteText
-				.getLayoutParams();
+		LinearLayout.LayoutParams qTextParam = (LinearLayout.LayoutParams) quoteText.getLayoutParams();
 		qTextParam.height = bg_x * 64 / 480;
 
-		LinearLayout.LayoutParams qHiddenParam = (LinearLayout.LayoutParams) quoteHiddenLayout
-				.getLayoutParams();
+		LinearLayout.LayoutParams qHiddenParam = (LinearLayout.LayoutParams) quoteHiddenLayout.getLayoutParams();
 		qHiddenParam.height = bg_x * 64 / 480;
 		quoteHiddenLayout.setPadding(0, 0, bg_x * 30 / 480, 0);
 
@@ -341,8 +327,8 @@ public class HistoryFragment extends Fragment {
 	public void onResume() {
 		super.onResume();
 		RelativeLayout r = (RelativeLayout) view;
-		recordBox = new AudioRecordBox(this, r);
-		storytellingBox = new StorytellingBox(this, r);
+		recordBox = new AudioRecordBox(this.getActivity(),this, r);
+		storytellingBox = new StorytellingBox(this.getActivity(),this, r);
 		if (loadHandler == null)
 			loadHandler = new LoadingHandler();
 		loadHandler.sendEmptyMessage(0);
@@ -357,8 +343,6 @@ public class HistoryFragment extends Fragment {
 			storytellingBox.clear();
 		if (scrollToHandler != null)
 			scrollToHandler.removeMessages(0);
-		selected_dates.clear();
-		selected_idx.clear();
 		historys.clear();
 		bars.clear();
 		hasAudio.clear();
@@ -396,7 +380,8 @@ public class HistoryFragment extends Fragment {
 		chartAreaLayout.removeView(chartTitle);
 		chartAreaLayout.removeView(chartLabel);
 
-		pageWidget.setBitmaps(null, null);
+		if (pageWidget!=null)
+			pageWidget.setBitmaps(null, null);
 
 		if (loadHandler != null)
 			loadHandler.removeMessages(0);
@@ -418,18 +403,10 @@ public class HistoryFragment extends Fragment {
 			next_bg_bmp.recycle();
 			next_bg_bmp = null;
 		}
-		if (chartCircleBmp != null && !chartCircleBmp.isRecycled()) {
-			chartCircleBmp.recycle();
-			chartCircleBmp = null;
-		}
 		if (pageWidget != null) {
 			pageWidget.destroyDrawingCache();
 			pageWidget.clear();
 			pageWidget = null;
-		}
-		if (chartPlayBmp != null && !chartPlayBmp.isRecycled()) {
-			chartPlayBmp.recycle();
-			chartPlayBmp = null;
 		}
 		System.gc();
 	}
@@ -439,8 +416,6 @@ public class HistoryFragment extends Fragment {
 
 		scrollView.setSmoothScrollingEnabled(true);
 		pageWidget = new PageWidgetVertical(activity, page_width, page_height);
-
-		curPageTouch = touchPoint;
 
 		Resources r = activity.getResources();
 
@@ -455,21 +430,13 @@ public class HistoryFragment extends Fragment {
 		if (chartBg4Drawable == null)
 			chartBg4Drawable = r.getDrawable(R.drawable.chart_bg4);
 
-		if (chartCircleBmp == null || chartCircleBmp.isRecycled())
-			chartCircleBmp = BitmapFactory.decodeResource(r, R.drawable.chart_circle);
-		if (chartPlayBmp == null || chartPlayBmp.isRecycled())
-			chartPlayBmp = BitmapFactory.decodeResource(r, R.drawable.chart_play);
-		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 		pageLayout.addView(pageWidget);
 		LayoutParams param = (LayoutParams) pageWidget.getLayoutParams();
 		param.width = page_width;
 		param.height = page_height;
 
-		
 		// Set chart
-		RelativeLayout.LayoutParams scrollParam = (RelativeLayout.LayoutParams) scrollView
-				.getLayoutParams();
+		RelativeLayout.LayoutParams scrollParam = (RelativeLayout.LayoutParams) scrollView.getLayoutParams();
 		scrollParam.width = screen.x;
 		scrollParam.height = chart_height;
 
@@ -480,38 +447,39 @@ public class HistoryFragment extends Fragment {
 		settingBars();
 		checkHasRecorder();
 
-		chart = new ChartView(activity);
-
 		chartHeight = chart_height;
-		chart_width = bar_left * 3 / 2 + (bar_width + bar_gap) * NUM_OF_BARS;
-		if (chart_width < screen.x)
-			chart_width = screen.x;
+
+		chart = new ChartView(activity.getBaseContext(), bars, page_week, hasAudio, chartHeight, scrollView,historyFragment);
+
+		chartWidth = chart.getChartWidth();
+		if (chartWidth < screen.x)
+			chartWidth = screen.x;
 
 		chartLayout.addView(chart);
-		RelativeLayout.LayoutParams chartParam = (RelativeLayout.LayoutParams) chart
-				.getLayoutParams();
-		chartParam.width = chart_width;
+
+		RelativeLayout.LayoutParams chartParam = (RelativeLayout.LayoutParams) chart.getLayoutParams();
+		chartParam.width = chartWidth;
 		chartParam.height = chart_height;
+
+		chartLayout.invalidate();
+		chartLayout.updateViewLayout(chart, chartParam);
 
 		chartYAxis = new ChartYAxisView(activity);
 		chartAreaLayout.addView(chartYAxis);
-		RelativeLayout.LayoutParams chartYParam = (RelativeLayout.LayoutParams) chartYAxis
-				.getLayoutParams();
+		RelativeLayout.LayoutParams chartYParam = (RelativeLayout.LayoutParams) chartYAxis.getLayoutParams();
 		chartYParam.width = screen.x * 94 / 1080;
 		chartYParam.height = chartParam.height;
 
 		chartTitle = new ChartTitleView(activity);
 		chartAreaLayout.addView(chartTitle);
-		RelativeLayout.LayoutParams chartTitleParam = (RelativeLayout.LayoutParams) chartTitle
-				.getLayoutParams();
+		RelativeLayout.LayoutParams chartTitleParam = (RelativeLayout.LayoutParams) chartTitle.getLayoutParams();
 		chartTitleParam.width = screen.x;
 		chartTitleParam.height = screen.x * 100 / 1080;
 		chartTitleParam.topMargin = screen.x * 35 / 1080;
 
 		chartLabel = new ChartLabelView(activity);
 		chartAreaLayout.addView(chartLabel, 0);
-		RelativeLayout.LayoutParams chartLabelParam = (RelativeLayout.LayoutParams) chartLabel
-				.getLayoutParams();
+		RelativeLayout.LayoutParams chartLabelParam = (RelativeLayout.LayoutParams) chartLabel.getLayoutParams();
 		chartLabelParam.width = screen.x * 540 / 1080;
 		chartLabelParam.height = screen.x * 90 / 1080;
 		chartLabelParam.topMargin = screen.x * 130 / 1080;
@@ -554,16 +522,16 @@ public class HistoryFragment extends Fragment {
 
 		String progress_str = format.format(progress) + "%\n";
 		Spannable p_str = new SpannableString(progress_str + doneStr);
-		p_str.setSpan(new CustomTypefaceSpan("c1", digitTypefaceBold, 0xFFE79100), 0,
-				progress_str.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-		p_str.setSpan(new CustomTypefaceSpan("c2", wordTypefaceBold, 0xFF717071),
-				progress_str.length(), progress_str.length() + doneStr.length(),
+		p_str.setSpan(new CustomTypefaceSpan("c1", digitTypefaceBold, 0xFFE79100), 0, progress_str.length(),
 				Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		p_str.setSpan(new CustomTypefaceSpan("c2", wordTypefaceBold, 0xFF717071), progress_str.length(),
+				progress_str.length() + doneStr.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		stageRateText.setText(p_str);
 		quoteText.setText(QUOTE_STR[page_week]);
 
 	}
 
+	@Override
 	public void endAnimation() {
 		setStorytellingTexts();
 		setStageVisible(true);
@@ -575,10 +543,11 @@ public class HistoryFragment extends Fragment {
 			Calendar cal = Calendar.getInstance();
 			DateValue dv = new DateValue(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
 					cal.get(Calendar.DAY_OF_MONTH));
-			recordBox.showMsgBox(dv, bars.size() - 1);
+			recordBox.showRecordBox(dv, bars.size() - 1);
 		}
 	}
 
+	@Override
 	public void endAnimation(int tt) {
 		setStorytellingTexts();
 		setStageVisible(true);
@@ -607,10 +576,11 @@ public class HistoryFragment extends Fragment {
 			Calendar cal = Calendar.getInstance();
 			DateValue dv = new DateValue(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
 					cal.get(Calendar.DAY_OF_MONTH));
-			recordBox.showMsgBox(dv, bars.size() - 1);
+			recordBox.showRecordBox(dv, bars.size() - 1);
 		}
 	}
 
+	@Override
 	public void resetPage(int change) {
 		if (cur_bg_bmp != null && !cur_bg_bmp.isRecycled()) {
 			cur_bg_bmp.recycle();
@@ -636,9 +606,8 @@ public class HistoryFragment extends Fragment {
 		tmp.recycle();
 		next_bg_bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
 		pageWidget.setBitmaps(cur_bg_bmp, next_bg_bmp);
-		pageWidget.setTouchPosition(curPageTouch);
 
-		int scroll_value = bar_left + (screen.x * 48 / 1080) * 7 * (page_week - 1);
+		int scroll_value = chart.getScrollValue(page_week);
 		if (scroll_value < 0)
 			scroll_value = 0;
 		Message msg = new Message();
@@ -653,6 +622,7 @@ public class HistoryFragment extends Fragment {
 	private class ScrollToHandler extends Handler {
 		public void handleMessage(Message msg) {
 
+			chart.setPageWeek(page_week);
 			int pos = msg.getData().getInt("pos", 0);
 			scrollView.smoothScrollTo(pos, 0);
 		}
@@ -671,8 +641,6 @@ public class HistoryFragment extends Fragment {
 			max_week = page_week;
 
 			historys = new ArrayList<DateBracDetectionState>();
-			selected_dates = new ArrayList<DateValue>();
-			selected_idx = new ArrayList<Integer>();
 			bars = new ArrayList<BarInfo>();
 			hasAudio = new ArrayList<Boolean>();
 
@@ -692,8 +660,8 @@ public class HistoryFragment extends Fragment {
 			recordBox.setImage();
 			endAnimation();
 
-			LoadingDialogControl.dismiss();
 			startAnim();
+			LoadingDialogControl.dismiss();
 
 			if (received_msg == NotificationBox.TYPE_STORYTELLING_SHARING) {
 				shareAnimation = new AlphaAnimation(1.0F, 0.0F);
@@ -705,7 +673,7 @@ public class HistoryFragment extends Fragment {
 			}
 
 			RelativeLayout r = (RelativeLayout) view;
-			quoteMsgBox = new QuoteMsgBox(historyFragment, r);
+			quoteMsgBox = new QuoteMsgBox(historyFragment.getActivity(),historyFragment, r);
 
 		}
 	}
@@ -721,16 +689,15 @@ public class HistoryFragment extends Fragment {
 		int[] aBgs = HistoryStorytelling.getAnimationBgs(page_states);
 		int startIdx = page_week - 1;
 		setStageVisible(false);
-		pageAnimationTask = new PageAnimationTaskVertical(pageWidget, from, to, aBgs,
-				historyFragment, startIdx);
+		pageAnimationTask = new PageAnimationTaskVertical(pageWidget, from, to, aBgs, historyFragment, startIdx);
 		if (Build.VERSION.SDK_INT >= 11)
 			pageAnimationTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
 		else
 			pageAnimationTask.execute();
 	}
 
-	public void setStageVisible(boolean t) {
-		if (t) {
+	public void setStageVisible(boolean visible) {
+		if (visible) {
 			storytellingButton.setVisibility(View.VISIBLE);
 			stageMessageText.setVisibility(View.VISIBLE);
 			stageMessage.setVisibility(View.VISIBLE);
@@ -783,18 +750,13 @@ public class HistoryFragment extends Fragment {
 				return true;
 			if (isAnimation)
 				return true;
-			//
 
 			float y1 = e1.getY();
 			float y2 = e2.getY();
 			if (y1 - y2 > FLING_THRESHOLD) {// UP
-				// pageWidget.setOnTouchListener(null);
-				// FragmentTabs.enableTabAndClick(false);
 				int[] aBgs = HistoryStorytelling.getAnimationBgs(page_states);
 				int pageIdx = page_week;
-				int startIdx = pageIdx;
-				int endIdx = startIdx + 1;
-				if (endIdx > max_week) {
+				if (pageIdx == max_week) {
 					isAnimation = false;
 					pageWidget.setOnTouchListener(gtListener);
 					FragmentTabs.enableTabAndClick(true);
@@ -807,21 +769,16 @@ public class HistoryFragment extends Fragment {
 				quoteScroll(page_week + 1);
 				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_UP);
 				setStageVisible(false);
-				pageAnimationTask2 = new PageAnimationTaskVerticalFling(pageWidget, from, to, aBgs,
-						historyFragment, curPageTouch, startIdx, pageIdx, 1);
+				pageAnimationTask2 = new PageAnimationTaskVerticalFling(pageWidget, from, to, aBgs, historyFragment,
+						pageIdx, 1);
 				if (Build.VERSION.SDK_INT >= 11)
-					pageAnimationTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-							(Void[]) null);
+					pageAnimationTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
 				else
 					pageAnimationTask2.execute();
 			} else if (y2 - y1 > FLING_THRESHOLD) {// DOWN
-				// pageWidget.setOnTouchListener(null);
-				// FragmentTabs.enableTabAndClick(false);
 				int[] aBgs = HistoryStorytelling.getAnimationBgs(page_states);
 				int pageIdx = page_week;
-				int startIdx = pageIdx;
-				int endIdx = startIdx - 1;
-				if (endIdx < 0) {
+				if (pageIdx == 0) {
 					isAnimation = false;
 					pageWidget.setOnTouchListener(gtListener);
 					FragmentTabs.enableTabAndClick(true);
@@ -834,11 +791,10 @@ public class HistoryFragment extends Fragment {
 				quoteScroll(page_week - 1);
 				ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_FLING_DOWN);
 				setStageVisible(false);
-				pageAnimationTask2 = new PageAnimationTaskVerticalFling(pageWidget, from, to, aBgs,
-						historyFragment, curPageTouch, startIdx, endIdx, 0);
+				pageAnimationTask2 = new PageAnimationTaskVerticalFling(pageWidget, from, to, aBgs, historyFragment,
+						pageIdx, 0);
 				if (Build.VERSION.SDK_INT >= 11)
-					pageAnimationTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-							(Void[]) null);
+					pageAnimationTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
 				else
 					pageAnimationTask2.execute();
 			}
@@ -867,7 +823,7 @@ public class HistoryFragment extends Fragment {
 			float d_sum = 0;
 			float b_sum = 0;
 			boolean drink = false;
-			
+
 			float emotion, desire, brac;
 
 			int pos = 0;
@@ -895,12 +851,16 @@ public class HistoryFragment extends Fragment {
 			boolean hasData = true;
 			if (count == 0) {
 				hasData = false;
-				emotion = desire = brac = 0F;
+				brac = 0F;
 				bar_week = WeekNum.getWeek(this.getActivity(), from_t);
+			} else {
+				brac = b_sum / count;
+			}
+			if (q_count == 0) {
+				emotion = desire = 0F;
 			} else {
 				emotion = e_sum / q_count;
 				desire = d_sum / q_count;
-				brac = b_sum / count;
 			}
 
 			int mYear = ccal.get(Calendar.YEAR);
@@ -909,8 +869,7 @@ public class HistoryFragment extends Fragment {
 
 			DateValue dv = new DateValue(mYear, mMonth, mDate);
 
-			BarInfo barInfo;
-			barInfo = new BarInfo(emotion, desire, brac, bar_week, hasData, dv,drink);
+			BarInfo barInfo = new BarInfo(emotion, desire, brac, bar_week, hasData, dv, drink);
 
 			bars.add(barInfo);
 
@@ -984,7 +943,7 @@ public class HistoryFragment extends Fragment {
 				}
 
 				invalidate();
-				chart.invalidate();
+				chart.setChartType(chart_type);
 				chartYAxis.invalidate();
 				chartLabel.invalidate();
 			}
@@ -994,30 +953,22 @@ public class HistoryFragment extends Fragment {
 		@Override
 		protected void onDraw(Canvas canvas) {
 			super.onDraw(canvas);
-			canvas.drawText(title_str[0], screen.x * 30F / 1080F, screen.x * 70F / 1080F,
-					text_paint_large);
-			canvas.drawText(title_str[1], screen.x * 310F / 1080F, screen.x * 70F / 1080F,
-					text_paint_large);
-			canvas.drawText(title_str[2], screen.x * 590F / 1080F, screen.x * 70F / 1080F,
-					text_paint_large);
-			canvas.drawText(title_str[3], screen.x * 870F / 1080F, screen.x * 70F / 1080F,
-					text_paint_large);
+			canvas.drawText(title_str[0], screen.x * 30F / 1080F, screen.x * 70F / 1080F, text_paint_large);
+			canvas.drawText(title_str[1], screen.x * 310F / 1080F, screen.x * 70F / 1080F, text_paint_large);
+			canvas.drawText(title_str[2], screen.x * 590F / 1080F, screen.x * 70F / 1080F, text_paint_large);
+			canvas.drawText(title_str[3], screen.x * 870F / 1080F, screen.x * 70F / 1080F, text_paint_large);
 			switch (chart_type) {
 			case 0:
-				canvas.drawText(title_str[0], screen.x * 30F / 1080F, screen.x * 70F / 1080F,
-						text_paint_large_2);
+				canvas.drawText(title_str[0], screen.x * 30F / 1080F, screen.x * 70F / 1080F, text_paint_large_2);
 				break;
 			case 1:
-				canvas.drawText(title_str[1], screen.x * 310F / 1080F, screen.x * 70F / 1080F,
-						text_paint_large_2);
+				canvas.drawText(title_str[1], screen.x * 310F / 1080F, screen.x * 70F / 1080F, text_paint_large_2);
 				break;
 			case 2:
-				canvas.drawText(title_str[2], screen.x * 590F / 1080F, screen.x * 70F / 1080F,
-						text_paint_large_2);
+				canvas.drawText(title_str[2], screen.x * 590F / 1080F, screen.x * 70F / 1080F, text_paint_large_2);
 				break;
 			case 3:
-				canvas.drawText(title_str[3], screen.x * 870F / 1080F, screen.x * 70F / 1080F,
-						text_paint_large_2);
+				canvas.drawText(title_str[3], screen.x * 870F / 1080F, screen.x * 70F / 1080F, text_paint_large_2);
 				break;
 			}
 		}
@@ -1045,6 +996,9 @@ public class HistoryFragment extends Fragment {
 		protected void onDraw(Canvas canvas) {
 			super.onDraw(canvas);
 
+			int bar_width = screen.x * 36 / 1080;
+			
+			int bar_bottom = screen.x * 90 / 1080;
 			int max_height = (chartHeight - bar_bottom) * 4 / 10;
 			int _bottom = chartHeight - bar_bottom;
 
@@ -1136,405 +1090,14 @@ public class HistoryFragment extends Fragment {
 		}
 	}
 
-	private class ChartView extends View {
-
-		private Paint paint_pass = new Paint();
-		private Paint paint_fail = new Paint();
-		private Paint paint_none = new Paint();
-
-		private Paint paint_highlight = new Paint();
-		private Paint circle_paint_stroke = new Paint();
-		private Paint text_paint_large = new Paint();
-		private Paint text_paint_small = new Paint();
-		private Paint text_paint_button = new Paint();
-		private Paint focus_paint_len = new Paint();
-		private Paint line_paint = new Paint();
-		private Paint axis_paint = new Paint();
-		private Paint record_paint = new Paint();
-		private Paint no_record_paint = new Paint();
-
-		private Paint emotion_paint = new Paint();
-		private Paint desire_paint = new Paint();
-		private Paint brac_paint = new Paint();
-
-		private Paint emotion_paint_bg = new Paint();
-		private Paint desire_paint_bg = new Paint();
-		private Paint brac_paint_bg = new Paint();
-
-		private int RADIUS;
-		private int RADIUS_SQUARE;
-		private int BUTTON_RADIUS;
-		private int BUTTON_RADIUS_SQUARE;
-		private int BUTTON_GAPS;
-
-		private int curX = -1, curY = -1;
-
-		private ArrayList<Point> circle_centers;
-		private ArrayList<Point> selected_centers;
-		private ArrayList<Point> button_centers;
-
-		private float top_touch;
-
-		public ChartView(Context context) {
-			super(context);
-
-			paint_pass.setColor(0xFF5bdebe);
-			paint_fail.setColor(0xFFf09600);
-			paint_none.setColor(0xFFc9c9ca);
-
-			record_paint.setColor(0xFFff6f61);
-			no_record_paint.setColor(0xFF858585);
-
-			paint_highlight.setColor(0x33FFFFFF);
-
-			circle_paint_stroke.setColor(0xFFFF0000);
-			circle_paint_stroke.setStyle(Style.STROKE);
-			circle_paint_stroke.setStrokeWidth(screen.x * 7 / 1080);
-
-			int smallTextSize = TextSize.smallTextSize(context);
-			
-			text_paint_large.setColor(0xFFFFFFFF);
-			text_paint_large.setTextSize(smallTextSize);
-			text_paint_large.setTextAlign(Align.LEFT);
-
-			text_paint_button.setColor(0xFFFFFFFF);
-			text_paint_button.setTextSize(smallTextSize);
-			text_paint_button.setTextAlign(Align.CENTER);
-
-			text_paint_small.setColor(0xFF908f90);
-			text_paint_small.setTextAlign(Align.CENTER);
-			text_paint_small.setTextSize(TextSize.mTextSize(context));
-
-			focus_paint_len.setColor(0x44FFFFFF);
-
-			axis_paint.setColor(0xFF5f5f5f);
-			axis_paint.setStrokeWidth(screen.x * 8 / 1080);
-
-			line_paint.setColor(0xFFFFFFFF);
-			line_paint.setStrokeWidth(screen.x * 3 / 1080);
-
-			emotion_paint.setColor(0xFF2dc7b3);
-			emotion_paint.setStrokeWidth(screen.x * 4 / 480);
-			desire_paint.setColor(0xFFf19700);
-			desire_paint.setStrokeWidth(screen.x * 4 / 480);
-			brac_paint.setColor(0xFFFFFFFF);
-			brac_paint.setStrokeWidth(screen.x * 4 / 480);
-
-			emotion_paint_bg.setColor(0x772dc7b3);
-			desire_paint_bg.setColor(0x77f19700);
-			brac_paint_bg.setColor(0x77FFFFFF);
-
-			selected_centers = new ArrayList<Point>();
-			circle_centers = new ArrayList<Point>();
-			button_centers = new ArrayList<Point>();
-
-			bar_width = screen.x * 36 / 1080;
-			bar_gap = screen.x * 12 / 1080;
-			chart_width = screen.x;
-			circle_radius = bar_width / 3;
-			bar_bottom = screen.x * 90 / 1080;
-			bar_left = screen.x * 94 / 1080;
-
-			RADIUS = bar_width * 9 / 5;
-			RADIUS_SQUARE = RADIUS * RADIUS;
-			BUTTON_RADIUS = chartCircleBmp.getWidth() / 2;
-			BUTTON_RADIUS_SQUARE = BUTTON_RADIUS * BUTTON_RADIUS;
-			BUTTON_GAPS = BUTTON_RADIUS * 9 / 2;
-
-			top_touch = screen.x * 180 / 1080;
-		}
-
-		private boolean onButton = false;
-		private int buttonNum = -1;
-
-		@Override
-		public boolean onTouchEvent(MotionEvent event) {
-
-			if (!chartTouchable)
-				return true;
-
-			int action = event.getAction();
-			if (action == MotionEvent.ACTION_DOWN) {
-				int x = (int) event.getX();
-				int y = (int) event.getY();
-
-				onButton = false;
-				buttonNum = -1;
-				for (int i = 0; i < button_centers.size(); ++i) {
-					Point c = button_centers.get(i);
-					int distance_square = (c.x - x) * (c.x - x) + (c.y - y) * (c.y - y);
-					if (distance_square < BUTTON_RADIUS_SQUARE * 2.25F) {
-						onButton = true;
-						buttonNum = i;
-						break;
-					}
-				}
-				if (!onButton) {
-					float ty = event.getY();
-					if (ty >= top_touch) {
-						curX = (int) event.getX();
-						curY = (int) event.getY();
-						ClickLogger.Log(getActivity(), ClickLogId.STORYTELLING_CHART_TOUCH);
-					}
-				}
-			} else if (action == MotionEvent.ACTION_UP && onButton && buttonNum >= 0
-					&& buttonNum < selected_dates.size()) {
-				int x = (int) event.getX();
-				int y = (int) event.getY();
-
-				Point c = button_centers.get(buttonNum);
-				int distance_square = (c.x - x) * (c.x - x) + (c.y - y) * (c.y - y);
-				if (distance_square < BUTTON_RADIUS_SQUARE * 2.25F) {
-					DateValue tdv = selected_dates.get(buttonNum);
-					ClickLogger.Log(getActivity(),
-							ClickLogId.STORYTELLING_CHART_BUTTON + tdv.toClickValue());
-					recordBox.showMsgBox(tdv, selected_idx.get(buttonNum));
-				}
-				onButton = false;
-				buttonNum = -1;
-			}
-			invalidate();
-			return true;
-		}
-
-		@SuppressLint("DrawAllocation")
-		@Override
-		protected void onDraw(Canvas canvas) {
-			super.onDraw(canvas);
-
-			circle_centers.clear();
-			selected_centers.clear();
-			selected_idx.clear();
-			button_centers.clear();
-			selected_dates.clear();
-
-			if (chart_type < 3) {
-				drawBarChart(canvas);
-				drawButtons(canvas);
-			} else
-				drawLineChart(canvas);
-		}
-
-		private void drawLineChart(Canvas canvas) {
-			int max_height = (chartHeight - bar_bottom) * 4 / 10;
-			int left = bar_left;
-			int small_radius = circle_radius / 2;
-
-			int _bottom = chartHeight - bar_bottom;
-
-			canvas.drawLine(left, _bottom, chart_width, _bottom, emotion_paint);
-
-			if (bars.size() == 0)
-				return;
-
-			Point prev_e_center = null;
-			Point prev_d_center = null;
-			Point prev_b_center = null;
-
-			for (int i = 0; i < bars.size(); ++i) {
-				BarInfo bar = bars.get(i);
-
-				float e_height, d_height, b_height;
-				e_height = bar.emotion / 5 * max_height;
-				d_height = bar.desire / 10 * max_height;
-				b_height = bar.brac / 0.3F * max_height;
-				if (b_height > max_height)
-					b_height = max_height;
-
-				int e_top = _bottom - (int) e_height;
-				int d_top = _bottom - (int) d_height;
-				int b_top = _bottom - (int) b_height;
-				if (!bar.hasData)
-					e_top = d_top = b_top = _bottom;
-
-				// Draw X axis Label
-				if (i % 7 == 0) {
-					String str = (bar.dv.month + 1) + "/" + bar.dv.date;
-					canvas.drawLine(left, _bottom, left, _bottom - max_height, axis_paint);
-					canvas.drawText(str, left + small_radius, _bottom + bar_width * 2,
-							text_paint_small);
-				}
-				// Draw bars & annotation_circles
-				Point e_center = new Point(left + small_radius, e_top - bar_gap - small_radius);
-				Point d_center = new Point(left + small_radius, d_top - bar_gap - small_radius);
-				Point b_center = new Point(left + small_radius, b_top - bar_gap - small_radius);
-
-				if (prev_e_center != null && prev_d_center != null && prev_b_center != null) {
-
-					Path path_e = new Path();
-					path_e.moveTo(prev_e_center.x, _bottom);
-					path_e.lineTo(prev_e_center.x, prev_e_center.y);
-					path_e.lineTo(e_center.x, e_center.y);
-					path_e.lineTo(e_center.x, _bottom);
-
-					Path path_d = new Path();
-					path_d.moveTo(prev_d_center.x, _bottom);
-					path_d.lineTo(prev_d_center.x, prev_d_center.y);
-					path_d.lineTo(d_center.x, d_center.y);
-					path_d.lineTo(d_center.x, _bottom);
-					path_d.lineTo(prev_d_center.x, _bottom);
-
-					Path path_b = new Path();
-					path_b.moveTo(prev_d_center.x, _bottom);
-					path_b.lineTo(prev_b_center.x, prev_b_center.y);
-					path_b.lineTo(b_center.x, b_center.y);
-					path_b.lineTo(b_center.x, _bottom);
-					path_b.lineTo(prev_b_center.x, _bottom);
-
-					canvas.drawPath(path_e, emotion_paint_bg);
-					canvas.drawPath(path_d, desire_paint_bg);
-					canvas.drawPath(path_b, brac_paint_bg);
-
-					canvas.drawLine(prev_e_center.x, prev_e_center.y, e_center.x, e_center.y,
-							emotion_paint);
-					canvas.drawLine(prev_d_center.x, prev_d_center.y, d_center.x, d_center.y,
-							desire_paint);
-					canvas.drawLine(prev_b_center.x, prev_b_center.y, b_center.x, b_center.y,
-							brac_paint);
-
-				} else {
-					canvas.drawLine(e_center.x, _bottom, e_center.x, e_center.y, emotion_paint);
-					canvas.drawLine(d_center.x, _bottom, d_center.x, d_center.y, desire_paint);
-					canvas.drawLine(b_center.x, _bottom, b_center.x, b_center.y, brac_paint);
-				}
-				prev_e_center = e_center;
-				prev_d_center = d_center;
-				prev_b_center = b_center;
-
-				// draw highlights
-				if (bar.week == page_week)
-					canvas.drawRect(left, _bottom - max_height - bar_width - circle_radius, left
-							+ bar_width + bar_gap, _bottom, paint_highlight);
-
-				if (i == bars.size() - 1) {
-					canvas.drawLine(e_center.x, _bottom, e_center.x, e_center.y, emotion_paint);
-					canvas.drawLine(d_center.x, _bottom, d_center.x, d_center.y, desire_paint);
-					canvas.drawLine(b_center.x, _bottom, b_center.x, b_center.y, brac_paint);
-				}
-				left += (bar_width + bar_gap);
-			}
-
-			if (curX > 0 && curY > 0)
-				canvas.drawCircle(curX, curY, RADIUS, focus_paint_len);
-		}
-
-		private void drawBarChart(Canvas canvas) {
-			int max_height = (chartHeight - bar_bottom) * 4 / 10;
-			int left = bar_left;
-
-			if (bars.size() == 0)
-				return;
-
-			int playW = chartPlayBmp.getWidth() / 2;
-			int playH = chartPlayBmp.getHeight() / 2;
-
-			int bar_half = bar_width / 2;
-			for (int i = 0; i < bars.size(); ++i) {
-
-				float height = 0;
-				BarInfo bar = bars.get(i);
-
-				if (chart_type == 0)
-					height = bar.emotion / 5 * max_height;
-				else if (chart_type == 1)
-					height = bar.desire / 10 * max_height;
-				else if (chart_type == 2) {
-					height = bar.brac / 0.3F * max_height;
-					if (height > max_height)
-						height = max_height;
-				}
-
-				// Draw bars & annotation_circles & highlights
-				int right = left + bar_width;
-				int _bottom = chartHeight - bar_bottom;
-				int _top = _bottom - (int) height;
-
-				// Draw bars & annotation_circles
-				Point center = new Point(left + bar_half, _top - bar_gap - circle_radius);
-
-				boolean hasAudioData = hasAudio.get(i);
-				;
-				if (!hasAudioData)
-					canvas.drawCircle(center.x, center.y, circle_radius, no_record_paint);
-				else
-					canvas.drawBitmap(chartPlayBmp, center.x - playW, center.y - playH, null);
-
-				if (!bar.hasData)
-					;
-				else if (bar.drink)
-					canvas.drawRect(left, _top, right, _bottom, paint_fail);
-				else
-					canvas.drawRect(left, _top, right, _bottom, paint_pass);
-
-				circle_centers.add(center);
-
-				// draw highlights
-				if (bar.week == page_week)
-					canvas.drawRect(left, _bottom - max_height - bar_width - circle_radius, right
-							+ bar_gap, _bottom, paint_highlight);
-
-				// Draw X axis Label
-				if (i % 7 == 0) {
-					String str = (bar.dv.month + 1) + "/" + bar.dv.date;
-					canvas.drawText(str, left + circle_radius, _bottom + bar_width * 2,
-							text_paint_small);
-				}
-				left += (bar_width + bar_gap);
-			}
-		}
-
-		private void drawButtons(Canvas canvas) {
-			// Draw buttons
-			if (curX > 0 && curY > 0) {
-
-				// Draw focus area
-				canvas.drawCircle(curX, curY, RADIUS, focus_paint_len);
-
-				for (int i = 0; i < circle_centers.size(); ++i) {
-					Point c = circle_centers.get(i);
-					int distance_square = (curX - c.x) * (curX - c.x) + (curY - c.y) * (curY - c.y);
-					if (distance_square < RADIUS_SQUARE) {
-						DateValue d = bars.get(i).dv;
-						selected_centers.add(c);
-						selected_dates.add(d);
-						selected_idx.add(i);
-					}
-				}
-
-				int b_center_x = screen.x * 100 / 1080 + scrollView.getScrollX();
-				int b_center_y = screen.x * 170 / 1080;
-				int b_center_x_bak = b_center_x;
-				// Draw lines
-				for (int i = 0; i < selected_centers.size(); ++i) {
-					Point from = selected_centers.get(i);
-					Point to = new Point(b_center_x, b_center_y);
-					button_centers.add(to);
-					canvas.drawLine(from.x, from.y, to.x, to.y, line_paint);
-					b_center_x += BUTTON_GAPS;
-				}
-				// Draw buttons
-				b_center_x = b_center_x_bak;
-				for (int i = 0; i < selected_centers.size(); ++i) {
-					Point to = new Point(b_center_x, b_center_y);
-
-					canvas.drawBitmap(chartCircleBmp, to.x - BUTTON_RADIUS, to.y - BUTTON_RADIUS,
-							null);
-					DateValue d = selected_dates.get(i);
-					String str = (d.month + 1) + "/" + d.date;
-					canvas.drawText(str, to.x, to.y + BUTTON_RADIUS / 3, text_paint_button);
-					b_center_x += BUTTON_GAPS;
-				}
-			}
-		}
-	}
-
+	@Override
 	public void enablePage(boolean enable) {
 		chartTouchable = enable;
-		if (pageWidget!=null)
+		if (pageWidget != null)
 			pageWidget.setEnabled(enable);
-		if (scrollView!=null)
+		if (scrollView != null)
 			scrollView.setEnabled(enable);
-		if (chart!=null)
+		if (chart != null)
 			chart.setEnabled(enable);
 		FragmentTabs.enableTabAndClick(enable);
 		storytellingButton.setEnabled(enable);
@@ -1712,5 +1275,10 @@ public class HistoryFragment extends Fragment {
 		}
 		quoteScrollView.scrollTo(0, 0);
 		quoteHiddenLayout.setOnClickListener(null);
+	}
+	
+	@Override
+	public void showRecordBox(DateValue tdv,int selected_button){
+		recordBox.showRecordBox(tdv, selected_button);
 	}
 }

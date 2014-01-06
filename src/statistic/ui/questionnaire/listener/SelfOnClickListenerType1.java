@@ -2,13 +2,13 @@ package statistic.ui.questionnaire.listener;
 
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.content.SelfHelpContentType1;
 import android.view.View;
 
 public class SelfOnClickListenerType1 extends QuestionnaireOnClickListener {
 
-	public SelfOnClickListenerType1(QuestionMsgBox msgBox) {
+	public SelfOnClickListenerType1(QuestionnaireBox msgBox) {
 		super(msgBox);
 	}
 

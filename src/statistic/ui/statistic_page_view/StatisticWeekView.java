@@ -57,8 +57,8 @@ public class StatisticWeekView extends StatisticPageView {
 	
 	private static final float ALPHA = 0.4F;
 	
-	public StatisticWeekView(Context context,StatisticFragment statisticFragment) {
-		super(context, R.layout.statistic_week_view, statisticFragment);
+	public StatisticWeekView(Context context) {
+		super(context, R.layout.statistic_week_view);
 		db = new HistoryDB(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);
 		wordTypefaceBold = Typefaces.getWordTypefaceBold(context);

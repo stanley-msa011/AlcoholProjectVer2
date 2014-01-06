@@ -3,10 +3,8 @@ package test.camera;
 import java.util.Iterator;
 import java.util.List;
 
-import ubicomp.drunk_detection.activities.R;
-
+import test.Tester;
 import test.data.ImageFileHandler;
-import ubicomp.drunk_detection.fragments.TestFragment;
 import ubicomp.drunk_detection.ui.ScreenSize;
 
 import android.annotation.SuppressLint;
@@ -27,7 +25,7 @@ import android.widget.RelativeLayout;
 @SuppressLint("InlinedApi")
 public class CameraRecorder {
     
-    private TestFragment testFragment;
+    private CameraCaller cameraCaller;
     private Context context;
     protected Camera camera;
     protected Camera.PictureCallback pictureCallback;
@@ -41,9 +39,9 @@ public class CameraRecorder {
     
     public int picture_count=0;
     
-    public CameraRecorder(TestFragment testFragment, ImageFileHandler imgFileHandler){
-    	this.testFragment = testFragment;
-    	this.context = testFragment.getActivity();
+    public CameraRecorder(Context context,CameraCaller cameraCaller, ImageFileHandler imgFileHandler){
+    	this.cameraCaller = cameraCaller;
+    	this.context = context;
     	this.imgFileHandler =  imgFileHandler;
     	imgFileHandler.setRecorder(this);
     	pictureCallback = new PictureCallback();
@@ -96,7 +94,7 @@ public class CameraRecorder {
     	previewFrame = null;
     	circle = new ImageView(context);
     	circle.setBackgroundColor(0xAAAACCFF);
-    	previewFrame =(FrameLayout) testFragment.getView().findViewById(R.id.test_camera_preview_layout);
+    	previewFrame =cameraCaller.getPreviewFrameLayout();
     	previewCircleLayout = new RelativeLayout(context);
     	if (previewFrame!=null){
     		preview = new PreviewWindow(context,this);
@@ -156,14 +154,14 @@ public class CameraRecorder {
     public void CloseSuccess(){
     	close();
     	circle.setVisibility(View.INVISIBLE);
-		testFragment.updateDoneState(TestFragment._CAMERA);
+		cameraCaller.updateDoneState(Tester._CAMERA);
     }
     
     public void CloseFail(int type){
     	close();
     	if (circle!=null)
     		circle.setVisibility(View.INVISIBLE);
-    	testFragment.stopByFail(type);
+    	cameraCaller.stopByFail(type);
     }
     
     public void drawFace(boolean detected){

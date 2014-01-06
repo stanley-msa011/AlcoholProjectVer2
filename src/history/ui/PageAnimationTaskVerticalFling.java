@@ -1,7 +1,6 @@
 package history.ui;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
-import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,7 +19,7 @@ public class PageAnimationTaskVerticalFling extends AsyncTask<Void, Void, Void> 
 	private static final int clip_time = 400;
 	private static final int sleep_time = clip_time/gaps;
 	private int[] bgs;
-	private HistoryFragment historyFragment;
+	private PageAnimationCaller endPageAnimation;
 	
 	private int startImageIdx;
 	
@@ -29,14 +28,14 @@ public class PageAnimationTaskVerticalFling extends AsyncTask<Void, Void, Void> 
 	private int type=-1; 
 	private int y_axis;
 	
-	public PageAnimationTaskVerticalFling(PageWidgetVertical pageWidget, PointF from, PointF to, int[] bgs,HistoryFragment historyFragment,PointF endTouch,int startImageIdx,int endImageIdx, int type){
+	public PageAnimationTaskVerticalFling(PageWidgetVertical pageWidget, PointF from, PointF to, int[] bgs,PageAnimationCaller endPageAnimation,int startImageIdx, int type){
 		this.pageWidget = pageWidget;
 		this.from = from;
 		this.to = to;
 		this.startImageIdx = startImageIdx;
 		
-		this.historyFragment = historyFragment;
-		screen = ScreenSize.getScreenSize(historyFragment.getActivity());
+		this.endPageAnimation = endPageAnimation;
+		screen = ScreenSize.getScreenSize(pageWidget.getContext());
 		width_gap = (to.x - from.x)/(float)gaps;
 		height_gap = (to.y - from.y)/(float)gaps;
 		this.bgs = bgs;
@@ -72,7 +71,7 @@ public class PageAnimationTaskVerticalFling extends AsyncTask<Void, Void, Void> 
 				pageWidget.setTouchPosition(touch);
 			}
 			
-			historyFragment.resetPage(+1);
+			endPageAnimation.resetPage(+1);
 			
 			
 		}else{ //next to cur (DOWN)
@@ -97,14 +96,14 @@ public class PageAnimationTaskVerticalFling extends AsyncTask<Void, Void, Void> 
 				pageWidget.setTouchPosition(touch);
 			}
 			
-			historyFragment.resetPage(-1);
+			endPageAnimation.resetPage(-1);
 		}
 		
 		return null;
 	}
 	@Override
 	 protected void onPostExecute(Void result) {
-		historyFragment.endAnimation(0);
+		endPageAnimation.endAnimation(0);
     }
 	@Override
 	protected void onCancelled(){

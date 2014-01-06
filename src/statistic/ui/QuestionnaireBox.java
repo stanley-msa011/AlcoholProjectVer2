@@ -12,7 +12,7 @@ import statistic.ui.questionnaire.content.Type1Content;
 import statistic.ui.questionnaire.content.Type2Content;
 import statistic.ui.questionnaire.content.Type3Content;
 import ubicomp.drunk_detection.activities.R;
-import ubicomp.drunk_detection.fragments.StatisticFragment;
+import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
@@ -35,12 +35,12 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
-public class QuestionMsgBox {
+public class QuestionnaireBox {
 
 	private ArrayList<String> clickSequence;
 	private ArrayList<QuestionnaireContent> contentSequence;
 	
-	private StatisticFragment statisticFragment;
+	private QuestionnaireBoxUpdater quesBoxUpdater;
 	private Context context;
 	private LayoutInflater inflater;
 	private RelativeLayout boxLayout = null;
@@ -59,9 +59,9 @@ public class QuestionMsgBox {
 	
 	private LinearLayout.LayoutParams questionParam;
 	
-	public QuestionMsgBox(StatisticFragment statisticFragment,RelativeLayout mainLayout){
-		this.statisticFragment = statisticFragment;
-		this.context = statisticFragment.getActivity();
+	public QuestionnaireBox(Context context,QuestionnaireBoxUpdater quesBoxUpdater,RelativeLayout mainLayout){
+		this.context = context;
+		this.quesBoxUpdater = quesBoxUpdater;
 		this.r = context.getResources();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
@@ -186,7 +186,7 @@ public class QuestionMsgBox {
 	}
 	
 	public void openBox(){
-		statisticFragment.enablePage(false);
+		quesBoxUpdater.enablePage(false);
 		shadow.setVisibility(View.VISIBLE);
 		shadow.setKeepScreenOn(true);
 		boxLayout.setVisibility(View.VISIBLE);
@@ -198,16 +198,16 @@ public class QuestionMsgBox {
 		SharedPreferences.Editor editor = sp.edit();
 		editor.putInt("latest_result", -1);
     	editor.commit();
-    	statisticFragment.enablePage(true);
+    	quesBoxUpdater.enablePage(true);
     	shadow.setVisibility(View.INVISIBLE);
     	shadow.setKeepScreenOn(false);
 		boxLayout.setVisibility(View.INVISIBLE);
-		statisticFragment.setQuestionAnimation();
+		quesBoxUpdater.setQuestionAnimation();
 		return;
 	}
 	
 	public void closeBoxNull(){
-    	statisticFragment.enablePage(true);
+		quesBoxUpdater.enablePage(true);
     	shadow.setVisibility(View.INVISIBLE);
     	shadow.setKeepScreenOn(false);
 		boxLayout.setVisibility(View.INVISIBLE);
@@ -296,7 +296,7 @@ public class QuestionMsgBox {
 			ClickLogger.Log(getContext(), ClickLogId.STATISTIC_QUESTION_CANCEL);
 			clickSequence.clear();
 			contentSequence.clear();
-			statisticFragment.enablePage(true);
+			quesBoxUpdater.enablePage(true);
 			shadow.setVisibility(View.INVISIBLE);
 			shadow.setKeepScreenOn(false);
 			boxLayout.setVisibility(View.INVISIBLE);
@@ -305,10 +305,13 @@ public class QuestionMsgBox {
 	}
 	
 	public void showEndOfQuestionnaire(boolean addAcc){
-		statisticFragment.showEndOfQuestionnaire(addAcc);
+		if (addAcc)
+			CustomToast.generateToast(context, R.string.after_questionnaire, 1);
+		else
+			CustomToast.generateToast(context, R.string.after_questionnaire, 0);
 	}
 	
 	public void updateSelfCounter(){
-		statisticFragment.updateSelfHelpCounter();
+		quesBoxUpdater.updateSelfHelpCounter();
 	}
 }

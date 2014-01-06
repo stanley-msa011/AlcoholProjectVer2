@@ -1,6 +1,6 @@
 package statistic.ui.questionnaire.content;
 
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.listener.EndOnClickListener;
 import statistic.ui.questionnaire.listener.FamilyOnClickListener;
 import statistic.ui.questionnaire.listener.SelectedListener;
@@ -9,7 +9,7 @@ import ubicomp.drunk_detection.activities.R;
 
 public class Type3Content extends QuestionnaireContent {
 
-	public Type3Content(QuestionMsgBox msgBox) {
+	public Type3Content(QuestionnaireBox msgBox) {
 		super(msgBox);
 	}
 

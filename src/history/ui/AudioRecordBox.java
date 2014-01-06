@@ -13,7 +13,6 @@ import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 
 import ubicomp.drunk_detection.activities.R;
-import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.CustomTypefaceSpan;
@@ -47,9 +46,9 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
-public class AudioRecordBox {
+public class AudioRecordBox implements AudioRecordBoxCallee{
 
-	private HistoryFragment historyFragment;
+	private RecorderCaller updateHasRecorder;
 	private Context context;
 	private LayoutInflater inflater;
 	private RelativeLayout boxLayout ,contentLayout;
@@ -97,9 +96,9 @@ public class AudioRecordBox {
 	private String playString;
 	private MediaUpdateHandler media_handler;
 	
-	public AudioRecordBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
-		this.historyFragment = historyFragment;
-		this.context = historyFragment.getActivity();
+	public AudioRecordBox(Context context,RecorderCaller updateHasRecorder,RelativeLayout mainLayout){
+		this.updateHasRecorder = updateHasRecorder;;
+		this.context = context;
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
 		backgroundLayout = new View(context);
@@ -123,7 +122,7 @@ public class AudioRecordBox {
 		if (state.equals(Environment.MEDIA_MOUNTED))
 			dir = new File(Environment.getExternalStorageDirectory(),"drunk_detection");
 		else
-			dir = new File(historyFragment.getActivity().getFilesDir(),"drunk_detection");
+			dir = new File(context.getFilesDir(),"drunk_detection");
 		mainDirectory = new File(dir,"audio_records");
 		if (!mainDirectory.exists())
 			if (!mainDirectory.mkdirs()){
@@ -212,7 +211,7 @@ public class AudioRecordBox {
 		if (boxLayout!=null)
 			mainLayout.removeView(boxLayout);
 		
-		historyFragment.enablePage(true);
+		updateHasRecorder.enablePage(true);
 	}
 	private class EndListener implements View.OnClickListener{
 		@Override
@@ -221,12 +220,13 @@ public class AudioRecordBox {
 			backgroundLayout.setVisibility(View.INVISIBLE);
 			backgroundLayout.setKeepScreenOn(false);
 			boxLayout.setVisibility(View.INVISIBLE);
-			historyFragment.updateHasRecorder(curIdx);
-			historyFragment.enablePage(true);
+			updateHasRecorder.updateHasRecorder(curIdx);
+			updateHasRecorder.enablePage(true);
 		}
 	}
 	
-	public void showMsgBox(DateValue dv, int idx){
+	@Override
+	public void showRecordBox(DateValue dv, int idx){
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor edit = sp.edit();
 		edit.putLong("LatestStorytellingRecordingTime", System.currentTimeMillis());
@@ -234,7 +234,7 @@ public class AudioRecordBox {
 		
 		this.curIdx = idx;
 		curDV = dv;
-		historyFragment.enablePage(false);
+		updateHasRecorder.enablePage(false);
 		String cur_date = curDV.toString();
 		helpSpannable = new SpannableString(helpStr[0]+cur_date+helpStr[1]);
 		int start = 0;
@@ -297,7 +297,7 @@ public class AudioRecordBox {
 						else
 							CustomToast.generateToast(context, R.string.audio_box_toast_timeup, 0);
 						
-						historyFragment.updateHasRecorder(curIdx);
+						updateHasRecorder.updateHasRecorder(curIdx);
 					} catch (IllegalStateException e) {}
 				}
 				ClickLogger.Log(context, ClickLogId.STORYTELLING_RECORD_CANCEL_RECORD);
@@ -548,7 +548,6 @@ public class AudioRecordBox {
 				while(true){
 					Thread.sleep(1000);
 					media_handler.sendEmptyMessage(0);
-					Log.d("PLAYING","IN THREAD");
 				}
 			} catch (InterruptedException e) {}
 		}
@@ -557,7 +556,6 @@ public class AudioRecordBox {
 	@SuppressLint("HandlerLeak")
 	private class MediaUpdateHandler extends Handler{
 		public void handleMessage(Message msg){
-			Log.d("PLAYING","IN HANDLER");
 			try{
 				help.setText(playString+"("+getFormattedTime(mediaPlayer.getCurrentPosition())+"/"+getFormattedTime(mediaPlayer.getDuration())+")");
 			}catch(Exception e){}

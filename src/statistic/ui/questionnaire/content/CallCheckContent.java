@@ -1,7 +1,7 @@
 package statistic.ui.questionnaire.content;
 
 import android.content.Context;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.listener.CallOnClickListener;
 import ubicomp.drunk_detection.activities.R;
 
@@ -9,13 +9,13 @@ public class CallCheckContent extends QuestionnaireContent {
 
 	private String name,phone;
 	
-	public CallCheckContent(QuestionMsgBox msgBox,String name, String phone) {
+	public CallCheckContent(QuestionnaireBox msgBox,String name, String phone) {
 		super(msgBox);
 		this.name = name;
 		this.phone = phone;
 	}
 	private boolean isEmotion = false;
-	public CallCheckContent(QuestionMsgBox msgBox,String name, String phone,boolean isEmotion) {
+	public CallCheckContent(QuestionnaireBox msgBox,String name, String phone,boolean isEmotion) {
 		super(msgBox);
 		this.name = name;
 		this.phone = phone;

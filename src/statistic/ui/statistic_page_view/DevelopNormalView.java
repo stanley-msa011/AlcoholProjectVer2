@@ -10,7 +10,6 @@ import java.util.Scanner;
 import data.database.HistoryDB;
 import data.info.BracDetectionState;
 import ubicomp.drunk_detection.activities.R;
-import ubicomp.drunk_detection.fragments.StatisticFragment;
 import android.content.Context;
 import android.os.Environment;
 import android.widget.TextView;
@@ -25,8 +24,8 @@ public class DevelopNormalView extends StatisticPageView {
 	private double brac_val, voltage_val;
 	private boolean result;
 	
-	public DevelopNormalView(Context context,StatisticFragment statisticFragment) {
-		super(context, R.layout.statistic_developer_view_normal, statisticFragment);
+	public DevelopNormalView(Context context) {
+		super(context, R.layout.statistic_developer_view_normal);
 		db = new HistoryDB(context);
 	}
 

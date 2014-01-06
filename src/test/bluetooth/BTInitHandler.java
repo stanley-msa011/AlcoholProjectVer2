@@ -1,15 +1,15 @@
 package test.bluetooth;
 
-import ubicomp.drunk_detection.fragments.TestFragment;
+import test.Tester;
 import android.os.Handler;
 import android.os.Message;
 
 public class BTInitHandler extends Handler {
-	private TestFragment testFragment;
+	private BluetoothCaller btCaller;
 	private Bluetooth bt;
 	
-	public BTInitHandler(TestFragment testFragment,Bluetooth bt){
-		this.testFragment = testFragment;
+	public BTInitHandler(BluetoothCaller btCaller,Bluetooth bt){
+		this.btCaller = btCaller;
 		this.bt = bt;
 	}
 	
@@ -17,13 +17,13 @@ public class BTInitHandler extends Handler {
 		bt.enableAdapter();
 		if (bt.pair()){
 			if (bt.connect())
-				testFragment.updateInitState(TestFragment._BT);
+				btCaller.updateInitState(Tester._BT);
 			else{
-				testFragment.stopDueToInit();
-				testFragment.failBT();
+				btCaller.stopDueToInit();
+				btCaller.failBT();
 			}
 		}else{
-			testFragment.setPairMessage();
+			btCaller.setPairMessage();
 		}
 	}
 }

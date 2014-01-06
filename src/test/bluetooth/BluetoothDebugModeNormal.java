@@ -1,12 +1,12 @@
 package test.bluetooth;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import test.camera.CameraRunHandler;
 import test.data.BracValueDebugHandler;
 import test.data.BracValueFileHandler;
-import ubicomp.drunk_detection.fragments.TestFragment;
 
 public class BluetoothDebugModeNormal extends Bluetooth {
 
@@ -17,17 +17,17 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 	
 	private String temp_pressure;
 	
-	public BluetoothDebugModeNormal(TestFragment testFragment,
+	public BluetoothDebugModeNormal(Context context, BluetoothDebugger debugger, BluetoothMessageUpdater updater,
 			CameraRunHandler cameraRunHandler,
 			BracValueFileHandler bracFileHandler,
 			BracValueDebugHandler bracDebugHandler) {
-		super(testFragment, cameraRunHandler, bracFileHandler,false);
+		super(context, debugger, updater, cameraRunHandler, bracFileHandler,false);
 		this.bracDebugHandler = bracDebugHandler;
 	}
 
 	@Override
 	public void start(){
-		testFragment.showDebug("bluetooth start the test");
+		debugger.showDebug("bluetooth start the test");
 		start = true;
 	}
 	
@@ -51,7 +51,7 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 		start_recorder = false;
 		try {
 			in = socket.getInputStream();
-			testFragment.showDebug("bluetooth start to read");
+			debugger.showDebug("bluetooth start to read");
 			if (in.available() > 0)
 				bytes =in.read(temp);
 			else
@@ -110,10 +110,10 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 			Log.e(TAG,"FAIL TO READ DATA FROM THE SENSOR: " +e.toString());
 			close();
 			if (e.getMessage()!=null && e.getMessage().equals("TIMEOUT")){
-				testFragment.showDebug("Close by timeout" );
+				debugger.showDebug("Close by timeout" );
 				cameraRunHandler.sendEmptyMessage(3);
 			}else{
-				testFragment.showDebug("Close by exception" );
+				debugger.showDebug("Close by exception" );
 				cameraRunHandler.sendEmptyMessage(2);
 			}
 		}
@@ -172,8 +172,8 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 					long timeStamp = System.currentTimeMillis()/1000L;
 					float alcohol = Float.valueOf(msg.substring(1));
 					String output = timeStamp+"\t"+temp_pressure+"\t"+alcohol;
-					testFragment.showDebug("time: "+timeStamp);
-					testFragment.showDebug("alcohol: "+alcohol);
+					debugger.showDebug("time: "+timeStamp);
+					debugger.showDebug("alcohol: "+alcohol);
 					if (start_recorder){
 						show_value = alcohol;
 						write_to_file(output);
@@ -188,25 +188,25 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 				
 				if(!start&&now_pressure < absolute_min){
 					absolute_min = now_pressure;
-					testFragment.showDebug("absolute min = "+absolute_min );
+					debugger.showDebug("absolute min = "+absolute_min );
 				}
 					
 				if (!start){
-					testFragment.showDebug("read before start testing" );
+					debugger.showDebug("read before start testing" );
 					return false;
 				}
 					
 				float diff_limit = PRESSURE_DIFF_MIN_RANGE * (5000.f - temp_duration)/5000.f + PRESSURE_DIFF_MIN;
 				
-				testFragment.showDebug("p: "+ now_pressure + " min: "+absolute_min+" l:"+diff_limit);
+				debugger.showDebug("p: "+ now_pressure + " min: "+absolute_min+" l:"+diff_limit);
 				
 				if(now_pressure > absolute_min + diff_limit && !isPeak){
-					testFragment.showDebug("Peak start" );
+					debugger.showDebug("Peak start" );
 					isPeak = true;
 					start_time = time;
 					temp_duration = 0;
 				}else if (now_pressure > absolute_min + diff_limit && isPeak){
-					testFragment.showDebug("is Peak" );
+					debugger.showDebug("is Peak" );
 					end_time = time;
 					duration += (end_time-start_time);
 					temp_duration += (end_time-start_time);
@@ -236,12 +236,12 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 						cameraRunHandler.sendEmptyMessage(0);
 						++image_count;
 					}else if (image_count == 3 && duration >MAX_DURATION_MILLIS ){
-						testFragment.showDebug("test end" );
+						debugger.showDebug("test end" );
 						show_in_UI(show_value,6);
 						return true;
 					}
 				}else if (isPeak ){
-					testFragment.showDebug("Peak end" );
+					debugger.showDebug("Peak end" );
 					isPeak = false;
 					start_time = end_time = 0;
 				}
@@ -249,7 +249,7 @@ public class BluetoothDebugModeNormal extends Bluetooth {
 				if (isPeak){
 					float voltage = Float.valueOf(msg.substring(1));
 					String output = "\t"+voltage+"\n";
-					testFragment.showDebug("voltage: "+voltage);
+					debugger.showDebug("voltage: "+voltage);
 					if (start_recorder)
 						write_to_file(output);
 				}

@@ -2,10 +2,10 @@ package test.ui;
 
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
+import test.gps.GPSInterface;
 import ubicomp.drunk_detection.activities.FragmentTabs;
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.check.AlwaysFinishActivitiesCheck;
-import ubicomp.drunk_detection.fragments.TestFragment;
 import ubicomp.drunk_detection.ui.CustomToastSmall;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.TextSize;
@@ -36,7 +36,8 @@ import android.widget.TextView;
 
 public class TestQuestionMsgBox implements TestQuestionMsgBoxInterface{
 
-	private TestFragment testFragment;
+	private TestQuestionCaller testQuestionCaller;
+	private GPSInterface gpsInterface;
 	private Context context;
 	private LayoutInflater inflater;
 	private RelativeLayout boxLayout = null;
@@ -90,9 +91,10 @@ public class TestQuestionMsgBox implements TestQuestionMsgBoxInterface{
 	
 	private boolean done,doneByDoubleClick;
 	
-	public TestQuestionMsgBox(TestFragment testFragment,RelativeLayout mainLayout){
-		this.testFragment = testFragment;
-		this.context = testFragment.getActivity();
+	public TestQuestionMsgBox(Context context,GPSInterface gps,TestQuestionCaller testQuestionCaller,RelativeLayout mainLayout){
+		this.testQuestionCaller = testQuestionCaller;
+		this.gpsInterface = gps;
+		this.context = context;
 		this.r = context.getResources();
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
@@ -429,8 +431,8 @@ public class TestQuestionMsgBox implements TestQuestionMsgBoxInterface{
 			int desire = desireSeekBar.getProgress()+1;
 			int emotion =  emotionSeekBar.getProgress()+1;
 				
-			testFragment.writeQuestionFile(emotion, desire);
-			testFragment.startGPS(enableGPS);
+			testQuestionCaller.writeQuestionFile(emotion, desire);
+			gpsInterface.startGPS(enableGPS);
 		}
 	}
 	
@@ -450,8 +452,8 @@ public class TestQuestionMsgBox implements TestQuestionMsgBoxInterface{
 			
 			ClickLogger.Log(context, ClickLogId.TEST_QUESTION_CANCEL);
 			
-			testFragment.writeQuestionFile(emotion, desire);
-			testFragment.startGPS(enableGPS);
+			testQuestionCaller.writeQuestionFile(emotion, desire);
+			gpsInterface.startGPS(enableGPS);
 		}
 	}
 	

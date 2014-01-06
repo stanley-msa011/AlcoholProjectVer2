@@ -21,10 +21,14 @@ import ubicomp.drunk_detection.ui.Typefaces;
 import test.bluetooth.BTInitHandler;
 import test.bluetooth.BTRunTask;
 import test.bluetooth.Bluetooth;
+import test.bluetooth.BluetoothCaller;
 import test.bluetooth.BluetoothDebugMode;
 import test.bluetooth.BluetoothDebugModeNormal;
+import test.bluetooth.BluetoothDebugger;
+import test.bluetooth.BluetoothMessageUpdater;
 import test.bluetooth.BluetoothOld;
 import test.bluetooth.SimpleBluetooth;
+import test.camera.CameraCaller;
 import test.camera.CameraInitHandler;
 import test.camera.CameraRecorder;
 import test.camera.CameraRecorderOld;
@@ -37,7 +41,9 @@ import test.data.BracValueFileHandler;
 import test.data.ImageFileHandler;
 import test.data.QuestionFile;
 import test.gps.GPSInitTask;
+import test.gps.GPSInterface;
 import test.ui.NotificationBox;
+import test.ui.TestQuestionCaller;
 import test.ui.TestQuestionMsgBox;
 import test.ui.TestQuestionMsgBoxInterface;
 import test.ui.TestQuestionMsgBoxOld;
@@ -77,10 +83,10 @@ import data.uploader.DataUploader;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 
-public class TestFragment extends Fragment {
+public class TestFragment extends Fragment implements GPSInterface,TestQuestionCaller, BluetoothDebugger, BluetoothMessageUpdater,BluetoothCaller, CameraCaller {
 
 	private static final String TAG = "TEST_PAGE";
-	
+
 	private Activity activity;
 	private TestFragment testFragment;
 	private View view;
@@ -89,10 +95,6 @@ public class TestFragment extends Fragment {
 
 	private final boolean[] INIT_PROGRESS = { false, false, false };
 	private final boolean[] DONE_PROGRESS = { false, false, false };
-
-	public static final int _GPS = 0;
-	public static final int _BT = 1;
-	public static final int _CAMERA = 2;
 
 	private static final long TEST_GAP_DURATION_LONG = Config.TEST_GAP_DURATION_LONG;
 	private static final long TEST_GAP_DURATION_SHORT = Config.TEST_GAP_DURATION_SHORT;
@@ -153,9 +155,8 @@ public class TestFragment extends Fragment {
 	private EditText debugMsg;
 	private ChangeMsgHandler msgHandler;
 
-	private static final int[] BLOW_RESOURCE = { 0, R.drawable.test_circle1,
-			R.drawable.test_circle2, R.drawable.test_circle3, R.drawable.test_circle4,
-			R.drawable.test_circle5, R.drawable.test_circle6 };
+	private static final int[] BLOW_RESOURCE = { 0, R.drawable.test_circle1, R.drawable.test_circle2,
+			R.drawable.test_circle3, R.drawable.test_circle4, R.drawable.test_circle5, R.drawable.test_circle6 };
 	private Drawable[] blowDrawables;
 
 	private ImageView face;
@@ -252,9 +253,9 @@ public class TestFragment extends Fragment {
 	private void settingOnResume() {
 		if (msgBox == null) {
 			if (Build.VERSION.SDK_INT >= 14)
-				msgBox = new TestQuestionMsgBox(testFragment, main_layout);
+				msgBox = new TestQuestionMsgBox(activity,testFragment,testFragment, main_layout);
 			else
-				msgBox = new TestQuestionMsgBoxOld(testFragment, main_layout);
+				msgBox = new TestQuestionMsgBoxOld(activity,testFragment,testFragment, main_layout);
 		}
 		if (notificationBox == null)
 			notificationBox = new NotificationBox(testFragment.getActivity(), main_layout);
@@ -270,14 +271,14 @@ public class TestFragment extends Fragment {
 
 	public void reset() {
 		SimpleBluetooth.closeConnection();
-		
+
 		timestamp = setTimeStamp();
 		setStorage();
 		locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
 		if (Build.VERSION.SDK_INT >= 9)
-			cameraRecorder = new CameraRecorder(testFragment, imgFileHandler);
+			cameraRecorder = new CameraRecorder(activity,testFragment, imgFileHandler);
 		else
-			cameraRecorder = new CameraRecorderOld(testFragment, imgFileHandler);
+			cameraRecorder = new CameraRecorderOld(activity,testFragment, imgFileHandler);
 
 		cameraRunHandler = new CameraRunHandler(cameraRecorder);
 		Boolean debug = sp.getBoolean("debug", false);
@@ -286,15 +287,13 @@ public class TestFragment extends Fragment {
 		if (Build.VERSION.SDK_INT >= 14) {
 			if (debug) {
 				if (debug_type)
-					bt = new BluetoothDebugModeNormal(testFragment, cameraRunHandler,
-							bracFileHandler, bracDebugHandler);
+					bt = new BluetoothDebugModeNormal(activity,testFragment,testFragment, cameraRunHandler, bracFileHandler, bracDebugHandler);
 				else
-					bt = new BluetoothDebugMode(testFragment, cameraRunHandler, bracFileHandler,
-							bracDebugHandler);
+					bt = new BluetoothDebugMode(activity,testFragment,testFragment, cameraRunHandler, bracFileHandler, bracDebugHandler);
 			} else
-				bt = new Bluetooth(testFragment, cameraRunHandler, bracFileHandler, true);
+				bt = new Bluetooth(activity,testFragment,testFragment,  cameraRunHandler, bracFileHandler, true);
 		} else
-			bt = new BluetoothOld(testFragment, cameraRunHandler, bracFileHandler, bracDebugHandler);
+			bt = new BluetoothOld(activity,testFragment,testFragment, cameraRunHandler, bracFileHandler, bracDebugHandler);
 
 		for (int i = 0; i < 3; ++i)
 			INIT_PROGRESS[i] = DONE_PROGRESS[i] = false;
@@ -389,19 +388,8 @@ public class TestFragment extends Fragment {
 		return view;
 	}
 
-	public void startGPS(boolean enable) {
-		msgBox.generateWaitingBox();
-		if (enable) {
-			gps_state = true;
-			Object[] gps_enable = { gps_state };
-			gpsInitTask = new GPSInitTask(testFragment, locationManager);
-			gpsInitTask.execute(gps_enable);
-		} else {
-			gps_state = false;
-			runGPS();
-		}
-	}
-
+	//GPSInterface
+	@Override
 	public void runGPS() {
 		if (gps_state) {
 			gpsInitTask.cancel(true);
@@ -425,6 +413,43 @@ public class TestFragment extends Fragment {
 		}
 	}
 
+	@Override
+	public void callGPSActivity() {
+		Intent gpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+		startActivityForResult(gpsIntent, TestFragment._GPS);
+	}
+	
+	@Override
+	public void startGPS(boolean enable) {
+		msgBox.generateWaitingBox();
+		if (enable) {
+			gps_state = true;
+			Object[] gps_enable = { gps_state };
+			gpsInitTask = new GPSInitTask(activity,testFragment, locationManager);
+			gpsInitTask.execute(gps_enable);
+		} else {
+			gps_state = false;
+			runGPS();
+		}
+	}
+	
+	@Override
+	public boolean isKeepMsgBox() {
+		return keepMsgBox;
+	}
+
+	@Override
+	public void setKeepMsgBox(boolean keepMsgBox) {
+		this.keepMsgBox = keepMsgBox;
+	}
+
+	//TestQuestionBox
+	public void writeQuestionFile(int emotion, int desire) {
+		questionFile.write(emotion, desire);
+	}
+	
+	
+	//BluetoothInterface
 	public void startBT() {
 		// messageView.setText(R.string.wait);
 		// initialize bt task
@@ -453,6 +478,11 @@ public class TestFragment extends Fragment {
 			failBgHandler.sendMessage(msg);
 	}
 
+	//Camera
+	@Override
+	public FrameLayout getPreviewFrameLayout() {
+		return (FrameLayout) this.getView().findViewById(R.id.test_camera_preview_layout);
+	}
 	private class StartOnClickListener implements View.OnClickListener {
 
 		@Override
@@ -483,8 +513,7 @@ public class TestFragment extends Fragment {
 				long curTime = System.currentTimeMillis();
 				Boolean debug = sp.getBoolean("debug", false);
 				boolean testFail = sp.getBoolean("testFail", false);
-				long TEST_GAP_DURATION = testFail ? TEST_GAP_DURATION_SHORT
-						: TEST_GAP_DURATION_LONG;
+				long TEST_GAP_DURATION = testFail ? TEST_GAP_DURATION_SHORT : TEST_GAP_DURATION_LONG;
 				long time = curTime - lastTime;
 				if (time > TEST_GAP_DURATION || debug) {
 					bg.setOnTouchListener(null);
@@ -499,22 +528,17 @@ public class TestFragment extends Fragment {
 				} else {
 					if (testFail) {
 						if (time > 30000)
-							CustomToastSmall.generateToast(getActivity(),
-									R.string.testTimeCheckToastHalf);
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastHalf);
 						else
-							CustomToastSmall.generateToast(getActivity(),
-									R.string.testTimeCheckToastShort);
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastShort);
 
 					} else {
 						if (time > 90000)
-							CustomToastSmall.generateToast(getActivity(),
-									R.string.testTimeCheckToastHalf);
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastHalf);
 						else if (time > 60000)
-							CustomToastSmall.generateToast(getActivity(),
-									R.string.testTimeCheckToastShort);
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastShort);
 						else
-							CustomToastSmall.generateToast(getActivity(),
-									R.string.testTimeCheckToastLong);
+							CustomToastSmall.generateToast(getActivity(), R.string.testTimeCheckToastLong);
 					}
 				}
 			}
@@ -577,8 +601,7 @@ public class TestFragment extends Fragment {
 				Boolean debug = sp.getBoolean("debug", false);
 
 				if (debug)
-					count_down_thread = new Thread(new CountDownRunnable(1,
-							COUNT_DOWN_SECOND_DEVELOP));
+					count_down_thread = new Thread(new CountDownRunnable(1, COUNT_DOWN_SECOND_DEVELOP));
 				else
 					count_down_thread = new Thread(new CountDownRunnable(1, COUNT_DOWN_SECOND));
 				count_down_thread.start();
@@ -595,7 +618,7 @@ public class TestFragment extends Fragment {
 			if (!DONE_PROGRESS[_GPS] && DONE_PROGRESS[_BT] && DONE_PROGRESS[_CAMERA]) {
 				stop();
 				if (msgBox == null)
-					msgBox = new TestQuestionMsgBox(testFragment, main_layout);
+					msgBox = new TestQuestionMsgBox(activity,testFragment,testFragment, main_layout);
 				if (msgLoadingHandler == null)
 					msgLoadingHandler = new MsgLoadingHandler();
 				msgLoadingHandler.sendEmptyMessage(0);
@@ -606,11 +629,11 @@ public class TestFragment extends Fragment {
 			Boolean debug_type = sp.getBoolean("debug_type", false);
 			if (debug) {
 				if (debug_type)
-					BDH = new BracDataHandlerDebugModeNormal(timestamp, testFragment);
+					BDH = new BracDataHandlerDebugModeNormal(activity,timestamp);
 				else
-					BDH = new BracDataHandlerDebugMode(timestamp, testFragment);
+					BDH = new BracDataHandlerDebugMode(activity,timestamp);
 			} else
-				BDH = new BracDataHandler(timestamp, testFragment);
+				BDH = new BracDataHandler(activity,timestamp);
 			BDH.start();
 
 			if (!gps_state)
@@ -738,9 +761,9 @@ public class TestFragment extends Fragment {
 			startButton.setEnabled(false);
 			if (msgBox == null) {
 				if (Build.VERSION.SDK_INT >= 14)
-					msgBox = new TestQuestionMsgBox(testFragment, main_layout);
+					msgBox = new TestQuestionMsgBox(activity,testFragment,testFragment, main_layout);
 				else
-					msgBox = new TestQuestionMsgBoxOld(testFragment, main_layout);
+					msgBox = new TestQuestionMsgBoxOld(activity,testFragment,testFragment, main_layout);
 			}
 			msgBox.settingPreTask();
 			msgBox.settingInBackground();
@@ -806,7 +829,7 @@ public class TestFragment extends Fragment {
 
 	private int prev_drawable_time = -1;
 
-	public void changeTestMessage(float value, int time) {
+	public void changeBluetoothCondition(float value, int time) {
 		bracText.setText(format.format(value));
 		if (time >= blowDrawables.length)
 			time = blowDrawables.length - 1;
@@ -850,14 +873,6 @@ public class TestFragment extends Fragment {
 		msg.what = 0;
 		if (failBgHandler != null)
 			failBgHandler.sendMessage(msg);
-	}
-
-	public boolean isKeepMsgBox() {
-		return keepMsgBox;
-	}
-
-	public void setKeepMsgBox(boolean keepMsgBox) {
-		this.keepMsgBox = keepMsgBox;
 	}
 
 	@SuppressLint("HandlerLeak")
@@ -958,10 +973,6 @@ public class TestFragment extends Fragment {
 		activity.startActivity(intent);
 	}
 
-	public void writeQuestionFile(int emotion, int desire) {
-		questionFile.write(emotion, desire);
-	}
-
 	public void setPairMessage() {
 		messageView.setText(R.string.test_guide_pair);
 	}
@@ -978,10 +989,10 @@ public class TestFragment extends Fragment {
 			debugMsg.setText("");
 			debugMsg.setOnKeyListener(null);
 			TextView debugText = (TextView) view.findViewById(R.id.debug_mode_text);
-			
-			Button modeButton =(Button) view.findViewById(R.id.debug_mode_change);
-			
-			modeButton.setOnClickListener(new OnClickListener(){
+
+			Button modeButton = (Button) view.findViewById(R.id.debug_mode_change);
+
+			modeButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					SharedPreferences.Editor edit = sp.edit();
@@ -990,11 +1001,10 @@ public class TestFragment extends Fragment {
 					checkDebug(sp.getBoolean("debug", false), sp.getBoolean("debug_type", false));
 				}
 			});
-			if (!debug_type){
+			if (!debug_type) {
 				modeButton.setText("->avm");
 				debugText.setText("Training(acvm)");
-			}
-			else{
+			} else {
 				modeButton.setText("->acvm");
 				debugText.setText("Testing(avm)");
 			}
@@ -1005,9 +1015,9 @@ public class TestFragment extends Fragment {
 			conditionButtons[3] = (Button) view.findViewById(R.id.debug_button_4);
 			for (int i = 0; i < 4; ++i)
 				conditionButtons[i].setOnClickListener(new ConditionOnClickListener(i));
-			
+
 			Button volButton = (Button) view.findViewById(R.id.debug_voltage);
-			volButton.setOnClickListener(new OnClickListener(){
+			volButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					SimpleBluetooth.getInitialVoltage(testFragment);
@@ -1042,13 +1052,13 @@ public class TestFragment extends Fragment {
 		}
 	}
 
-	public void showDebugVoltage(String message){
+	public void showDebugVoltage(String message) {
 		TextView vol_tv = (TextView) view.findViewById(R.id.debug_voltage_value);
 		vol_tv.setText(message);
 		vol_tv.invalidate();
 	}
-	
-	public void showDebug(String message,int type) {
+
+	public void showDebug(String message, int type) {
 		if (this == null)
 			return;
 		Boolean debug = sp.getBoolean("debug", false);
@@ -1062,9 +1072,9 @@ public class TestFragment extends Fragment {
 			msgHandler.sendMessage(msg);
 		}
 	}
-	
+
 	public void showDebug(String message) {
-		showDebug(message,0);
+		showDebug(message, 0);
 	}
 
 	@SuppressLint("HandlerLeak")
@@ -1072,10 +1082,10 @@ public class TestFragment extends Fragment {
 		public void handleMessage(Message msg) {
 			Bundle data = msg.getData();
 			int type = data.getInt("type");
-			if (type == 0){
+			if (type == 0) {
 				debugMsg.append("\n" + data.getString("message"));
 				debugScrollView.scrollTo(0, debugMsg.getBottom() + 100);
-			}else if (type == 1){
+			} else if (type == 1) {
 				showDebugVoltage(data.getString("message"));
 			}
 		}

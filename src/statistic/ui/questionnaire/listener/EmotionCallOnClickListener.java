@@ -2,14 +2,14 @@ package statistic.ui.questionnaire.listener;
 
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.content.CallCheckContent;
 import ubicomp.drunk_detection.activities.R;
 import android.view.View;
 
 public class EmotionCallOnClickListener extends QuestionnaireOnClickListener {
 
-	public EmotionCallOnClickListener(QuestionMsgBox msgBox) {
+	public EmotionCallOnClickListener(QuestionnaireBox msgBox) {
 		super(msgBox);
 	}
 

@@ -2,7 +2,7 @@ package statistic.ui.questionnaire.content;
 
 import java.util.ArrayList;
 
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.TextSize;
 
@@ -23,7 +23,7 @@ abstract public class QuestionnaireContent {
 	private Drawable choiceDrawable;
 	protected ArrayList<String>seq;
 	protected ArrayList <QuestionnaireContent> contentSeq;
-	protected QuestionMsgBox msgBox;
+	protected QuestionnaireBox msgBox;
 	private int textSize;
 	private int contentSideMargin, contentMargin;
 	private Context context;
@@ -31,7 +31,7 @@ abstract public class QuestionnaireContent {
 	private int itemHeight;
 	
 	public QuestionnaireContent(
-			QuestionMsgBox msgBox
+			QuestionnaireBox msgBox
 			){
 		this.questionnaireLayout = msgBox.getQuestionnaireLayout();
 		this.seq = msgBox.getClickSequence();

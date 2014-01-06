@@ -1,7 +1,6 @@
 package history.ui;
 
 import ubicomp.drunk_detection.activities.FragmentTabs;
-import ubicomp.drunk_detection.fragments.HistoryFragment;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,20 +17,20 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	public static final int gaps = 30;
 	private static final int clip_time = 500;
 	private static final int sleep_time = clip_time/gaps;
-	private HistoryFragment historyFragment;
+	private PageAnimationCaller endPageAnimaion;
 	
 	private Bitmap cur=null,next=null;
 	
 	private Point screen;
 	private int y_axis;
 	
-	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,int[] bgs,HistoryFragment historyFragment,int startImageIdx){
+	public PageAnimationTaskVertical(PageWidgetVertical pageWidget, PointF from, PointF to,int[] bgs,PageAnimationCaller endPageAnimation,int startImageIdx){
 		this.pageWidget = pageWidget;
 		this.from = from;
-		this.historyFragment = historyFragment;
+		this.endPageAnimaion = endPageAnimation;
 		width_gap = (to.x - from.x)/(float)gaps;
 		height_gap = (to.y - from.y)/(float)gaps;
-		screen =ScreenSize.getScreenSize(historyFragment.getActivity());
+		screen =ScreenSize.getScreenSize(pageWidget.getContext());
 		y_axis = screen.y - screen.x * 574/1080;
 		Bitmap tmp;
 		tmp = BitmapFactory.decodeResource(pageWidget.getResources(), bgs[startImageIdx]);
@@ -63,8 +62,8 @@ public class PageAnimationTaskVertical extends AsyncTask<Void, Void, Void> {
 	@Override
 	 protected void onPostExecute(Void result) {
 		clean();
-		historyFragment.resetPage(0);
-		historyFragment.endAnimation();
+		endPageAnimaion.resetPage(0);
+		endPageAnimaion.endAnimation();
     }
 	@Override
 	protected void onCancelled(){

@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-import ubicomp.drunk_detection.fragments.TestFragment;
-
 import data.calculate.WeekNum;
 import data.database.HistoryDB;
 import data.database.StartDateCheck;
@@ -33,10 +31,10 @@ public class BracDataHandler {
 	protected double avg_result = 0;
 	protected HistoryDB db;
 	
-	public BracDataHandler(String timestamp_string, TestFragment fragment){
+	public BracDataHandler(Context context,String timestamp_string){
 		ts = timestamp_string;
-		context = fragment.getActivity();
-		db = new HistoryDB(fragment.getActivity());
+		this.context = context;
+		db = new HistoryDB(context);
 	}
 	
 	public static final int Nothing = 0; 

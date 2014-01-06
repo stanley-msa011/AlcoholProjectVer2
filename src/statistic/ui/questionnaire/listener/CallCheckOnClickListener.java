@@ -2,14 +2,14 @@ package statistic.ui.questionnaire.listener;
 
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.content.CallCheckContent;
 import android.view.View;
 
 public class CallCheckOnClickListener extends QuestionnaireOnClickListener {
 
 	private String name,phone;
-	public CallCheckOnClickListener(QuestionMsgBox msgBox,String name,String phone) {
+	public CallCheckOnClickListener(QuestionnaireBox msgBox,String name,String phone) {
 		super(msgBox);
 		this.name = name;
 		this.phone = phone;

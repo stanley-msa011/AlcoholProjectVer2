@@ -42,8 +42,8 @@ public class AnalysisSavingView extends StatisticPageView {
 	private String[] helpStr;
 	private String money_sign;
 	
-	public AnalysisSavingView(Context context,StatisticFragment statisticFragment) {
-		super(context, R.layout.analysis_saving_view,statisticFragment);
+	public AnalysisSavingView(Context context) {
+		super(context, R.layout.analysis_saving_view);
 		db = new HistoryDB(context);
 		wordTypeface = Typefaces.getWordTypeface(context);
 		digitTypefaceBold = Typefaces.getDigitTypefaceBold(context);

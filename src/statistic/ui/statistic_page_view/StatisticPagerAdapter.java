@@ -3,8 +3,6 @@ package statistic.ui.statistic_page_view;
 
 import java.util.ArrayList;
 
-import ubicomp.drunk_detection.fragments.StatisticFragment;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -19,14 +17,14 @@ public class StatisticPagerAdapter extends PagerAdapter {
 	private StatisticPageView[] statisticViews;
 	
 	
-	public StatisticPagerAdapter(Context context,StatisticFragment statisticFragment){
+	public StatisticPagerAdapter(Context context){
 		viewsList = new ArrayList<View>();
 		
 		if (Build.VERSION.SDK_INT<14){
 			statisticViews = new StatisticPageView[3];
-			statisticViews[0] = new StatisticDayView(context,statisticFragment);
-			statisticViews[1] = new StatisticWeekViewOld(context,statisticFragment);
-			statisticViews[2] = new StatisticMonthViewOld(context,statisticFragment);
+			statisticViews[0] = new StatisticDayView(context);
+			statisticViews[1] = new StatisticWeekViewOld(context);
+			statisticViews[2] = new StatisticMonthViewOld(context);
 			viewsList.add(statisticViews[0].getView());
 			viewsList.add(statisticViews[1].getView());
 			viewsList.add(statisticViews[2].getView());
@@ -39,15 +37,15 @@ public class StatisticPagerAdapter extends PagerAdapter {
 		if (debug){
 			if (!debug_type){
 				statisticViews = new StatisticPageView[2];
-				statisticViews[0] = new DevelopView(context,statisticFragment);
-				statisticViews[1] = new StatisticDayView(context,statisticFragment);
+				statisticViews[0] = new DevelopView(context);
+				statisticViews[1] = new StatisticDayView(context);
 				viewsList.add(statisticViews[0].getView());
 				viewsList.add(statisticViews[1].getView());
 				return;
 			}else{
 				statisticViews = new StatisticPageView[2];
-				statisticViews[0] = new DevelopNormalView(context,statisticFragment);
-				statisticViews[1] = new StatisticDayView(context,statisticFragment);
+				statisticViews[0] = new DevelopNormalView(context);
+				statisticViews[1] = new StatisticDayView(context);
 				viewsList.add(statisticViews[0].getView());
 				viewsList.add(statisticViews[1].getView());
 				return;
@@ -55,9 +53,9 @@ public class StatisticPagerAdapter extends PagerAdapter {
 		}
 		
 		statisticViews = new StatisticPageView[3];
-		statisticViews[0] = new StatisticDayView(context,statisticFragment);
-		statisticViews[1] = new StatisticWeekView(context,statisticFragment);
-		statisticViews[2] = new StatisticMonthView(context,statisticFragment);
+		statisticViews[0] = new StatisticDayView(context);
+		statisticViews[1] = new StatisticWeekView(context);
+		statisticViews[2] = new StatisticMonthView(context);
 		
 		viewsList.add(statisticViews[0].getView());
 		viewsList.add(statisticViews[1].getView());

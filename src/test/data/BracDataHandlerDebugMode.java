@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -15,13 +16,10 @@ import data.calculate.WeekNum;
 import data.info.AccumulatedHistoryState;
 import data.info.DateBracDetectionState;
 
-import ubicomp.drunk_detection.fragments.TestFragment;
-
 public class BracDataHandlerDebugMode extends BracDataHandler {
 
-	public BracDataHandlerDebugMode(String timestamp_string,
-			TestFragment fragment) {
-		super(timestamp_string, fragment);
+	public BracDataHandlerDebugMode(Context context,String timestamp_string) {
+		super(context,timestamp_string);
 	}
 	
 	@Override

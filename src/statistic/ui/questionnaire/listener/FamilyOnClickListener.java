@@ -2,13 +2,13 @@ package statistic.ui.questionnaire.listener;
 
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.content.ConnectContent;
 import android.view.View;
 
 public class FamilyOnClickListener extends QuestionnaireOnClickListener {
 
-	public FamilyOnClickListener(QuestionMsgBox msgBox) {
+	public FamilyOnClickListener(QuestionnaireBox msgBox) {
 		super(msgBox);
 	}
 

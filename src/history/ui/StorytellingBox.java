@@ -5,7 +5,7 @@ import debug.clicklog.ClickLogger;
 
 import ubicomp.drunk_detection.activities.R;
 import ubicomp.drunk_detection.activities.StorytellingSharingActivity;
-import ubicomp.drunk_detection.fragments.HistoryFragment;
+import ubicomp.drunk_detection.ui.EnablePage;
 import ubicomp.drunk_detection.ui.ScreenSize;
 import ubicomp.drunk_detection.ui.TextSize;
 import ubicomp.drunk_detection.ui.Typefaces;
@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 public class StorytellingBox {
 
-	private HistoryFragment historyFragment;
+	private EnablePage enablePage;
 	private Context context;
 	private LayoutInflater inflater;
 	private RelativeLayout boxLayout = null;
@@ -41,9 +41,9 @@ public class StorytellingBox {
 	private OKListener okListener = new OKListener();
 	private EndListener endListener = new EndListener();
 	
-	public StorytellingBox(HistoryFragment historyFragment,RelativeLayout mainLayout){
-		this.historyFragment = historyFragment;
-		this.context = historyFragment.getActivity();
+	public StorytellingBox(Context context,EnablePage enablePage,RelativeLayout mainLayout){
+		this.enablePage = enablePage;
+		this.context = context;
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mainLayout = mainLayout;
 		background = new FrameLayout(context);
@@ -114,7 +114,7 @@ public class StorytellingBox {
 		if (boxLayout!=null)
 			mainLayout.removeView(boxLayout);
 		
-		historyFragment.enablePage(true);
+		enablePage.enablePage(true);
 	}
 	
 	private class EndListener implements View.OnClickListener{
@@ -123,7 +123,7 @@ public class StorytellingBox {
 			ClickLogger.Log(context, ClickLogId.STORYTELLING_SHARE_CANCEL);
 			background.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
-			historyFragment.enablePage(true);
+			enablePage.enablePage(true);
 		}
 	}
 	
@@ -134,7 +134,7 @@ public class StorytellingBox {
 			ClickLogger.Log(context, ClickLogId.STORYTELLING_SHARE_OK);
 			background.setVisibility(View.INVISIBLE);
 			boxLayout.setVisibility(View.INVISIBLE);
-			historyFragment.enablePage(true);
+			enablePage.enablePage(true);
 			Intent questionIntent = new Intent(context,StorytellingSharingActivity.class);
 			context.startActivity(questionIntent);
 			
@@ -142,7 +142,7 @@ public class StorytellingBox {
 	}
 	
 	public void showMsgBox(){
-		historyFragment.enablePage(false);
+		enablePage.enablePage(false);
 		background.setVisibility(View.VISIBLE);
 		boxLayout.setVisibility(View.VISIBLE);
 	}

@@ -1,6 +1,6 @@
 package statistic.ui.questionnaire.content;
 
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 import statistic.ui.questionnaire.listener.EndOnClickListener;
 import ubicomp.drunk_detection.activities.R;
 
@@ -8,7 +8,7 @@ public class SolutionContent extends QuestionnaireContent {
 
 	private static String[] TEXT;
 	private int aid;
-	public SolutionContent(QuestionMsgBox msgBox, int aid) {
+	public SolutionContent(QuestionnaireBox msgBox, int aid) {
 		super(msgBox);
 		this.aid = aid;
 		TEXT = msgBox.getContext().getResources().getStringArray(R.array.question_solutions);

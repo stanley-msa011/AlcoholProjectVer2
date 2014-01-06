@@ -1,18 +1,18 @@
 package test.bluetooth;
 
+import android.content.Context;
 import android.util.Log;
 import test.camera.CameraRunHandler;
 import test.data.BracValueDebugHandler;
 import test.data.BracValueFileHandler;
-import ubicomp.drunk_detection.fragments.TestFragment;
 
 public class BluetoothOld extends Bluetooth {
 
-	public BluetoothOld(TestFragment testFragment,
+	public BluetoothOld(Context context, BluetoothDebugger debugger, BluetoothMessageUpdater updater,
 			CameraRunHandler cameraRunHandler,
 			BracValueFileHandler bracFileHandler,
 			BracValueDebugHandler bracDebugHandler) {
-		super(testFragment, cameraRunHandler, bracFileHandler,true);
+		super(context, debugger, updater,  cameraRunHandler, bracFileHandler,true);
 	}
 
 	@Override

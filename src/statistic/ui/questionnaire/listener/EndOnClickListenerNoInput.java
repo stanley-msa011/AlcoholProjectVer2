@@ -3,11 +3,11 @@ package statistic.ui.questionnaire.listener;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 import android.view.View;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
 
 public class EndOnClickListenerNoInput extends QuestionnaireOnClickListener {
 
-	public EndOnClickListenerNoInput(QuestionMsgBox msgBox) {
+	public EndOnClickListenerNoInput(QuestionnaireBox msgBox) {
 		super(msgBox);
 	}
 

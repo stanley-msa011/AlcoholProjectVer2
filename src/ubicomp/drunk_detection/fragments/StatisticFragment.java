@@ -8,8 +8,10 @@ import ubicomp.drunk_detection.ui.CustomToast;
 import ubicomp.drunk_detection.ui.LoadingDialogControl;
 import ubicomp.drunk_detection.ui.ScaleOnTouchListener;
 import ubicomp.drunk_detection.ui.ScreenSize;
-import statistic.ui.QuestionMsgBox;
+import statistic.ui.QuestionnaireBox;
+import statistic.ui.QuestionnaireBoxUpdater;
 import statistic.ui.RadarChart3;
+import statistic.ui.ShowRadarChart;
 import statistic.ui.statistic_page_view.AnalysisCounterView;
 import statistic.ui.statistic_page_view.AnalysisProgressView;
 import statistic.ui.statistic_page_view.AnalysisRatingView;
@@ -44,7 +46,7 @@ import android.widget.ScrollView;
 import debug.clicklog.ClickLogId;
 import debug.clicklog.ClickLogger;
 
-public class StatisticFragment extends Fragment {
+public class StatisticFragment extends Fragment implements ShowRadarChart,QuestionnaireBoxUpdater {
 	
 	private View view;
 	private Activity activity;
@@ -67,7 +69,7 @@ public class StatisticFragment extends Fragment {
 	
 	private AlphaAnimation questionAnimation;
 	
-	private QuestionMsgBox msgBox;
+	private QuestionnaireBox msgBox;
 	
 	private ImageView firstScroll;
 	
@@ -135,14 +137,14 @@ public class StatisticFragment extends Fragment {
     	enablePage(true);
     	statisticFragment = this;
     	analysisViews = new StatisticPageView[4];
-    	analysisViews[0] = new AnalysisCounterView(activity, statisticFragment);
-    	analysisViews[1] = new AnalysisProgressView(activity, statisticFragment);
+    	analysisViews[0] = new AnalysisCounterView(activity);
+    	analysisViews[1] = new AnalysisProgressView(activity);
     	SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
     	if (sp.getBoolean("show_saving", true))
-    		analysisViews[2] = new AnalysisSavingView(activity, statisticFragment);
+    		analysisViews[2] = new AnalysisSavingView(activity);
 		analysisViews[3] = new AnalysisRatingView(activity,statisticFragment);
-		statisticViewAdapter = new StatisticPagerAdapter(activity,statisticFragment);
-		msgBox = new QuestionMsgBox(statisticFragment,(RelativeLayout) view);
+		statisticViewAdapter = new StatisticPagerAdapter(activity);
+		msgBox = new QuestionnaireBox(activity,this,(RelativeLayout) view);
 		if (loadHandler==null)
 			loadHandler = new LoadingHandler();
 		
@@ -384,13 +386,6 @@ public class StatisticFragment extends Fragment {
 		analysisView.setEnabled(enable);
 		questionButton.setEnabled(enable);
 		FragmentTabs.enableTabAndClick(enable);
-	}
-	
-	public void showEndOfQuestionnaire(boolean addAcc){
-		if (addAcc)
-			CustomToast.generateToast(activity, R.string.after_questionnaire, 1);
-		else
-			CustomToast.generateToast(activity, R.string.after_questionnaire, 0);
 	}
 	
 	public void updateSelfHelpCounter(){
