@@ -467,6 +467,7 @@ public class AdditionalDataUploader extends AsyncTask<Void, Void, Void> {
 			nvps.add(new BasicNameValuePair("usageData[]", String.valueOf(week)));
 			nvps.add(new BasicNameValuePair("usageData[]", su.name));
 			nvps.add(new BasicNameValuePair("usageData[]", String.valueOf(su.minutes)));
+			nvps.add(new BasicNameValuePair("usageData[]", su.content));
 			httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
 			if (uploader(httpClient, httpPost, context)) {
@@ -599,6 +600,8 @@ public class AdditionalDataUploader extends AsyncTask<Void, Void, Void> {
 				uploadSuccess = 1;
 			nvps.add(new BasicNameValuePair("data[]", String.valueOf(uploadSuccess)));
 
+			nvps.add(new BasicNameValuePair("data[]", String.valueOf(finfo.sendGroup)));
+			
 			httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
 			if (uploader(httpClient, httpPost, context)) {

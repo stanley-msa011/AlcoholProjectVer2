@@ -50,7 +50,7 @@ public class StorytellingSharingActivity extends Activity {
 	
 	private ItemOnTouchListener onTouchListener;
 	
-	private EditText who_texts, time_texts;
+	private EditText who_texts, time_texts, content_texts;
 	
 	private QuestionDB db;
 	private static final int TOTAL_BLOCK = 15;	
@@ -114,6 +114,12 @@ public class StorytellingSharingActivity extends Activity {
 		
 		View timev = createEditView(1);
 		mainLayout.addView(timev);
+		
+		View content_text_v = createTextView(R.string.storytelling_help3);
+		mainLayout.addView(content_text_v);
+		
+		View content_v = createEditView(2);
+		mainLayout.addView(content_v);
 		
 		View endv=createIconView(R.string.ok,R.drawable.questionnaire_item_ok,new EndOnClickListener());
 		mainLayout.addView(endv);
@@ -197,11 +203,15 @@ private View createTextView(int textStr){
 		param.leftMargin = screen.x * 10/480;
 		if (type == 0)
 			who_texts = edit;
-		else{
+		else if (type == 1) {
 			time_texts = edit;
 			time_texts.setFilters(new InputFilter[] {new InputFilter.LengthFilter(3)});
 			edit.setInputType(InputType.TYPE_CLASS_NUMBER);
+		}else if (type == 2){
+			content_texts = edit;
+			edit.setMaxEms(200);
 		}
+		
 		layout.setBackgroundResource(R.drawable.questionnaire_bar_normal);
 		return layout;
 	}
@@ -278,7 +288,7 @@ private View createIconView(int textStr, int DrawableId ,OnClickListener listene
 			}
 			int time = Integer.valueOf(time_str);
 			
-			boolean getSHC = db.insertStorytellingUsage(who,time);
+			boolean getSHC = db.insertStorytellingUsage(who,time,content_texts.getText().toString());
 			
 			if (getSHC)
 				CustomToast.generateToast(getBaseContext(), R.string.storytelling_end_toast, 1);

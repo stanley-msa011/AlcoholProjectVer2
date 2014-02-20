@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import ubicomp.drunk_detection.ui.CustomToast;
@@ -42,13 +43,17 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.RelativeLayout.LayoutParams;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -87,8 +92,9 @@ public class FacebookActivity extends Activity {
 	private int image_week, image_score;
 
 	private EditText texts;
-
-	private View shareButton, inputMessage, guideMessage;
+	private int sendGroup = 0;
+	
+	private View shareButton, inputMessage, guideMessage, privacySelection;
 
 	private Bitmap state_bmp;
 
@@ -125,6 +131,8 @@ public class FacebookActivity extends Activity {
 
 		bgShadow = new View(activity);
 		bgShadow.setBackgroundColor(0x99000000);
+
+		fb_array = getResources().getStringArray(R.array.fb_selection);
 		
 		screen = ScreenSize.getScreenSize(this);
 
@@ -149,7 +157,7 @@ public class FacebookActivity extends Activity {
 		ttParam.height = screen.x * 245 / 1080;
 
 		authButton = (LoginButton) this.findViewById(R.id.authButton);
-		authButton.setReadPermissions(Arrays.asList("basic_info"));
+		authButton.setReadPermissions(Arrays.asList("basic_info","read_friendlists"));
 		authButton.setText(R.string.fb_login);
 		authButton.setTypeface(wordTypefaceBold);
 		authButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize.smallTitleTextSize(activity));
@@ -167,15 +175,11 @@ public class FacebookActivity extends Activity {
 
 		inputMessage = createEditView();
 		inputLayout.addView(inputMessage);
-
+		
+		privacySelection=createSendGroupView();
+		inputLayout.addView(privacySelection);
+		
 		shareButton = createIconView(R.string.fb_share, R.drawable.questionnaire_item_ok,
-		/*		new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						//publishStory();
-					}
-				}
-				*/
 				new SendOnClickListener()
 		);
 
@@ -313,13 +317,13 @@ public class FacebookActivity extends Activity {
 					if (result) {
 						Log.d(TAG, "upload success");
 						info = new FacebookInfo(System.currentTimeMillis(), image_week,
-								image_score, text_msg, true);
+								image_score, text_msg, true,sendGroup);
 						CustomToast.generateToast(activity, R.string.fb_success_toast, 0);
 
 					} else {
 						Log.d(TAG, "upload failed");
 						info = new FacebookInfo(System.currentTimeMillis(), image_week,
-								image_score, text_msg, false);
+								image_score, text_msg, false,sendGroup);
 						CustomToastSmall.generateToast(activity, R.string.fb_fail_toast);
 					}
 					AdditionalDB adb = new AdditionalDB(activity);
@@ -339,6 +343,19 @@ public class FacebookActivity extends Activity {
 				params.putString("name", getString(R.string.app_name) + " "
 						+ getString(R.string.homepage));
 
+			JSONObject privacy = new JSONObject();
+		    try {
+		        switch (sendGroup){
+		            case 0: 
+		                privacy.put("value", "ALL_FRIENDS");
+		                break;
+		            case 1: 
+		                privacy.put("value", "SELF");
+		                break;
+		        }
+		    } catch (JSONException e1) {}
+		    params.putString("privacy", privacy.toString());
+			
 			request.setParameters(params);
 			request.executeAsync();
 
@@ -411,6 +428,49 @@ public class FacebookActivity extends Activity {
 		return layout;
 	}
 
+	
+	private Spinner privacySpinner;
+	
+	private String[] fb_array;
+	
+	private View createSendGroupView(){
+
+		RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.facebook_send_group, null);
+		
+		TextView text = (TextView) layout.findViewById(R.id.fb_privacy_text);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		text.setTypeface(wordTypefaceBold);
+		RelativeLayout.LayoutParams tParam = (RelativeLayout.LayoutParams) text.getLayoutParams();
+		tParam.leftMargin = textSize;
+		
+		privacySpinner = (Spinner) layout.findViewById(R.id.fb_privacy_spinner);
+		
+		ArrayAdapter<CharSequence> timeAdapter =
+				new ArrayAdapter<CharSequence>(
+						getBaseContext(),
+						R.layout.time_spinner,R.id.custom_spinner_text,
+						fb_array); 
+		
+		privacySpinner.setAdapter(timeAdapter);
+		sendGroup = FacebookInfo.FRIEND;
+		privacySpinner.setSelection(0);
+		
+		privacySpinner.setOnItemSelectedListener(
+				new OnItemSelectedListener(){
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
+						if (sendGroup != position){
+							ClickLogger.Log(getBaseContext(), ClickLogId.FB_SHARE_SPINNER_SELECTION);
+							sendGroup = position;
+						}
+					}
+					@Override
+					public void onNothingSelected(AdapterView<?> parent) {}}
+		);
+		
+		return layout;
+	}
+	
 	private final OnTouchListener onTouchListener = new ItemOnTouchListener();
 
 	private class ItemOnTouchListener implements View.OnTouchListener {

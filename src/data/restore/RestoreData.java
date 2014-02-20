@@ -408,7 +408,7 @@ public class RestoreData extends AsyncTask<Void, Void, Void> {
 							name = data[3];
 							minutes = Integer.valueOf(data[4]);
 						}
-						su = new StorytellingUsage(ts,0,acc,used,name,minutes);
+						su = new StorytellingUsage(ts,0,acc,used,name,minutes,"");
 					}
 				}
 				reader.close();

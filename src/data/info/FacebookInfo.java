@@ -7,8 +7,12 @@ public class FacebookInfo {
 	public int pageLevel = 0;
 	public String text = null;
 	public boolean uploadSuccess = false;
+	public int sendGroup = 0;
 	
-	public FacebookInfo(long ts,int pageWeek, int pageLevel, String text, boolean uploadSuccess){
+	public final static int FRIEND = 0;
+	public final static int SELF = 1;
+	
+	public FacebookInfo(long ts,int pageWeek, int pageLevel, String text, boolean uploadSuccess,int sendGroup){
 		this.ts = ts;
 		this.pageWeek = pageWeek;
 		this.pageLevel = pageLevel;
@@ -18,6 +22,7 @@ public class FacebookInfo {
 		if (this.text.length()>=500)
 			this.text = this.text.substring(0,499);
 		this.uploadSuccess = uploadSuccess;
+		this.sendGroup = sendGroup;
 	}
 	
 }

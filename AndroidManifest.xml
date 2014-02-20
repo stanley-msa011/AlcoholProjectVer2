@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="136"
-    android:versionName="3.87" >
+    android:versionCode="143"
+    android:versionName="3.94" >
 
     <uses-sdk
-        android:maxSdkVersion="18"
+        android:maxSdkVersion="19"
         android:minSdkVersion="7"
         android:targetSdkVersion="13" />
 
     <uses-feature android:name="android.hardware.camera" />
-
+	<uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
+    
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

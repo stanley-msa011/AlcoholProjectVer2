@@ -133,8 +133,8 @@ public class TestFragment extends Fragment implements GPSInterface,TestQuestionC
 	private LoadingHandler loadingHandler;
 	private FailBgHandler failBgHandler;
 	private MsgLoadingHandler msgLoadingHandler;
-	private TestHandler testHandler;
 	private TimeUpHandler timeUpHandler;
+	private TestHandler testHandler;
 	private ChangeTabsHandler changeTabsHandler;
 	private CountDownHandler countDownHandler;
 
@@ -830,6 +830,8 @@ public class TestFragment extends Fragment implements GPSInterface,TestQuestionC
 	private int prev_drawable_time = -1;
 
 	public void changeBluetoothCondition(float value, int time) {
+		if (value <  0.03)
+			value /=2;
 		bracText.setText(format.format(value));
 		if (time >= blowDrawables.length)
 			time = blowDrawables.length - 1;

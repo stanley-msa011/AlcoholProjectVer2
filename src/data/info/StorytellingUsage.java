@@ -7,14 +7,16 @@ public class StorytellingUsage implements SelfHelpCounter{
 	public int used = 0;
 	public String name;
 	public int minutes;
+	public String content;
 	
-	public StorytellingUsage(long ts, int daily_usage, int acc, int used, String name, int minutes){
+	public StorytellingUsage(long ts, int daily_usage, int acc, int used, String name, int minutes, String content){
 		this.ts = ts;
 		this.daily_usage = daily_usage;
 		this.acc = acc;
 		this.used = used;
 		this.name = name;
 		this.minutes = minutes;
+		this.content = content;
 	}
 
 	@Override

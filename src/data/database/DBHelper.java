@@ -8,7 +8,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	/*SQLiteOpenHelper. need to migrate with */
 	private static final String DATABASE_NAME = "Alcohol Project";
-	private static final int DB_VERSION = 16; 
+	private static final int DB_VERSION = 18; 
 	
 	public DBHelper(Context context) {
 		super(context, DATABASE_NAME, null, DB_VERSION);
@@ -185,7 +185,8 @@ public class DBHelper extends SQLiteOpenHelper {
         		" used INTEGER NOT NULL," +
         		" upload INTEGER NOT NULL DEFAULT 0," +
         		" name CHAR[255] NOT NULL DEFAULT 'NONE',"+
-        		" minutes INTEGER NOT NULL DEFAULT -1"+
+        		" minutes INTEGER NOT NULL DEFAULT -1,"+
+        		" content CHAR[255] NOT NULL DEFAULT ''"+
         		")"
         		);
         
@@ -218,7 +219,8 @@ public class DBHelper extends SQLiteOpenHelper {
         		" pageLevel INTEGER NOT NULL," +
         		" text CHAR[500] NOT NULL," +
         		" uploadSuccess INTEGER NOT NULL,"+
-        		" upload INTEGER NOT NULL DEFAULT 0" +
+        		" upload INTEGER NOT NULL DEFAULT 0," +
+        		" sendGroup INTEGER NOT NULL DEFAULT 0"+
         		")"
         		);
 	}
@@ -319,6 +321,12 @@ public class DBHelper extends SQLiteOpenHelper {
 	        		" upload INTEGER NOT NULL DEFAULT 0" +
 	        		")"
 	        		);
+		}
+		if (old_ver < 17){
+			db.execSQL("ALTER TABLE Facebook ADD sendGroup INTEGER NOT NULL DEFAULT 0");
+		}
+		if (old_ver < 18){
+			db.execSQL("ALTER TABLE StorytellingUsage ADD content CHAR[255] NOT NULL DEFAULT ''");
 		}
 	}
 	

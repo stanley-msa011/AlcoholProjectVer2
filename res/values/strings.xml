@@ -467,6 +467,7 @@
     <string name="storytelling_end_toast">分享酒測歷程</string>
     <string name="storytelling_help1">您所分享的對象是：</string>
     <string name="storytelling_help2">您所分享的時間為﹝分鐘﹞：</string>
+    <string name="storytelling_help3">您所分享的內容為﹝選填﹞：</string>
     <string name="storytelling_leave_toast">您確定要離開嗎？</string>
     <string name="storytelling_share_title">填寫分享資料</string>
     <string name="storytelling_check_toast1">分享對象未填寫</string>
@@ -521,5 +522,10 @@
     <string name = "fb_login">登入</string>
     <string name = "fb_logout">登出</string>
     <string name = "fb_check">確定分享至臉書？</string>
+    <string name = "fb_privacy">分享對象為：</string>
+    <string-array name="fb_selection">
+        <item>朋友</item>
+        <item>自己</item>
+    </string-array>
     
 </resources>

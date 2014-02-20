@@ -112,4 +112,5 @@ public class ClickLogId {
 	public final static long FB_SHARE_BUTTON														= 9600000;
 	public final static long FB_SHARE_CHECK_BUTTON										= 9600010;
 	public final static long FB_SHARE_CANCEL_BUTTON									= 9600020;
+	public final static long FB_SHARE_SPINNER_SELECTION							= 9600036;
 }
