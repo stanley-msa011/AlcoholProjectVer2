@@ -451,6 +451,8 @@ public class HistoryFragment extends Fragment implements AudioRecordBoxCallee,En
 
 		chart = new ChartView(activity.getBaseContext(), bars, page_week, hasAudio, chartHeight, scrollView,historyFragment);
 
+		chart.setChartType(chart_type);
+		
 		chartWidth = chart.getChartWidth();
 		if (chartWidth < screen.x)
 			chartWidth = screen.x;
