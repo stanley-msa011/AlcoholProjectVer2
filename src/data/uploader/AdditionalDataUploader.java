@@ -21,10 +21,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -358,24 +356,40 @@ public class AdditionalDataUploader extends AsyncTask<Void, Void, Void> {
 			HttpPost httpPost = new HttpPost(SERVER_URL_QUESTIONNAIRE);
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION,
 					HttpVersion.HTTP_1_1);
-			MultipartEntity mpEntity = new MultipartEntity();
-
+			
+			
+			
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 			String uid = sp.getString("uid", "");
-			mpEntity.addPart("questionnaireData[]", new StringBody(uid));
-			mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.ts)));
-			mpEntity.addPart("questionnaireData[]", new StringBody(q_data.seq));
 			int week = WeekNum.getWeek(context, q_data.ts);
-			mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(week)));
-			mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.type)));
-			for (int i = 0; i < q_data.acc.length; ++i) {
-				mpEntity.addPart("questionnaireAcc[]",
-						new StringBody(String.valueOf(q_data.acc[i])));
-				mpEntity.addPart("questionnaireUsed[]",
-						new StringBody(String.valueOf(q_data.used[i])));
+			
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+			builder.addTextBody("questionnaireData[]", uid);
+			builder.addTextBody("questionnaireData[]", String.valueOf(q_data.ts));
+			builder.addTextBody("questionnaireData[]", q_data.seq);
+			builder.addTextBody("questionnaireData[]", String.valueOf(week));
+			builder.addTextBody("questionnaireData[]", String.valueOf(q_data.type));
+			for (int i=0;i<q_data.acc.length;++i){
+				builder.addTextBody("questionnaireAcc[]", String.valueOf(q_data.acc[i]));
+				builder.addTextBody("questionnaireUsed[]", String.valueOf(q_data.used[i]));
 			}
-
-			httpPost.setEntity(mpEntity);
+			httpPost.setEntity(builder.build());
+			
+//			MultipartEntity mpEntity = new MultipartEntity();
+//			mpEntity.addPart("questionnaireData[]", new StringBody(uid));
+//			mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.ts)));
+//			mpEntity.addPart("questionnaireData[]", new StringBody(q_data.seq));
+//			
+//			mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(week)));
+//			mpEntity.addPart("questionnaireData[]", new StringBody(String.valueOf(q_data.type)));
+//			for (int i = 0; i < q_data.acc.length; ++i) {
+//				mpEntity.addPart("questionnaireAcc[]",
+//						new StringBody(String.valueOf(q_data.acc[i])));
+//				mpEntity.addPart("questionnaireUsed[]",
+//						new StringBody(String.valueOf(q_data.used[i])));
+//			}
+//
+//			httpPost.setEntity(mpEntity);
 			if (uploader(httpClient, httpPost, context)) {
 				db.setQuestionnaireUploaded(q_data.ts);
 			} else {
@@ -407,19 +421,27 @@ public class AdditionalDataUploader extends AsyncTask<Void, Void, Void> {
 			HttpPost httpPost = new HttpPost(SERVER_URL_USED);
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION,
 					HttpVersion.HTTP_1_1);
-			MultipartEntity mpEntity = new MultipartEntity();
-
-			Log.d(TAG, " POST");
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 			String uid = sp.getString("uid", "");
-			mpEntity.addPart("usedData[]", new StringBody(uid));
-			mpEntity.addPart("usedData[]", new StringBody(String.valueOf(ts)));
+			
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+			builder.addTextBody("usedData[]", uid);
+			builder.addTextBody("usedData[]", String.valueOf(ts));
 			for (int i = 0; i < ud.test.length; ++i)
-				mpEntity.addPart("usedDataTest[]", new StringBody(String.valueOf(ud.test[i])));
+				builder.addTextBody("usedDataTest[]", String.valueOf(ud.test[i]));
 			for (int i = 0; i < ud.pass.length; ++i)
-				mpEntity.addPart("usedDataPass[]", new StringBody(String.valueOf(ud.pass[i])));
-
-			httpPost.setEntity(mpEntity);
+				builder.addTextBody("usedDataPass[]", String.valueOf(ud.pass[i]));
+			httpPost.setEntity(builder.build());
+			
+//			MultipartEntity mpEntity = new MultipartEntity();
+//
+//			mpEntity.addPart("usedData[]", new StringBody(uid));
+//			mpEntity.addPart("usedData[]", new StringBody(String.valueOf(ts)));
+//			for (int i = 0; i < ud.test.length; ++i)
+//				mpEntity.addPart("usedDataTest[]", new StringBody(String.valueOf(ud.test[i])));
+//			for (int i = 0; i < ud.pass.length; ++i)
+//				mpEntity.addPart("usedDataPass[]", new StringBody(String.valueOf(ud.pass[i])));
+//			httpPost.setEntity(mpEntity);
 			if (uploader(httpClient, httpPost, context)) {
 				Log.d(TAG, " USED_TS SUCCESS");
 				db.updateNotUploadSHCUpdate(ts);
@@ -463,7 +485,6 @@ public class AdditionalDataUploader extends AsyncTask<Void, Void, Void> {
 			nvps.add(new BasicNameValuePair("usageData[]", String.valueOf(su.acc)));
 			nvps.add(new BasicNameValuePair("usageData[]", String.valueOf(su.used)));
 			int week = WeekNum.getWeek(context, su.ts);
-			Log.d(TAG, "UPLOAD - STORYTELLING USAGE " + su.name + " " + su.minutes);
 			nvps.add(new BasicNameValuePair("usageData[]", String.valueOf(week)));
 			nvps.add(new BasicNameValuePair("usageData[]", su.name));
 			nvps.add(new BasicNameValuePair("usageData[]", String.valueOf(su.minutes)));
@@ -634,43 +655,75 @@ public class AdditionalDataUploader extends AsyncTask<Void, Void, Void> {
 			HttpPost httpPost = new HttpPost(SERVER_URL_AUDIO);
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION,
 					HttpVersion.HTTP_1_1);
-			MultipartEntity mpEntity = new MultipartEntity();
+			
 
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 			String uid = sp.getString("uid", "");
-			mpEntity.addPart("userData[]", new StringBody(uid));
-			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.ts)));
-
-			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.year)));
-			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.month + 1)));
-			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.date)));
-			int upload_data = 0;
-			if (uploadAudio)
-				upload_data = 1;
-			mpEntity.addPart("userData[]", new StringBody(String.valueOf(upload_data)));
-
-			for (int i = 0; i < 3; ++i)
-				mpEntity.addPart("accData[]", new StringBody(String.valueOf(info.acc[i])));
-			for (int i = 0; i < 3; ++i)
-				mpEntity.addPart("usedData[]", new StringBody(String.valueOf(info.used[i])));
-
+			
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+			builder.addTextBody("userData[]", uid);
+			builder.addTextBody("userData[]", String.valueOf(info.ts));
+			builder.addTextBody("userData[]", String.valueOf(info.year));
+			builder.addTextBody("userData[]", String.valueOf(info.month+1));
+			builder.addTextBody("userData[]", String.valueOf(info.date));
+			builder.addTextBody("userData[]", String.valueOf(uploadAudio?1:0));
+			for (int i=0;i<3;++i){
+				builder.addTextBody("accData[]", String.valueOf(info.acc[i]));
+				builder.addTextBody("usedData[]", String.valueOf(info.used[i]));
+			}
+			
 			File mainDirectory = setStorage();
-			if (mainDirectory != null) {
-
+			if (mainDirectory != null){
 				File audio = new File(mainDirectory, info.filename + ".3gp");
 				if (!audio.exists()) {
-					if (info.year == 0 && info.month == 0 && info.date == 0);
-					else {
-						Log.d(TAG, "cannot find the file " + audio.getAbsolutePath());
-						return -2;
-					}
-				} else {
-					if (uploadAudio) {
-						ContentBody aFile = new FileBody(audio, "application/octet-stream");
-						mpEntity.addPart("userfile[]", aFile);
-					}
+				if (info.year == 0 && info.month == 0 && info.date == 0);
+				else {
+					Log.d(TAG, "cannot find the file " + audio.getAbsolutePath());
+					return -2;
 				}
-				httpPost.setEntity(mpEntity);
+			} else {
+				if (uploadAudio) {
+					builder.addPart("userfile[]", new FileBody(audio));
+				}
+			}
+			
+			httpPost.setEntity(builder.build());
+			
+			
+//			MultipartEntity mpEntity = new MultipartEntity();
+//			mpEntity.addPart("userData[]", new StringBody(uid));
+//			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.ts)));
+//
+//			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.year)));
+//			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.month + 1)));
+//			mpEntity.addPart("userData[]", new StringBody(String.valueOf(info.date)));
+//			int upload_data = 0;
+//			if (uploadAudio)
+//				upload_data = 1;
+//			mpEntity.addPart("userData[]", new StringBody(String.valueOf(upload_data)));
+//
+//			for (int i = 0; i < 3; ++i)
+//				mpEntity.addPart("accData[]", new StringBody(String.valueOf(info.acc[i])));
+//			for (int i = 0; i < 3; ++i)
+//				mpEntity.addPart("usedData[]", new StringBody(String.valueOf(info.used[i])));
+//
+//			File mainDirectory = setStorage();
+//			if (mainDirectory != null) {
+//
+//				File audio = new File(mainDirectory, info.filename + ".3gp");
+//				if (!audio.exists()) {
+//					if (info.year == 0 && info.month == 0 && info.date == 0);
+//					else {
+//						Log.d(TAG, "cannot find the file " + audio.getAbsolutePath());
+//						return -2;
+//					}
+//				} else {
+//					if (uploadAudio) {
+//						ContentBody aFile = new FileBody(audio, "application/octet-stream");
+//						mpEntity.addPart("userfile[]", aFile);
+//					}
+//				}
+//				httpPost.setEntity(mpEntity);
 				if (!uploader(httpClient, httpPost, context)) {
 					Log.d(TAG, "fail to upload");
 					return -1;

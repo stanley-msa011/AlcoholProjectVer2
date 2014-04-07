@@ -275,7 +275,7 @@ public class FacebookActivity extends Activity {
 			List<String> permissions = session.getPermissions();
 			if (!isSubsetOf(PERMISSIONS, permissions)) {
 				Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(
-						this, PERMISSIONS);
+						this.getParent(), PERMISSIONS);
 				session.requestNewPublishPermissions(newPermissionsRequest);
 				return;
 			}

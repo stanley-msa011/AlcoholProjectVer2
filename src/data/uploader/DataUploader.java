@@ -19,10 +19,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
@@ -187,60 +185,94 @@ public class DataUploader {
 				
 				HttpPost httpPost = new HttpPost(SERVER_URL);
 				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-				MultipartEntity mpEntity = new MultipartEntity();
-				
-				
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
-				mpEntity.addPart("userData[]", new StringBody(uid));
-				mpEntity.addPart("userData[]", new StringBody(ts));
-				mpEntity.addPart("userData[]", new StringBody(devId));
+				
+				MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+				builder.addTextBody("userData[]", uid);
+				builder.addTextBody("userData[]", ts);
+				builder.addTextBody("userData[]", devId);
 				
 				Calendar c = Calendar.getInstance();
-				
 			    int mYear = sp.getInt("sYear", c.get(Calendar.YEAR));
 			    int mMonth = sp.getInt("sMonth", c.get(Calendar.MONTH));
 			    int mDay = sp.getInt("sDate", c.get(Calendar.DATE));
-			    
-			    
 			    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
-			    mpEntity.addPart("userData[]", new StringBody(joinDate));
+			    builder.addTextBody("userData[]", joinDate);
 				
 			    PackageInfo pinfo;
 				try {
 					pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 					String versionName = pinfo.versionName;
-					mpEntity.addPart("userData[]", new StringBody( versionName));
+					builder.addTextBody("userData[]", versionName);
 				} catch (NameNotFoundException e) {	}
 			    
-				ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
-				mpEntity.addPart("userfile[]", cbFile);
-				if (geoFile.exists()){
-					ContentBody cbGeoFile = new FileBody(geoFile, "application/octet-stream");
-					mpEntity.addPart("userfile[]", cbGeoFile);
-				}
-				if(stateFile.exists()){
-					ContentBody cbStateFile = new FileBody(stateFile, "application/octet-stream");
-					mpEntity.addPart("userfile[]", cbStateFile);
-				}
-				if (questionFile.exists()){
-					ContentBody cbQuestionFile = new FileBody(questionFile, "application/octet-stream");
-					mpEntity.addPart("userfile[]", cbQuestionFile);
-				}
+				if (textFile.exists())
+					builder.addPart("userfile[]", new FileBody(textFile));
+				if (geoFile.exists())
+					builder.addPart("userfile[]", new FileBody(geoFile));
+				if (stateFile.exists())
+					builder.addPart("userfile[]", new FileBody(stateFile));
+				if (questionFile.exists())
+					builder.addPart("userfile[]", new FileBody(questionFile));
+				if (pressureFile.exists())
+					builder.addPart("userfile[]", new FileBody(pressureFile));
+				for (int i=0;i<3;++i)
+					if (imageFiles[i].exists())
+						builder.addPart("userfile[]", new FileBody(imageFiles[i]));
 				
-				if (pressureFile.exists()){
-					ContentBody cbPressureFile = new FileBody(pressureFile, "application/octet-stream");
-					mpEntity.addPart("userfile[]", cbPressureFile);
-				}
-				
-				if (imageFiles[0].exists())
-					mpEntity.addPart("userfile[]", new FileBody(imageFiles[0], "image/jpeg"));
-				if (imageFiles[1].exists())
-					mpEntity.addPart("userfile[]", new FileBody(imageFiles[1], "image/jpeg"));
-				if (imageFiles[2].exists())
-					mpEntity.addPart("userfile[]", new FileBody(imageFiles[2], "image/jpeg"));
-				
-				httpPost.setEntity(mpEntity);
+				httpPost.setEntity(builder.build());
+//				MultipartEntity mpEntity = new MultipartEntity();
+//				
+//				mpEntity.addPart("userData[]", new StringBody(uid));
+//				mpEntity.addPart("userData[]", new StringBody(ts));
+//				mpEntity.addPart("userData[]", new StringBody(devId));
+//				
+//				Calendar c = Calendar.getInstance();
+//				
+//			    int mYear = sp.getInt("sYear", c.get(Calendar.YEAR));
+//			    int mMonth = sp.getInt("sMonth", c.get(Calendar.MONTH));
+//			    int mDay = sp.getInt("sDate", c.get(Calendar.DATE));
+//			    
+//			    
+//			    String joinDate = mYear+"-"+(mMonth+1)+"-"+mDay;
+//			    mpEntity.addPart("userData[]", new StringBody(joinDate));
+//				
+//			    PackageInfo pinfo;
+//				try {
+//					pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+//					String versionName = pinfo.versionName;
+//					mpEntity.addPart("userData[]", new StringBody( versionName));
+//				} catch (NameNotFoundException e) {	}
+//			    
+//				ContentBody cbFile = new FileBody(textFile, "application/octet-stream");
+//				mpEntity.addPart("userfile[]", cbFile);
+//				if (geoFile.exists()){
+//					ContentBody cbGeoFile = new FileBody(geoFile, "application/octet-stream");
+//					mpEntity.addPart("userfile[]", cbGeoFile);
+//				}
+//				if(stateFile.exists()){
+//					ContentBody cbStateFile = new FileBody(stateFile, "application/octet-stream");
+//					mpEntity.addPart("userfile[]", cbStateFile);
+//				}
+//				if (questionFile.exists()){
+//					ContentBody cbQuestionFile = new FileBody(questionFile, "application/octet-stream");
+//					mpEntity.addPart("userfile[]", cbQuestionFile);
+//				}
+//				
+//				if (pressureFile.exists()){
+//					ContentBody cbPressureFile = new FileBody(pressureFile, "application/octet-stream");
+//					mpEntity.addPart("userfile[]", cbPressureFile);
+//				}
+//				
+//				if (imageFiles[0].exists())
+//					mpEntity.addPart("userfile[]", new FileBody(imageFiles[0], "image/jpeg"));
+//				if (imageFiles[1].exists())
+//					mpEntity.addPart("userfile[]", new FileBody(imageFiles[1], "image/jpeg"));
+//				if (imageFiles[2].exists())
+//					mpEntity.addPart("userfile[]", new FileBody(imageFiles[2], "image/jpeg"));
+//				
+//				httpPost.setEntity(mpEntity);
 				if (uploader(httpClient, httpPost,ts,context)){
 					db.updateDetectionUploaded(Long.valueOf(ts)*1000L);
 				}

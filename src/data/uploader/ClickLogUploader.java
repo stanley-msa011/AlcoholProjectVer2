@@ -27,10 +27,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
@@ -195,19 +193,25 @@ public class ClickLogUploader {
 				
 				HttpPost httpPost = new HttpPost(SERVER_URL);
 				httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-				MultipartEntity mpEntity = new MultipartEntity();
-				
-				
 				SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(context);
 				String uid = sp.getString("uid", "");
-				mpEntity.addPart("userData[]", new StringBody(uid));			
-				
+
+				MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+				builder.addTextBody("userData[]", uid);
 				if (logFile.exists()){
-					ContentBody cbLogFile = new FileBody(logFile, "application/octet-stream");
-					mpEntity.addPart("userfile[]", cbLogFile);
+					builder.addPart("userfile[]", new FileBody(logFile));
 				}
+				httpPost.setEntity(builder.build());
 				
-				httpPost.setEntity(mpEntity);
+//				MultipartEntity mpEntity = new MultipartEntity();
+//				
+//				mpEntity.addPart("userData[]", new StringBody(uid));			
+//				
+//				if (logFile.exists()){
+//					ContentBody cbLogFile = new FileBody(logFile, "application/octet-stream");
+//					mpEntity.addPart("userfile[]", cbLogFile);
+//				}
+//				httpPost.setEntity(mpEntity);
 				if (uploader(httpClient, httpPost,context)){
 					Log.d(TAG, "success upload logFile: " + logFile.getName());
 					set_uploaded_logfile(logFile.getName());

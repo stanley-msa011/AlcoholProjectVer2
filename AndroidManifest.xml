@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ubicomp.drunk_detection.activities"
-    android:versionCode="144"
-    android:versionName="3.94b" >
+    android:versionCode="145"
+    android:versionName="3.95" >
 
     <uses-sdk
         android:maxSdkVersion="19"
-        android:minSdkVersion="7"
+        android:minSdkVersion="10"
         android:targetSdkVersion="13" />
 
     <uses-feature android:name="android.hardware.camera" />

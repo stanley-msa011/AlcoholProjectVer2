@@ -90,7 +90,8 @@ public class CameraRecorder {
     		preview.setVisibility(View.VISIBLE);
     }
     
-    private void setSurfaceCallback(){
+    @SuppressWarnings("deprecation")
+	private void setSurfaceCallback(){
     	previewFrame = null;
     	circle = new ImageView(context);
     	circle.setBackgroundColor(0xAAAACCFF);
@@ -99,6 +100,8 @@ public class CameraRecorder {
     	if (previewFrame!=null){
     		preview = new PreviewWindow(context,this);
     		previewHolder = preview.getHolder();
+    		if (Build.VERSION.SDK_INT < 11)
+				previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     		previewHolder.addCallback(preview);
     		previewFrame.addView(preview);
     		preview.setVisibility(View.INVISIBLE);

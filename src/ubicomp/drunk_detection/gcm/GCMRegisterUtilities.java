@@ -14,8 +14,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
@@ -54,10 +53,16 @@ public class GCMRegisterUtilities {
 			
 			HttpPost httpPost = new HttpPost(serverUrl);
 			httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-			MultipartEntity mpEntity = new MultipartEntity();
-			mpEntity.addPart("uid", new StringBody(uid));
-			mpEntity.addPart("regId", new StringBody(regId));
-			httpPost.setEntity(mpEntity);
+			
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+			builder.addTextBody("uid", uid);
+			builder.addTextBody("regId", regId);
+			httpPost.setEntity(builder.build());
+			
+//			MultipartEntity mpEntity = new MultipartEntity();
+//			mpEntity.addPart("uid", new StringBody(uid));
+//			mpEntity.addPart("regId", new StringBody(regId));
+//			httpPost.setEntity(mpEntity);
 			if(uploader(httpClient, httpPost,context)){
 				
 			}else{
